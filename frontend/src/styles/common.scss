@@ -1,0 +1,28 @@
+// ************************************************
+// [COMMON] LEGO Component Style Import
+// ************************************************
+@import './variables';
+@import '~lego-component/styles/lego.scss';
+
+// ************************************************
+// [COMMON] Sub-style import
+// ************************************************
+@import './reset';
+
+// ************************************************
+// [COMMON] Global style
+// ************************************************
+body {
+    color:$lego__font-color--default;
+    font-size:$lego__font-size--default;
+    font-family:$lego__font-family;
+    background-color: #EAEAEA;
+}
+
+*::selection {background:$lego__color--point;color:$lego__color--white;}
+
+.ellipsis {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

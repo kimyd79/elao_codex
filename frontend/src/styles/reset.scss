@@ -1,0 +1,14 @@
+html, body {margin:0px;padding:0px;}
+
+*, *:before, *:after {box-sizing:border-box;}
+
+/* list style*/
+ul {padding:0;margin-block-start:0;margin-block-end:0}
+li {list-style: none;}
+
+/* margins */
+h1,h2,h3,h4,h5,h6 {margin:0;}
+pre {margin:0;}
+
+/* outline */
+button:focus {outline:0;}

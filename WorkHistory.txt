@@ -1,0 +1,86 @@
+* DRF 기본환경 설정
+mkdir tutorial
+cd tutorial
+
+python -m venv env
+
+env\Scripts\activate.bat
+
+pip install django
+pip install djangorestframework
+
+django-admin startproject tutorial .  
+cd tutorial
+django-admin startapp quickstart
+
+python manage.py makemigrations (app명, 여러개 일때 )
+python manage.py migrate
+
+python manage.py createsuperuser 
+admin/admin
+
+python manage.py runserver
+
+
+* Admin 사용
+ID/PWD : admin/admin
+
+* Database 연동
+
+(방법)
+1.1 연둥 드라이버 설치
+1.2 settings.py 파일 수정
+1.3 변경사항 장고에 반영하기
+1.4 작업 확인하기
+
+(Postgresql) --> 일단 이걸로
+1.1 연둥 드라이버 설치
+pip3 install psycopg2 설치 (안되서)
+바이너리로 설치함
+pip install psycopg2-binary
+
+1.2 settings.py 파일 수정
+
+DATABASES = {
+	'default': {
+	'ENGINE': 'django.db.backends.postgresql' ,
+	'NAME': 'loganalyzer' ,
+	'USER': 'citec' ,
+	'PASSWORD': 'citec!00' ,
+	'HOST': '172.16.1.107' ,
+	'PORT': '5432' ,
+	}
+}
+
+$ su - postgres
+(postgres 계정에 대한 패스워드 입력 )
+$ psql - U postgres
+
+CREATE DATABASE fordjango;
+CREATE USER django WITH PASSWORD 'django';
+ALTER ROLE django SET client_encoding TO 'utf8 ';
+ALTER ROLE django SET default_transaction_isolation TO 'read committed' ;
+ALTER ROLE django SET timezone TO 'Asia/Seoul';
+GRANT ALL PRIVILEGES ON DATABASE fordjango TO django;
+
+1.3 변경사항 장고에 반영하기
+
+python manage.py migrate
+
+* requirement 만들기
+pip freeze > requirements.txt
+
+* 설치하기 
+pip install -r requirements.txt
+
+* 삭제 
+pip uninstall
+
+============================================================================================
+* ML 모듈이 추가된 경우 구조 확인
+https://hugrypiggykim.com/2016/08/21/python-postgresql-django-rest-tensorflow-%EC%84%9C%EB%B9%84%EC%8A%A4-%EA%B0%9C%EB%B0%9C/
+
+
+* Django 도커라이징
+https://www.slideshare.net/raccoonyy/django-164557454
+https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
