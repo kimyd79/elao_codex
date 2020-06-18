@@ -22,26 +22,30 @@
 </template>
 
 <script>
+
+import store from './vuex/store'
+
 export default {
-    data() {
-        return {
-            menus: [
-                //{ label:'Component Set', linkto:'/sets', key:'componentset', isSelected: false },
-                //{ label:'Template', linkto:'/template', key:'template', isSelected: false },
-                // LogAnalyzer
-                { label:'Analysis', linkto:'/analysis', key:'analysis', isSelected: false },
-                { label:'Compare', linkto:'/compare', key:'compare', isSelected: false },
-                { label:'Detail', linkto:'/detail', key:'detail', isSelected: false }
-            ]
-        }
-    },
-    watch: {
-      '$route' (to, from) {
-        this.menus.forEach(function(menu){
-          menu.isSelected = (to.path.includes(menu.linkto));
-        })
-      }
+  store,
+  data() {
+    return {
+      menus: [
+          //{ label:'Component Set', linkto:'/sets', key:'componentset', isSelected: false },
+          //{ label:'Template', linkto:'/template', key:'template', isSelected: false },
+          // LogAnalyzer
+          { label:'Analysis', linkto:'/analysis', key:'analysis', isSelected: false },
+          { label:'Compare', linkto:'/compare', key:'compare', isSelected: false },
+          { label:'Detail', linkto:'/detail', key:'detail', isSelected: false }
+      ]
     }
+  },
+  watch: {
+    '$route' (to, from) {
+      this.menus.forEach(function(menu){
+        menu.isSelected = (to.path.includes(menu.linkto));
+      })
+    }
+  }
 }
 </script>
 

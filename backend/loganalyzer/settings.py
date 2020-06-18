@@ -25,7 +25,10 @@ SECRET_KEY = 'i90v8o(hkxz@9$k@*^kei8^jat9&^1tq&ecmoj@8nw3g1c2iuq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# To use local ip not localhost, 127.0.0.1
+# npm run serve 172.16.1.110:8000
+# Need to change in production
+ALLOWED_HOSTS = [ u'172.16.1.110', u'localhost', u'127.0.0.1' ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -41,18 +44,26 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'loganalyzerapi'
+    'loganalyzerapi',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
 
 ROOT_URLCONF = 'loganalyzer.urls'
 
@@ -73,6 +84,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'loganalyzer.wsgi.application'
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = [
+    'http://172.16.1.110:8080'
+]
 
 
 # Database

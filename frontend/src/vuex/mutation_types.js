@@ -1,0 +1,13 @@
+export const SET_PROJECTNAME	= "SET_PROJECTNAME"
+export const SET_FILENAMES      = "SET_FILENAMES"
+export const SET_LOGFORMAT      = "SET_LOGFORMAT"
+export const SET_FROMDATE       = "SET_FROMDATE"
+export const SET_TODATE         = "SET_TODATE"
+export const SET_FROMTIME       = "SET_FROMTIME"
+export const SET_TOTIME         = "SET_TOTIME"
+export const SET_FROMTIMETAKEN  = "SET_FROMTIMETAKEN"
+export const SET_TOTIMETAKEN    = "SET_TOTIMETAKEN"
+export const SET_CONDITION      = "SET_CONDITION"
+export const SET_SEARCHKEYWORD  = "SET_SEARCHKEYWORD"
+
+export const TOGGLE_SEARCH  = "TOGGLE_SEARCH"

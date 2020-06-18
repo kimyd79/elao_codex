@@ -1,34 +1,29 @@
 <template>
     <div id="detail">
-        This page is Detail
-        <Info></Info>
-        <Notice></Notice>
+
+      <ui-container-box :columns="18" :height="10" vertical class="mt20">
         <Search></Search>
-        <Statistics></Statistics>
-        <Graph></Graph>
+        <GridTable></GridTable>
+      </ui-container-box>
     </div>
 </template>
 
 <script>
-import Graph from '@/components/layout/Graph'
-import GridTable from '@/components/layout/GridTable'
-import Info from '@/components/layout/Info'
-import Init from '@/components/layout/Init'
-import Notice from '@/components/layout/Notice'
 import Search from '@/components/layout/Search'
-import Statistics from '@/components/layout/Statistics'
+import GridTable from '@/components/layout/GridTable'
+
 
 export default {
-  name: 'Detail',
+  name: 'Compare',
 
-     // 컴포넌트 등록
+  // 컴포넌트 등록
   components:{
-    'Info': Info,
-    'Notice': Notice, 
     'Search': Search, 
-    'Statistics': Statistics,
-    'Graph': Graph,
-  }
+    'GridTable': GridTable,
+  },
+
+  methods: {
+  },
 }
 </script>
 

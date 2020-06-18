@@ -13,8 +13,8 @@
                     <div class="ui-table-control__info-total-label">
                         Total
                     </div>
-                    <div class="ui-table-control__info-total-number">
-                        <b>{{items.length}}</b>
+                    <div class="ui-table-control__info-total-number" >
+                        <b>{{items.length}}</b>                                           
                     </div>
                 </div>
                 <div v-if="pagingInfo" class="ui-table-control__info-size">
@@ -168,7 +168,7 @@
         </div>
 
         <div v-if="pagingInfo && !noPaging" class="ui-table-pagination">
-            <lego-pagination :pagination="pagingInfo" />
+            <lego-pagination :pagination="pagingInfo" @move="pageChange" @change="pageChange"  />
         </div>
 
         <div v-show="headerToolColumn" class="ui-table-tool"
@@ -249,6 +249,12 @@ export default {
         }
     },
     methods: {
+        
+        // Leehs
+        pageChange(page) {
+            this.pagingInfo.currentPage = page
+        },
+
         clickHeaderIcon(column, refId) {
             if (this.headerToolColumn === column) {
                 this.headerToolColumn = null;
