@@ -100,8 +100,15 @@ export default {
 
     getLogDetails() {
       
+      console.log("dateFromValue(vuex) : " + this.dateFromValue);
+      console.log("dateToValue(vuex) : " + this.dateToValue);
+      console.log("timeFromValue(vuex) : " + this.timeFromValue);
+      console.log("timeToValue(vuex) : " + this.timeToValue);
+      console.log("ttFromValue(vuex) : " + this.ttFromValue);
+      console.log("ttToValue(vuex) : " + this.ttToValue);
+
       console.log("conditionValue(vuex) : " + this.conditionValue);
-      console.log("searchValue(vuex) : " + this.searchValue);
+      console.log("searchValue(vuex) : " + this.searchValue);      
 
       console.log("pagingInfo : " + this.pagingInfo.rowsPerPage);
       console.log("pagingInfo : " + this.pagingInfo.currentPage);
@@ -112,14 +119,40 @@ export default {
       // 1 : 0~9, 2 : 10~19,
       console.log("offset :" + offset);
 
-      // TODO : Filter - backend (view에 기능추가 필요하다.)
-      // 
+      // Filter String
+      let filters=""
+      if ( this.dateFromValue != '') {
+        filters = filters + "&dateFromValue="+this.dateFromValue
+      }
+      if ( this.dateToValue != '') {
+        filters = filters + "&dateToValue="+this.dateToValue
+      }
+      if ( this.timeFromValue != '') {
+        filters = filters + "&timeFromValue="+this.timeFromValue
+      }
+      if ( this.timeToValue != '') {
+        filters = filters + "&timeToValue="+this.timeToValue
+      }
+      if ( this.conditionValue != '') {
+        filters = filters + "&conditionValue="+this.conditionValue
+      }
+      if ( this.searchValue != '') {
+        filters = filters + "&searchValue="+this.searchValue
+      }
+      if ( this.ttFromValue != '') {
+        filters = filters + "&ttFromValue="+this.ttFromValue
+      }
+      if ( this.ttToValue != '') {
+        filters = filters + "&ttToValue="+this.ttToValue
+      }
+
+      console.log("filters : "+filters)
 
       var urlstring =
         "http://172.16.1.110:8000/logdetail/?limit=" +
         this.pagingInfo.rowsPerPage +
         "&offset=" +
-        offset;
+        offset + filters;
 
       // TODO : Set axiosConfig to set headers
       //let axiosConfig = {
@@ -145,9 +178,6 @@ export default {
 
           // TODO #1 : Data 처리 - Table Row에 맞도록 => items에 매핑
           this.setItemList(res.data.results);
-
-          // TODO #2 : Search, GridTable 화면 나누고 vuex 적용
-
           // TODO #3 : Graph 그리기 - Analysis 화면
         })
         .catch(err => {

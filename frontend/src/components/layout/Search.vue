@@ -4,9 +4,11 @@
       <ui-form-box>
         <ui-form-row>
           <ui-form-item :columns="12" label="Date/Time" required-left>
-            <lego-date-picker v-model="dateFromValue" />
+            <!--<lego-date-picker v-model="dateFromValue" />-->
+            <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
             <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
-            <lego-date-picker v-model="dateToValue" />
+            <!--<lego-date-picker v-model="dateToValue" />-->
+            <lego-text-field v-model="dateToValue" placeholder="YYYYMMDD" />
             <lego-text-field v-model="timeToValue" placeholder="hhmmss" />
           </ui-form-item>
         </ui-form-row>

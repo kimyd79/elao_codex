@@ -59,23 +59,25 @@ class LogDetail(models.Model):
     # PK
     logdetail_id = models.UUIDField(verbose_name="did",primary_key=True, default=uuid.uuid4, editable=False) 
     logfile = models.ForeignKey(LogFile, on_delete=models.CASCADE)
-    
-    # TODO : 300이면 되는가? 차후에 null여부 False로 바꿀것
-    log_line = models.CharField(max_length=300, null=True, blank=True)
+    log_line = models.CharField(max_length=1000, null=True, blank=True)
     
     # Filters
-    fyear = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
-    fmonth = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
-    fday = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
+    fyear = models.CharField(max_length=4, null=True, blank=True)
+    fmonth = models.CharField(max_length=2, null=True, blank=True)
+    fday = models.CharField(max_length=2, null=True, blank=True)
     
-    fhour = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
-    fminute = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
-    fsecond = models.PositiveSmallIntegerField(default=0, null=True, blank=True)
+    fhour = models.CharField(max_length=2, null=True, blank=True)
+    fminute = models.CharField(max_length=2, null=True, blank=True)
+    fsecond = models.CharField(max_length=2, null=True, blank=True)
     
-    frequest = models.CharField(max_length=300, null=True, blank=True)
+    fdate = models.CharField(max_length=8, null=True, blank=True)
+    ftime = models.CharField(max_length=6, null=True, blank=True)    
+    fdatetime = models.CharField(max_length=14, null=True, blank=True)    
+    
+    frequest = models.CharField(max_length=500, null=True, blank=True)
     fip = models.CharField(max_length=40, null=True, blank=True)
-    freferrer = models.CharField(max_length=200, null=True, blank=True)
-    fuser_agent = models.CharField(max_length=200, null=True, blank=True)
+    freferer = models.CharField(max_length=500, null=True, blank=True)
+    fuser_agent = models.CharField(max_length=500, null=True, blank=True)
     fstatus = models.CharField(max_length=10, null=True, blank=True)
     ftime_taken = models.SmallIntegerField(default=0)
     

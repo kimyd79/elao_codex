@@ -13,13 +13,23 @@ from rest_framework.response import Response
 from django.db import transaction
 import pandas as pd
 from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
     queryset = LogMaster.objects.all()
     serializer_class = LogMasterSerializer
     
-    # TODO : 미사용시 settings.py에서 DjangoFilterBackend 삭제
+    # 검색관련
+    # filterset_fields 사용시 복합조건 쿼리 가능
+    # filterset_fields = ['category', 'in_stock']
+    # -> http://example.com/api/products?category=clothing&in_stock=True
+    #
+    # SearchFilter 는 simple single query paramete 만 가능
+    # 복합쿼리 사용하지 않음
+    # Multiple Search
+    # http://127.0.0.1:8000/logmaster/?search=aa,22
+    
     #filterset_fields = ['project_name', 'uploader']
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     
@@ -46,15 +56,85 @@ class LogFileViewSet(viewsets.ModelViewSet):
     '=' Exact matches.
     '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
     '$' Regex search. : default
-    '''
+    '''   
     
 class LogDetailViewSet(viewsets.ModelViewSet):
     queryset = LogDetail.objects.all()
     serializer_class = LogDetailSerializer
     
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    
+    # filterset_fields 사용
+    # -> http://example.com/api/products?category=clothing&in_stock=True
+    # 정확한 검색
+    filterset_fields = ['fdate', 'ftime', 'fyear', 'fmonth', 'fday', 'fhour', 'fminute', 'fsecond', 'ftime_taken']
+    search_fields = ['fdate', 'ftime', 'fyear', 'fmonth', 'fday', 'fhour', 'fminute', 'fsecond', 'frequest', 'fip', 'freferer', 'fuser_agent', 'fstatus']    
+    
+    ordering_fields = ['fdate', 'ftime', 'fyear', 'fmonth', 'fday', 'fhour', 'fminute', 'fsecond', 'frequest', 'fip', 'freferer', 'fuser_agent', 'fstatus', 'ftime_taken']
+    ordering = ['fdate', 'ftime']
+    
+    # Multiple Order
+    # http://127.0.0.1:8000/logdetail/?ordering=project_name,-created
+    
+    # search + pagination + ordering
+    # http://127.0.0.1:8000/logdetail/?search=te&ordering=-created&limit=10&offset=1
+    
     # Pagination : LimitOffsetPagination
     # http://127.0.0.1:8000/logdetail/?limit=10&offset=20
     
+    
+    # Reference API : http://www.cdrf.co/3.1/rest_framework.viewsets/ModelViewSet.html#get_queryset 
+    # QuerySet(Field lookups) : https://docs.djangoproject.com/en/3.0/ref/models/querysets/#id4    
+    
+    # For Gridtable Filtering
+    def get_queryset(self):
+        
+        print("== LogDetailViewSet get_queryset!!")
+        
+        queryset = LogDetail.objects.all()
+        
+        '''
+        username = self.request.query_params.get('username', None)
+        if username is not None:
+            queryset = queryset.filter(purchaser__username=username)
+        '''
+        # TODO : 조건 적용
+        dateFromValue = self.request.query_params.get('dateFromValue', None)
+        dateToValue = self.request.query_params.get('dateToValue', None)
+        timeFromValue = self.request.query_params.get('timeFromValue', None)
+        timeToValue = self.request.query_params.get('timeToValue', None)
+        
+        ttFromValue = self.request.query_params.get('ttFromValue', None)
+        ttToValue = self.request.query_params.get('ttToValue', None)
+        
+        conditionValue = self.request.query_params.get('conditionValue', None)
+        searchValue = self.request.query_params.get('searchValue', None)
+        
+        # Date, Time : Between
+        if (dateFromValue is not None) and (dateToValue is not None) and (timeFromValue is not None) and (timeToValue is not None):
+            start_datetime = dateFromValue + timeFromValue
+            end_datetime = dateToValue + timeToValue
+            queryset = queryset.filter(fdatetime__range=(start_datetime, end_datetime))
+        
+        # Time-taken : Between
+        if (ttFromValue is not None) and (ttToValue is not None):        
+            queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
+            
+        # conditionValue : Contain
+        if conditionValue is not None :
+            if conditionValue == 'I':
+                queryset = queryset.filter(fip__icontains=searchValue)
+            elif conditionValue == 'R':
+                queryset = queryset.filter(frequest__icontains=searchValue)
+            elif conditionValue == 'E':
+                queryset = queryset.filter(freferer__icontains=searchValue)
+            elif conditionValue == 'U':
+                queryset = queryset.filter(fuser_agent__icontains=searchValue)
+            elif conditionValue == 'S':
+                queryset = queryset.filter(fstatus__icontains=searchValue)
+        
+        return queryset 
+
     def create(self, request, *args, **kwargs):
         
         print("== LogDetailViewSet create!!")
@@ -90,7 +170,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         log_format = '%h %l %u %t \"%r\" %>s %b'      
         
         # 임시 csv 파일생성 for copy to postgresql
-        log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferrer','fuser_agent','fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id','frequest','fday','fmonth','fyear']
+        log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent','fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id','frequest','fday','fmonth','fyear','fdate','ftime','fdatetime']
         
         # TODO : Log Body생성 - pandas 활용
         # 
@@ -119,9 +199,9 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             df_logs['fstatus'] = 'NA'
 
         if 'Referer' in log_format:
-            df_logs.rename(columns = {format_index['Referer'] : 'freferrer'}, inplace = True)
+            df_logs.rename(columns = {format_index['Referer'] : 'freferer'}, inplace = True)
         else:
-            df_logs['freferrer'] = 'NA'
+            df_logs['freferer'] = 'NA'
             
         if 'User-agent' in log_format:
             df_logs.rename(columns = {format_index['User-agent'] : 'fuser_agent'}, inplace = True)
@@ -165,11 +245,16 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
 
         month_map = {
-            'Jan' : 1, 'Feb' : 2, 'Mar' : 3, 'Apr' : 4, 'May' : 5, 'Jun' : 6,
-            'Jul' : 7, 'Aug' : 8, 'Sep' : 9, 'Oct' : 10, 'Nov' : 11, 'Dec' : 12,
+            'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
+            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
         }
 
-        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
+        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])
+        
+        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
+        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
         
         # 합치기
         df_logs = df_logs.rename_axis('logdetail_id').reset_index()
@@ -210,6 +295,6 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 
             index = index + 1 
         return format_index    
-           
+          
 
     

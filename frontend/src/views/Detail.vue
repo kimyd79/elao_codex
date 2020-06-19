@@ -4,6 +4,9 @@
       <ui-container-box :columns="18" :height="10" vertical class="mt20">
         <Search></Search>
         <GridTable></GridTable>
+
+        <Graph></Graph>
+
       </ui-container-box>
     </div>
 </template>
@@ -11,6 +14,7 @@
 <script>
 import Search from '@/components/layout/Search'
 import GridTable from '@/components/layout/GridTable'
+import Graph from '@/components/layout/Graph'
 
 
 export default {
@@ -20,6 +24,9 @@ export default {
   components:{
     'Search': Search, 
     'GridTable': GridTable,
+
+    // for Test
+    'Graph': Graph,
   },
 
   methods: {
