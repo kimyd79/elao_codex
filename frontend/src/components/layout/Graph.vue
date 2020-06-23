@@ -1,53 +1,33 @@
-<template>
-  <div id="graph" class="page-summary-title">
-    <br />
-    <br />Sample : Chartjs graph
-    <line-chart :chart-data="datacollection"></line-chart>
-    <button @click="fillData()">Randomize</button>
-  </div>
-</template>
-
 <script>
-import LineChart from "./Graph.js";
+
+import { Line } from 'vue-chartjs'
 
 export default {
-  name: "Graph",
-  components: {
-    LineChart
-  },
-  data() {
-    return {
-      datacollection: null
-    };
-  },
-  mounted() {
-    this.fillData();
-  },
-  methods: {
-    fillData() {
-      this.datacollection = {
-        labels: [this.getRandomInt(), this.getRandomInt()],
-        datasets: [
-          {
-            label: "Data One",
-            backgroundColor: "#f87979",
-            data: [this.getRandomInt(), this.getRandomInt()]
-          },
-          {
-            label: "Data Two",
-            backgroundColor: "#ff55ff",
-            data: [this.getRandomInt(), this.getRandomInt()]
-          }
-        ]
-      };
+  extends: Line,
+  data: () => ({
+    chartdata: {
+      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      datasets: [{
+          label: 'My First dataset',
+          backgroundColor: 'rgb(255, 99, 132)',
+          borderColor: 'rgb(255, 99, 132)',
+          fill: false,
+          data: [1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6],                
+      }]
     },
-    getRandomInt() {
-      //return Math.floor(Math.random() * (50 - 5 + 1)) + 5;
-      return Math.floor(Math.random() * (5 - 5 + 1)) + 5;
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
     }
+  }),
+
+  mounted () {
+    this.renderChart(this.chartdata, this.options)
   }
-};
+}
+
 </script>
 
-<style scoped>
+<style>
 </style>
+
