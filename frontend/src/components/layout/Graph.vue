@@ -3,6 +3,8 @@
 import { Line } from 'vue-chartjs'
 
 export default {
+  name: 'Graph',
+  
   extends: Line,
   data: () => ({
     chartdata: {

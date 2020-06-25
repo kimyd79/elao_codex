@@ -2,10 +2,9 @@
     <div id="detail">
 
       <ui-container-box :columns="18" :height="10" vertical class="mt20">
-        <Search></Search>
-        <GridTable></GridTable>
-
-        <Graph></Graph>
+        <search></search>
+        <grid-table></grid-table>
+        <graph></graph>
 
       </ui-container-box>
     </div>
@@ -18,7 +17,7 @@ import Graph from '@/components/layout/Graph'
 
 
 export default {
-  name: 'Compare',
+  name: 'Detail',
 
   // 컴포넌트 등록
   components:{

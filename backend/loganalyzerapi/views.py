@@ -14,6 +14,8 @@ from django.db import transaction
 import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Count, Max, F
+
 
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
@@ -86,6 +88,76 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     # Reference API : http://www.cdrf.co/3.1/rest_framework.viewsets/ModelViewSet.html#get_queryset 
     # QuerySet(Field lookups) : https://docs.djangoproject.com/en/3.0/ref/models/querysets/#id4    
     
+    
+    
+    # For Statistics - top1
+    @action(methods=['post'], detail=False)
+    def statistics_top1(self, request, pk=None):
+               
+        queryset = LogDetail.objects
+    
+        type = request.data['type']
+        print("** statistics_top1 : type --> ", type)
+        
+        #0. TODO : 검색 조건 적용
+        
+        #type=1. 전체 처리량(건수)
+        print("type1 : queryset.count() - ", queryset.count())
+               
+        #type=2. 최다접속 IP주소
+        top_ip = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')
+        print("type2 : TOP IP - ", top_ip[0]['fip'])
+        print("type2 : TOP IP Count - ", top_ip[0]['fip_count'])
+        
+        #type=3. 최다접속 사용자 요청(request)
+        top_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')
+        print("type3 : TOP REQUEST - ", top_request[0]['frequest'])
+        print("type3 : TOP REQUEST Count - ", top_request[0]['frequest_count'])
+        
+        #type=4. 최다 404 발생 URL
+        top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
+        print("type4 : TOP 404 REQUEST - ", top_404_request[0]['frequest'])
+        print("type4 : TOP 404 REQUEST Count - ", top_404_request[0]['frequest_404_count'])
+                
+        response = {'message': 'statistics returned', 'result': 'TEST'}
+        return Response(response, status = status.HTTP_200_OK)
+    
+     # For Statistics - top5
+    @action(methods=['post'], detail=False)
+    def statistics_top5(self, request, pk=None):
+        
+        queryset = LogDetail.objects
+                       
+        type = request.data['type']
+        print("** statistics_top5 : type --> ", type)
+        
+        #0. TODO : 검색 조건 적용
+        
+        #type=1. Status Codes Top5
+        top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]
+        for idx in range(0,5):
+            print("type1 : TOP5 STATUS - ", top5_status[idx]['fstatus'])
+            print("type1 : TOP5 STATUS Count - ", top5_status[idx]['fstatus_count'])
+        
+        #type=2. Requests Top5
+        top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
+        for idx in range(0,5):
+            print("type2 : TOP5 REQUEST - ", top5_request[idx]['frequest'])
+            print("type2 : TOP5 REQUEST Count - ", top5_request[idx]['frequest_count'])
+        
+        #type=3. Search Terms Top5
+        
+        #type=4. 최다 404 발생 URL Top5
+        top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
+        for idx in range(0,5):
+            print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])
+            print("type4 : TOP 404 REQUEST Count - ", top5_404_request[idx]['frequest_404_count'])        
+        
+        response = {'message': 'statistics returned', 'result': 'TEST'}
+        return Response(response, status = status.HTTP_200_OK)
+        
+        
+    
     # For Gridtable Filtering
     def get_queryset(self):
         
@@ -98,7 +170,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         if username is not None:
             queryset = queryset.filter(purchaser__username=username)
         '''
-        # TODO : 조건 적용
+        # 조건 적용
         dateFromValue = self.request.query_params.get('dateFromValue', None)
         dateToValue = self.request.query_params.get('dateToValue', None)
         timeFromValue = self.request.query_params.get('timeFromValue', None)
