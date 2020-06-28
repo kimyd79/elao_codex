@@ -1,4 +1,4 @@
-# UIDev-OPUS-template
+# LogAnalyzer - Leehs
 
 ## Project setup
 ```
