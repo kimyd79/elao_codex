@@ -1,11 +1,13 @@
 <template>
   <div id="search">
-    <ui-container-box :columns="20" vertical title="Search" class="mb50">
+    <ui-container-box :columns="10" vertical title="Search" class="mb50">
       <ui-form-box>
         <ui-form-row>
-          <ui-form-item :columns="12" label="Date/Time" required-left>
+          <ui-form-item :columns="8" label="Date/Time" required-left>
+            <!--<lego-date-picker v-model="dateFromValue" />-->
             <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
-            <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />            
+            <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
+            <!--<lego-date-picker v-model="dateToValue" />-->
             <lego-text-field v-model="dateToValue" placeholder="YYYYMMDD" />
             <lego-text-field v-model="timeToValue" placeholder="hhmmss" />
           </ui-form-item>
@@ -14,22 +16,23 @@
         <ui-form-row>
           <ui-form-item :columns="8" label="Condition">
             <lego-dropdown :items="conditions" v-model="conditionValue" />
+            &nbsp;&nbsp;&nbsp;
             <lego-text-field v-model="searchValue" placeholder="Enter your keyword" searchable />
           </ui-form-item>
         </ui-form-row>
 
         <ui-form-row>
-          <ui-form-item :columns="6" label="TimeTaken">
+          <ui-form-item :columns="8" label="TimeTaken">
             <lego-text-field v-model="ttFromValue" placeholder="ms" />
             <lego-text-field v-model="ttToValue" placeholder="ms" />
-          </ui-form-item>
-          <ui-form-item :columns="8" align-right margin-right>
+            &nbsp;&nbsp;&nbsp;
             <lego-button v-on:click="initialize">Initialize</lego-button>
             <lego-button v-on:click="search" main>Search</lego-button>
           </ui-form-item>
+          
         </ui-form-row>
       </ui-form-box>
-    </ui-container-box>   
+    </ui-container-box>
   </div>
 </template>
 
@@ -62,7 +65,6 @@ export default {
   computed: {
     conditions() {
       let rtn = [];
-      rtn.push({ value: "N", text: "None" });
       rtn.push({ value: "I", text: "IP" });
       rtn.push({ value: "R", text: "Request" });
       rtn.push({ value: "E", text: "Referrer" });

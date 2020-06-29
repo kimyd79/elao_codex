@@ -194,6 +194,7 @@ export default {
 
   created() {
     this.getLogDetails();
+
   },
 
   watch: {

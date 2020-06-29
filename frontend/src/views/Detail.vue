@@ -1,13 +1,24 @@
 <template>
-    <div id="detail">
+    <ui-container-box :columns="24" vertical align-center class="page-container">
 
-      <ui-container-box :columns="18" :height="10" vertical class="mt20">
-        <search></search>
-        <grid-table></grid-table>
-        <graph></graph>
+    <ui-container-box :columns="20" horizontal align-center class="page-title">
+      <span class="page-title__label">Detail</span>
+    </ui-container-box>
 
+      <ui-container-box :columns="20" vertical align-center class="page-form-area">
+        <search></search>        
       </ui-container-box>
-    </div>
+
+      <ui-container-box :columns="20" vertical align-center class="page-form-area">
+        <grid-table></grid-table>
+      </ui-container-box>
+
+       <ui-container-box :columns="20" horizontal class="page-tab-area">
+        TODO : Footer 영역
+      </ui-container-box>
+      
+    </ui-container-box>
+
 </template>
 
 <script>
@@ -23,9 +34,6 @@ export default {
   components:{
     'Search': Search, 
     'GridTable': GridTable,
-
-    // for Test
-    'Graph': Graph,
   },
 
   methods: {

@@ -65,8 +65,9 @@ import PopupS from './views/templates/Popup/PopupS.vue'
 
 
 // LogAnalyzer
+import Init from "./views/Init.vue"
 import Analysis from "./views/Analysis.vue"
-import Compare from "./views/Compare.vue"
+import Comparison from "./views/Comparison.vue"
 import Detail from "./views/Detail.vue"
 
 Vue.use(Router)
@@ -81,6 +82,11 @@ export default new Router({
 
     // LogAnalyzer
     {
+      path: '/initialization',
+      name: 'initialization',
+      component: Init,
+    },
+    {
       path: '/analysis',
       name: 'analysis',
       component: Analysis,
@@ -91,9 +97,9 @@ export default new Router({
       component: Detail,
     },
     {
-      path: '/compare',
-      name: 'compare',
-      component: Compare,
+      path: '/comparison',
+      name: 'Comparison',
+      component: Comparison,
     },
 
 
