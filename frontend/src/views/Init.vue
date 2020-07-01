@@ -20,22 +20,22 @@
                 <span id="step1" v-if="tabs[1].isSelected">
                 
                 <ui-form-item :columns=11 label="Project" required-left left-label :label-width=144 :label-padding=16>
-                    <lego-radio v-model="radioValue" value="1">New</lego-radio>
-                    <lego-radio v-model="radioValue" value="2">Exist</lego-radio>                    
+                    <lego-radio v-model="radioValue" value="1" >New</lego-radio>
+                    <lego-radio v-model="radioValue" value="2" v-on:click="getProjects">Exist</lego-radio>
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
                     label="Project Name" required-left left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field />
+                    <lego-text-field v-model="projectName"/>
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
                     label="Project Description" required-left left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field textarea rows="3" />
+                    <lego-text-field textarea rows="3" v-model="projectDescription"/>
                 </ui-form-item>
 
                 <!-- TODO : GridTable for existing project -->
-                <ui-container-box :columns="11" vertical>
+                <ui-container-box :columns="11" vertical v-if="radioValue == 2">
                   <ui-table header-divider no-action :columns="columns" :items="itemList" class="mt20"></ui-table>
                 </ui-container-box>
                 <!-- STEP1 end -->
@@ -45,20 +45,33 @@
                 <span id="step2" v-if="tabs[2].isSelected">
                 <ui-form-item :columns=11 
                     label="File" required-left left-label :label-width=144 :label-padding=16 >
-                    <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+                    <input type="file" id="file" ref="file" v-on:change="selectFile"/>
+                </ui-form-item>
+
+                <ui-form-item :columns=11 
+                    label="File Size" required-left left-label :label-width=144 :label-padding=16 >
+                    {{ fileSize }} bytes
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
                     label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                  <lego-dropdown :items="items" v-model="value"/>
+                  <lego-dropdown :items="items" v-model="fileFormat"/>
                 </ui-form-item>
 
                 <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16 >
-                  <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
-                  <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
-                  &nbsp;&nbsp;&nbsp;&nbsp;~            
-                  <lego-text-field v-model="dateToValue" placeholder="YYYYMMDD" />
-                  <lego-text-field v-model="timeToValue" placeholder="hhmmss" />
+
+                    <lego-radio v-model="dataRangeValue" value="1" >ALL</lego-radio>
+                    <lego-radio v-model="dataRangeValue" value="2">Select Range</lego-radio>  
+
+                </ui-form-item>
+
+                <ui-form-item :columns="11" label="" required-left left-label :label-width=144 :label-padding=16 v-if="dataRangeValue == 2">
+                    <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
+                    <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
+                    &nbsp;&nbsp;&nbsp;&nbsp;~            
+                    <lego-text-field v-model="dateToValue" placeholder="YYYYMMDD" />
+                    <lego-text-field v-model="timeToValue" placeholder="hhmmss" />
+                  
                 </ui-form-item>
                 
                 <!-- STEP2 end -->
@@ -68,24 +81,27 @@
                 <span id="step3" v-if="tabs[0].isSelected | tabs[3].isSelected">
                 <ui-form-item :columns=11 
                     label="Project Name" required-left left-label :label-width=144 :label-padding=16 >
-                    <!--{{ projectName }}-->
+                    {{ projectName }}
                 </ui-form-item>
                 <ui-form-item :columns=11 
                     label="Project Description" required-left left-label :label-width=144 :label-padding=16 >
-                    <!--{{ projectDescription }}-->
+                    {{ projectDescription }}
                 </ui-form-item>
                 <ui-form-item :columns=11 
                     label="File" required-left left-label :label-width=144 :label-padding=16 >
-                    <!--{{ fileName }}-->
+                    {{ fileName }}
                 </ui-form-item>
                 <ui-form-item :columns=11 
                     label="File Format" required-left left-label :label-width=144 :label-padding=16 >
-                    <!--{{ FileFormat }}-->
+                    {{ fileFormat }}
                 </ui-form-item>
+                
+                <!--
                 <ui-form-item :columns=11 
                     label="Data range" required-left left-label :label-width=144 :label-padding=16 >
-                    <!--{{ this.dateFromValue }} {{timeFromValue}} ~ {{ dateToValue }} {{timeToValue}}-->
+                    {{ this.dateFromValue }} {{timeFromValue}} ~ {{ dateToValue }} {{timeToValue}}
                 </ui-form-item>
+                -->
 
                 <!-- STEP3 end -->
                 </span>
@@ -93,7 +109,7 @@
 
             <div class="popup-buttons">
                 <lego-button>Cancel</lego-button>
-                <lego-button v-on:click="submitFile()" main>Next</lego-button>
+                <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
             </div>
 
         </ui-container-box>
@@ -109,6 +125,9 @@ import Notice from '@/components/layout/Notice'
 import Search from '@/components/layout/Search'
 import Statistics from '@/components/layout/Statistics'
 
+import * as types from "@/vuex/mutation_types";
+import { mapGetters } from "vuex";
+
 export default {
   name: 'Init',
 
@@ -122,14 +141,25 @@ export default {
   },
   data: function() {
       return {
-        
+        buttonName: "Next",
+
+        projectName: "",
+        projectDescription: "",
+        creator: "Leehs",      // TODO : 인증처리 후 사용자 ID입력
+        projectID: "",
+
+        fileName: "",
+        fileSize: 0,
+        fileFormat: "",
+        logfileID: "",
+
         dateFromValue: "",
         dateToValue: "",
         timeFromValue: "",
         timeToValue: "",
 
-        radioValue: "",
-        value: "",
+        radioValue: "1",
+        dataRangeValue: "1",
 
           // for tabs
               
@@ -146,30 +176,113 @@ export default {
 
           columns: [
             {label: 'Project Name', key: "projectName", sortable: true, sortValue: "asc", filtable: false, alignRight: false, width: 30 },
-            {label: 'Project Description', key: "projectDescription", sortable: true, sortValue: "desc", filtable: true, filterValue:[], alignRight: false, width: 70 },
+            {label: 'Project Description', key: "projectDescription", sortable: true, sortValue: "desc", filtable: true, filterValue:[], alignRight: false, width: 50 },
             {label: 'Creator', key: "creator", sortable: false, filtable: true, filterValue:[], alignRight: false, width: 15, filterList: ["Success","Error","Processing"] },
-            {label: 'Created Date', key: "createdDate", sortable: false, filtable: false, alignRight: false, width: 20 },            
+            {label: 'Created Date', key: "createdDate", sortable: false, filtable: false, alignRight: false, width: 30 },            
           ],
 
           // Grid Rows
           itemList: [
-            {projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
-            {projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
-            {projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
+            //{projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
+            //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
+            //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
             
           ]
       }
   },
-  computed : {
-        items() {
+  computed: mapGetters({
+            projectName: "getProjectName",            
+            fileName: "getFileNames",
+            fileFormat: "getLogFormat"
+        }),
+  
+  computed: {
+
+          items() {
             // TODO : Get File Formats from DB
             let rtn = [];
-            rtn.push({value:'A',text:'FileFormat A'});
-            rtn.push({value:'B',text:'FileFormat B'});
+            rtn.push({value:'%h %l %u %t \"%r\" %>s %b',text:'Common Log Format(CLF) => %h %l %u %t \"%r\" %>s %b'});
+            rtn.push({value:'%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"',text:'NCSA extended/combined => %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"'});
+            rtn.push({value:'TODO',text:'TODO : Custom '});
             return rtn;
-        }
+        },
     },
   methods: {
+      
+      setItemList(results) {
+
+        this.itemList = [];
+
+        for (let i = 0; i < results.length; i++) {
+            this.itemList.push({
+                projectName: results[i].project_name,
+                projectDescription: results[i].project_description,
+                creator: results[i].creator,
+                createdDate: results[i].created,
+                isSelected: false
+            })
+        }
+      },
+
+      getProjects(){
+          // {projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
+          //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
+          //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
+            
+          // /logmaster/?search=Leehs
+          var url = "http://172.16.1.110:8000/logmaster/?search="+this.creator
+
+          let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+          axios.get(url,axiosConfig)
+          .then(res => {
+              console.log(res)
+              this.setItemList(res.data.results);
+          })
+          .catch(err => {
+              console.error(err); 
+          })
+      },
+      nextButton(){
+
+        // Next 버튼 처리
+        if(this.tabs[0].isSelected){
+            this.buttonName = "OK"
+        }
+
+        // Logic 처리 : TODO - Global 변수로 뺄 것
+        var url = "http://172.16.1.110:8000"       
+
+        // for Test : --> TODO : vuex에 추가할 것
+        //this.projectID = '49898027-f29d-4d7e-9a68-ab590e46e783'
+        //this.logfileID = 'c2eaa555-4980-4945-8bd9-6afcdda4de4e'
+        
+        if(this.tabs[1].isSelected){ // Step1 : logmaster    
+            
+            if(this.radioValue == 1 & this.projectID == ""){   // New인 경우 새로운 정보로 저장한다.
+
+                 this.createLogmaster(url);
+            }else{        
+                              // Exist인 경우 - TODO : 현재 ID 기준으로 기존 project들을 가져와서 보여준다.
+            }
+            
+        } else if(this.tabs[2].isSelected  & this.projectID != ""){ // Step2 : 
+
+            // TODO : Tab 왔다갔다 할때 체크로직 필요
+            this.createLogfile(url)
+        } else if(this.tabs[3].isSelected  & this.logfileID != ""){ // Step3 or Info
+
+            // TODO : Tab 왔다갔다 할때 체크로직 필요
+            this.createLogdetail(url)
+        }
+
+        // Tab 변경 - Backward
+        this.tabChange(2)
+      },
 
       tabChange(dir){
         
@@ -200,23 +313,57 @@ export default {
 
       },
 
-      handleFileUpload(){
+      createLogmaster(url){
+          let postData = {
+                
+                project_name: this.projectName,        
+                project_description: this.projectDescription,
+                creator: this.creator
+            };
+
+            this.$store.dispatch("setProjectName", this.projectName);
+
+            let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+            axios.post(url+"/logmaster/", postData, axiosConfig )
+            .then(res => {
+                console.log(res)                
+                this.projectID = res.data.project_id
+                
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+      },
+
+      selectFile(){
+
         this.file = this.$refs.file.files[0];
         console.log('size=' + this.file.size);
         console.log('name=' + this.file.name);
+
+        this.fileName = this.file.name
+        this.fileSize = this.file.size
+
+        this.$store.dispatch("setFileNames", this.fileName);
+
       },
-      submitFile(){
+      createLogfile(url){
 
             // TODO : Multi-file upload 필요
 
             let formData = new FormData();
             formData.append('file_object', this.file);
-            formData.append('file_name', this.file.name);
-            formData.append('file_size', this.file.size);
-
-             // this.project
-            let project = '3d2bb0b6-143b-4e61-a064-0d65bd3e4623'    // ID 가져와야 한다.
-            formData.append('project', project);  
+            formData.append('file_name', this.fileName);
+            formData.append('file_size', this.fileSize);
+            formData.append('file_format', this.fileFormat);
+            formData.append('project', this.projectID);  
+            
+            this.$store.dispatch("setLogFormat", this.fileFormat);            
 
             let axiosConfig = {
                 headers: {
@@ -225,25 +372,59 @@ export default {
                 }
             };
 
-            axios.post('http://172.16.1.110:8000/logfile/', formData, axiosConfig)
-            .then(function(){
-              console.log('SUCCESS!!');
+            axios.post(url+'/logfile/', formData, axiosConfig)
+            .then(res => {
+                console.log(res)
+                
+                this.logfileID = res.data.logfile_id
             })
-            .catch(function(){
-              console.log('FAILURE!!');
-            });
+            .catch(err => {
+                console.error(err); 
+            })
             
       },
+
+      createLogdetail(url){
+
+            let postData = {
+                logfile: this.logfileID
+            };
+
+            let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+          axios.post(url+"/logdetail/", postData, axiosConfig )
+            .then(res => {
+                console.log(res)
+
+                // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
+                //        끝 시간은 +1 시간으로 설정(기본)
+
+                
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+      }
   },
 
-  watch: {
-      tabs() {
-          console.log(this.tabs[0])
-          console.log(this.tabs[1])
-          console.log(this.tabs[2])
-          console.log(this.tabs[3])
-      }
-  }
+  created() {
+      // Initial Value Setting
+      this.projectName = "TEST_NAME",
+      this.projectDescription = "TEST_DESCRIPTION",
+      
+      this.fileName = "TEST_FILENAME",
+      this.fileFormat = "TEST_FILEFORMAT"
+
+      // From Vuex
+
+
+  },
+
+  watch: {}
 
 }
 </script>
