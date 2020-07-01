@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import renderers
 from rest_framework import viewsets, status
+from rest_framework.renderers import JSONRenderer
 from loganalyzerapi.models import LogMaster, LogFile, LogDetail
 from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer
 import time, uuid, re, csv
@@ -37,7 +38,7 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     
     # Multiple Search
     # http://127.0.0.1:8000/logmaster/?search=aa,22
-    search_fields = ['project_name', 'project_description', 'uploader']
+    search_fields = ['project_name', 'project_description', 'creator']
     
     ordering_fields = ['project_name', 'project_description', 'created']
     ordering = ['created']
@@ -93,13 +94,12 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     # For Statistics - top1
     @action(methods=['post'], detail=False)
     def statistics_top1(self, request, pk=None):
-               
-        queryset = LogDetail.objects
     
         type = request.data['type']
         print("** statistics_top1 : type --> ", type)
         
         #0. TODO : 검색 조건 적용
+        queryset = LogDetail.objects
         
         #type=1. 전체 처리량(건수)
         print("type1 : queryset.count() - ", queryset.count())
@@ -125,19 +125,22 @@ class LogDetailViewSet(viewsets.ModelViewSet):
      # For Statistics - top5
     @action(methods=['post'], detail=False)
     def statistics_top5(self, request, pk=None):
-        
-        queryset = LogDetail.objects
                        
         type = request.data['type']
         print("** statistics_top5 : type --> ", type)
         
         #0. TODO : 검색 조건 적용
+        queryset = LogDetail.objects
+        
+        results = []
         
         #type=1. Status Codes Top5
         top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]
         for idx in range(0,5):
             print("type1 : TOP5 STATUS - ", top5_status[idx]['fstatus'])
             print("type1 : TOP5 STATUS Count - ", top5_status[idx]['fstatus_count'])
+            
+            results.append({"fstatus" : top5_status[idx]['fstatus'], "fstatus_count" : top5_status[idx]['fstatus_count']})
         
         #type=2. Requests Top5
         top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
@@ -153,7 +156,9 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])
             print("type4 : TOP 404 REQUEST Count - ", top5_404_request[idx]['frequest_404_count'])        
         
-        response = {'message': 'statistics returned', 'result': 'TEST'}
+        # TODO : 결과값을 생성해서 보내야 한다.
+        
+        response = {'message': 'statistics returned', 'results': results}
         return Response(response, status = status.HTTP_200_OK)
         
         
@@ -164,12 +169,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         print("== LogDetailViewSet get_queryset!!")
         
         queryset = LogDetail.objects.all()
-        
-        '''
-        username = self.request.query_params.get('username', None)
-        if username is not None:
-            queryset = queryset.filter(purchaser__username=username)
-        '''
+
         # 조건 적용
         dateFromValue = self.request.query_params.get('dateFromValue', None)
         dateToValue = self.request.query_params.get('dateToValue', None)
@@ -205,21 +205,25 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             elif conditionValue == 'S':
                 queryset = queryset.filter(fstatus__icontains=searchValue)
         
-        return queryset 
+        return queryset
 
     def create(self, request, *args, **kwargs):
         
         print("== LogDetailViewSet create!!")
         start = time.time()
         
-        data = request.data.dict()
-        logfile_id = data["logfile"]        
+        # For Basic
+        #data = request.data.dict()
+        #logfile_id = data["logfile"]        
+        
+        # For UI
+        logfile_id = request.data['logfile']
                 
         logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
-        logfile = logfile_model.file_path.file         
+        logfile = logfile_model.file_object.file         
         
         # Log Parsing : postgresql copy 사용을 위해 csv파일 생성
-        self.parse_log(logfile, logfile_id)      
+        firstRow = self.parse_log(logfile, logfile_id)      
         
         # postgresql copy 실행
         LogDetail.objects.from_csv(logfile.name+'.csv', delimiter=',')        
@@ -229,7 +233,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # print("==serializer.data : ", serializer.data)        
         # 건수만 리턴하자. 
         #response = {'message': 'logdetail created', 'result': len(serializer.data)}
-        response = {'message': 'logdetail created', 'result': 'TEST'}
+        response = {'message': 'logdetail created', 'result': firstRow}
         return Response(response, status = status.HTTP_200_OK)
 
     def parse_log(self, logfile, logfile_id):
@@ -332,15 +336,20 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         df_logs = df_logs.rename_axis('logdetail_id').reset_index()
         df_logs = pd.concat([df_logs, df_time], axis=1)
         
+        firstRow = df_logs.iloc[0,] #.to_json(orient='index')
+        
         #'logdetail_id' : UUID 생성로직 필요        
         df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4()) 
-                
+        
+                        
         # index 미사용  
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
-       
-        # TODO : 시간이 좀 걸린다. 확인해볼것
+               # TODO : 시간이 좀 걸린다. 확인해볼것
         print("Duration to create temporary csv :", time.time() - start)        
+        
+        # 화면에서 사용할 정보(시작시간 등)를 리턴하기 위해 1라인을 결과로 뽑는다.
+        return firstRow
     
     def get_logformat_index(self, log_format):
         format_index = {}

@@ -36,8 +36,7 @@
 <script>
 // @ is an alias to /src
 import axios from "axios";
-//import * as types from '../../vuex/mutation_types';
-import * as types from "@/vuex/mutation_types";
+//import { mapGetters } from "vuex";
 
 export default {
   name: "Search",
@@ -46,7 +45,7 @@ export default {
 
       conditionValue: "",
       searchValue: "",
-      dateFromValue: "",
+      dateFromValue: '',
       dateToValue: "",
       timeFromValue: "",
       timeToValue: "",
@@ -56,10 +55,34 @@ export default {
     };
   },
   created() {
-    // TODO : 초기 조건값 세팅필요(파일 업로드 이후 시작시간, 시작시간+10 등)
-
+    
+    // Initial Value Setting
+    this.dateFromValue = this.$store.state.fromDate
+    this.dateToValue = this.$store.state.toDate
+    this.timeFromValue = this.$store.state.fromTime
+    this.timeToValue = this.$store.state.toTime
+    this.conditionValue = this.$store.state.condition
+    this.searchValue = this.$store.state.searchKeyword
+    this.ttFromValue = this.$store.state.fromTimeTaken
+    this.ttToValue = this.$store.state.toTimeTaken
   },
+
   computed: {
+    // ...mapGetters({
+    
+    //   // TODO : 초기 조건값 세팅필요(파일 업로드 이후 시작시간, 시작시간+10 등)
+
+    //   dateFromValue: "getFromDate",
+    //   ateToValue: "getToDate",
+    //   imeFromValue: "getFromTime",
+    //   imeToValue: "getToTime",
+    //   onditionValue: "getCondition",
+    //   earchValue: "getSearchKeyword",
+    //   tFromValue: "getFromTimeTaken",
+    //   ttToValue: "getToTimeTaken",
+
+    // }),
+
     conditions() {
       let rtn = [];
       rtn.push({ value: "N", text: "None" });

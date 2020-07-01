@@ -190,12 +190,15 @@ export default {
           ]
       }
   },
-  computed: mapGetters({
-            projectName: "getProjectName",            
-            fileName: "getFileNames",
-            fileFormat: "getLogFormat"
-        }),
-  
+
+  created() {
+    
+    // Initial Value Setting
+    this.projectName = this.$store.state.projectName
+    this.fileName = this.$store.state.fileNames
+    this.fileFormat = this.$store.state.logFormat
+    
+  },
   computed: {
 
           items() {
@@ -402,6 +405,18 @@ export default {
 
                 // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
                 //        끝 시간은 +1 시간으로 설정(기본)
+                let day = res.data.result[19]
+                let month = res.data.result[20]
+                let year = res.data.result[21]
+
+                let hour = res.data.result[22]
+                let minute = res.data.result[23]
+                let second = res.data.result[24]
+
+                this.$store.dispatch("setFromDate", year+month+day);
+                this.$store.dispatch("setToDate", year+month+day);
+                this.$store.dispatch("setFromTime", hour+minute+second);
+                this.$store.dispatch("setToTime", hour+minute+second);
 
                 
             })
@@ -410,20 +425,6 @@ export default {
             })
       }
   },
-
-  created() {
-      // Initial Value Setting
-      this.projectName = "TEST_NAME",
-      this.projectDescription = "TEST_DESCRIPTION",
-      
-      this.fileName = "TEST_FILENAME",
-      this.fileFormat = "TEST_FILEFORMAT"
-
-      // From Vuex
-
-
-  },
-
   watch: {}
 
 }
