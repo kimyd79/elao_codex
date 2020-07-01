@@ -1,6 +1,6 @@
 <template>
 
-  <ui-container-box :columns="24" vertical align-center >
+  <ui-container-box :columns="24" vertical align-center class="page-container-for-init">
     <ui-container-box :columns=12 vertical class="popup-container">
 
             <div class="popup-header">
@@ -12,48 +12,48 @@
                 </div>                
             </div>
 
-            <ui-tab box :tabs="tabs" no-action />
+            <ui-tab box :tabs="tabs" v-on:tabChange="tabChange"/>
 
             <div class="popup-form">
 
                 <!-- STEP1 start -->
-                <span id="step1">
+                <span id="step1" v-if="tabs[1].isSelected">
                 
-                <ui-form-item :columns=11 label="Project" required left-label :label-width=144 :label-padding=16>
+                <ui-form-item :columns=11 label="Project" required-left left-label :label-width=144 :label-padding=16>
                     <lego-radio v-model="radioValue" value="1">New</lego-radio>
                     <lego-radio v-model="radioValue" value="2">Exist</lego-radio>                    
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
-                    label="Project Name" required left-label :label-width=144 :label-padding=16 >
+                    label="Project Name" required-left left-label :label-width=144 :label-padding=16 >
                     <lego-text-field />
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
-                    label="Project Description" required left-label :label-width=144 :label-padding=16 >
+                    label="Project Description" required-left left-label :label-width=144 :label-padding=16 >
                     <lego-text-field textarea rows="3" />
                 </ui-form-item>
 
                 <!-- TODO : GridTable for existing project -->
                 <ui-container-box :columns="11" vertical>
-                  <ui-table header-divider no-action :columns="columns" :items="items" class="mt20"></ui-table>
+                  <ui-table header-divider no-action :columns="columns" :items="itemList" class="mt20"></ui-table>
                 </ui-container-box>
                 <!-- STEP1 end -->
                 </span>
 
                 <!-- STEP2 start -->
-                <span id="step2">
+                <span id="step2" v-if="tabs[2].isSelected">
                 <ui-form-item :columns=11 
-                    label="File" required left-label :label-width=144 :label-padding=16 >
+                    label="File" required-left left-label :label-width=144 :label-padding=16 >
                     <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
-                    label="File Format" required left-label :label-width=144 :label-padding=16>
+                    label="File Format" required-left left-label :label-width=144 :label-padding=16>
                   <lego-dropdown :items="items" v-model="value"/>
                 </ui-form-item>
 
-                <ui-form-item :columns="11" label="Data Range" required left-label :label-width=144 :label-padding=16 >
+                <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16 >
                   <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
                   <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
                   &nbsp;&nbsp;&nbsp;&nbsp;~            
@@ -62,29 +62,29 @@
                 </ui-form-item>
                 
                 <!-- STEP2 end -->
-                </span>
+                </span>    
 
                 <!-- Current Info / STEP3 start -->
-                <span id="step3">
+                <span id="step3" v-if="tabs[0].isSelected | tabs[3].isSelected">
                 <ui-form-item :columns=11 
-                    label="Project Name" required left-label :label-width=144 :label-padding=16 >
-                    {{ projectName }}
+                    label="Project Name" required-left left-label :label-width=144 :label-padding=16 >
+                    <!--{{ projectName }}-->
                 </ui-form-item>
                 <ui-form-item :columns=11 
-                    label="Project Description" required left-label :label-width=144 :label-padding=16 >
-                    {{ projectDescription }}
+                    label="Project Description" required-left left-label :label-width=144 :label-padding=16 >
+                    <!--{{ projectDescription }}-->
                 </ui-form-item>
                 <ui-form-item :columns=11 
-                    label="File" required left-label :label-width=144 :label-padding=16 >
-                    {{ fileName }}
+                    label="File" required-left left-label :label-width=144 :label-padding=16 >
+                    <!--{{ fileName }}-->
                 </ui-form-item>
                 <ui-form-item :columns=11 
-                    label="File Format" required left-label :label-width=144 :label-padding=16 >
-                    {{ FileFormat }}
+                    label="File Format" required-left left-label :label-width=144 :label-padding=16 >
+                    <!--{{ FileFormat }}-->
                 </ui-form-item>
                 <ui-form-item :columns=11 
-                    label="Data range" required left-label :label-width=144 :label-padding=16 >
-                    {{ this.dateFromValue }} {{timeFromValue}} ~ {{ dateToValue }} {{timeToValue}}
+                    label="Data range" required-left left-label :label-width=144 :label-padding=16 >
+                    <!--{{ this.dateFromValue }} {{timeFromValue}} ~ {{ dateToValue }} {{timeToValue}}-->
                 </ui-form-item>
 
                 <!-- STEP3 end -->
@@ -122,6 +122,18 @@ export default {
   },
   data: function() {
       return {
+        
+        dateFromValue: "",
+        dateToValue: "",
+        timeFromValue: "",
+        timeToValue: "",
+
+        radioValue: "",
+        value: "",
+
+          // for tabs
+              
+
           // For file upload
           file: '',
 
@@ -140,7 +152,7 @@ export default {
           ],
 
           // Grid Rows
-          items: [
+          itemList: [
             {projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
             {projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
             {projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
@@ -158,7 +170,37 @@ export default {
         }
     },
   methods: {
-    handleFileUpload(){
+
+      tabChange(dir){
+        
+        if( dir == 1 ){ // Forward
+            for (let i = 0; i < this.tabs.length; i++) {
+                if (this.tabs[i].isSelected == true){
+                    if ( i-1 >= 0){
+                        this.tabs[i].isSelected = false
+                        this.tabs[i-1].isSelected = true
+                        break;
+                    }
+                }
+                    
+            }
+        } else {    // Backward
+            for (let i = 0; i < this.tabs.length; i++) {
+                if (this.tabs[i].isSelected == true){
+                    if ( i+1 < this.tabs.length){
+                        this.tabs[i].isSelected = false
+                        this.tabs[i+1].isSelected = true
+                        break;
+                    }
+                }
+                    
+            }
+        }
+
+
+      },
+
+      handleFileUpload(){
         this.file = this.$refs.file.files[0];
         console.log('size=' + this.file.size);
         console.log('name=' + this.file.name);
@@ -192,6 +234,15 @@ export default {
             });
             
       },
+  },
+
+  watch: {
+      tabs() {
+          console.log(this.tabs[0])
+          console.log(this.tabs[1])
+          console.log(this.tabs[2])
+          console.log(this.tabs[3])
+      }
   }
 
 }

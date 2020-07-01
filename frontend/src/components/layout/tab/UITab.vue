@@ -31,12 +31,12 @@
         <div v-if="!noAction" class="ui-tab-action">
             <div class="ui-tab-action-item">
                 <div class="ui-tab-action-forward">
-                    <lego-icon small type="picto">collapse_menu</lego-icon>
+                    <lego-icon small type="picto" v-on:click="tabForward">collapse_menu</lego-icon>
                 </div>
             </div>
             <div class="ui-tab-action-item">
                 <div class="ui-tab-action-backward">
-                    <lego-icon small type="picto">collapse_menu</lego-icon>
+                    <lego-icon small type="picto"  v-on:click="tabBackward">collapse_menu</lego-icon>
                 </div>
             </div>
             <div v-if="removable" class="ui-tab-action-item">
@@ -59,6 +59,22 @@ export default {
 
         noAction : { type: Boolean, default: false },
         noBottomBorder : { type: Boolean, default: false },
+    },
+
+    methods: {
+
+        tabChange(dir) {
+            this.$emit('tabChange', dir)
+        },
+
+        tabForward() {
+            this.tabChange(1)
+        },
+        tabBackward() {
+            this.tabChange(2)
+        },
+        
+
     }
 }
 </script>

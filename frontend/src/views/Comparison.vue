@@ -3,7 +3,7 @@
     <ui-container-box :columns="24" vertical align-center class="page-container">
 
       <ui-container-box :columns="20" horizontal align-center class="page-title">
-        <span class="page-title__label">Compare</span>
+        <span class="page-title__label">Comparison</span>
       </ui-container-box>
 
       <ui-container-box :columns="20" horizontal align-center class="page-form-area">

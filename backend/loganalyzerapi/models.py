@@ -14,12 +14,8 @@ class LogMaster(models.Model):
     project_name = models.CharField(max_length=50, null=False, blank=False)
     project_description = models.TextField(max_length=300)
     
-    # 삭제
-    #file_name = models.CharField(max_length=100, blank=True, default='')    
-    #file_path = models.FileField(upload_to=upload_directory_path)
-    
-    file_format = models.CharField(max_length=100, null=False, blank=False)
-    uploader = models.CharField(max_length=50, null=False, blank=False)
+    #file_format = models.CharField(max_length=100, null=False, blank=False)
+    creator = models.CharField(max_length=50, null=False, blank=False)
     created = models.DateTimeField(auto_now=True, verbose_name="date create")
     
     def __str__(self):
@@ -41,7 +37,8 @@ class LogFile(models.Model):
     logfile_id = models.UUIDField(verbose_name="fid",primary_key=True, default=uuid.uuid4, editable=False)   
     project = models.ForeignKey(LogMaster, on_delete=models.CASCADE)    
     file_name = models.CharField(max_length=100, blank=True, default='')    
-    file_path = models.FileField(upload_to=upload_directory_path)
+    file_object = models.FileField(upload_to=upload_directory_path)
+    file_format = models.CharField(max_length=100, null=False, blank=False)
     file_size = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now=True, verbose_name="date create")
     

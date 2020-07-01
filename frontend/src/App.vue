@@ -16,7 +16,7 @@
           </template>
       </ui-gnb>
       
-      <router-view style="padding-top: 73px; display:flex; justify-content:center;" />
+      <router-view style="padding-top: 0px; display:flex; justify-content:center;" />
 
   </div>
 </template>
@@ -158,6 +158,13 @@ em {
   padding: 48px 80px;
   background-color: white;
 }
+
+.page-container-for-init {
+  margin: 48px 0 32px;
+  padding: 48px 80px;
+  background-color: #eaeaea;
+}
+
 .page-title {
   margin-top: 16px;
   margin-bottom: 32px;
