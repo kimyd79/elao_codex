@@ -34,9 +34,9 @@ export default {
         return {
             menus: [
                 { 
-                  label: 'Stack with LNB' ,
+                  label: 'LogFormat' ,
                   menus: [
-                    { label:'LNB - Stack 01', linkto:'/template/LNBStack01', key:'LNBStack01', isSelected: false },
+                    { label:'LogFormat', linkto:'/logformat', key:'logformat', isSelected: false },
                     { label:'LNB - Stack 02', linkto:'/template/LNBStack02', key:'LNBStack02', isSelected: false },                    
                   ]
                 },
