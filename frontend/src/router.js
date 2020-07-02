@@ -24,6 +24,7 @@ import Analysis from "./views/Analysis.vue"
 import Comparison from "./views/Comparison.vue"
 import Detail from "./views/Detail.vue"
 import Setting from "./views/Setting.vue"
+import Logformat from "./views/Logformat.vue"
 
 Vue.use(Router)
 
@@ -60,6 +61,13 @@ export default new Router({
       path: '/setting',
       name: 'Setting',
       component: Setting,
+      children: [
+        {
+          path: '/logformat',
+          name: 'logformat',
+          component: Logformat
+        },
+      ]
     },
 
   ]
