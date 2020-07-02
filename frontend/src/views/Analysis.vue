@@ -7,12 +7,12 @@
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
-      <Info></Info>
-      <Notice></Notice>
+      <info></info>
+      <notice></notice>
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
-      <Search></Search>
+      <search></search>
     </ui-container-box>
 
     <ui-container-box :columns="20" vertical align-left class="page-title">
@@ -22,13 +22,13 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">    
       
       <ui-container-box :columns="10" vertical class="mt20">
-        <Statistics></Statistics>
-        <Statistics></Statistics>
+        <statistics></statistics>
+        <statistics></statistics>
      </ui-container-box>
            
       <ui-container-box :columns="10" vertical class="mt20">
-        <Statistics></Statistics>
-        <Statistics></Statistics>
+        <statistics></statistics>
+        <statistics></statistics>
       </ui-container-box>
       
     </ui-container-box>
@@ -40,13 +40,13 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">    
       
       <ui-container-box :columns="10" vertical class="mt20">
-        <Statistics></Statistics>
-        <Statistics></Statistics>
+        <statistics-top :statisticsRow="statisticsRow" :statisticsKind="statisticsKind"></statistics-top>
+        <statistics></statistics>
      </ui-container-box>
            
       <ui-container-box :columns="10" vertical class="mt20">
-        <Statistics></Statistics>
-        <Statistics></Statistics>
+        <statistics></statistics>
+        <statistics></statistics>
       </ui-container-box>
       
     </ui-container-box>
@@ -58,7 +58,8 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line></chart-line>
+        <chart-line></chart-line> 
+        <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
         <chart-bar></chart-bar>
       </ui-container-box>      
 
@@ -89,9 +90,23 @@ import Init from "@/components/layout/Init";
 import Notice from "@/components/layout/Notice";
 import Search from "@/components/layout/Search";
 import Statistics from "@/components/layout/Statistics";
+import StatisticsTop from "@/components/layout/StatisticsTop";
 
 export default {
   name: "Analysis",
+
+  data(){
+    return {
+      // For Chart
+      // chartdata : [],
+      // options : [],
+
+      // For Statistics -> use 'props'
+      statisticsRow: "1",   // Top or Top5 (Row 수)
+      statisticsKind: "1",  // 전체 처리량 (통계 종류)  
+    }
+  },
+  
 
   // 컴포넌트 등록
   components: {
@@ -99,6 +114,7 @@ export default {
     Notice: Notice,
     Search: Search,
     Statistics: Statistics,
+    StatisticsTop: StatisticsTop,
     ChartLine: ChartLine,
     ChartBar: ChartBar,
     ChartPie: ChartPie,

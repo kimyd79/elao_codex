@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework import renderers
 from rest_framework import viewsets, status
 from rest_framework.renderers import JSONRenderer
-from loganalyzerapi.models import LogMaster, LogFile, LogDetail
-from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer
+from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString
+from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer
 import time, uuid, re, csv
 from datetime import datetime, timezone
 from rest_framework.response import Response
@@ -378,4 +378,15 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         return format_index    
           
 
+class LogFormatViewSet(viewsets.ModelViewSet):
+    queryset = LogFormat.objects.all()
+    serializer_class = LogFormatSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['format_kind']
     
+
+class LogFormatStringViewSet(viewsets.ModelViewSet):
+    queryset = LogFormatString.objects.all()
+    serializer_class = LogFormatStringSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['format_kind']    

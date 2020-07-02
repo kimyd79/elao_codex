@@ -11,7 +11,7 @@
           <tbody>
             <tr>
               <td>1</td>
-              <td>/test1 TODO : 열너비 증가</td>
+              <td>/test1</td>
               <td>1000</td>            
             </tr>
             <tr>
@@ -42,7 +42,7 @@
 <script>
 export default {
     name: 'Statistics',
-    props: ['statisticsRow', 'statisticskind'],
+    props: ['statisticsRow', 'statisticsKind'],
 
     data: function() {
       return {
@@ -51,7 +51,11 @@ export default {
     },
 
     created() {
-      
+      console.log(this.statisticsRow, this.statisticsKind)
+
+      // TODO : 넘어온 데이터로 v-for 이용해서 table 그리기
+
+      // TODO : 데이터 가져오기 (기본 조건값 필요 - 그래야 변경분 반영된다.)    
     },
 
 }

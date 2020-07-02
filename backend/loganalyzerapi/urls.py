@@ -13,9 +13,14 @@ router = DefaultRouter()  #  automatically creates the API root view
 router.register(r'logmaster', views.LogMasterViewSet)
 router.register(r'logfile', views.LogFileViewSet)
 router.register(r'logdetail', views.LogDetailViewSet)
+
 # For statistics 
 router.register(r'logdetail/statistics_top1', views.LogDetailViewSet)
 router.register(r'logdetail/statistics_top5', views.LogDetailViewSet)
+
+# For logformat
+router.register(r'logformat', views.LogFormatViewSet)
+router.register(r'logformatstring', views.LogFormatStringViewSet)
 
 #router.register(r'users', views.UserViewSet)
 

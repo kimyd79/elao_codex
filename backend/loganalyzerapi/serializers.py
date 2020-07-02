@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from loganalyzerapi.models import LogMaster, LogFile, LogDetail
+from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString
 
 class LogMasterSerializer(serializers.ModelSerializer):
     
@@ -18,3 +18,15 @@ class LogDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogDetail
         fields = '__all__' #('log_line','logfile')
+        
+class LogFormatSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = LogFormat
+        fields = '__all__'
+
+class LogFormatStringSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = LogFormatString
+        fields = '__all__'        

@@ -94,3 +94,31 @@ class LogDetail(models.Model):
     class Meta:
         ordering = ['created']
     
+class LogFormat(models.Model):
+    # PK
+    format_id = models.UUIDField(verbose_name="fid",primary_key=True, default=uuid.uuid4, editable=False)
+    format_kind = models.CharField(max_length=50, null=False, blank=False)
+    format_name = models.CharField(max_length=50, null=False, blank=False)
+    format_strings = models.CharField(max_length=500, null=False, blank=False)
+    creator = models.CharField(max_length=50, null=False, blank=False)
+    created = models.DateTimeField(auto_now=True, verbose_name="date create")
+    
+    class Meta:
+        ordering = ['created']
+
+    def __str__(self): 
+        return self.format_id   
+
+class LogFormatString(models.Model):
+    # PK
+    formatstring_id = models.UUIDField(verbose_name="fsid",primary_key=True, default=uuid.uuid4, editable=False)
+    format_kind = models.CharField(max_length=50, null=False, blank=False)
+    format_string = models.CharField(max_length=50, null=False, blank=False)
+    format_definition = models.CharField(max_length=500, null=False, blank=False)
+    created = models.DateTimeField(auto_now=True, verbose_name="date create")
+    
+    class Meta:
+        ordering = ['created']
+
+    def __str__(self): 
+        return self.formatstring_id       
