@@ -95,11 +95,15 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=False)
     def statistics_top1(self, request, pk=None):
     
+        logfile_id = request.data['logfile_id']
+        
         type = request.data['type']
         print("** statistics_top1 : type --> ", type)
         
-        #0. TODO : 검색 조건 적용
-        queryset = LogDetail.objects
+        #0. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+        queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)
+        
+        #1. TODO : 검색 조건 적용(공통항목으로 Extract)
         
         #type=1. 전체 처리량(건수)
         print("type1 : queryset.count() - ", queryset.count())
@@ -125,12 +129,16 @@ class LogDetailViewSet(viewsets.ModelViewSet):
      # For Statistics - top5
     @action(methods=['post'], detail=False)
     def statistics_top5(self, request, pk=None):
+        
+        logfile_id = request.data['logfile_id']
                        
         type = request.data['type']
         print("** statistics_top5 : type --> ", type)
         
-        #0. TODO : 검색 조건 적용
-        queryset = LogDetail.objects
+        #0. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+        queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)
+        
+        #1. TODO : 검색 조건 적용(공통항목으로 Extract)
         
         results = []
         

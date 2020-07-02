@@ -8,6 +8,7 @@ export default {
     getToTimeTaken: state => state.toTimeTaken ,
     getCondition: state => state.condition ,
     getSearchKeyword: state => state.searchKeyword ,
+    
     getProjectName: state => state.projectName ,
     getFileNames: state => state.fileNames ,
     getLogFormat: state => state.logFormat ,
