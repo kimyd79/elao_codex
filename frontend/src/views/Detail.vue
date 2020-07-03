@@ -5,6 +5,11 @@
       <span class="page-title__label">Detail</span>
     </ui-container-box>
 
+    <ui-container-box :columns="20" horizontal align-center class="page-form-area">
+        <info></info>
+        <notice></notice>
+      </ui-container-box>
+
       <ui-container-box :columns="20" vertical align-center class="page-form-area">
         <search></search>        
       </ui-container-box>
@@ -24,7 +29,8 @@
 <script>
 import Search from '@/components/layout/Search'
 import GridTable from '@/components/layout/GridTable'
-import Graph from '@/components/layout/Graph'
+import Info from '@/components/layout/Info'
+import Notice from '@/components/layout/Notice'
 
 
 export default {
@@ -32,6 +38,8 @@ export default {
 
   // 컴포넌트 등록
   components:{
+    'Info': Info,
+    'Notice': Notice,
     'Search': Search, 
     'GridTable': GridTable,
   },

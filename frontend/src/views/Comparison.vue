@@ -17,13 +17,13 @@
       </ui-container-box>
       
       <ui-container-box :columns="20" horizontal align-center class="page-form-area">
-        <graph :width="800" :height="400"></graph>
-        <graph :width="800" :height="400"></graph>
+        <chart-line :width="800" :height="400"></chart-line>
+        <chart-line :width="800" :height="400"></chart-line>
       </ui-container-box>
 
       <ui-container-box :columns="20" horizontal align-center class="page-form-area">
-        <graph :width="800" :height="400"></graph>
-        <graph :width="800" :height="400"></graph>
+        <chart-stacked-bar :width="800" :height="400"></chart-stacked-bar>
+        <chart-stacked-bar :width="800" :height="400"></chart-stacked-bar>
       </ui-container-box>
 
        <ui-container-box :columns="20" horizontal class="page-tab-area">
@@ -36,7 +36,11 @@
 </template>
 
 <script>
-import Graph from '@/components/layout/Graph'
+import ChartLine from "@/components/layout/ChartLine";
+import ChartBar from "@/components/layout/ChartBar";
+import ChartPie from "@/components/layout/ChartPie";
+import ChartStackedBar from "@/components/layout/ChartStackedBar";
+
 import GridTable from '@/components/layout/GridTable'
 import Info from '@/components/layout/Info'
 import Init from '@/components/layout/Init'
@@ -51,13 +55,16 @@ export default {
 
   // 컴포넌트 등록
   components:{
-    'Info': Info,
-    'Notice': Notice, 
-    'Search': Search, 
-    'SearchCompare1': SearchCompare1,
-    'SearchCompare2': SearchCompare2,
-    'Statistics': Statistics,
-    'Graph': Graph,
+    Info: Info,
+    Notice: Notice, 
+    Search: Search, 
+    SearchCompare1: SearchCompare1,
+    SearchCompare2: SearchCompare2,
+    Statistics: Statistics,
+    ChartLine: ChartLine,
+    ChartBar: ChartBar,
+    ChartPie: ChartPie,
+    ChartStackedBar: ChartStackedBar
   }
 }
 </script>

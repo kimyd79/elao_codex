@@ -38,7 +38,7 @@
         /*
           Make the request to the POST /single-file URL
         */
-            axios.post( ' http://172.16.1.110:8000/single-file',
+            axios.post( ' http://127.0.0.1:8000/single-file',
                 formData,
                 {
                 headers: {

@@ -37,7 +37,7 @@ export default {
           { label:'Analysis', linkto:'/analysis', key:'analysis', isSelected: false },
           { label:'Comparison', linkto:'/comparison', key:'comparison', isSelected: false },
           { label:'Detail', linkto:'/detail', key:'detail', isSelected: false },
-          { label:'Setting', linkto:'/setting', key:'setting', isSelected: false }
+          { label:'Management', linkto:'/management', key:'management', isSelected: false }
       ]
     }
   },
@@ -188,6 +188,7 @@ em {
   margin-bottom: 24px;
 }
 .page-summary-table {
+  padding: 16px 0;
   border-spacing: 0;
 }
 .page-summary-table thead th {

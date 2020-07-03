@@ -149,7 +149,7 @@ export default {
       console.log("filters : "+filters)
 
       var urlstring =
-        "http://172.16.1.110:8000/logdetail/?limit=" +
+        "http://127.0.0.1:8000/logdetail/?limit=" +
         this.pagingInfo.rowsPerPage +
         "&offset=" +
         offset + filters;

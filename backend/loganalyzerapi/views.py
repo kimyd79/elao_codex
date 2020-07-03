@@ -100,30 +100,43 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         type = request.data['type']
         print("** statistics_top1 : type --> ", type)
         
+        # 결과 처리
+        result = []
+        
         #0. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
         queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)
         
         #1. TODO : 검색 조건 적용(공통항목으로 Extract)
         
+        #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
+        
         #type=1. 전체 처리량(건수)
-        print("type1 : queryset.count() - ", queryset.count())
+        if type == 1:
+            print("type1 : queryset.count() - ", queryset.count())
+            result.append({"result" : 'Total', "result_count" : queryset.count()})
                
         #type=2. 최다접속 IP주소
-        top_ip = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')
-        print("type2 : TOP IP - ", top_ip[0]['fip'])
-        print("type2 : TOP IP Count - ", top_ip[0]['fip_count'])
+        elif type == 2:
+            top_ip = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')
+            print("type2 : TOP IP - ", top_ip[0]['fip'])
+            print("type2 : TOP IP Count - ", top_ip[0]['fip_count'])
+            result.append({"result" : top_ip[0]['fip'], "result_count" : top_ip[0]['fip_count']})
         
         #type=3. 최다접속 사용자 요청(request)
-        top_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')
-        print("type3 : TOP REQUEST - ", top_request[0]['frequest'])
-        print("type3 : TOP REQUEST Count - ", top_request[0]['frequest_count'])
-        
+        elif type == 3:
+            top_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')
+            print("type3 : TOP REQUEST - ", top_request[0]['frequest'])
+            print("type3 : TOP REQUEST Count - ", top_request[0]['frequest_count'])
+            result.append({"result" :  top_request[0]['frequest'], "result_count" : top_request[0]['frequest_count']})
+            
         #type=4. 최다 404 발생 URL
-        top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
-        print("type4 : TOP 404 REQUEST - ", top_404_request[0]['frequest'])
-        print("type4 : TOP 404 REQUEST Count - ", top_404_request[0]['frequest_404_count'])
-                
-        response = {'message': 'statistics returned', 'result': 'TEST'}
+        elif type == 4:
+            top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
+            print("type4 : TOP 404 REQUEST - ", top_404_request[0]['frequest'])
+            print("type4 : TOP 404 REQUEST Count - ", top_404_request[0]['frequest_404_count'])
+            result.append({"result" :  top_404_request[0]['frequest'], "result_count" : top_404_request[0]['frequest_404_count']})
+                    
+        response = {'message': 'statistics returned', 'results': result}
         return Response(response, status = status.HTTP_200_OK)
     
      # For Statistics - top5
@@ -140,31 +153,40 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         #1. TODO : 검색 조건 적용(공통항목으로 Extract)
         
+        #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
+        
         results = []
         
         #type=1. Status Codes Top5
-        top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]
-        for idx in range(0,5):
-            print("type1 : TOP5 STATUS - ", top5_status[idx]['fstatus'])
-            print("type1 : TOP5 STATUS Count - ", top5_status[idx]['fstatus_count'])
-            
-            results.append({"fstatus" : top5_status[idx]['fstatus'], "fstatus_count" : top5_status[idx]['fstatus_count']})
+        if type == 1:
+            top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]
+            for idx in range(0,5):
+                print("type1 : TOP5 STATUS - ", top5_status[idx]['fstatus'])
+                print("type1 : TOP5 STATUS Count - ", top5_status[idx]['fstatus_count'])
+                
+                results.append({"result" : top5_status[idx]['fstatus'], "result_count" : top5_status[idx]['fstatus_count']})
         
         #type=2. Requests Top5
-        top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
-        for idx in range(0,5):
-            print("type2 : TOP5 REQUEST - ", top5_request[idx]['frequest'])
-            print("type2 : TOP5 REQUEST Count - ", top5_request[idx]['frequest_count'])
+        elif type == 2:
+            top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
+            for idx in range(0,5):
+                print("type2 : TOP5 REQUEST - ", top5_request[idx]['frequest'])
+                print("type2 : TOP5 REQUEST Count - ", top5_request[idx]['frequest_count'])
+                
+                results.append({"result" : top5_request[idx]['frequest'], "result_count" : top5_request[idx]['frequest_count']})     
         
-        #type=3. Search Terms Top5
+        #type=3. 최다 404 발생 URL Top5
+        elif type == 3:
+            top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
+            for idx in range(0,5):
+                print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])
+                print("type4 : TOP 404 REQUEST Count - ", top5_404_request[idx]['frequest_404_count']) 
+                
+                results.append({"result" : top5_404_request[idx]['frequest'], "result_count" : top5_404_request[idx]['frequest_404_count']})      
+            
+         #type=4. Search Terms Top5     
         
-        #type=4. 최다 404 발생 URL Top5
-        top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
-        for idx in range(0,5):
-            print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])
-            print("type4 : TOP 404 REQUEST Count - ", top5_404_request[idx]['frequest_404_count'])        
-        
-        # TODO : 결과값을 생성해서 보내야 한다.
+        # TODO : 결과값을 생성해서 보내야 한다 & Exception 처리
         
         response = {'message': 'statistics returned', 'results': results}
         return Response(response, status = status.HTTP_200_OK)

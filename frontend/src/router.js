@@ -23,7 +23,7 @@ import Init from "./views/Init.vue"
 import Analysis from "./views/Analysis.vue"
 import Comparison from "./views/Comparison.vue"
 import Detail from "./views/Detail.vue"
-import Setting from "./views/Setting.vue"
+import Management from "./views/Management.vue"
 import Logformat from "./views/Logformat.vue"
 
 Vue.use(Router)
@@ -58,9 +58,9 @@ export default new Router({
       component: Comparison,
     },
     {
-      path: '/setting',
-      name: 'Setting',
-      component: Setting,
+      path: '/management',
+      name: 'Management',
+      component: Management,
       children: [
         {
           path: '/logformat',

@@ -187,7 +187,9 @@ export default {
 
 <style scoped>
 .highlight {
-  background-color: yellow;
+  color: #553CA5; 
+  background-color: #F3F1F9;
+  font-weight: bold;
 }
 .page-container {
   margin: 48px 0 32px;

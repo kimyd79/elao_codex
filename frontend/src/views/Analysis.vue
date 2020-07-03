@@ -16,19 +16,19 @@
     </ui-container-box>
 
     <ui-container-box :columns="20" vertical align-left class="page-title">
-      <span class="page-title__label">Statistics - Top1</span>
+      <span class="page-title__label">Statistics - Top</span>
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-form-area">    
       
       <ui-container-box :columns="10" vertical class="mt20">
-        <statistics></statistics>
-        <statistics></statistics>
+        <statistics-top :statisticsRow="1" :statisticsKind="1"></statistics-top>
+        <statistics-top :statisticsRow="1" :statisticsKind="2"></statistics-top>
      </ui-container-box>
-           
-      <ui-container-box :columns="10" vertical class="mt20">
-        <statistics></statistics>
-        <statistics></statistics>
+
+     <ui-container-box :columns="10" vertical class="mt20">
+        <statistics-top :statisticsRow="1" :statisticsKind="3"></statistics-top>
+        <statistics-top :statisticsRow="1" :statisticsKind="4"></statistics-top>
       </ui-container-box>
       
     </ui-container-box>
@@ -40,13 +40,13 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">    
       
       <ui-container-box :columns="10" vertical class="mt20">
-        <statistics-top :statisticsRow="statisticsRow" :statisticsKind="statisticsKind"></statistics-top>
-        <statistics></statistics>
+        <statistics-top :statisticsRow="5" :statisticsKind="1"></statistics-top>
+        <statistics-top :statisticsRow="5" :statisticsKind="2"></statistics-top>
      </ui-container-box>
            
       <ui-container-box :columns="10" vertical class="mt20">
-        <statistics></statistics>
-        <statistics></statistics>
+        <statistics-top :statisticsRow="5" :statisticsKind="3"></statistics-top>
+        <statistics-top :statisticsRow="5" :statisticsKind="1"></statistics-top>
       </ui-container-box>
       
     </ui-container-box>

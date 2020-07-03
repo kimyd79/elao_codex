@@ -233,7 +233,7 @@ export default {
           //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
             
           // /logmaster/?search=Leehs
-          var url = "http://172.16.1.110:8000/logmaster/?search="+this.creator
+          var url = "http://127.0.0.1:8000/logmaster/?search="+this.creator
 
           let axiosConfig = {
                 headers: {
@@ -258,7 +258,7 @@ export default {
         }
 
         // Logic 처리 : TODO - Global 변수로 뺄 것
-        var url = "http://172.16.1.110:8000"       
+        var url = "http://127.0.0.1:8000"       
 
         // for Test : --> TODO : vuex에 추가할 것
         //this.projectID = '49898027-f29d-4d7e-9a68-ab590e46e783'

@@ -3,39 +3,17 @@
         <table class="page-summary-table">
           <thead>
             <tr>
-              <th rowspan="2" style="width: 180px;" v-on:click="getStatistics">Request Top 1/5</th>
-              <th rowspan="2" style="width: 460px;">Request URI</th>
+              <th rowspan="2" style="width: 180px;">{{ this.title }}</th>
+              <th rowspan="2" style="width: 460px;">{{ this.content }}</th>
               <th rowspan="2" style="width: 100px;">Count</th>            
             </tr>          
           </thead>
           <tbody>
             <tr v-for="(item, index) in items">
-              <td>{{ index }}</td>
-              <td>{{ item.content }}</td>
-              <td>{{ item.result }}</td>            
+              <td>{{ index+1 }}</td>
+              <td>{{ item.result }}</td>
+              <td>{{ item.result_count }}</td>            
             </tr>
-            
-            <!--
-            <tr>
-              <td>2</td>
-              <td>/test2</td>
-              <td>100</td>            
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>/test3</td>
-              <td>50</td>            
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>/test4</td>
-              <td>50</td>            
-            </tr>
-            <tr>
-              <td>5</td>
-              <td>/test5</td>
-              <td>50</td>
-            </tr>-->
             
           </tbody>
         </table>
@@ -44,6 +22,7 @@
 
 <script>
 import axios from "axios";
+import { mapGetters } from "vuex";
 
 export default {
     name: 'Statistics',
@@ -51,11 +30,13 @@ export default {
 
     data: function() {
       return {
+        title: "",
+        content: "",
         items: [
-          { content: 'Foo1', result: 'Foo1',},
-          { content: 'Foo2', result: 'Foo2',},
-          { content: 'Foo3', result: 'Foo3',},
-          { content: 'Foo4', result: 'Foo4',},
+          { result: 'Foo1', result_count: 'Foo1',},
+          { result: 'Foo2', result_count: 'Foo2',},
+          { result: 'Foo3', result_count: 'Foo3',},
+          { result: 'Foo4', result_count: 'Foo4',},
         ]
       }
     },
@@ -63,6 +44,22 @@ export default {
     created() {
       console.log(this.statisticsRow, this.statisticsKind)
     },
+
+    computed: mapGetters({
+      isSearch: "getToggleSearch",
+      
+      dateFromValue: "getFromDate",
+      dateToValue: "getToDate",
+      timeFromValue: "getFromTime",
+      timeToValue: "getToTime",
+
+      conditionValue: "getCondition",
+      searchValue: "getSearchKeyword",
+
+      ttFromValue: "getFromTimeTaken",
+      ttToValue: "getToTimeTaken",
+
+    }),
 
     methods: {
       // TODO : 데이터 가져오기 (기본 조건값 필요 - 그래야 변경분 반영된다.)    
@@ -72,24 +69,73 @@ export default {
 
         for (let i = 0; i < results.length; i++) {
             this.items.push({
-                content: results[i].fstatus,
-                result: results[i].fstatus_count
+                result: results[i].result,
+                result_count: results[i].result_count
             })
         }
       },
 
       getStatistics(){          
           
-          // TODO
-          var url = "http://172.16.1.110:8000/logdetail/statistics_top5/"
+          var url = "http://127.0.0.1:8000/logdetail/statistics_top"
 
+          // CASE#1 - Top 5 일때
+          // type=1. Status Codes Top5
+          // type=2. Requests Top5
+          // type=3. 최다 404 발생 URL Top5
+        
+          // CASE#2 - Top 1 일때
+          // type=1. 전체 처리량(건수)
+          // type=2. 최다접속 IP주소
+          // type=3. 최다접속 사용자 요청(request)
+          // type=4. 최다 404 발생 URL
+
+          // TODO : title, content
+          if ( this.statisticsRow == 5){
+            
+            this.title = "Top 5"
+
+            switch(this.statisticsKind){
+              case 1:
+                this.content = "Status Codes"
+                break;
+              case 2:
+                this.content = "Requests URI"
+                break;
+              case 3:
+                this.content = "404 Requests URI"
+                break;
+              default:
+            }
+
+          }else if ( this.statisticsRow == 1){
+
+            this.title = "Top"
+            switch(this.statisticsKind){
+              case 1:
+                this.content = "Total"
+                break;
+              case 2:
+                this.content = "Top Request IP"
+                break;
+              case 3:
+                this.content = "Top Requests URI"
+                break;
+              case 4:
+                this.content = "Top 404 Requests URI"
+                break;
+              default:
+            }
+          }
+
+          // TODO : For Test          
           let logfile_id = 'e005c4ee-2df8-4c53-9d35-ec7bd7629b76'
-          let type = '1'
+          var url = "http://127.0.0.1:8000/logdetail/statistics_top"+this.statisticsRow+"/"  // 1 or 5
 
           let postData = {
                 
                 logfile_id: logfile_id,
-                type: type
+                type: this.statisticsKind
             };
 
           let axiosConfig = {
@@ -107,7 +153,15 @@ export default {
               console.error(err); 
           })
       },
+    },
+
+    
+  watch: {
+    isSearch() {
+
+      this.getStatistics();
     }
+  }
 
 }
 </script>

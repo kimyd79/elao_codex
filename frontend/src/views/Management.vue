@@ -34,15 +34,15 @@ export default {
         return {
             menus: [
                 { 
-                  label: 'LogFormat' ,
+                  label: 'Setting' ,
                   menus: [
                     { label:'LogFormat', linkto:'/logformat', key:'logformat', isSelected: false },
-                    { label:'LNB - Stack 02', linkto:'/template/LNBStack02', key:'LNBStack02', isSelected: false },                    
+                    { label:'Language', linkto:'/template/LNBStack02', key:'LNBStack02', isSelected: false },                    
                   ]
                 },
                 
                 { 
-                  label: 'Split with LNB' ,
+                  label: 'User' ,
                   menus: [
                     { label:'LNB - Split 01', linkto:'/template/LNBSplit01', key:'LNBSplit01', isSelected: false },
                     { label:'LNB - Split 02', linkto:'/template/LNBSplit02', key:'LNBSplit02', isSelected: false },                  
@@ -50,12 +50,10 @@ export default {
                 },
 
                 { 
-                  label: 'Complex with LNB' ,
+                  label: 'TODO' ,
                   menus: [
                     { label:'LNB - Complex 01', linkto:'/template/LNBComplex01', key:'LNBComplex01', isSelected: false },
-                    { label:'LNB - Complex 02', linkto:'/template/LNBComplex02', key:'LNBComplex02', isSelected: false },
-                    { label:'LNB - Complex 03', linkto:'/template/LNBComplex03', key:'LNBComplex03', isSelected: false },
-                    { label:'LNB - Complex 04', linkto:'/template/LNBComplex04', key:'LNBComplex04', isSelected: false },
+                    { label:'LNB - Complex 02', linkto:'/template/LNBComplex02', key:'LNBComplex02', isSelected: false },                    
                   ]
                 }                
             ]
