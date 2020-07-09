@@ -58,7 +58,8 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line></chart-line> 
+        <chart-line :chart-data="datacollection" :options="options"></chart-line>
+        <button @click="fillData()">Randomize</button> 
         <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
         <chart-bar></chart-bar>
       </ui-container-box>      
@@ -104,9 +105,15 @@ export default {
       // For Statistics -> use 'props'
       statisticsRow: "1",   // Top or Top5 (Row 수)
       statisticsKind: "1",  // 전체 처리량 (통계 종류)  
+
+      // for chart reactivess Test
+      datacollection: null,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
     }
-  },
-  
+  }, 
 
   // 컴포넌트 등록
   components: {
@@ -119,7 +126,50 @@ export default {
     ChartBar: ChartBar,
     ChartPie: ChartPie,
     ChartStackedBar: ChartStackedBar
+  },
+
+  mounted () {
+      this.fillData()
+  },
+  methods: {
+    fillData () {
+
+      var results1 = []
+      var results2 = []
+0
+      for(var i=0 ; i<1000 ; i++){
+        results1.push(this.getRandomInt())
+        results2.push(this.getRandomInt())
+      }
+
+      this.datacollection = {
+        //labels: [this.getRandomInt(), this.getRandomInt()],
+        labels: results1,
+        
+        datasets: [          
+          {
+            label: 'Data One',
+            fill: false,
+            backgroundColor: '#f87979',
+            borderColor: 'rgb(255, 99, 132)',
+            //data: [this.getRandomInt(), this.getRandomInt()]
+            data: results1
+          }, {
+            label: 'Data One',
+            fill: false,
+            backgroundColor: '#f87979',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            //data: [this.getRandomInt(), this.getRandomInt()]
+            data: results2
+          }
+        ]
+      }
+    },
+    getRandomInt () {
+      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+    }
   }
+
 };
 </script>
 
