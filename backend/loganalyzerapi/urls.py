@@ -25,7 +25,8 @@ router.register(r'logdetail/chartdata', views.LogDetailViewSet)
 router.register(r'logformat', views.LogFormatViewSet)
 router.register(r'logformatstring', views.LogFormatStringViewSet)
 
-#router.register(r'users', views.UserViewSet)
+# For user
+router.register(r'user', views.UserViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
