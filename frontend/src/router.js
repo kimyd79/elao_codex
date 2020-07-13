@@ -25,6 +25,9 @@ import Comparison from "./views/Comparison.vue"
 import Detail from "./views/Detail.vue"
 import Management from "./views/Management.vue"
 import Logformat from "./views/Logformat.vue"
+import Register from "./components/layout/Register.vue"
+import LogIn from "./components/layout/LogIn.vue"
+import LogOut from "./components/layout/LogOut.vue"
 
 Vue.use(Router)
 
@@ -66,6 +69,21 @@ export default new Router({
           path: '/logformat',
           name: 'logformat',
           component: Logformat
+        },
+                {
+          path: '/register',
+          name: 'register',
+          component: Register
+        },
+        {
+          path: '/login',
+          name: 'login',
+          component: LogIn
+        },
+        {
+          path: '/logout',
+          name: 'logout',
+          component: LogOut
         },
       ]
     },
