@@ -15,7 +15,8 @@ from django.db import transaction
 import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Max, F
+from django.db.models import Count, Max, Min, Avg
+from django.db.models.functions import Concat
 
 
 # 기본 CRUD생성
@@ -89,6 +90,68 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     # Reference API : http://www.cdrf.co/3.1/rest_framework.viewsets/ModelViewSet.html#get_queryset 
     # QuerySet(Field lookups) : https://docs.djangoproject.com/en/3.0/ref/models/querysets/#id4    
     
+    # For Statistics - top1
+    @action(methods=['post'], detail=False)
+    def chartdata(self, request, pk=None):
+        logfile_id = request.data['logfile_id']
+        
+        type = request.data['type']
+        kind = request.data['kind']
+        print("** chartdata : type, kind --> ", type, kind)
+        
+        #0. TODO : 검색 조건 적용(공통항목으로 Extract) - 확인필요
+        queryset = self.get_queryset()
+        
+        #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+        queryset = queryset.filter(logfile_id__exact=logfile_id)        
+        
+        #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
+        
+        # 결과 처리
+        resultX = []
+        resultY = []        
+
+        # Type1 : 시(HH)기준
+        #   Kind1 : request(요청) 건수(count)
+        #   Kind2 : time-taken 시간(max, min, count)
+        
+        #type=1. 시(HH)기준
+        if type == '1':
+            hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
+
+            if(kind == '1'):
+                for idx in range(0,hhRequest.count()):
+                    print("type1, kind1 : request(요청) 건수(count) x - ", hhRequest[idx]['x'])
+                    print("type1, kind1 : request(요청) 건수(count) y - ", hhRequest[idx]['y'])            
+                    
+                    resultX.append(hhRequest[idx]['x'])
+                    resultY.append(hhRequest[idx]['y'])
+            elif(kind =='2'):
+                # TODO : time-taken 존재여부 Check
+                pass
+        
+        # Type2 : 시분(HHMM)기준                    
+        #   Kind1 : request(요청) 건수(count)
+        #   Kind2 : time-taken 시간(max, min, count) 
+        elif type == '2':          
+                           
+            if(kind == '1'):
+                
+                hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
+                
+                for idx in range(0,hhmmRequest.count()):
+                    print("type2, kind1 : request(요청) 건수(count) x - ", hhmmRequest[idx]['x'])
+                    print("type2, kind1 : request(요청) 건수(count) y - ", hhmmRequest[idx]['y'])            
+                    
+                    resultX.append(hhmmRequest[idx]['x'])
+                    resultY.append(hhmmRequest[idx]['y'])
+            elif(kind == '2'):
+                # TODO : time-taken 존재여부 Check
+                pass
+        
+        
+        response = {'message': 'chartdata returned successfully', 'resultX': resultX, 'resultY': resultY}
+        return Response(response, status = status.HTTP_200_OK)
     
     
     # For Statistics - top1
@@ -111,26 +174,26 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
         
         #type=1. 전체 처리량(건수)
-        if type == 1:
+        if type == '1':
             print("type1 : queryset.count() - ", queryset.count())
             result.append({"result" : 'Total', "result_count" : queryset.count()})
                
         #type=2. 최다접속 IP주소
-        elif type == 2:
+        elif type == '2':
             top_ip = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')
             print("type2 : TOP IP - ", top_ip[0]['fip'])
             print("type2 : TOP IP Count - ", top_ip[0]['fip_count'])
             result.append({"result" : top_ip[0]['fip'], "result_count" : top_ip[0]['fip_count']})
         
         #type=3. 최다접속 사용자 요청(request)
-        elif type == 3:
+        elif type == '3':
             top_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')
             print("type3 : TOP REQUEST - ", top_request[0]['frequest'])
             print("type3 : TOP REQUEST Count - ", top_request[0]['frequest_count'])
             result.append({"result" :  top_request[0]['frequest'], "result_count" : top_request[0]['frequest_count']})
             
         #type=4. 최다 404 발생 URL
-        elif type == 4:
+        elif type == '4':
             top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
             print("type4 : TOP 404 REQUEST - ", top_404_request[0]['frequest'])
             print("type4 : TOP 404 REQUEST Count - ", top_404_request[0]['frequest_404_count'])
@@ -148,17 +211,18 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         type = request.data['type']
         print("** statistics_top5 : type --> ", type)
         
-        #0. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-        queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)
+        #0. TODO : 검색 조건 적용(공통항목으로 Extract) - 확인필요
+        #queryset = get_queryset(self)
         
-        #1. TODO : 검색 조건 적용(공통항목으로 Extract)
+        #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+        queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)        
         
         #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
         
         results = []
         
         #type=1. Status Codes Top5
-        if type == 1:
+        if type == '1':
             top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]
             for idx in range(0,5):
                 print("type1 : TOP5 STATUS - ", top5_status[idx]['fstatus'])
@@ -167,7 +231,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 results.append({"result" : top5_status[idx]['fstatus'], "result_count" : top5_status[idx]['fstatus_count']})
         
         #type=2. Requests Top5
-        elif type == 2:
+        elif type == '2':
             top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
             for idx in range(0,5):
                 print("type2 : TOP5 REQUEST - ", top5_request[idx]['frequest'])
@@ -176,7 +240,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 results.append({"result" : top5_request[idx]['frequest'], "result_count" : top5_request[idx]['frequest_count']})     
         
         #type=3. 최다 404 발생 URL Top5
-        elif type == 3:
+        elif type == '3':
             top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
             for idx in range(0,5):
                 print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])

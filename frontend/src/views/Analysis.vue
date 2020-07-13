@@ -93,6 +93,8 @@ import Search from "@/components/layout/Search";
 import Statistics from "@/components/layout/Statistics";
 import StatisticsTop from "@/components/layout/StatisticsTop";
 
+import axios from "axios";
+
 export default {
   name: "Analysis",
 
@@ -111,7 +113,12 @@ export default {
       options: {
         responsive: true,
         maintainAspectRatio: false
-      }
+      },
+
+      // For ChartData
+      axisX: [],
+      axisY: [],
+
     }
   }, 
 
@@ -129,22 +136,72 @@ export default {
   },
 
   mounted () {
+      // TODO : default value
       this.fillData()
   },
   methods: {
+
+    // TODO : 여기부터....
+    getChartData(){
+      var url = "http://127.0.0.1:8000/logdetail/chartdata/"
+
+      // TODO : for test
+      let logfile_id = '57cbb001-2851-43b6-8039-7af723978579'
+
+      let postData = {
+                
+          logfile_id: logfile_id,
+          //for Test
+          type: "2",
+          kind: "1"
+
+      };
+
+      let axiosConfig = {
+          headers: {
+          //'Authorization': 'Token '+ this.token // For Django
+          }
+      };
+
+      axios.post(url, postData, axiosConfig)
+
+      .then(res => {
+          console.log(res)
+          //this.setItems(res.data.results[12].resultXX);
+          console.log(res.data.resultX)
+          console.log(res.data.resultY)
+
+          this.axisX = res.data.resultX
+          this.axisY = res.data.resultY
+
+      })
+      .catch(err => {
+          console.error(err); 
+      })
+
+    },
+
     fillData () {
+
+      // TODO : Error 처리
+      this.getChartData()
 
       var results1 = []
       var results2 = []
-0
-      for(var i=0 ; i<1000 ; i++){
+
+      for(var i=0 ; i<10 ; i++){
         results1.push(this.getRandomInt())
         results2.push(this.getRandomInt())
       }
 
+      console.log(results1)
+      console.log(this.axisX)
+      console.log(this.axisY)
+
       this.datacollection = {
         //labels: [this.getRandomInt(), this.getRandomInt()],
-        labels: results1,
+        //labels: results1,
+        labels: this.axisX,
         
         datasets: [          
           {
@@ -153,15 +210,17 @@ export default {
             backgroundColor: '#f87979',
             borderColor: 'rgb(255, 99, 132)',
             //data: [this.getRandomInt(), this.getRandomInt()]
-            data: results1
-          }, {
-            label: 'Data One',
-            fill: false,
-            backgroundColor: '#f87979',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            //data: [this.getRandomInt(), this.getRandomInt()]
-            data: results2
-          }
+            //data: results1
+            data: this.axisY
+          }, 
+          // {
+          //   label: 'Data One',
+          //   fill: false,
+          //   backgroundColor: '#f87979',
+          //   borderColor: 'rgba(54, 162, 235, 1)',
+          //   //data: [this.getRandomInt(), this.getRandomInt()]
+          //   data: results2
+          // }
         ]
       }
     },
