@@ -44,8 +44,9 @@ export default {
                 { 
                   label: 'User' ,
                   menus: [
-                    { label:'LNB - Split 01', linkto:'/template/LNBSplit01', key:'LNBSplit01', isSelected: false },
-                    { label:'LNB - Split 02', linkto:'/template/LNBSplit02', key:'LNBSplit02', isSelected: false },                  
+                    { label:'Register', linkto:'/register', key:'register', isSelected: false },
+                    { label:'LogIn', linkto:'/login', key:'login', isSelected: false }, 
+                    { label:'LogOut', linkto:'/logout', key:'logout', isSelected: false },                             
                   ]
                 },
 
