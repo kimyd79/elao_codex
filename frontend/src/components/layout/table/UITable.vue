@@ -121,6 +121,7 @@
                             >
                                 <lego-checkbox small v-model="item.isSelected"/>
                             </div>
+                            
                             <div class="ui-table-body__list-item-cells">
                                 <div v-for="column in columns" :key="column.key+group.key+index"
                                     :class="[
@@ -130,11 +131,11 @@
                                     ]"
                                     :style="{ flexBasis: column.width+'%' }"
                                 >
-                                    <div class="ui-table-body__list-item-cell__content">
+                                    <div class="ui-table-body__list-item-cell__content" v-on:click="selectedRow(item)">
                                         <slot v-if="editingItem === item" :name="'celledit-'+column.key" :item="item" >
                                             {{item[column.key]}}
                                         </slot>
-                                        <slot v-else :name="'cellview-'+column.key" :item="item" >
+                                        <slot v-else :name="'cellview-'+column.key" :item="item">
                                             {{item[column.key]}}
                                         </slot>
                                     </div>
@@ -253,6 +254,35 @@ export default {
         // Leehs
         pageChange(page) {
             this.pagingInfo.currentPage = page
+        },
+
+        selectedRow(item){
+  
+            var selectedCount = 0
+            for(let i = 0 ; i< this.items.length; i++){
+                if ( this.items[i].isSelected == true ){
+                    selectedCount++
+                }
+            }
+            if (selectedCount == 0){
+                 item.isSelected == true ? item.isSelected = false : item.isSelected = true
+                 this.$store.dispatch("setToggleSearch");
+            }else if (selectedCount == 1 && item.isSelected == true){                
+                item.isSelected == true ? item.isSelected = false : item.isSelected = true
+            }else {
+                item.isSelected = false
+            }
+
+            console.log('item : ', item)
+
+            // TODO : project_id 등 설정 필요 - vuex 사용
+            console.log('item : ', item.projectID)
+            console.log('item : ', item.projectName)
+            console.log('item : ', item.projectDescription)
+
+            this.$store.dispatch("setProjectName", item.projectName);
+            this.$store.dispatch("setProjectDescription", item.projectDescription);
+            this.$store.dispatch("setProjectID", item.projectID);
         },
 
         clickHeaderIcon(column, refId) {

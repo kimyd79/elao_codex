@@ -192,6 +192,7 @@ export default {
   },
 
   created() {
+    // TODO : 인증에 대해 처리한다.  
     
     // Initial Value Setting
     this.projectName = this.$store.state.projectName
@@ -199,7 +200,12 @@ export default {
     this.fileFormat = this.$store.state.logFormat
     
   },
-  computed: {
+  computed: { 
+      
+      ...mapGetters({
+        isRowChecked: "getToggleSearch"
+      }),
+    
 
           items() {
             // TODO : Get File Formats from DB
@@ -211,6 +217,10 @@ export default {
         },
     },
   methods: {
+
+      selectRow() {
+
+      },
       
       setItemList(results) {
 
@@ -222,17 +232,19 @@ export default {
                 projectDescription: results[i].project_description,
                 creator: results[i].creator,
                 createdDate: results[i].created,
-                isSelected: false
+                isSelected: false,
+                projectID: results[i].project_id
             })
         }
       },
 
-      getProjects(){
+      getProjects(project_id){
           // {projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
           //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
           //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
             
-          // /logmaster/?search=Leehs
+          // /logmaster/?search=Leehs       
+        // "+(project_id != '' ? project_id+"/" : project_id)+"
           var url = "http://127.0.0.1:8000/logmaster/?search="+this.creator
 
           let axiosConfig = {
@@ -245,6 +257,7 @@ export default {
           .then(res => {
               console.log(res)
               this.setItemList(res.data.results);
+              
           })
           .catch(err => {
               console.error(err); 
@@ -277,6 +290,7 @@ export default {
 
             // TODO : Tab 왔다갔다 할때 체크로직 필요
             this.createLogfile(url)
+
         } else if(this.tabs[3].isSelected  & this.logfileID != ""){ // Step3 or Info
 
             // TODO : Tab 왔다갔다 할때 체크로직 필요
@@ -337,6 +351,9 @@ export default {
                 console.log(res)                
                 this.projectID = res.data.project_id
                 
+                // Set in vuex
+                this.$store.dispatch("setProjectID", this.projectID);
+                
             })
             .catch(err => {
                 console.error(err); 
@@ -355,6 +372,7 @@ export default {
         this.$store.dispatch("setFileNames", this.fileName);
 
       },
+
       createLogfile(url){
 
             // TODO : Multi-file upload 필요
@@ -380,6 +398,9 @@ export default {
                 console.log(res)
                 
                 this.logfileID = res.data.logfile_id
+
+                // Set in vuex
+                this.$store.dispatch("setLogFileID", this.logfileID);
             })
             .catch(err => {
                 console.error(err); 
@@ -399,6 +420,7 @@ export default {
                 }
             };
 
+          // TODO : Progress Bar가 필요하다.
           axios.post(url+"/logdetail/", postData, axiosConfig )
             .then(res => {
                 console.log(res)
@@ -425,7 +447,19 @@ export default {
             })
       }
   },
-  watch: {}
+  watch: {
+      isRowChecked(){
+        console.log("Is isRowChecked?")
+          
+        this.projectName = this.$store.state.projectName
+        this.projectDescription = this.$store.state.projectDescription
+
+        // TODO : project id로 file 정보 가져오기 (여기부터....)
+        this.fileName = this.$store.state.fileNames
+        this.fileFormat = this.$store.state.logFormat
+          
+      }
+  }
 
 }
 </script>

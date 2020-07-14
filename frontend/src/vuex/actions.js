@@ -3,8 +3,12 @@ import * as types from './mutation_types'
 export default {
     
     setProjectName({commit}, value) { commit(types.SET_PROJECTNAME, value) },
+    setProjectDescription({commit}, value) { commit(types.SET_PROJECTDESCRIPTION, value) },
     setFileNames({commit}, value) { commit(types.SET_FILENAMES, value) },
     setLogFormat({commit}, value) { commit(types.SET_LOGFORMAT, value) },
+    setProjectID({commit}, value) { commit(types.SET_PROJECTID, value) },
+    setLogFileID({commit}, value) { commit(types.SET_LOGFILEID, value) },
+
     setFromDate({commit}, value) { commit(types.SET_FROMDATE, value) },
     setToDate({commit}, value) { commit(types.SET_TODATE, value) },
     setFromTime({commit}, value) { commit(types.SET_FROMTIME, value) },

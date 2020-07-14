@@ -12,8 +12,12 @@ const state = {
     
     // common info
     projectName: '',
+    projectDescription: '',
     fileNames: '',
     logFormat: '',
+
+    projectID: '',
+    logFileID: '',
 
     // search info   
     fromDate: '',
@@ -26,7 +30,7 @@ const state = {
     searchKeyword: '',
 
     // check
-    toggleSearch: '0',  //  0 or 1 변경사항 확인용
+    toggleSearch: '0',  //  0 or 1 변경사항 확인용    
 }
 
 // mutation
@@ -34,8 +38,11 @@ const mutations = {
 
     // common info
     [types.SET_PROJECTNAME] (state, value) { state.projectName = value },
+    [types.SET_PROJECTDESCRIPTION] (state, value) { state.projectDescription = value },
     [types.SET_FILENAMES] (state, value) { state.fileNames = value },
     [types.SET_LOGFORMAT] (state, value) { state.logFormat = value },
+    [types.SET_PROJECTID] (state, value) { state.projectID = value },
+    [types.SET_LOGFILEID] (state, value) { state.logFileID = value },
 
     // search info
     [types.SET_FROMDATE] (state, value) { state.fromDate = value },

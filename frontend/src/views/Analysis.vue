@@ -146,13 +146,13 @@ export default {
       var url = "http://127.0.0.1:8000/logdetail/chartdata/"
 
       // TODO : for test
-      let logfile_id = '57cbb001-2851-43b6-8039-7af723978579'
+      let logfile_id = this.$store.state.logFileID
 
       let postData = {
                 
           logfile_id: logfile_id,
           //for Test
-          type: "2",
+          type: "1",
           kind: "1"
 
       };
@@ -167,7 +167,7 @@ export default {
 
       .then(res => {
           console.log(res)
-          //this.setItems(res.data.results[12].resultXX);
+          
           console.log(res.data.resultX)
           console.log(res.data.resultY)
 

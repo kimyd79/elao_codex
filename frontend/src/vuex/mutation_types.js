@@ -1,6 +1,10 @@
 export const SET_PROJECTNAME	= "SET_PROJECTNAME"
+export const SET_PROJECTDESCRIPTION	= "SET_PROJECTDESCRIPTION"
 export const SET_FILENAMES      = "SET_FILENAMES"
 export const SET_LOGFORMAT      = "SET_LOGFORMAT"
+export const SET_PROJECTID      = "SET_PROJECTID"
+export const SET_LOGFILEID      = "SET_LOGFILEID"
+
 export const SET_FROMDATE       = "SET_FROMDATE"
 export const SET_TODATE         = "SET_TODATE"
 export const SET_FROMTIME       = "SET_FROMTIME"

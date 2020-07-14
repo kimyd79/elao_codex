@@ -1,5 +1,12 @@
 export default {
-    
+
+    getProjectName: state => state.projectName ,
+    getProjectDescription: state => state.projectDescription ,
+    getFileNames: state => state.fileNames ,
+    getLogFormat: state => state.logFormat ,
+    getProjectID: state => state.projectID,
+    getLogFileID: state => state.logFileID,
+
     getFromDate: state => state.fromDate ,
     getToDate: state => state.toDate ,
     getFromTime: state => state.fromTime ,
@@ -7,11 +14,7 @@ export default {
     getFromTimeTaken: state => state.fromTimeTaken ,
     getToTimeTaken: state => state.toTimeTaken ,
     getCondition: state => state.condition ,
-    getSearchKeyword: state => state.searchKeyword ,
-    
-    getProjectName: state => state.projectName ,
-    getFileNames: state => state.fileNames ,
-    getLogFormat: state => state.logFormat ,
+    getSearchKeyword: state => state.searchKeyword ,    
 
     getToggleSearch: state => state.toggleSearch
 
