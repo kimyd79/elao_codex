@@ -7,7 +7,7 @@ from rest_framework import renderers
 from rest_framework import viewsets, status
 from rest_framework.renderers import JSONRenderer
 from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString
-from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer
+from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer
 import time, uuid, re, csv
 from datetime import datetime, timezone
 from rest_framework.response import Response
@@ -17,7 +17,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Max, Min, Avg
 from django.db.models.functions import Concat
-
+from django.contrib.auth.models import User
 
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
@@ -484,3 +484,8 @@ class LogFormatStringViewSet(viewsets.ModelViewSet):
     serializer_class = LogFormatStringSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['format_kind']    
+    
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = [DjangoFilterBackend]   
