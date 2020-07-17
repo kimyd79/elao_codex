@@ -53,8 +53,11 @@ class LogMasterViewSet(viewsets.ModelViewSet):
 class LogFileViewSet(viewsets.ModelViewSet):
     queryset = LogFile.objects.all()
     serializer_class = LogFileSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['file_name']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    
+    search_fields = ['file_name']    
+    filterset_fields = ['project']    
+    
     '''
     '^' Starts-with search.
     '=' Exact matches.
@@ -90,7 +93,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     # Reference API : http://www.cdrf.co/3.1/rest_framework.viewsets/ModelViewSet.html#get_queryset 
     # QuerySet(Field lookups) : https://docs.djangoproject.com/en/3.0/ref/models/querysets/#id4    
     
-    # For Statistics - top1
+    # For Statistics - chartdata
     @action(methods=['post'], detail=False)
     def chartdata(self, request, pk=None):
         logfile_id = request.data['logfile_id']
@@ -174,26 +177,26 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
         
         #type=1. 전체 처리량(건수)
-        if type == '1':
+        if type == 1:
             print("type1 : queryset.count() - ", queryset.count())
             result.append({"result" : 'Total', "result_count" : queryset.count()})
                
         #type=2. 최다접속 IP주소
-        elif type == '2':
+        elif type == 2:
             top_ip = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')
             print("type2 : TOP IP - ", top_ip[0]['fip'])
             print("type2 : TOP IP Count - ", top_ip[0]['fip_count'])
             result.append({"result" : top_ip[0]['fip'], "result_count" : top_ip[0]['fip_count']})
         
         #type=3. 최다접속 사용자 요청(request)
-        elif type == '3':
+        elif type == 3:
             top_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')
             print("type3 : TOP REQUEST - ", top_request[0]['frequest'])
             print("type3 : TOP REQUEST Count - ", top_request[0]['frequest_count'])
             result.append({"result" :  top_request[0]['frequest'], "result_count" : top_request[0]['frequest_count']})
             
         #type=4. 최다 404 발생 URL
-        elif type == '4':
+        elif type == 4:
             top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
             print("type4 : TOP 404 REQUEST - ", top_404_request[0]['frequest'])
             print("type4 : TOP 404 REQUEST Count - ", top_404_request[0]['frequest_404_count'])
@@ -221,28 +224,28 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         results = []
         
-        #type=1. Status Codes Top5
-        if type == '1':
+        #type=1. Status Codes Top5        
+        if type == 1:
             top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]
-            for idx in range(0,5):
+            for idx in range(0, top5_status.count()):
                 print("type1 : TOP5 STATUS - ", top5_status[idx]['fstatus'])
                 print("type1 : TOP5 STATUS Count - ", top5_status[idx]['fstatus_count'])
                 
                 results.append({"result" : top5_status[idx]['fstatus'], "result_count" : top5_status[idx]['fstatus_count']})
         
         #type=2. Requests Top5
-        elif type == '2':
+        elif type == 2:
             top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
-            for idx in range(0,5):
+            for idx in range(0, top5_request.count()):
                 print("type2 : TOP5 REQUEST - ", top5_request[idx]['frequest'])
                 print("type2 : TOP5 REQUEST Count - ", top5_request[idx]['frequest_count'])
                 
                 results.append({"result" : top5_request[idx]['frequest'], "result_count" : top5_request[idx]['frequest_count']})     
         
         #type=3. 최다 404 발생 URL Top5
-        elif type == '3':
-            top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')
-            for idx in range(0,5):
+        elif type == 3:
+            top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')[0:5]
+            for idx in range(0, top5_404_request.count()):
                 print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])
                 print("type4 : TOP 404 REQUEST Count - ", top5_404_request[idx]['frequest_404_count']) 
                 
@@ -306,15 +309,13 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         print("== LogDetailViewSet create!!")
         start = time.time()
         
-        # For Basic
-        #data = request.data.dict()
-        #logfile_id = data["logfile"]        
-        
         # For UI
         logfile_id = request.data['logfile']
                 
         logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
         logfile = logfile_model.file_object.file         
+        
+        # TODO : 파일을 나누고 병렬 처리한다.
         
         # Log Parsing : postgresql copy 사용을 위해 csv파일 생성
         firstRow = self.parse_log(logfile, logfile_id)      
@@ -324,10 +325,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             
         print("To DB, Total Duration :", time.time() - start)
         
-        # print("==serializer.data : ", serializer.data)        
-        # 건수만 리턴하자. 
         #response = {'message': 'logdetail created', 'result': len(serializer.data)}
-        response = {'message': 'logdetail created', 'result': firstRow}
+        response = {'message': 'logdetail created', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime }
         return Response(response, status = status.HTTP_200_OK)
 
     def parse_log(self, logfile, logfile_id):
@@ -336,61 +335,72 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         count = 0               
         start = time.time()
         
-        # TODO : Fileformat 가져오기(from DB)
-        log_format = '%h %l %u %t \"%r\" %>s %b'      
+        # Fileformat 가져온다.(from logfile DB using logfile_id)
+        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'      
+        log_format = LogFile.objects.get(logfile_id=logfile_id).file_format
         
+        # format_kind : apache, nginx, IIS
+        format_kind = LogFile.objects.get(logfile_id=logfile_id).format_kind        
+        format_name = LogFile.objects.get(logfile_id=logfile_id).format_name
+                
         # 임시 csv 파일생성 for copy to postgresql
-        log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent','fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id','frequest','fday','fmonth','fyear','fdate','ftime','fdatetime']
+        log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
+                           'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
+                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime']
         
-        # TODO : Log Body생성 - pandas 활용
-        # 
-        df_logs = pd.read_csv(logfile.name, header=None, delimiter=" ",)
+        # pandas 활용 - 로그파일 읽기
+        # TODO : %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
+        df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False)
+                
+        # TODO : format_kind - Apache, Nginx, IIS를 구분해야 한다.
         
         # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
-        format_index = self.get_logformat_index(log_format)
+        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
+        format_index = self.get_logformat_index(log_format, format_kind)
         
-        #'log_line' : 그대로 들어가야 한다.
-        df_logs_all = pd.read_csv(logfile.name, header=None)
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("*" 명시, * 사용하지 않을 것임...가정)
+        df_logs_all = pd.read_csv(logfile.name, header=None, delimiter="*", error_bad_lines=False, escapechar="\\", na_filter=False)                
         df_logs['log_line'] = df_logs_all
         
-        if 'h' in log_format:
+        # if 'h' in log_format:
+        if log_format.find('h') != -1:
             df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
         else:
             df_logs['fip'] = 'NA' 
             
-        if 'r' in log_format:
+        # if 'r' in log_format:
+        if log_format.find('r') != -1:
             df_logs.rename(columns = {format_index['r'] : 'frequest'}, inplace = True)
         else:
             df_logs['frequest'] = 'NA'    
 
-        if 's' in log_format:
+        # if 's' in log_format:
+        if log_format.find('s') != -1:
             df_logs.rename(columns = {format_index['s'] : 'fstatus'}, inplace = True)
         else:
             df_logs['fstatus'] = 'NA'
 
-        if 'Referer' in log_format:
+        if log_format.find('Referer') != -1:
             df_logs.rename(columns = {format_index['Referer'] : 'freferer'}, inplace = True)
         else:
             df_logs['freferer'] = 'NA'
             
-        if 'User-agent' in log_format:
-            df_logs.rename(columns = {format_index['User-agent'] : 'fuser_agent'}, inplace = True)
+        if log_format.find('User-Agent') != -1:
+            df_logs.rename(columns = {format_index['User-Agent'] : 'fuser_agent'}, inplace = True)
         else:
             df_logs['fuser_agent'] = 'NA'
 
         time_taken_flag = False    
-        if 'T' in log_format:
+        if log_format.find('T') != -1:
             df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
             time_taken_flag = True
 
-        if (not time_taken_flag) & ('D' in log_format):
+        if (not time_taken_flag) & (log_format.find('D') != -1):
             df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
         else:
             df_logs['ftime_taken'] = -1
         
-        #'freserve1'
-        #'freserve2'
-        #'freserve3'
+        #'freserve1', 'freserve2', 'freserve3'
         df_logs['freserve1'] = ''
         df_logs['freserve2'] = ''
         df_logs['freserve3'] = ''
@@ -402,12 +412,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #'logfile_id'
         df_logs['logfile_id'] = logfile_id
         
-        #'fhour' 
-        #'fminute'
-        #'fsecond'
-        #'fday'
-        #'fmonth'
-        #'fyear'
+        #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
         # 시간관련, dummy는 , 때문에
         time_index = format_index['t']
         df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
@@ -426,51 +431,57 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
         df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
         
-        # 합치기
+        # Merge
         df_logs = df_logs.rename_axis('logdetail_id').reset_index()
         df_logs = pd.concat([df_logs, df_time], axis=1)
         
         firstRow = df_logs.iloc[0,] #.to_json(orient='index')
         
-        #'logdetail_id' : UUID 생성로직 필요        
-        df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4()) 
-        
+        # 'logdetail_id' : UUID 생성
+        df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4())         
                         
         # index 미사용  
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
-               # TODO : 시간이 좀 걸린다. 확인해볼것
+        # TODO : 시간이 좀 걸린다. 확인해볼것
         print("Duration to create temporary csv :", time.time() - start)        
         
         # 화면에서 사용할 정보(시작시간 등)를 리턴하기 위해 1라인을 결과로 뽑는다.
         return firstRow
     
-    def get_logformat_index(self, log_format):
+    def get_logformat_index(self, log_format, format_kind):
         format_index = {}
         index = 0
         for tmp in log_format.split(sep=' '):
-            #print(tmp)
-            if "h" in tmp:
-                format_index['h'] = index
-            elif "t" in tmp:
-                format_index['t'] = index
-                index = index + 1 # 하나 더 세야 한다.
-            elif "r" in tmp:
-                format_index['r'] = index
-            elif "s" in tmp:
-                format_index['s'] = index
-            elif "D" in tmp:
-                format_index['D'] = index
-            elif "T" in tmp:
-                format_index['T'] = index
-            elif "Referer" in tmp:
-                format_index['Referer'] = index
-            elif "User-agent" in tmp:
-                format_index['User-agent'] = index
+            
+            if format_kind == 'apache':
+                if tmp.find('Referer') != -1:
+                    format_index['Referer'] = index
+                elif tmp.find('User-Agent') != -1:
+                    format_index['User-Agent'] = index
+                elif "%h" in tmp:
+                    format_index['h'] = index
+                elif "%t" in tmp:
+                    format_index['t'] = index
+                    index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
+                elif "%r" in tmp:
+                    format_index['r'] = index
+                elif "%s" in tmp or "%>s" in tmp:
+                    format_index['s'] = index
+                elif "%D" in tmp:
+                    format_index['D'] = index
+                elif "%T" in tmp:
+                    format_index['T'] = index                
+            
+            # TODO : nginx, IIS                    
+            elif format_kind == 'nginx':
+                pass
+            elif format_kind == 'IIS':
+                pass
                 
             index = index + 1 
+            
         return format_index    
-          
 
 class LogFormatViewSet(viewsets.ModelViewSet):
     queryset = LogFormat.objects.all()

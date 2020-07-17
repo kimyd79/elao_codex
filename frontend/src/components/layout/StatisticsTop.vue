@@ -127,9 +127,10 @@ export default {
               default:
             }
           }
+              
+          let logfile_id = this.$store.state.logFileID
+          console.log(logfile_id)
 
-          // TODO : For Test          
-          let logfile_id = 'e005c4ee-2df8-4c53-9d35-ec7bd7629b76'
           var url = "http://127.0.0.1:8000/logdetail/statistics_top"+this.statisticsRow+"/"  // 1 or 5
 
           let postData = {

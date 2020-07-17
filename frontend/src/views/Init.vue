@@ -161,8 +161,8 @@ export default {
         radioValue: "1",
         dataRangeValue: "1",
 
-          // for tabs
-              
+        // for file format
+        items: [],
 
           // For file upload
           file: '',
@@ -199,23 +199,37 @@ export default {
     this.fileName = this.$store.state.fileNames
     this.fileFormat = this.$store.state.logFormat
     
+    // File format 가져오기
+    var url = "http://127.0.0.1:8000/logformat"
+
+    let axiosConfig = {
+        headers: {
+        //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    axios.get(url,axiosConfig)
+    .then(res => {
+               
+        for(let i = 0; i < res.data.results.length; i++){
+            let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
+            this.items.push({value: tmp + '/' + res.data.results[i].format_strings, text: tmp + ' => ' + res.data.results[i].format_strings });
+        }
+                        
+    })
+    .catch(err => {
+        console.error(err); 
+    })
+    
   },
+
   computed: { 
       
       ...mapGetters({
         isRowChecked: "getToggleSearch"
       }),
-    
-
-          items() {
-            // TODO : Get File Formats from DB
-            let rtn = [];
-            rtn.push({value:'%h %l %u %t \"%r\" %>s %b',text:'Common Log Format(CLF) => %h %l %u %t \"%r\" %>s %b'});
-            rtn.push({value:'%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"',text:'NCSA extended/combined => %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"'});
-            rtn.push({value:'TODO',text:'TODO : Custom '});
-            return rtn;
-        },
-    },
+  },
+      
   methods: {
 
       selectRow() {
@@ -238,8 +252,8 @@ export default {
         }
       },
 
-      getProjects(project_id){
-          // {projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
+      getProjects(){
+          //{projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
           //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
           //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
             
@@ -273,10 +287,6 @@ export default {
         // Logic 처리 : TODO - Global 변수로 뺄 것
         var url = "http://127.0.0.1:8000"       
 
-        // for Test : --> TODO : vuex에 추가할 것
-        //this.projectID = '49898027-f29d-4d7e-9a68-ab590e46e783'
-        //this.logfileID = 'c2eaa555-4980-4945-8bd9-6afcdda4de4e'
-        
         if(this.tabs[1].isSelected){ // Step1 : logmaster    
             
             if(this.radioValue == 1 & this.projectID == ""){   // New인 경우 새로운 정보로 저장한다.
@@ -380,8 +390,15 @@ export default {
             let formData = new FormData();
             formData.append('file_object', this.file);
             formData.append('file_name', this.fileName);
-            formData.append('file_size', this.fileSize);
-            formData.append('file_format', this.fileFormat);
+            formData.append('file_size', this.fileSize);     
+
+
+            let splitedFormat = this.fileFormat.split("/")
+
+            formData.append('format_kind', splitedFormat[0]);
+            formData.append('format_name', splitedFormat[1]);
+            formData.append('file_format', splitedFormat[2]);
+            
             formData.append('project', this.projectID);  
             
             this.$store.dispatch("setLogFormat", this.fileFormat);            
@@ -426,20 +443,77 @@ export default {
                 console.log(res)
 
                 // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
+                //        끝 시간은 동일 시간으로 설정(기본)
+                this.$store.dispatch("setFromDate", res.data.start_date);
+                this.$store.dispatch("setToDate", res.data.start_date);
+                this.$store.dispatch("setFromTime", res.data.start_time);
+                this.$store.dispatch("setToTime", res.data.start_time);
+
+                
+            })
+            .catch(err => {
+                console.error(err); 
+            })
+      },
+      
+      getLogfile(projectID){
+          
+          // http://127.0.0.1:8000/logfile?project=ce447191-fd2c-48b2-8ad6-732e8f7a8543
+          var url = "http://127.0.0.1:8000/logfile?project="+projectID
+
+          let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+          axios.get(url,axiosConfig)
+          .then(res => {
+              console.log(res.data)
+              console.log(res.data.results[0])
+              console.log(res.data.results[0].file_format)
+              console.log(res.data.results[0].file_name)
+              
+              // TODO : 파일이 없는 경우도 있다. (프로젝트만 만들어놓은 경우)
+              //        오류처리 해야 한다.
+              this.fileName = res.data.results[0].file_name
+              this.fileFormat = res.data.results[0].file_format
+              this.logfileID = res.data.results[0].logfile_id
+
+              this.$store.dispatch("setFileNames", this.fileName);
+              this.$store.dispatch("setLogFormat", this.fileFormat);
+              this.$store.dispatch("setLogFileID", this.logfileID);
+          })
+          .catch(err => {
+              console.error(err); 
+          })
+      },
+
+      getLogDetail(logfileID){
+
+          var url = "http://127.0.0.1:8000/logdetail/?limit=1&offset=1&logfile="+logfileID
+
+          // TODO : 초기 설정을 위해 시작 1건만 가져온다.
+          let axiosConfig = {
+              headers: {
+              //'Authorization': 'Token '+ this.token // For Django
+              }
+          };
+
+          // TODO : Progress Bar가 필요하다.
+           axios.get(url, axiosConfig)
+            .then(res => {
+                console.log(res)
+
+                // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
                 //        끝 시간은 +1 시간으로 설정(기본)
-                let day = res.data.result[19]
-                let month = res.data.result[20]
-                let year = res.data.result[21]
+                let fdate = res.data.results[0].fdate               
+                let ftime = res.data.results[0].ftime
 
-                let hour = res.data.result[22]
-                let minute = res.data.result[23]
-                let second = res.data.result[24]
-
-                this.$store.dispatch("setFromDate", year+month+day);
-                this.$store.dispatch("setToDate", year+month+day);
-                this.$store.dispatch("setFromTime", hour+minute+second);
-                this.$store.dispatch("setToTime", hour+minute+second);
-
+                this.$store.dispatch("setFromDate", fdate);
+                this.$store.dispatch("setToDate", fdate);
+                this.$store.dispatch("setFromTime", ftime);
+                this.$store.dispatch("setToTime", ftime);
                 
             })
             .catch(err => {
@@ -450,13 +524,15 @@ export default {
   watch: {
       isRowChecked(){
         console.log("Is isRowChecked?")
-          
+
+        // 초기정보 설정 : 기존 project 가져오기          
         this.projectName = this.$store.state.projectName
         this.projectDescription = this.$store.state.projectDescription
+        this.projectID = this.$store.state.projectID
+        
+        this.getLogfile(this.projectID)     
 
-        // TODO : project id로 file 정보 가져오기 (여기부터....)
-        this.fileName = this.$store.state.fileNames
-        this.fileFormat = this.$store.state.logFormat
+        this.getLogDetail(this.logfileID)
           
       }
   }

@@ -24,11 +24,6 @@ class LogMaster(models.Model):
     class Meta:
         ordering = ['created']
         
-def upload_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/<yymmdd>/<project_name>/<filename>
-    return '{0}/{1}/{2}'.format(datetime.now().strftime('%Y%m%d'), instance.project, filename)        
-
-
 # 복수개의 파일이 존재한다.        
 class LogFile(models.Model):
     
@@ -38,7 +33,11 @@ class LogFile(models.Model):
     project = models.ForeignKey(LogMaster, on_delete=models.CASCADE)    
     file_name = models.CharField(max_length=100, blank=True, default='')    
     file_object = models.FileField(upload_to=upload_directory_path)
-    file_format = models.CharField(max_length=100, null=False, blank=False)
+    file_format = models.CharField(max_length=200, null=False, blank=False)
+    
+    format_kind = models.CharField(max_length=50, null=True, blank=False)
+    format_name = models.CharField(max_length=50, null=True, blank=False)
+    
     file_size = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now=True, verbose_name="date create")
     
@@ -76,7 +75,7 @@ class LogDetail(models.Model):
     freferer = models.CharField(max_length=500, null=True, blank=True)
     fuser_agent = models.CharField(max_length=500, null=True, blank=True)
     fstatus = models.CharField(max_length=10, null=True, blank=True)
-    ftime_taken = models.SmallIntegerField(default=0)
+    ftime_taken = models.IntegerField(default=0)
     
     # Reservation Fields
     freserve1 = models.CharField(max_length=200, null=True, blank=True)
