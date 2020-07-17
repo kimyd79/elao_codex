@@ -110,6 +110,7 @@
             <div class="popup-buttons">
                 <lego-button>Cancel</lego-button>
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
+                <lego-button v-on:click="deleteProjects" main>DelProjects</lego-button>
             </div>
 
         </ui-container-box>
@@ -233,6 +234,46 @@ export default {
   methods: {
 
       selectRow() {
+
+      },
+
+      // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
+      deleteProjects(projectID){
+          
+          
+          let projectIDList = []
+
+          // Get Projects
+
+          let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+          axios.get("http://127.0.0.1:8000/logmaster/",axiosConfig)
+          .then(res => {
+              console.log(res)
+
+              for(let i = 0; i < res.data.results.length; i++){
+                    
+                    projectIDList.push(res.data.results[i].project_id);
+
+                    axios.delete('http://127.0.0.1:8000/logmaster/'+res.data.results[i].project_id+'/', axiosConfig)  // '가 아니라 `이다.
+                    .then(res => {
+                        console.log(res.data)
+                    })
+                    .catch(err => {
+                        console.error(err); 
+                    })  
+                }              
+              
+          })
+          .catch(err => {
+              console.error(err); 
+          })
+
+         //console.log(projectIDList)
 
       },
       

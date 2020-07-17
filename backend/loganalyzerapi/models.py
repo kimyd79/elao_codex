@@ -5,7 +5,7 @@ from postgres_copy import CopyManager
 
 def upload_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/<yymmdd>/<project_name>/<filename>
-    return '{0}/{1}/{2}'.format(datetime.now().strftime('%Y%m%d'), instance.project_name, filename)
+    return '{0}/{1}/{2}'.format(datetime.now().strftime('%Y%m%d'), instance.project, filename)
 
 class LogMaster(models.Model):
     

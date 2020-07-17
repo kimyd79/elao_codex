@@ -313,13 +313,15 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         logfile_id = request.data['logfile']
                 
         logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
-        logfile = logfile_model.file_object.file         
+        logfile = logfile_model.file_object.file    
+        
+        print("logfile :", logfile)     
         
         # TODO : 파일을 나누고 병렬 처리한다.
         
         # Log Parsing : postgresql copy 사용을 위해 csv파일 생성
         firstRow = self.parse_log(logfile, logfile_id)      
-        
+     
         # postgresql copy 실행
         LogDetail.objects.from_csv(logfile.name+'.csv', delimiter=',')        
             
@@ -358,8 +360,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
         format_index = self.get_logformat_index(log_format, format_kind)
         
-        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("*" 명시, * 사용하지 않을 것임...가정)
-        df_logs_all = pd.read_csv(logfile.name, header=None, delimiter="*", error_bad_lines=False, escapechar="\\", na_filter=False)                
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요)
+        df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="@", error_bad_lines=False, escapechar="\\", na_filter=False)                
         df_logs['log_line'] = df_logs_all
         
         # if 'h' in log_format:
