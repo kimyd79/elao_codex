@@ -10,6 +10,7 @@
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
     "lego-component": "file:local_modules/lego-component-0.1.2.tgz",
+    "mixins": "0.0.1",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.5.0",
     "vue-router": "^3.0.3",
