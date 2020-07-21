@@ -75,6 +75,9 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],    
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
 # 로그인하지 않으면 API 호출 시 401 리턴(테스트 위해 주석처리)	
 #    'DEFAULT_PERMISSION_CLASSES': (
 #        'rest_framework.permissions.IsAuthenticated',
