@@ -33,10 +33,7 @@ export default {
         title: "",
         content: "",
         items: [
-          { result: 'Foo1', result_count: 'Foo1',},
-          { result: 'Foo2', result_count: 'Foo2',},
-          { result: 'Foo3', result_count: 'Foo3',},
-          { result: 'Foo4', result_count: 'Foo4',},
+          { result: 'Loading...', result_count: '....',},          
         ]
       }
     },

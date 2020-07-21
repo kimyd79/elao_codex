@@ -151,8 +151,15 @@ export default {
       let postData = {
                 
           logfile_id: logfile_id,
-          //for Test
-          type: "1",
+          
+          //Type1 : 시(HH)기준
+          //  Kind1 : request(요청) 건수(count)
+          //   Kind2 : time-taken 시간(max, min, count)
+          // Type2 : 시분(HHMM)기준                    
+          //   Kind1 : request(요청) 건수(count)
+          //   Kind2 : time-taken 시간(max, min, count) 
+
+          type: "2",
           kind: "1"
 
       };
