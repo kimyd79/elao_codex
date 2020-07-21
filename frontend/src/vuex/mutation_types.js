@@ -15,3 +15,6 @@ export const SET_CONDITION      = "SET_CONDITION"
 export const SET_SEARCHKEYWORD  = "SET_SEARCHKEYWORD"
 
 export const TOGGLE_SEARCH  = "TOGGLE_SEARCH"
+
+export const SET_USERTOKEN      = "SET_USERTOKEN"
+export const SET_USERNAME       = "SET_USERNAME"
