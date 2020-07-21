@@ -19,4 +19,7 @@ export default {
     setSearchKeyword({commit}, value) { commit(types.SET_SEARCHKEYWORD, value) },
     
     setToggleSearch({commit}) { commit(types.TOGGLE_SEARCH) },
+    
+    setUserToken({commit}, value) { commit(types.SET_USERTOKEN, value) },
+    setUserName({commit}, value) { commit(types.SET_USERNAME, value) },
 }
