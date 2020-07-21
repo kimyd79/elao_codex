@@ -30,7 +30,11 @@ const state = {
     searchKeyword: '',
 
     // check
-    toggleSearch: '0',  //  0 or 1 변경사항 확인용    
+    toggleSearch: '0',  //  0 or 1 변경사항 확인용
+    
+    //login info
+    userToken: '',
+    userName: 'Not logged in', 
 }
 
 // mutation
@@ -55,6 +59,10 @@ const mutations = {
     [types.SET_SEARCHKEYWORD] (state, value) { state.searchKeyword = value },
 
     [types.TOGGLE_SEARCH] (state) { state.toggleSearch == 1 ? state.toggleSearch = 0 : state.toggleSearch = 1 },
+    
+    //login info
+    [types.SET_USERTOKEN] (state, value) { state.userToken = value },
+    [types.SET_USERNAME] (state, value) { state.userName = value },
 
 }
 
