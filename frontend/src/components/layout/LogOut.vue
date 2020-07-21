@@ -17,7 +17,7 @@
 
                 <ui-form-item :columns=8 
                     label="Username" required left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field disabled v-model="this.username" />
+                    <lego-text-field disabled v-model="username" />
                 </ui-form-item>
 
 
@@ -35,23 +35,45 @@
 </template>
 
 <script>
+
 import axios from 'axios';
+import * as types from "@/vuex/mutation_types";
+import { mapGetters } from "vuex";
 
 export default {
    name: 'LogOut',
    data: function() {
         return {
-            username: 'login_username',
+            username: this.$store.state.userName,
 
         }
     },
     methods: {
         clickCancle: function() {
-            this.show(false);
+            this.$router.push('/');
         },
         
-        clickLogin: function() {
-            EventBus.$emit("Logout", this.logout);
+        clickLogout: function() {
+            var url = "http://127.0.0.1:8000/rest-auth/logout/"
+
+            let axiosConfig = {
+                headers: {
+                'Authorization': 'Token '+ this.$store.state.userToken
+                }
+            };
+
+            axios.post( url, null, axiosConfig)
+            .then((response) => {
+            console.log(response);
+            this.$store.dispatch("setUserName", 'Not logged in');
+            this.$store.dispatch("setUserToken", '');
+            localStorage.setItem('user-token', '');
+            delete axios.defaults.headers.common['Authorization'];
+            this.$router.push('/');
+            })
+            .catch((ex) => {
+            console.log('user logout failed', ex);
+            })
         }
     }
 };
