@@ -44,6 +44,15 @@ export default new Router({
       path: '/initialization',
       name: 'initialization',
       component: Init,
+      /* 메뉴 이동 시 로그인 여부 체크
+      beforeEnter(to, from, next) {
+        console.log(localStorage.getItem('user-token'));
+        if(localStorage.getItem('user-token') != '') {
+          next();
+        } else {
+          next('/Login');
+        }
+      } */
     },
     {
       path: '/analysis',

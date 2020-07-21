@@ -16,6 +16,9 @@ export default {
     getCondition: state => state.condition ,
     getSearchKeyword: state => state.searchKeyword ,    
 
-    getToggleSearch: state => state.toggleSearch
+    getToggleSearch: state => state.toggleSearch ,
+
+    getUserToken: state => state.userToken ,
+    getUserName: state => state.userName  
 
 }
