@@ -22,7 +22,7 @@
 
                 <ui-form-item :columns=8 
                     label="Password" required left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field v-model="login.password" placeholder="enter password" />
+                    <lego-text-field v-model="login.password" v-on:keyup.enter="clickLogin" placeholder="enter password" />
                 </ui-form-item>
 
             </div>
@@ -40,6 +40,8 @@
 
 <script>
 import axios from 'axios';
+import * as types from "@/vuex/mutation_types";
+import { mapGetters } from "vuex";
 
 export default {
     name: 'Login',
@@ -55,12 +57,50 @@ export default {
     },
     methods: {
         clickCancle: function() {
-            this.show(false);
+            this.$router.push('/');
         },
         
         clickLogin: function() {
-            EventBus.$emit("Login", this.login);
-        }
+            var url = "http://127.0.0.1:8000/rest-auth/login/"
+
+            axios.post( url, this.login )
+            .then((response) => {
+            console.log(response);
+            //토큰을 로컬스토리지에 저장
+            localStorage.setItem('user-token', response.data.key);
+            this.$store.dispatch("setUserToken", response.data.key);
+            axios.defaults.headers.common['Authorization'] = 'Token '+ response.data.key;
+            console.log(this.$store.state.userToken);
+            this.getUserInfo();
+            })
+            .catch((ex) => {
+            console.log('user login failed', ex);
+            })
+        },
+
+        getUserInfo: function() {
+            var url = "http://127.0.0.1:8000/rest-auth/user/"
+
+            let axiosConfig = {
+                headers: {
+                'Authorization': 'Token '+ this.$store.state.userToken
+                }
+            };
+            console.log(this.$store.state.userName);
+            console.log(axiosConfig);
+            axios.get( url, axiosConfig )
+            .then((response) => {
+            console.log(response);
+            //토큰을 로컬스토리지에 저장
+            localStorage.setItem('user-name', response.data.username);
+            this.$store.dispatch("setUserName", response.data.username);
+            console.log(this.$store.state.userName);
+            this.$router.push('/');
+            })
+            .catch((ex) => {
+            console.log('get user info failed', ex);
+            })
+        },
     }
 };
 </script>
