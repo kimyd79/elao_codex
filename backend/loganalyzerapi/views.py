@@ -8,7 +8,7 @@ from rest_framework import viewsets, status
 from rest_framework.renderers import JSONRenderer
 from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString
 from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer
-import time, uuid, re, csv
+import time, uuid, re, csv, io
 from datetime import datetime, timezone
 from rest_framework.response import Response
 from django.db import transaction
@@ -251,7 +251,16 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 
                 results.append({"result" : top5_404_request[idx]['frequest'], "result_count" : top5_404_request[idx]['frequest_404_count']})      
             
-         #type=4. Search Terms Top5     
+        #type=4. Time-taken Top5(오래 걸린시간)
+        elif type == 4:
+            top5_timetaken_request = queryset.order_by('-ftime_taken')[0:5]
+            for idx in range(0, top5_timetaken_request.count()):
+                print("type4 : TOP Timtaken REQUEST - ", top5_timetaken_request[idx].frequest)
+                print("type4 : TOP Timtaken - ", top5_timetaken_request[idx].ftime_taken) 
+                
+                results.append({"result" : top5_timetaken_request[idx].frequest, "result_count" : top5_timetaken_request[idx].ftime_taken})    
+         
+         #type=5. Search Terms Top5     
         
         # TODO : 결과값을 생성해서 보내야 한다 & Exception 처리
         
@@ -317,9 +326,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         print("logfile :", logfile)     
         
-        # TODO : 파일을 나누고 병렬 처리한다.
-        
-        # Log Parsing : postgresql copy 사용을 위해 csv파일 생성
+        # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
         firstRow = self.parse_log(logfile, logfile_id)      
      
         # postgresql copy 실행
@@ -360,10 +367,13 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
         format_index = self.get_logformat_index(log_format, format_kind)
         
-        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요)
-        df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="@", error_bad_lines=False, escapechar="\\", na_filter=False)                
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?)
+        df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)                
         df_logs['log_line'] = df_logs_all
         
+        # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
+        #df_logs['log_line'] = df_logs[df_logs.columns[0:]].apply(lambda x: ' '.join(x.astype(str)), axis=1)              
+                
         # if 'h' in log_format:
         if log_format.find('h') != -1:
             df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
@@ -437,15 +447,14 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         df_logs = df_logs.rename_axis('logdetail_id').reset_index()
         df_logs = pd.concat([df_logs, df_time], axis=1)
         
-        firstRow = df_logs.iloc[0,] #.to_json(orient='index')
-        
         # 'logdetail_id' : UUID 생성
         df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4())         
+                        
+        firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function                        
                         
         # index 미사용  
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
-        # TODO : 시간이 좀 걸린다. 확인해볼것
         print("Duration to create temporary csv :", time.time() - start)        
         
         # 화면에서 사용할 정보(시작시간 등)를 리턴하기 위해 1라인을 결과로 뽑는다.

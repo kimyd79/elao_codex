@@ -105,6 +105,9 @@ export default {
               case 3:
                 this.content = "404 Requests URI"
                 break;
+              case 4:
+                this.content = "Requests Time-taken"
+                break;
               default:
             }
 

@@ -46,7 +46,7 @@
            
       <ui-container-box :columns="10" vertical class="mt20">
         <statistics-top :statisticsRow="5" :statisticsKind="3"></statistics-top>
-        <statistics-top :statisticsRow="5" :statisticsKind="1"></statistics-top>
+        <statistics-top :statisticsRow="5" :statisticsKind="4"></statistics-top>
       </ui-container-box>
       
     </ui-container-box>
