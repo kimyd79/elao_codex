@@ -31,4 +31,6 @@ router.register(r'user', views.UserViewSet)
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
+    path('rest-auth/', include('rest_auth.urls')),
+    path('rest-auth/registration/', include('rest_auth.registration.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
