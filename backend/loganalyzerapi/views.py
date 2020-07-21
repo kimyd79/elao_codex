@@ -18,6 +18,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Max, Min, Avg
 from django.db.models.functions import Concat
 from django.contrib.auth.models import User
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
