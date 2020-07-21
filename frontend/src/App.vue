@@ -14,6 +14,11 @@
                 </template>
               </ui-gnb-menus>
           </template>
+          <template v-slot:tail>
+            <button class="popup-buttons" v-on:click="submitRegister" v-if="registerButton">REGISTER</button>
+            <input type="button" class="popup-buttons" v-bind:value="btnText" v-on:click="submitEvent"/>
+            <ui-gnb-profile> {{ getUserName }} </ui-gnb-profile>
+          </template>
       </ui-gnb>
       
       <router-view style="padding-top: 0px; display:flex; justify-content:center;" />
@@ -24,6 +29,8 @@
 <script>
 
 import store from './vuex/store'
+import * as types from "@/vuex/mutation_types";
+import { mapGetters } from 'vuex'
 
 export default {
   store,
@@ -38,7 +45,34 @@ export default {
           { label:'Comparison', linkto:'/comparison', key:'comparison', isSelected: false },
           { label:'Detail', linkto:'/detail', key:'detail', isSelected: false },
           { label:'Management', linkto:'/management', key:'management', isSelected: false }
-      ]
+      ],
+    }
+  },
+
+  computed: {
+    ...mapGetters(['getUserName']),
+
+    btnText: function() {
+      if (this.$store.state.userName == 'Not logged in') return 'LOGIN';
+      else return 'LOGOUT';
+    },
+
+    registerButton: function() {
+      if (this.$store.state.userName == 'Not logged in') return true;
+      else return false;
+    }
+  },
+
+  methods: {
+    submitEvent: function() {
+      if(this.btnText == 'LOGIN') {
+        this.$router.push('/Login');
+      } else {
+        this.$router.push('/Logout');
+      }
+    },
+    submitRegister: function() {
+        this.$router.push('/Register');
     }
   },
   watch: {
@@ -217,6 +251,12 @@ em {
 }
 .page-table-area {
   margin: 32px 0 24px;
+}
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 5px;
+    //margin-top: 16px;
 }
 
 </style>
