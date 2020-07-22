@@ -142,14 +142,18 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                            
             if(kind == '1'):
                 
+                start_time = time.time()
                 hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
-                
+                print("== 쿼리 시간 : ", time.time() - start_time)
                 for idx in range(0,hhmmRequest.count()):
-                    print("type2, kind1 : request(요청) 건수(count) x - ", hhmmRequest[idx]['x'])
-                    print("type2, kind1 : request(요청) 건수(count) y - ", hhmmRequest[idx]['y'])            
+                    #print("type2, kind1 : request(요청) 건수(count) x - ", hhmmRequest[idx]['x'])
+                    #print("type2, kind1 : request(요청) 건수(count) y - ", hhmmRequest[idx]['y'])            
                     
                     resultX.append(hhmmRequest[idx]['x'])
                     resultY.append(hhmmRequest[idx]['y'])
+                    
+                print("== 전체 시간 : ", time.time() - start_time)
+                
             elif(kind == '2'):
                 # TODO : time-taken 존재여부 Check
                 pass

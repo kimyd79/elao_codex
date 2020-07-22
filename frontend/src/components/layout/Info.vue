@@ -1,6 +1,6 @@
 <template>
   <div id="info">
-     <ui-card :columns="10" :height="150">
+     <ui-card :columns="10" :height="180">
         <ui-card-item header>Information</ui-card-item>
         <ui-card-item sub>
         <span style="color:blue">

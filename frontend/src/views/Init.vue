@@ -34,7 +34,7 @@
                     <lego-text-field textarea rows="3" v-model="projectDescription"/>
                 </ui-form-item>
 
-                <!-- TODO : GridTable for existing project -->
+                <!-- GridTable for existing project -->
                 <ui-container-box :columns="11" vertical v-if="radioValue == 2">
                   <ui-table header-divider no-action :columns="columns" :items="itemList" class="mt20"></ui-table>
                 </ui-container-box>
@@ -108,7 +108,7 @@
             </div>            
 
             <div class="popup-buttons">
-                <lego-button>Cancel</lego-button>
+                <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
                 <lego-button v-on:click="deleteProjects" main>DelProjects</lego-button>
             </div>
@@ -143,6 +143,7 @@ export default {
   data: function() {
       return {
         buttonName: "Next",
+        isPrevShow: false,
 
         projectName: "",
         projectDescription: "",
@@ -153,6 +154,7 @@ export default {
         fileSize: 0,
         fileFormat: "",
         logfileID: "",
+        isNewFileAdded: false,
 
         dateFromValue: "",
         dateToValue: "",
@@ -293,13 +295,8 @@ export default {
         }
       },
 
-      getProjects(){
-          //{projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
-          //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
-          //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
-            
-          // /logmaster/?search=Leehs       
-        // "+(project_id != '' ? project_id+"/" : project_id)+"
+      getProjects(){          
+
           var url = "http://127.0.0.1:8000/logmaster/?search="+this.creator
 
           let axiosConfig = {
@@ -318,34 +315,67 @@ export default {
               console.error(err); 
           })
       },
+
+      prevButton(){
+        if(this.tabs[1].isSelected){
+            this.isPrevShow = false
+        }else if(this.tabs[3].isSelected){
+            this.buttonName = "Next"
+            this.isPrevShow = true
+        }
+
+        this.tabChange(1)
+
+      },
+
       nextButton(){
 
         // Next 버튼 처리
         if(this.tabs[0].isSelected){
-            this.buttonName = "OK"
+            this.isPrevShow = true
         }
 
         // Logic 처리 : TODO - Global 변수로 뺄 것
         var url = "http://127.0.0.1:8000"       
 
-        if(this.tabs[1].isSelected){ // Step1 : logmaster    
-            
-            if(this.radioValue == 1 & this.projectID == ""){   // New인 경우 새로운 정보로 저장한다.
+        if(this.tabs[1].isSelected){          // Step1 : logmaster    
 
+            if(this.radioValue == 1){         // New인 경우 새로운 정보로 저장한다.
                  this.createLogmaster(url);
-            }else{        
-                              // Exist인 경우 - TODO : 현재 ID 기준으로 기존 project들을 가져와서 보여준다.
+            }else if(this.radioValue == 2){   // Exist인 경우 기존 정보를 가져온다.
+                 
+                 // 로그 파일을 추가할 것인가?
+                 if(confirm("Need to add another log file?")){
+                     // Step2로 이동
+                     this.isNewFileAdded = true;
+                 }else{
+                     // Step3으로 이동 :한번 더 이동시킨다.
+                     this.tabChange(2);
+                     this.buttonName = "OK"
+                     this.isNewFileAdded = false;
+
+                     //선택한 project의 file 정보를 가져온다.
+                     this.getLogfile(this.projectID)
+                 }
             }
             
-        } else if(this.tabs[2].isSelected  & this.projectID != ""){ // Step2 : 
+        } else if(this.tabs[2].isSelected){   // Step2 : this.projectID
 
-            // TODO : Tab 왔다갔다 할때 체크로직 필요
             this.createLogfile(url)
+            this.buttonName = "OK"
+            this.isNewFileAdded = true;
 
-        } else if(this.tabs[3].isSelected  & this.logfileID != ""){ // Step3 or Info
+        } else if(this.tabs[3].isSelected){   // Step3 : this.logfileID
 
-            // TODO : Tab 왔다갔다 할때 체크로직 필요
-            this.createLogdetail(url)
+            // TODO : Multi-File 및 기존 project에 File Add시 처리
+
+            // CASE1 : File을 새로 추가한 경우
+            if (this.isNewFileAdded){
+                this.createLogdetail(url);        
+            }else{
+            // CASE2 : 기존 File을 이용하는 경우
+                this.getLogDetail(this.logfileID)
+            }            
         }
 
         // Tab 변경 - Backward

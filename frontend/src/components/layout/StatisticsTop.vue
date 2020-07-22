@@ -3,15 +3,15 @@
         <table class="page-summary-table">
           <thead>
             <tr>
-              <th rowspan="2" style="width: 180px;">{{ this.title }}</th>
+              <th v-if="statisticsRow != 1" rowspan="2" style="width: 180px;">{{ this.title }}</th>
               <th rowspan="2" style="width: 460px;">{{ this.content }}</th>
-              <th rowspan="2" style="width: 100px;">Count</th>            
+              <th rowspan="2" style="width: 100px;">Result</th>            
             </tr>          
           </thead>
           <tbody>
-            <tr v-for="(item, index) in items">
-              <td>{{ index+1 }}</td>
-              <td>{{ item.result }}</td>
+            <tr v-for="(item, index) in items" >
+              <td v-if="statisticsRow != 1">{{ index+1 }}</td>
+              <td v-on:click="getDetail(item)">{{ item.result }}</td>
               <td>{{ item.result_count }}</td>            
             </tr>
             
@@ -59,6 +59,11 @@ export default {
     }),
 
     methods: {
+
+      getDetail(item){
+        alert('getDetail : '+item)
+        console.log(item)
+      },
       // TODO : 데이터 가져오기 (기본 조건값 필요 - 그래야 변경분 반영된다.)    
       setItems(results) {
 
@@ -72,6 +77,7 @@ export default {
         }
       },
 
+      // TODO : Aync 효과 있는지?
       getStatistics(){          
           
           var url = "http://127.0.0.1:8000/logdetail/statistics_top"
@@ -80,6 +86,7 @@ export default {
           // type=1. Status Codes Top5
           // type=2. Requests Top5
           // type=3. 최다 404 발생 URL Top5
+          // type=4. Time Taken Top5
         
           // CASE#2 - Top 1 일때
           // type=1. 전체 처리량(건수)
@@ -94,16 +101,16 @@ export default {
 
             switch(this.statisticsKind){
               case 1:
-                this.content = "Status Codes"
+                this.content = "HTTP Status Codes(count)"
                 break;
               case 2:
-                this.content = "Requests URI"
+                this.content = "Requests URI(count)"
                 break;
               case 3:
-                this.content = "404 Requests URI"
+                this.content = "404 Requests URI(count)"
                 break;
               case 4:
-                this.content = "Requests Time-taken"
+                this.content = "Requests Time-taken(ms/㎲)"
                 break;
               default:
             }
@@ -113,16 +120,16 @@ export default {
             this.title = "Top"
             switch(this.statisticsKind){
               case 1:
-                this.content = "Total"
+                this.content = "Total Request(count)"
                 break;
               case 2:
-                this.content = "Top Request IP"
+                this.content = "Top Request IP(count)"
                 break;
               case 3:
-                this.content = "Top Requests URI"
+                this.content = "Top Requests URI(count)"
                 break;
               case 4:
-                this.content = "Top 404 Requests URI"
+                this.content = "Top 404 Requests URI(count)"
                 break;
               default:
             }

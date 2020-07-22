@@ -1,6 +1,6 @@
 <template>
   <div id="notice">    
-      <ui-card :columns="10" :height="150">
+      <ui-card :columns="10" :height="180">
         <ui-card-item header > Notice (Async)</span></ui-card-item>
         <ui-card-item sub>
           <span style="color:red">
