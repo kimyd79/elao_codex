@@ -585,6 +585,8 @@ export default {
                 this.$store.dispatch("setToDate", fdate);
                 this.$store.dispatch("setFromTime", ftime);
                 this.$store.dispatch("setToTime", ftime);
+
+                alert('Get Data completed..!!')
                 
             })
             .catch(err => {
