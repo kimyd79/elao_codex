@@ -58,7 +58,7 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line :chart-data="chartData" :options="lineOptions"></chart-line>
+        <chart-line :chart-data="lChartData" :options="lOptions"></chart-line>
         <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
         <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
         <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
@@ -114,6 +114,8 @@ import Statistics from "@/components/layout/Statistics";
 import StatisticsTop from "@/components/layout/StatisticsTop";
 
 import axios from "axios";
+import { getPieChartTemplate, getBarChartTemplate, getStackedBarChartTemplate, getLineChartTemplate, 
+        getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions } from "@/common"
 
 export default {
   name: "Analysis",
@@ -131,47 +133,17 @@ export default {
       statisticsKind: "1",  // 전체 처리량 (통계 종류)  
 
       // for chart reactivess Test
-      chartData: null,
-      lineOptions: {
-        responsive: true,
-        maintainAspectRatio: false
-      },
+      lChartData: null,
+      lOptions: getLineChartOptions(),
 
       bChartData: null,
-      bOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-                  yAxes: [{
-                      ticks: {
-                          beginAtZero: true
-                      }
-                  }]
-              }
-      },
+      bOptions: getBarChartOptions(),
 
       sbChartData: null,
-      sbOptions: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-                  xAxes: [{
-                    stacked: true,
-                  }],
-                  yAxes: [{
-                      stacked: true,
-                      ticks: {
-                          beginAtZero: true
-                      }
-                  }]
-              }
-      },
+      sbOptions: getStackedBarChartOptions(),
 
       pChartData: null,
-      pOptions: {
-        responsive: true,
-        maintainAspectRatio: false
-      },
+      pOptions: getPieChartOptions(),
 
       // For ChartData
       axisX: [],
@@ -208,8 +180,7 @@ export default {
   },
 
   mounted () {
-      // TODO : default value
-      this.lineChartData()
+
   },
   methods: {
 
@@ -289,132 +260,20 @@ export default {
     pieChartData () {
 
       this.getChartDataFromStatistics(1)
-
-      this.pChartData = {
-        
-        labels: this.pieX,
-        
-        datasets: [
-          {
-            data: this.pieY,
-            backgroundColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',                   
-            ],                
-          }]
-      }
+      this.pChartData = getPieChartTemplate(this.pieX, this.pieY)
     },
   
 
     barChartData () {
 
-      // TODO : Error 처리
       this.getChartDataFromStatistics(1)
-
-      this.bChartData = {
-        
-        labels: this.barX,
-        
-        datasets: [          
-          {
-            label: this.content,
-            fill: false,
-            data: this.barY,
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-            ],
-            borderWidth: 1
-          }, 
-          
-        ]
-      }
+      this.bChartData = getBarChartTemplate(this.barX, this.barY, this.content)
     },
 
     stackedbarChartData () {
-
-      // TODO : Error 처리
-      this.getLineChartData(2)
-
-      this.sbChartData = {
-        
-        labels: this.sbarX,
-        
-        datasets: [{
-                label: '20x',
-                data: this.sbarY_200,
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    // 'rgba(255, 206, 86, 0.2)',
-                    // 'rgba(75, 192, 192, 0.2)',
-                    // 'rgba(153, 102, 255, 0.2)',
-                    // 'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    // 'rgba(255, 206, 86, 1)',
-                    // 'rgba(75, 192, 192, 1)',
-                    // 'rgba(153, 102, 255, 1)',
-                    // 'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            },
-            {
-                label: '40x',
-                data: this.sbarY_400,
-                backgroundColor: [
-                    'rgba(155, 199, 132, 0.2)',
-                    'rgba(154, 12, 235, 0.2)',
-                    // 'rgba(155, 06, 86, 0.2)',
-                    // 'rgba(175, 92, 192, 0.2)',
-                    // 'rgba(53, 02, 255, 0.2)',
-                    // 'rgba(155, 19, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    // 'rgba(255, 206, 86, 1)',
-                    // 'rgba(75, 192, 192, 1)',
-                    // 'rgba(153, 102, 255, 1)',
-                    // 'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            },
-            {
-                label: '50x',
-                data: this.sbarY_500,
-                backgroundColor: [
-                    'rgba(155, 199, 132, 0.2)',
-                    'rgba(154, 12, 235, 0.2)',
-                    // 'rgba(155, 06, 86, 0.2)',
-                    // 'rgba(175, 92, 192, 0.2)',
-                    // 'rgba(53, 02, 255, 0.2)',
-                    // 'rgba(155, 19, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    // 'rgba(255, 206, 86, 1)',
-                    // 'rgba(75, 192, 192, 1)',
-                    // 'rgba(153, 102, 255, 1)',
-                    // 'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-      }
+      
+      this.getLineChartData(2)      
+      this.sbChartData = getStackedBarChartTemplate(this.sbarX, this.sbarY_200, this.sbarY_400, this.sbarY_500)
     },
 
 
@@ -479,26 +338,9 @@ export default {
 
     lineChartData () {
 
-      // TODO : Error 처리
       this.getLineChartData(1)
-
-      this.chartData = {
-        //labels: [this.getRandomInt(), this.getRandomInt()],
-        //labels: results1,
-        labels: this.axisX,
-        
-        datasets: [          
-          {
-            label: 'Data One',
-            fill: false,
-            backgroundColor: '#f87979',
-            borderColor: 'rgb(255, 99, 132)',
-            //data: [this.getRandomInt(), this.getRandomInt()]
-            //data: results1
-            data: this.axisY
-          }, 
-        ]
-      }
+      this.lChartData = getLineChartTemplate(this.axisX, this.axisY, "Request")       
+      
     },
     
   }
