@@ -113,9 +113,9 @@ import Search from "@/components/layout/Search";
 import Statistics from "@/components/layout/Statistics";
 import StatisticsTop from "@/components/layout/StatisticsTop";
 
-import axios from "axios";
 import { getPieChartTemplate, getBarChartTemplate, getStackedBarChartTemplate, getLineChartTemplate, 
-        getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions } from "@/common"
+        getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions,
+        getChartDataFromStatistics, getLineChartData } from "@/common"
 
 export default {
   name: "Analysis",
@@ -145,24 +145,7 @@ export default {
       pChartData: null,
       pOptions: getPieChartOptions(),
 
-      // For ChartData
-      axisX: [],
-      axisY: [],
-
-      barX: [],
-      barY: [],
-
-      sbarX: [],
-      sbarY_200: [],
-      sbarY_400: [],
-      sbarY_500: [],      
-
-      pieX: [],
-      pieY: [],
-
-      title:'',
-      content:'',
-
+      logfile_id: '',
     }
   }, 
 
@@ -179,172 +162,42 @@ export default {
     ChartStackedBar: ChartStackedBar
   },
 
+  created() {
+    this.logfile_id = this.$store.state.logFileID
+  },
+
   mounted () {
 
   },
-  methods: {
+  methods: {    
 
-    // 
-    getChartDataFromStatistics(type){
-      var url = "http://127.0.0.1:8000/logdetail/statistics_top"
+    async pieChartData () { 
 
-          // Top 5 일때
-          // type=1. Status Codes Top5
-          // type=2. Requests Top5
-          // type=3. 최다 404 발생 URL Top5
-          // type=4. Time Taken Top5        
-          
-            this.title = "Top 5"
-
-            switch(type){
-              case 1:
-                this.content = "HTTP Status Codes(count)"
-                break;
-              case 2:
-                this.content = "Requests URI(count)"
-                break;
-              case 3:
-                this.content = "404 Requests URI(count)"
-                break;
-              case 4:
-                this.content = "Requests Time-taken(ms/㎲)"
-                break;
-              default:
-            }
-
-          let logfile_id = this.$store.state.logFileID
-          console.log(logfile_id)
-
-          var url = "http://127.0.0.1:8000/logdetail/statistics_top5/"
-
-          let postData = {
-                
-                logfile_id: logfile_id,
-                type: type
-            };
-
-          let axiosConfig = {
-                headers: {
-                //'Authorization': 'Token '+ this.token // For Django
-                }
-            };
-
-          axios.post(url, postData, axiosConfig)
-          .then(res => {
-              console.log(res)
-              //this.setItems(res.data.results);
-              // 0~4까지 루프돌면서 x[], y[] 만들어야 한다.
-              this.barX = []
-              this.barY = []
-
-              this.pieX = []
-              this.pieY = []
-
-              for (let i = 0; i < res.data.results.length; i++) {
-                this.barX.push(res.data.results[i].result);
-                this.barY.push(res.data.results[i].result_count);
-
-                this.pieX.push(res.data.results[i].result);
-                this.pieY.push(res.data.results[i].result_count);
-              }
-
-              console.log(this.barX)
-              console.log(this.barY)
-          })
-          .catch(err => {
-              console.error(err); 
-          })
-
-    },
-
-    pieChartData () {
-
-      this.getChartDataFromStatistics(1)
-      this.pChartData = getPieChartTemplate(this.pieX, this.pieY)
+      let res = await getChartDataFromStatistics(1, this.logfile_id)
+      this.pChartData = getPieChartTemplate(res.x, res.y)
     },
   
+    async barChartData () {
 
-    barChartData () {
+      let res = await getChartDataFromStatistics(1, this.logfile_id)      
+      this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
 
-      this.getChartDataFromStatistics(1)
-      this.bChartData = getBarChartTemplate(this.barX, this.barY, this.content)
     },
 
-    stackedbarChartData () {
+    async stackedbarChartData () {
       
-      this.getLineChartData(2)      
-      this.sbChartData = getStackedBarChartTemplate(this.sbarX, this.sbarY_200, this.sbarY_400, this.sbarY_500)
+      let res = await getLineChartData(2, this.timeCondition, this.logfile_id)      
+      this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_400, res.sbarY_500)
     },
-
 
     // 시계열 분석용 Line Chart
-    getLineChartData(kind=1){
-      var url = "http://127.0.0.1:8000/logdetail/chartdata/"
+    async lineChartData () {
 
-      // TODO : for test
-      let logfile_id = this.$store.state.logFileID
-
-      let postData = {
-                
-          logfile_id: logfile_id,
-          
-          //Type1 : 시(HH)기준
-          //   Kind1 : request(요청) 건수(count)
-          //   Kind2 : status code 건수(count)
-          //   Kind3 : time-taken 시간(max, min, count)
-          //Type2 : 시분(HHMM)기준                    
-          //   Kind1 : request(요청) 건수(count)
-          //   Kind2 : status code 건수(count)
-          //   Kind3 : time-taken 시간(max, min, count)
-
-          type: this.timeCondition,
-          kind: kind
-
-      };
-
-      let axiosConfig = {
-          headers: {
-          //'Authorization': 'Token '+ this.token // For Django
-          }
-      };
-
-      axios.post(url, postData, axiosConfig)
-
-      .then(res => {
-          console.log(res)
-          
-          if ( kind == 1){
-            this.axisX = res.data.resultX
-            this.axisY = res.data.resultY 
-          } else if ( kind == 2){
-            this.sbarX = res.data.resultX
-            this.sbarY_200 = res.data.resultY_200
-            this.sbarY_400 = res.data.resultY_400
-            this.sbarY_500 = res.data.resultY_500
-
-            console.log(this.sbarX)
-            console.log(this.sbarY_200)
-            console.log(this.sbarY_400)
-            console.log(this.sbarY_500)
-
-          }
-          
-      })
-      .catch(err => {
-          console.error(err); 
-      })
-
-    },
-
-    lineChartData () {
-
-      this.getLineChartData(1)
-      this.lChartData = getLineChartTemplate(this.axisX, this.axisY, "Request")       
-      
+      let res = await getLineChartData(1, this.timeCondition, this.logfile_id)
+      this.lChartData = getLineChartTemplate(res.x, res.y, "Request")      
     },
     
   }
-
 };
 </script>
 
