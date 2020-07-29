@@ -61,7 +61,7 @@ export default {
     methods: {
         clickCancle: function() {
             console.log("click Cancel Button");
-            EventBus.$emit("cancel");
+            this.$emit('popupClose');
         },
         
         clickSave: function() {
