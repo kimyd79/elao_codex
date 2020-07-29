@@ -24,4 +24,12 @@ export default {
     
     setUserToken({commit}, value) { commit(types.SET_USERTOKEN, value) },
     setUserName({commit}, value) { commit(types.SET_USERNAME, value) },
+    
+    setPopupHeader({commit}, value) { commit(types.SET_POPUPHEADER, value) },
+    setPopupBody({commit}, value) { commit(types.SET_POPUPBODY, value) },
+    setPopupButton({commit}, value) { commit(types.SET_POPUPBUTTON, value) },
+    setPopupRetrun({commit}, value) { commit(types.SET_POPUPRETURN, value) },
+    setPopupKind({commit}, value) { commit(types.SET_POPUPKIND, value) },
+    setPopupFormatId({commit}, value) { commit(types.SET_POPUPFORMATID, value) },
+    setPopupFormatKind({commit}, value) { commit(types.SET_POPUPFORMATKIND, value) },
 }
