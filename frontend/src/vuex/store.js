@@ -39,6 +39,15 @@ const state = {
     //login info
     userToken: '',
     userName: 'Not logged in', 
+    
+    //popup info
+    popupHeader: '',
+    popupBody: '', 
+    popupButton: '', 
+    popupReturn: '', 
+    popupKind: '', 
+    popupFormatId: '',
+    popupFormatKind: '', 
 }
 
 // mutation
@@ -67,9 +76,20 @@ const mutations = {
     [types.TOGGLE_SEARCH1] (state) { state.toggleSearch1 == 1 ? state.toggleSearch1 = 0 : state.toggleSearch1 = 1 },
     [types.TOGGLE_SEARCH2] (state) { state.toggleSearch2 == 1 ? state.toggleSearch2 = 0 : state.toggleSearch2 = 1 },
     
-    //login info
+    // login info
     [types.SET_USERTOKEN] (state, value) { state.userToken = value },
     [types.SET_USERNAME] (state, value) { state.userName = value },
+    
+    // popup info
+    [types.SET_POPUPHEADER] (state, value) { state.popupHeader = value },
+    [types.SET_POPUPBODY] (state, value) { state.popupBody = value },
+    [types.SET_POPUPBUTTON] (state, value) { state.popupButton = value },
+    [types.SET_POPUPRETURN] (state, value) { state.popupReturn = value },
+    [types.SET_POPUPKIND] (state, value) { state.popupKind = value },
+    [types.SET_POPUPFORMATID] (state, value) { state.popupFormatId = value },
+    [types.SET_POPUPFORMATKIND] (state, value) { state.popupFormatKind = value },
+
+
 
 }
 
