@@ -5,85 +5,87 @@ import axios from "axios";
 
 export var serverUrl = "http://127.0.0.1:8000"
 
-// Common Char Data
-export function getChartDataFromStatistics(type, logfile_id){
+//////////////////////////////////////////////////////////////
+// Common Chart Data
+//////////////////////////////////////////////////////////////
+export function getChartDataFromStatistics(type, logfile_id) {
 
     // Top 5 일때
     // type=1. Status Codes Top5
     // type=2. Requests Top5
     // type=3. 최다 404 발생 URL Top5
     // type=4. Time Taken Top5        
-    
-      //this.title = "Top 5"
 
-      var url = serverUrl+"/logdetail/statistics_top5/"
+    //this.title = "Top 5"
 
-      var label
+    var url = serverUrl + "/logdetail/statistics_top5/"
 
-      switch(type){
+    var label
+
+    switch (type) {
         case 1:
-          label = "HTTP Status Codes(count)"
-          break;
+            label = "HTTP Status Codes(count)"
+            break;
         case 2:
-          label = "Requests URI(count)"
-          break;
+            label = "Requests URI(count)"
+            break;
         case 3:
-          label = "404 Requests URI(count)"
-          break;
+            label = "404 Requests URI(count)"
+            break;
         case 4:
-          label = "Requests Time-taken(ms/㎲)"
-          break;
+            label = "Requests Time-taken(ms/㎲)"
+            break;
         default:
-      }
+    }
 
     //let logfile_id = this.$store.state.logFileID
-    console.log(logfile_id)    
+    console.log(logfile_id)
 
-    let postData = {          
-          logfile_id: logfile_id,
-          type: type
-      };
+    let postData = {
+        logfile_id: logfile_id,
+        type: type
+    };
 
     let axiosConfig = {
-          headers: {
-          //'Authorization': 'Token '+ this.token // For Django
-          }
-      };
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
 
     // For Await
     return axios.post(url, postData, axiosConfig)
-    .then(res => {
-        console.log(res)
+        .then(res => {
+            console.log(res)
 
-        var x = []
-        var y = []
+            var x = []
+            var y = []
 
-        for (let i = 0; i < res.data.results.length; i++) {
+            for (let i = 0; i < res.data.results.length; i++) {
 
-          x.push(res.data.results[i].result);
-          y.push(res.data.results[i].result_count);
-        }
+                x.push(res.data.results[i].result);
+                y.push(res.data.results[i].result_count);
+            }
 
-        res.x = x
-        res.y = y
-        res.label = label
+            res.x = x
+            res.y = y
+            res.label = label
 
-        return res
-    })
-    .catch(err => {
-        console.error(err); 
-    })
+            return res
+        })
+        .catch(err => {
+            console.error(err);
+        })
 
 
 }
 
-export function getLineChartData(kind=1, timeCondition, logfile_id){
-    var url = serverUrl+"/logdetail/chartdata/"
+export function getLineChartData(kind = 1, timeCondition, logfile_id) {
+    var url = serverUrl + "/logdetail/chartdata/"
 
     let postData = {
-              
+
         logfile_id: logfile_id,
-        
+
         //Type1 : 시(HH)기준
         //   Kind1 : request(요청) 건수(count)
         //   Kind2 : status code 건수(count)
@@ -100,36 +102,38 @@ export function getLineChartData(kind=1, timeCondition, logfile_id){
 
     let axiosConfig = {
         headers: {
-        //'Authorization': 'Token '+ this.token // For Django
+            //'Authorization': 'Token '+ this.token // For Django
         }
     };
 
     return axios.post(url, postData, axiosConfig)
 
-    .then(res => {
-        console.log(res)
-         
-        if ( kind == 1){
-          res.x = res.data.resultX
-          res.y = res.data.resultY 
+        .then(res => {
+            console.log(res)
 
-        } else if ( kind == 2){
-          res.sbarX = res.data.resultX
-          res.sbarY_200 = res.data.resultY_200
-          res.sbarY_400 = res.data.resultY_400
-          res.sbarY_500 = res.data.resultY_500
-        }
+            if (kind == 1) {
+                res.x = res.data.resultX
+                res.y = res.data.resultY
 
-        return res
-        
-    })
-    .catch(err => {
-        console.error(err); 
-    })
+            } else if (kind == 2) {
+                res.sbarX = res.data.resultX
+                res.sbarY_200 = res.data.resultY_200
+                res.sbarY_400 = res.data.resultY_400
+                res.sbarY_500 = res.data.resultY_500
+            }
 
-  }
+            return res
 
+        })
+        .catch(err => {
+            console.error(err);
+        })
+
+}
+
+//////////////////////////////////////////////////////////////
 // Common Chart Area
+//////////////////////////////////////////////////////////////
 var bgColors = function (data) {
 
     var count = data.length;
@@ -167,10 +171,10 @@ export function getPieChartTemplate(x, y) {
 
 export function getPieChartOptions() {
 
-    var options =  {
+    var options = {
         responsive: true,
         maintainAspectRatio: false
-      }
+    }
 
     return options;
 }
@@ -278,15 +282,17 @@ export function getLineChartTemplate(x, y, label) {
         }, ]
     }
 
+
+    
     return chartData;
 }
 
 export function getLineChartOptions() {
 
-    var options =  {
+    var options = {
         responsive: true,
         maintainAspectRatio: false
-      }
+    }
 
     return options;
 }

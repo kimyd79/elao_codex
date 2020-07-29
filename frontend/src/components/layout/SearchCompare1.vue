@@ -113,7 +113,7 @@ export default {
       this.$store.dispatch("setFromTimeTaken", this.ttFromValue);
       this.$store.dispatch("setToTimeTaken", this.ttToValue);
 
-      this.$store.dispatch("setToggleSearch");
+      this.$store.dispatch("setToggleSearch1");
     },
 
     search(){

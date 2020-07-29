@@ -19,6 +19,8 @@ export default {
     setSearchKeyword({commit}, value) { commit(types.SET_SEARCHKEYWORD, value) },
     
     setToggleSearch({commit}) { commit(types.TOGGLE_SEARCH) },
+    setToggleSearch1({commit}) { commit(types.TOGGLE_SEARCH1) },
+    setToggleSearch2({commit}) { commit(types.TOGGLE_SEARCH2) },
     
     setUserToken({commit}, value) { commit(types.SET_USERTOKEN, value) },
     setUserName({commit}, value) { commit(types.SET_USERNAME, value) },

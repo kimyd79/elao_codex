@@ -17,6 +17,8 @@ export default {
     getSearchKeyword: state => state.searchKeyword ,    
 
     getToggleSearch: state => state.toggleSearch ,
+    getToggleSearch1: state => state.toggleSearch1 ,
+    getToggleSearch2: state => state.toggleSearch2 ,
 
     getUserToken: state => state.userToken ,
     getUserName: state => state.userName  

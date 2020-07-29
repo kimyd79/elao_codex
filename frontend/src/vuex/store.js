@@ -32,6 +32,10 @@ const state = {
     // check
     toggleSearch: '0',  //  0 or 1 변경사항 확인용
     
+    // For Comparison
+    toggleSearch1: '0',  //  0 or 1 변경사항 확인용    
+    toggleSearch2: '0',  //  0 or 1 변경사항 확인용
+    
     //login info
     userToken: '',
     userName: 'Not logged in', 
@@ -59,6 +63,9 @@ const mutations = {
     [types.SET_SEARCHKEYWORD] (state, value) { state.searchKeyword = value },
 
     [types.TOGGLE_SEARCH] (state) { state.toggleSearch == 1 ? state.toggleSearch = 0 : state.toggleSearch = 1 },
+    
+    [types.TOGGLE_SEARCH1] (state) { state.toggleSearch1 == 1 ? state.toggleSearch1 = 0 : state.toggleSearch1 = 1 },
+    [types.TOGGLE_SEARCH2] (state) { state.toggleSearch2 == 1 ? state.toggleSearch2 = 0 : state.toggleSearch2 = 1 },
     
     //login info
     [types.SET_USERTOKEN] (state, value) { state.userToken = value },
