@@ -2,7 +2,7 @@
     <div class="modal">
         <ui-container-box :columns=9 vertical class="popup-container">
             <div class="popup-header">
-                <div class="popup-header__title">
+                <div class="popup-header__title"> 
                     Logformat 수정
                 </div>
                 <div class="popup-header__close">
@@ -78,7 +78,7 @@ export default {
         },
         clickCancle: function() {
             console.log("click Cancel Button");
-            EventBus.$emit("cancel");
+            this.$emit('popupClose');
         },
         
         clickSave: function() {
@@ -89,20 +89,6 @@ export default {
 </script>
 
 <style scoped>
-/*
-.modal {
-    display: balck;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-}
-*/
 .modal {
     position: fixed;
     width: 704px;
