@@ -4,7 +4,7 @@
       <div class="page-summary-title">Logformat 조회 결과</div>
 
       <!-- component :is="currentView"></component -->
-      <UpdateLogformatForm :is="currentView" :format="format"></UpdateLogformatForm>   
+      <component :is="currentView" v-on:popupClose="currentView=null" :format="format" v-on:popupOK="popupOK"></component>   
 
       <ui-form-item :columns=20 align-right margin-right>
           <lego-button main v-on:click="clickUpdate">수정</lego-button>
@@ -44,6 +44,10 @@ import axios from 'axios';
 import EventBus from '../../EventBus';
 import AddLogformatForm from './AddLogformatForm';
 import UpdateLogformatForm from './UpdateLogformatForm';
+import CommonPopup from './CommonPopup';
+import store from '@/vuex/store';
+import * as types from "@/vuex/mutation_types";
+import { mapGetters } from 'vuex';
 
 var urlStr = "http://127.0.0.1:8000/logformat/";
 
@@ -52,7 +56,7 @@ export default {
     components: { 
       AddLogformatForm,
       UpdateLogformatForm,
- 
+      CommonPopup, 
     },
     data: function() {
       return {
@@ -70,12 +74,20 @@ export default {
       EventBus.$on("addFormat", (format) => {
         this.addData(format);
         this.currentView = null;
-
+      });
+      EventBus.$on("updateOK", (format) => {
+        this.currentView = null;
+        this.currentView = 'updateLogformatForm';
       });
       EventBus.$on("updateFormat", (format) => {
         this.updateData(format);
         this.currentView = null;
       });
+      EventBus.$on("deleteFormat", (format) => {
+        this.deleteData(format);
+        this.currentView = null;
+      });
+      
     },
 
     methods: {
@@ -85,6 +97,12 @@ export default {
         .then((response) => {
                 console.log(response);
                 this.format_lists = response.data.results;
+                this.selected_format_id = '';
+                this.format.format_id = '';
+                this.format.format_kind = '';
+                this.format.format_name = '';
+                this.format.format_strings = '';
+                this.format.creator = '';                
         })
         .catch((ex) => {
           console.log('getData failed', ex);
@@ -96,6 +114,7 @@ export default {
         .then((response) => {
                 console.log(response);
                 this.format = response.data.results;
+                
         })
         .catch((ex) => {
           console.log('getData failed', ex);
@@ -147,40 +166,43 @@ export default {
 
       },
       clickDelete: function() {
-         if ( !this.selected_format_id ) {
-          alert('선택된 Logformat이 없습니다.');
-        }else{
-          if ( confirm('Logformat ID : ' + this.selected_format_id +' 를 삭제하시겠습니까?'))
-          {
-            this.deleteData(this.format);
-          }
-        }
+        this.$store.state.popupKind = 'Delete';
+        this.$store.state.popupHeader = 'Confirm Delete';
+        if (this.format.format_id != '') {
+          this.$store.state.popupBody = 'Are you sure want to Delete? </p> ID : ' + this.selected_format_id;
+          this.$store.state.popupFormatId = this.format.format_id;
+          this.$store.state.popupFormatKind = this.format.format_kind;
+          this.$store.state.popupButton = 'CancelOK';
+          this.currentView = 'CommonPopup';
+        } else {
+          this.$store.state.popupBody = 'No LogFormat selected.';
+          this.$store.state.popupButton = 'Close';
+          this.currentView = 'CommonPopup';
+        }       
       },
       clickAdd: function() {
         this.currentView = 'AddLogformatForm';
       },
-      clickSave: function() {
-        this.checkSelectedFormatIdNull(); 
-        console.log("click ID : " + this.selected_format_id);
-      },
       clickUpdate: function() {
-        if ( !this.selected_format_id ) {
-          alert('선택된 Logformat이 없습니다.');
-        }else{
-          alert('선택된 Logformat ID는 ' + this.selected_format_id + ' 입니다.');
-          //EventBus.$emit("updateFormat", this.format);
+        this.$store.state.popupKind = 'Update';
+        this.$store.state.popupHeader = 'Confirm Update';
+        if (this.format.format_id != '') {
           this.currentView = 'updateLogformatForm';
+        } else {
+          this.$store.state.popupBody = 'No LogFormat selected.';
+          this.$store.state.popupButton = 'Close';
+          this.currentView = 'CommonPopup';
         }
-        
-        console.log("click ID : " + this.selected_format_id);
       },
-      checkSelectedFormatIdNull() {
-        if ( !this.selected_format_id ) {
-          alert('선택된 Logformat이 없습니다.');
-        }else{
-          alert('선택된 Logformat ID는 ' + this.selected_format_id + ' 입니다.');
-        }
-      }
+      popupOK: function() {
+        if (this.$store.state.popupKind == 'Delete') {
+          console.log(this.format.format_id);
+          this.deleteData(this.format);  
+          this.currentView = null; 
+        } else if(this.$store.state.popupKind == 'Update') {
+          this.updateData(this.format);
+        }               
+      },
     }
 };
 </script>
