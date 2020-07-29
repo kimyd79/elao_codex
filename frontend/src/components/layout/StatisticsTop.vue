@@ -9,8 +9,11 @@
             </tr>          
           </thead>
           <tbody>
+            
             <tr v-for="(item, index) in items" >
-              <td v-if="statisticsRow != 1">{{ index+1 }}</td>
+              <td v-if="statisticsRow != 1">{{ index+1 }}</td>    
+
+              <!-- TODO: content 종류에 따라 style= "text-align:left;" 적용할 것 -->          
               <td v-on:click="getDetail(item)">{{ item.result }}</td>
               <td>{{ item.result_count }}</td>            
             </tr>

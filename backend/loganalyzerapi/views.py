@@ -16,10 +16,12 @@ import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count, Sum, Max, Min, Avg
-from django.db.models.functions import Concat, Coalesce
+from django.db.models.functions import Concat, Coalesce, Substr
 from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+
+import copy
 
 # for test
 from django.core import serializers
@@ -127,14 +129,20 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 결과 처리
         resultX = []
         resultY = []
+                
         resultY_200 = []
+        resultY_300 = []
         resultY_400 = []
         resultY_500 = []
+        
+        resultY_SCode = {}
 
         # Type1 : 시(HH)기준
         #   Kind1 : request(요청) 건수(count)        
         #   Kind2 : status code 건수(count)
         #   Kind3 : time-taken 시간(max, min, count)
+        
+        start_time = time.time()
         
         #type=1. 시(HH)기준
         if type == '1':          
@@ -152,38 +160,49 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                     resultY.append(row['y'])
                     
             elif(kind == 2):
-                                
-                # 시간축 X
-                hhStatusCodeX = queryset.values(hh=Concat('fdate','fhour')).order_by('hh').distinct('hh')
-                rows = hhStatusCodeX.values('hh')
-                              
-                for row in rows:
-                    print("type1, kind2 : status code 건수(count) x - ", row['hh'])                                        
-                    resultX.append(row['hh'])
                 
-                # 코드결과축 Y - 20x
-                hhStatusCodeY_2 = queryset.filter(fstatus__startswith='2').annotate(f_date=Concat('fdate','fhour')).values('f_date').annotate(status_count=Count('fstatus'))
-                rows = hhStatusCodeY_2.values('status_count')
-                              
-                for row in rows:
-                    print("type1, kind2 : status 200 code 건수(count) x - ", row['status_count'])                                        
-                    resultY_200.append(row['status_count'])
-                                
-                # 코드결과축 Y - 40x
-                hhStatusCodeY_4 = queryset.filter(fstatus__startswith='4').annotate(f_date=Concat('fdate','fhour')).values('f_date').annotate(status_count=Count('fstatus'))
-                rows = hhStatusCodeY_4.values('status_count')
-                              
-                for row in rows:
-                    print("type1, kind2 : status 400 code 건수(count) x - ", row['status_count'])                                        
-                    resultY_400.append(row['status_count'])
+                start_time = time.time()
+                 
+                hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
+                rows = hhRequest.values('f_date', 'f_status', 'status_count')
                 
-                # 코드결과축 Y - 50x
-                hhStatusCodeY_5 = queryset.filter(fstatus__startswith='5').annotate(f_date=Concat('fdate','fhour')).values('f_date').annotate(status_count=Count('fstatus'))
-                rows = hhStatusCodeY_5.values('status_count')
+                dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
+                statusCount = {}
+                
+                resultStatusCode = []
+                                              
+                for row in rows:
+                    print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
+                    print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
+                    print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
                     
-                for row in rows:
-                    print("type1, kind2 : status 500 code 건수(count) x - ", row['status_count'])                                        
-                    resultY_500.append(row['status_count'])             
+                    # x축 : 중복제거
+                    if row['f_date'] not in resultX:
+                        resultX.append(row['f_date'])
+                        
+                    # y축-1 : status 코드 중복제거
+                    if row['f_status'] not in resultStatusCode:
+                        resultStatusCode.append(row['f_status']) 
+                        
+                    # 전체 Map 구하기                    
+                    statusCount[row['f_status']] = row['status_count']
+                    dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                    
+                for xDate in resultX:
+                    for yStatusCode in resultStatusCode:
+                        
+                        if yStatusCode == '2':
+                            resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                        elif yStatusCode == '3':
+                            resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                        elif yStatusCode == '4':
+                            resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                        elif yStatusCode == '5':
+                            resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                        else:
+                            print('There is no available status code.')
+                           
+                print("== 전체 시간 : ", time.time() - start_time)
                 
             elif(kind == 3):
                 # TODO : time-taken 존재여부 Check
@@ -195,9 +214,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #   Kind3 : time-taken 시간(max, min, count) 
         elif type == '2':          
                            
-            if(kind == 1):
-                
-                start_time = time.time()
+            if(kind == 1):               
                 
                 hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
                 print("== 쿼리 시간 : ", time.time() - start_time)
@@ -211,45 +228,54 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 print("== 전체 시간 : ", time.time() - start_time)
                 
             elif(kind == 2):
-                               
-                # 시간축 X
-                hhmmStatusCodeX = queryset.values(hhmm=Concat('fdate','fhour','fminute')).order_by('hhmm').distinct('hhmm')                
-                rows = hhmmStatusCodeX.values('hhmm')
-                              
-                for row in rows:
-                    print("type2, kind2 : status code 건수(count) x - ", row['hhmm'])                                        
-                    resultX.append(row['hhmm'])
                 
-                # 코드결과축 Y - 20x
-                hhmmStatusCodeY_2 = queryset.filter(fstatus__startswith='2').annotate(f_date=Concat('fdate','fhour','fminute')).values('f_date').annotate(status_count=Count('fstatus'))
-                rows = hhmmStatusCodeY_2.values('status_count')
-                              
-                for row in rows:
-                    print("type2, kind2 : status 200 code 건수(count) - ", row['status_count'])                                        
-                    resultY_200.append(row['status_count'])
-                                
-                # 코드결과축 Y - 40x
-                hhmmStatusCodeY_4 = queryset.filter(fstatus__startswith='4').annotate(f_date=Concat('fdate','fhour','fminute')).values('f_date').annotate(status_count=Count('fstatus'))
-                rows = hhmmStatusCodeY_4.values('status_count')
-                              
-                for row in rows:
-                    print("type2, kind2 : status 400 code 건수(count) - ", row['status_count'])                                        
-                    resultY_400.append(row['status_count'])
+                hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
+                rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
                 
-                # 코드결과축 Y - 50x
-                hhmmStatusCodeY_5 = queryset.filter(fstatus__startswith='5').annotate(f_date=Concat('fdate','fhour','fminute')).values('f_date').annotate(status_count=Count('fstatus'))
-                rows = hhmmStatusCodeY_5.values('status_count')
+                dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
+                statusCount = {}
+                
+                resultStatusCode = []
+                                              
+                for row in rows:
+                    print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
+                    print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
+                    print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
                     
-                for row in rows:
-                    print("type2, kind2 : status 500 code 건수(count) - ", row['status_count'])                                        
-                    resultY_500.append(row['status_count'])                         
+                    # x축 : 중복제거
+                    if row['f_date'] not in resultX:
+                        resultX.append(row['f_date'])
+                        
+                    # y축-1 : status 코드 중복제거
+                    if row['f_status'] not in resultStatusCode:
+                        resultStatusCode.append(row['f_status']) 
+                        
+                    # 전체 Map 구하기                    
+                    statusCount[row['f_status']] = row['status_count']
+                    dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                    
+                for xDate in resultX:
+                    for yStatusCode in resultStatusCode:
+                        
+                        if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
+                            resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                        elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
+                            resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                        elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
+                            resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                        elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
+                            resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                        else:
+                            #print('There is no available status code.')
+                            pass
+                           
+                print("== 전체 시간 : ", time.time() - start_time)
                     
             elif(kind == 3):
                 # TODO : time-taken 존재여부 Check
                 pass
-        
-        
-        response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_200': resultY_200, 'resultY_400': resultY_400, 'resultY_500': resultY_500}
+                
+        response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
         return Response(response, status = status.HTTP_200_OK)
     
     
@@ -349,13 +375,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 print("type2 : TOP5 REQUEST Count - ", row['frequest_count'])
                 
                 results.append({"result" : row['frequest'], "result_count" : row['frequest_count']})   
-            
-            # for idx in range(0, top5_request.count()):
-            #     print("type2 : TOP5 REQUEST - ", top5_request[idx]['frequest'])
-            #     print("type2 : TOP5 REQUEST Count - ", top5_request[idx]['frequest_count'])
-                
-            #     results.append({"result" : top5_request[idx]['frequest'], "result_count" : top5_request[idx]['frequest_count']})     
-        
+                    
         #type=3. 최다 404 발생 URL Top5
         elif type == 3:
             top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')[0:5]
@@ -367,13 +387,6 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 
                 results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']})   
             
-            
-            # for idx in range(0, top5_404_request.count()):
-            #     print("type4 : TOP 404 REQUEST - ", top5_404_request[idx]['frequest'])
-            #     print("type4 : TOP 404 REQUEST Count - ", top5_404_request[idx]['frequest_404_count']) 
-                
-            #     results.append({"result" : top5_404_request[idx]['frequest'], "result_count" : top5_404_request[idx]['frequest_404_count']})      
-            
         #type=4. Time-taken Top5(오래 걸린시간)
         elif type == 4:
             top5_timetaken_request = queryset.order_by('-ftime_taken')[0:5]
@@ -383,13 +396,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 print("type3 : TOP5 Timtaken REQUEST - ", row['frequest'])
                 print("type3 : TOP5 Timtaken REQUEST Count - ", row['ftime_taken'])
                 
-                results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']}) 
-            
-            # for idx in range(0, top5_timetaken_request.count()):
-            #     print("type4 : TOP Timtaken REQUEST - ", top5_timetaken_request[idx].frequest)
-            #     print("type4 : TOP Timtaken - ", top5_timetaken_request[idx].ftime_taken) 
-                
-            #     results.append({"result" : top5_timetaken_request[idx].frequest, "result_count" : top5_timetaken_request[idx].ftime_taken})    
+                results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']})             
         
         print("== statistics_top1 (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
         #type=5. Search Terms Top5     

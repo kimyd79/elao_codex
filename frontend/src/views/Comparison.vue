@@ -150,7 +150,7 @@ export default {
       this.stackedbarChartData(2)
       this.lineChartData(2)
       this.barChartData(2)
-      this.pieChartData(3)
+      this.pieChartData(2)
     },
 
     async pieChartData (searchArea) { 
