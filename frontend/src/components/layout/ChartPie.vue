@@ -8,7 +8,7 @@ export default {
   
   extends: Pie,
   mixins: [reactiveProp],
-  props: ['options'],
+  props: ['chartData', 'options'],
   
   mounted () {
     this.renderChart(this.chartdata, this.options)

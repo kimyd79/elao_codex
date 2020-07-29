@@ -187,7 +187,7 @@ export default {
     async stackedbarChartData () {
       
       let res = await getLineChartData(2, this.timeCondition, this.logfile_id)      
-      this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_400, res.sbarY_500)
+      this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
     },
 
     // 시계열 분석용 Line Chart

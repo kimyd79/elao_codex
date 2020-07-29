@@ -179,9 +179,9 @@ export default {
       
       let res = await getLineChartData(2, this.timeCondition, this.logfile_id)
       if ( searchArea == 1 ){
-        this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_400, res.sbarY_500)
+        this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
       }else{
-        this.sbChartData2 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_400, res.sbarY_500)
+        this.sbChartData2 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
       }
     },
 

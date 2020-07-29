@@ -291,13 +291,13 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 결과 처리
         result = []
         
-        #0. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+        #0. TODO: 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
         queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)
         
-        #1. TODO : 검색 조건 적용(공통항목으로 Extract)        
+        #1. TODO: 검색 조건 적용(공통항목으로 Extract)        
         queryset = self.get_queryset()
         
-        #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
+        #2. TODO: 아래 결과 key 동일하게 맞추기 - for 화면처리 
         
         start_time = time.time()
        
