@@ -10,10 +10,7 @@
 
             <div class="popup-body" v-html="this.$store.state.popupBody">
             </div>  
-            <!--div class="popup-body" >
-                <PulseLoader :size="'30px'" :loading="buttonClose"/>
-            </div-->      
-
+            
             <div class="popup-buttons">
                 <lego-button v-on:click="clickCancel" v-if="buttonClose">Close</lego-button>
                 <lego-button v-on:click="clickCancel" v-if="buttonCancel">Cancel</lego-button>
@@ -31,15 +28,11 @@ import EventBus from '../../EventBus';
 import store from '@/vuex/store';
 import * as types from "@/vuex/mutation_types";
 import { mapGetters } from 'vuex';
-//import PulseLoader from './PulseLoader';
 
 var urlStr = "http://127.0.0.1:8000/logformat/";
 
 export default {
     name: 'CommonPopup',
-    components: { 
-      PulseLoader,
-    },
     props: {
         format: {
             type: Object,
