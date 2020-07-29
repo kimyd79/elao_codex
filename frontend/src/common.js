@@ -300,6 +300,9 @@ export function getLineChartOptions() {
         responsive: true,
         maintainAspectRatio: false,
 
+        // TODO: Scale
+        
+        // TODO: Zooming and Panning - 미완성
         plugins: {
             zoom: {
                 // Container for pan options
@@ -314,7 +317,7 @@ export function getLineChartOptions() {
                     //   mode: function({ chart }) {
                     //     return 'xy';
                     //   },
-                    mode: 'xy',
+                    mode: 'x',
         
                     rangeMin: {
                         // Format of min pan range depends on scale type
@@ -349,10 +352,10 @@ export function getLineChartOptions() {
         
                     // Drag-to-zoom effect can be customized
                     // drag: {
-                    // 	 borderColor: 'rgba(225,225,225,0.3)'
-                    // 	 borderWidth: 5,
-                    // 	 backgroundColor: 'rgb(225,225,225)',
-                    // 	 animationDuration: 0
+                    // 	borderColor: 'rgba(180,180,180,0.3)',
+                    // 	borderWidth: 5,
+                    // 	backgroundColor: 'rgb(180,180,180)',
+                    // 	animationDuration: 0
                     // },
         
                     // Zooming directions. Remove the appropriate direction to disable
@@ -362,7 +365,7 @@ export function getLineChartOptions() {
                     //   mode: function({ chart }) {
                     //     return 'xy';
                     //   },
-                    mode: 'xy',
+                    mode: 'x',
         
                     rangeMin: {
                         // Format of min zoom range depends on scale type
