@@ -15,8 +15,8 @@
               </ui-gnb-menus>
           </template>
           <template v-slot:tail>
-            <button class="popup-buttons" v-on:click="submitRegister" v-if="registerButton">REGISTER</button>
-            <input type="button" class="popup-buttons" v-bind:value="btnText" v-on:click="submitEvent"/>
+            <lego-button v-on:click="submitRegister" v-if="registerButton">REGISTER</lego-button>
+            <lego-button v-on:click="submitEvent">{{ btnText }}</lego-button>
             <ui-gnb-profile> {{ getUserName }} </ui-gnb-profile>
           </template>
       </ui-gnb>
