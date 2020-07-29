@@ -21,6 +21,14 @@ export default {
     getToggleSearch2: state => state.toggleSearch2 ,
 
     getUserToken: state => state.userToken ,
-    getUserName: state => state.userName  
+    getUserName: state => state.userName ,
+      
+    getPopupHeader: state => state.PopupHeader,
+    getPopupBody: state => state.PopupBody,
+    getPopupButton: state => state.PopupButton,
+    getPopupReturn: state => state.PopupReturn,
+    getPopupKind: state => state.PopupKind,
+    getPopupFormatId: state => state.PopupFormatId,
+    getPopupFormatKind: state => state.PopupFormatKind
 
 }
