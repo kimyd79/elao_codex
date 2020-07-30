@@ -21,7 +21,11 @@
 
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
       <button @click="search1Chart">Search1 Test</button>
+      <button @click="resetZoom1">resetZoom1</button>
+
       <button @click="search2Chart">Search2 Test</button>
+      <button @click="resetZoom1">resetZoom2</button>
+      
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
@@ -146,6 +150,9 @@ export default {
     }),
   },
   methods: {
+    resetZoom1() {
+
+    },
     getFilter() {
       
       let filter = {

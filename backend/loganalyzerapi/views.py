@@ -455,16 +455,6 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             searchValue = self.request.query_params.get('searchValue', None)
         
         elif method == 'post':
-            # dateFromValue = self.request.data['filter']['dateFromValue'] if 'dateFromValue' in self.request.data['filter'] else None
-            # dateToValue = self.request.data['filter']['dateToValue'] if 'dateToValue' in self.request.data['filter'] else None
-            # timeFromValue = self.request.data['filter']['timeFromValue'] if 'timeFromValue' in self.request.data['filter'] else None
-            # timeToValue = self.request.data['filter']['timeToValue'] if 'timeToValue' in self.request.data['filter'] else None
-
-            # ttFromValue = self.request.data['filter']['ttFromValue'] if 'ttFromValue' in self.request.data['filter'] else -1
-            # ttToValue = self.request.data['filter']['ttToValue'] if 'ttToValue' in self.request.data['filter'] else -1
-
-            # conditionValue = self.request.data['conditionValue'] if 'conditionValue' in self.request.data['filter'] else None
-            # searchValue = self.request.data['searchValue'] if 'searchValue' in self.request.data['filter'] else None
             
             dateFromValue = self.request.data['filter']['dateFromValue'] if self.request.data['filter']['dateFromValue'] != '' else None
             dateToValue = self.request.data['filter']['dateToValue'] if self.request.data['filter']['dateToValue'] != '' else None

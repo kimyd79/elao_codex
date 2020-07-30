@@ -61,6 +61,7 @@
         <chart-line :chart-data="lChartData" :options="lOptions"></chart-line>
         <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
         <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
+        <button @click="resetZoom">resetZoom Test</button>
         <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
         <!-- 
           Type1 : 시(HH)기준
@@ -188,7 +189,9 @@ export default {
     }),
 
   methods: {    
+    resetZoom() {
 
+    },
     getFilter() {
       
       let filter = {
