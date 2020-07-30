@@ -80,7 +80,24 @@ export default {
         }
       },
 
-      // TODO : Aync 효과 있는지?
+      getFilter() {
+      
+        let filter = {
+          dateFromValue: this.dateFromValue,
+          dateToValue: this.dateToValue,
+          timeFromValue: this.timeFromValue,
+          timeToValue: this.timeToValue,
+
+          conditionValue: this.conditionValue,
+          searchValue: this.searchValue,
+
+          ttFromValue: this.ttFromValue,
+          ttToValue: this.ttToValue,
+        }
+        
+        return filter
+    },
+
       getStatistics(){          
           
           var url = "http://127.0.0.1:8000/logdetail/statistics_top"
@@ -146,7 +163,18 @@ export default {
           let postData = {
                 
                 logfile_id: logfile_id,
-                type: this.statisticsKind
+                type: this.statisticsKind,
+
+                // Filters
+                // dateFromValue: this.dateFromValue,
+                // dateToValue: this.dateToValue,
+                // timeFromValue: this.timeFromValue,
+                // timeToValue: this.timeToValue,
+                // ttFromValue: this.ttFromValue,
+                // ttToValue: this.ttToValue,
+                // conditionValue: this.conditionValue,
+                // searchValue: this.searchValue,
+                filter: this.getFilter()
             };
 
           let axiosConfig = {

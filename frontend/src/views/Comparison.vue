@@ -132,9 +132,38 @@ export default {
     ...mapGetters({
       isSearch1: "getToggleSearch1",
       isSearch2: "getToggleSearch2",
+
+      dateFromValue: "getFromDate",
+      dateToValue: "getToDate",
+      timeFromValue: "getFromTime",
+      timeToValue: "getToTime",
+
+      conditionValue: "getCondition",
+      searchValue: "getSearchKeyword",
+
+      ttFromValue: "getFromTimeTaken",
+      ttToValue: "getToTimeTaken",
     }),
   },
   methods: {
+    getFilter() {
+      
+      let filter = {
+        dateFromValue: this.dateFromValue,
+        dateToValue: this.dateToValue,
+        timeFromValue: this.timeFromValue,
+        timeToValue: this.timeToValue,
+
+        conditionValue: this.conditionValue,
+        searchValue: this.searchValue,
+
+        ttFromValue: this.ttFromValue,
+        ttToValue: this.ttToValue,
+      }
+      
+      return filter
+    },
+
     search1Chart(){
 
       console.log("search1Chart")
@@ -155,7 +184,8 @@ export default {
 
     async pieChartData (searchArea) { 
 
-      let res = await getChartDataFromStatistics(1, this.logfile_id)
+      let filter = this.getFilter()
+      let res = await getChartDataFromStatistics(1, this.logfile_id, filter)
 
       if ( searchArea == 1 ){
         this.pChartData1 = getPieChartTemplate(res.x, res.y)
@@ -165,8 +195,8 @@ export default {
     },
   
     async barChartData (searchArea) {
-
-      let res = await getChartDataFromStatistics(1, this.logfile_id)      
+      let filter = this.getFilter()
+      let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
       if ( searchArea == 1 ){
         this.bChartData1 = getBarChartTemplate(res.x, res.y, res.label)
       }else{
@@ -176,8 +206,8 @@ export default {
     },
 
     async stackedbarChartData (searchArea) {
-      
-      let res = await getLineChartData(2, this.timeCondition, this.logfile_id)
+      let filter = this.getFilter()
+      let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)
       if ( searchArea == 1 ){
         this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
       }else{
@@ -187,8 +217,8 @@ export default {
 
     // 시계열 분석용 Line Chart
     async lineChartData (searchArea) {
-
-      let res = await getLineChartData(1, this.timeCondition, this.logfile_id)
+      let filter = this.getFilter()
+      let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
       if ( searchArea == 1 ){
         this.lChartData1 = getLineChartTemplate(res.x, res.y, "Request")
       }else{

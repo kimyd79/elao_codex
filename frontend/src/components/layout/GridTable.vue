@@ -14,6 +14,7 @@
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
+import { getSearchFilter } from "@/common"
 
 export default {
   name: "GridTable",
@@ -100,59 +101,17 @@ export default {
 
     getLogDetails() {
       
-      console.log("dateFromValue(vuex) : " + this.dateFromValue);
-      console.log("dateToValue(vuex) : " + this.dateToValue);
-      console.log("timeFromValue(vuex) : " + this.timeFromValue);
-      console.log("timeToValue(vuex) : " + this.timeToValue);
-      console.log("ttFromValue(vuex) : " + this.ttFromValue);
-      console.log("ttToValue(vuex) : " + this.ttToValue);
 
-      console.log("conditionValue(vuex) : " + this.conditionValue);
-      console.log("searchValue(vuex) : " + this.searchValue);      
-
-      console.log("pagingInfo : " + this.pagingInfo.rowsPerPage);
-      console.log("pagingInfo : " + this.pagingInfo.currentPage);
-
-      let offset =
-        this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
+      let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
 
       // 1 : 0~9, 2 : 10~19,
       console.log("offset :" + offset);
 
-      // Filter String
-      let filters=""
-      if ( this.dateFromValue != '') {
-        filters = filters + "&dateFromValue="+this.dateFromValue
-      }
-      if ( this.dateToValue != '') {
-        filters = filters + "&dateToValue="+this.dateToValue
-      }
-      if ( this.timeFromValue != '') {
-        filters = filters + "&timeFromValue="+this.timeFromValue
-      }
-      if ( this.timeToValue != '') {
-        filters = filters + "&timeToValue="+this.timeToValue
-      }
-      if ( this.conditionValue != '') {
-        filters = filters + "&conditionValue="+this.conditionValue
-      }
-      if ( this.searchValue != '') {
-        filters = filters + "&searchValue="+this.searchValue
-      }
-      if ( this.ttFromValue != '') {
-        filters = filters + "&ttFromValue="+this.ttFromValue
-      }
-      if ( this.ttToValue != '') {
-        filters = filters + "&ttToValue="+this.ttToValue
-      }
-
+      let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue)
       console.log("filters : "+filters)
 
       var urlstring =
-        "http://127.0.0.1:8000/logdetail/?limit=" +
-        this.pagingInfo.rowsPerPage +
-        "&offset=" +
-        offset + filters;
+        "http://127.0.0.1:8000/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
 
       // TODO : Set axiosConfig to set headers
       //let axiosConfig = {
@@ -165,20 +124,11 @@ export default {
       axios
         .get(urlstring)
         .then(res => {
-          //console.log(res.data)       // 전체 Object
+
           console.log(res.data.count); // 전체건수
-
           this.pagingInfo.totalItems = res.data.count;
-
-          console.log(this.pagingInfo.totalPages);
-
-          console.log(res.data.results); // 결과(offset)
-
-          //this.tempItems = res.data.results
-
-          // TODO #1 : Data 처리 - Table Row에 맞도록 => items에 매핑
           this.setItemList(res.data.results);
-          // TODO #3 : Graph 그리기 - Analysis 화면
+
         })
         .catch(err => {
           console.error(err);
@@ -199,7 +149,6 @@ export default {
 
   watch: {
     isSearch() {
-      //alert('This value is changed -- '+ this.isSearch)
       this.getLogDetails();
     }
   }

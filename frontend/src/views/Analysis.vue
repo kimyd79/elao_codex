@@ -113,9 +113,11 @@ import Search from "@/components/layout/Search";
 import Statistics from "@/components/layout/Statistics";
 import StatisticsTop from "@/components/layout/StatisticsTop";
 
+import { mapGetters } from "vuex";
+
 import { getPieChartTemplate, getBarChartTemplate, getStackedBarChartTemplate, getLineChartTemplate, 
         getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions,
-        getChartDataFromStatistics, getLineChartData } from "@/common"
+        getChartDataFromStatistics, getLineChartData, getSearchFilter } from "@/common"
 
 export default {
   name: "Analysis",
@@ -169,31 +171,66 @@ export default {
   mounted () {
 
   },
+
+  computed: mapGetters({
+      
+      dateFromValue: "getFromDate",
+      dateToValue: "getToDate",
+      timeFromValue: "getFromTime",
+      timeToValue: "getToTime",
+
+      conditionValue: "getCondition",
+      searchValue: "getSearchKeyword",
+
+      ttFromValue: "getFromTimeTaken",
+      ttToValue: "getToTimeTaken",
+
+    }),
+
   methods: {    
 
-    async pieChartData () { 
+    getFilter() {
+      
+      let filter = {
+        dateFromValue: this.dateFromValue,
+        dateToValue: this.dateToValue,
+        timeFromValue: this.timeFromValue,
+        timeToValue: this.timeToValue,
 
-      let res = await getChartDataFromStatistics(1, this.logfile_id)
+        conditionValue: this.conditionValue,
+        searchValue: this.searchValue,
+
+        ttFromValue: this.ttFromValue,
+        ttToValue: this.ttToValue,
+      }
+      
+      return filter
+    },
+
+    async pieChartData () { 
+      let filter = this.getFilter()
+      let res = await getChartDataFromStatistics(1, this.logfile_id, filter)
       this.pChartData = getPieChartTemplate(res.x, res.y)
+      
     },
   
     async barChartData () {
-
-      let res = await getChartDataFromStatistics(1, this.logfile_id)      
+      let filter = this.getFilter()
+      let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
       this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
 
     },
 
     async stackedbarChartData () {
-      
-      let res = await getLineChartData(2, this.timeCondition, this.logfile_id)      
+      let filter = this.getFilter()
+      let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)      
       this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
     },
 
     // 시계열 분석용 Line Chart
     async lineChartData () {
-
-      let res = await getLineChartData(1, this.timeCondition, this.logfile_id)
+      let filter = this.getFilter()
+      let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
       this.lChartData = getLineChartTemplate(res.x, res.y, "Request")      
     },
     

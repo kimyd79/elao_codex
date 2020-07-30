@@ -1,6 +1,6 @@
 <template>
   <div id="search">
-    <ui-container-box :columns="10" vertical title="Search" class="mb50">
+    <ui-container-box :columns="10" vertical title="Search-1" class="mb50">
       <ui-form-box>
         <ui-form-row>
           <ui-form-item :columns="8" label="Date/Time" required-left>
@@ -82,14 +82,6 @@ export default {
   },
   methods: {
     initialize() {
-      console.log(this.dateFromValue);
-      console.log(this.dateToValue);
-      console.log(this.timeFromValue);
-      console.log(this.timeToValue);
-      console.log(this.conditionValue);
-      console.log(this.searchValue);
-      console.log(this.ttFromValue);
-      console.log(this.ttToValue);
 
       this.dateFromValue = "";
       this.dateToValue = "";

@@ -111,7 +111,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         kind = request.data['kind']
         print("** chartdata : type, kind --> ", type, kind)
         
-        #0. TODO : 검색 조건 적용(공통항목으로 Extract) - 확인필요
+        # 검색 조건 적용
         queryset = self.get_queryset()
         
         #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
@@ -291,11 +291,11 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 결과 처리
         result = []
         
-        #0. TODO: 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-        queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)
-        
-        #1. TODO: 검색 조건 적용(공통항목으로 Extract)        
+        # 검색 조건 적용
         queryset = self.get_queryset()
+        
+        #0. TODO: 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+        queryset = queryset.filter(logfile_id__exact=logfile_id)
         
         #2. TODO: 아래 결과 key 동일하게 맞추기 - for 화면처리 
         
@@ -323,10 +323,16 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             
         #type=4. 최다 404 발생 URL
         elif type == 4:
-            top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count').values('frequest', 'frequest_404_count')[0]
-            print("type4 : TOP 404 REQUEST - ", top_404_request['frequest'])
-            print("type4 : TOP 404 REQUEST Count - ", top_404_request['frequest_404_count'])
-            result.append({"result" :  top_404_request['frequest'], "result_count" : top_404_request['frequest_404_count']})
+            
+            try:
+                top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count').values('frequest', 'frequest_404_count')[0]
+            
+                print("type4 : TOP 404 REQUEST - ", top_404_request['frequest'])
+                print("type4 : TOP 404 REQUEST Count - ", top_404_request['frequest_404_count'])
+                result.append({"result" :  top_404_request['frequest'], "result_count" : top_404_request['frequest_404_count']})
+            except :
+                print("Error occured!")
+                result.append({"result" : "-", "result_count" : "0"})                           
         
         print("== statistics_top1 (type="+str(type)+")걸린 시간 : ", time.time() - start_time) 
                             
@@ -341,13 +347,13 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                        
         type = request.data['type']
         print("** statistics_top5 : type --> ", type)
-        
-        #0. TODO : 검색 조건 적용(공통항목으로 Extract) - 확인필요
+                
+        # 검색 조건 적용
         queryset = self.get_queryset()
         
         #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-        queryset = LogDetail.objects.filter(logfile_id__exact=logfile_id)        
-        
+        queryset = queryset.filter(logfile_id__exact=logfile_id)        
+                
         #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
         
         results = []
@@ -381,11 +387,14 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')[0:5]
             rows = top5_404_request.values('frequest','frequest_404_count')
             
-            for row in rows:
-                print("type3 : TOP5 404 REQUEST - ", row['frequest'])
-                print("type3 : TOP5 404 REQUEST Count - ", row['frequest_404_count'])
-                
-                results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']})   
+            if rows.count() > 0 :
+                for row in rows:
+                    print("type3 : TOP5 404 REQUEST - ", row['frequest'])
+                    print("type3 : TOP5 404 REQUEST Count - ", row['frequest_404_count'])
+                    
+                    results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']}) 
+            else:
+                results.append({"result" : "-", "result_count" : "0" }) 
             
         #type=4. Time-taken Top5(오래 걸린시간)
         elif type == 4:
@@ -408,37 +417,82 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         
     
-    # For Gridtable Filtering
+    # For Filtering
     def get_queryset(self):
         
         print("== LogDetailViewSet get_queryset!!")
         
         queryset = LogDetail.objects.all()
+        
+        # Request Method 확인
+        method = ""
+        for key in self.action_map:
+            if self.action_map[key] == self.action:
+                method = key
+                break
+        print("method = ", method)
+        
+        dateFromValue = ""
+        dateToValue = ""
+        timeFromValue = ""
+        timeToValue = ""
+        ttFromValue = ""
+        ttToValue = ""
+        conditionValue = ""
+        searchValue = ""        
 
-        # 조건 적용
-        dateFromValue = self.request.query_params.get('dateFromValue', None)
-        dateToValue = self.request.query_params.get('dateToValue', None)
-        timeFromValue = self.request.query_params.get('timeFromValue', None)
-        timeToValue = self.request.query_params.get('timeToValue', None)
+        # 조건 적용(GET)
+        if method == 'get' :
+            dateFromValue = self.request.query_params.get('dateFromValue', None)
+            dateToValue = self.request.query_params.get('dateToValue', None)
+            timeFromValue = self.request.query_params.get('timeFromValue', None)
+            timeToValue = self.request.query_params.get('timeToValue', None)
+            
+            ttFromValue = self.request.query_params.get('ttFromValue', None)
+            ttToValue = self.request.query_params.get('ttToValue', None)
+            
+            conditionValue = self.request.query_params.get('conditionValue', None)
+            searchValue = self.request.query_params.get('searchValue', None)
         
-        ttFromValue = self.request.query_params.get('ttFromValue', None)
-        ttToValue = self.request.query_params.get('ttToValue', None)
-        
-        conditionValue = self.request.query_params.get('conditionValue', None)
-        searchValue = self.request.query_params.get('searchValue', None)
+        elif method == 'post':
+            # dateFromValue = self.request.data['filter']['dateFromValue'] if 'dateFromValue' in self.request.data['filter'] else None
+            # dateToValue = self.request.data['filter']['dateToValue'] if 'dateToValue' in self.request.data['filter'] else None
+            # timeFromValue = self.request.data['filter']['timeFromValue'] if 'timeFromValue' in self.request.data['filter'] else None
+            # timeToValue = self.request.data['filter']['timeToValue'] if 'timeToValue' in self.request.data['filter'] else None
+
+            # ttFromValue = self.request.data['filter']['ttFromValue'] if 'ttFromValue' in self.request.data['filter'] else -1
+            # ttToValue = self.request.data['filter']['ttToValue'] if 'ttToValue' in self.request.data['filter'] else -1
+
+            # conditionValue = self.request.data['conditionValue'] if 'conditionValue' in self.request.data['filter'] else None
+            # searchValue = self.request.data['searchValue'] if 'searchValue' in self.request.data['filter'] else None
+            
+            dateFromValue = self.request.data['filter']['dateFromValue'] if self.request.data['filter']['dateFromValue'] != '' else None
+            dateToValue = self.request.data['filter']['dateToValue'] if self.request.data['filter']['dateToValue'] != '' else None
+            timeFromValue = self.request.data['filter']['timeFromValue'] if self.request.data['filter']['timeFromValue'] != '' else None
+            timeToValue = self.request.data['filter']['timeToValue'] if self.request.data['filter']['timeToValue'] != '' else None
+
+            ttFromValue = self.request.data['filter']['ttFromValue'] if self.request.data['filter']['ttFromValue'] != '' else None
+            ttToValue = self.request.data['filter']['ttToValue'] if self.request.data['filter']['ttToValue'] != '' else None
+
+            conditionValue = self.request.data['filter']['conditionValue'] if self.request.data['filter']['conditionValue'] != '' else None
+            searchValue = self.request.data['filter']['searchValue'] if self.request.data['filter']['searchValue'] != '' else None
         
         # Date, Time : Between
         if (dateFromValue is not None) and (dateToValue is not None) and (timeFromValue is not None) and (timeToValue is not None):
             start_datetime = dateFromValue + timeFromValue
             end_datetime = dateToValue + timeToValue
             queryset = queryset.filter(fdatetime__range=(start_datetime, end_datetime))
+            print('Date and Time applied!')
         
         # Time-taken : Between
         if (ttFromValue is not None) and (ttToValue is not None):        
             queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
+            print('Time-taken applied!')
             
         # conditionValue : Contain
         if conditionValue is not None :
+            print('conditionValue applied! (conditionValue) : ', conditionValue)
+            print('searchValue : ', searchValue)
             if conditionValue == 'I':
                 queryset = queryset.filter(fip__icontains=searchValue)
             elif conditionValue == 'R':
@@ -448,7 +502,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             elif conditionValue == 'U':
                 queryset = queryset.filter(fuser_agent__icontains=searchValue)
             elif conditionValue == 'S':
-                queryset = queryset.filter(fstatus__icontains=searchValue)
+                queryset = queryset.filter(fstatus__icontains=searchValue)                
         
         return queryset
 

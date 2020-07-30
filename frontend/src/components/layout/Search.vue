@@ -68,20 +68,6 @@ export default {
   },
 
   computed: {
-    // ...mapGetters({
-    
-    //   // TODO : 초기 조건값 세팅필요(파일 업로드 이후 시작시간, 시작시간+10 등)
-
-    //   dateFromValue: "getFromDate",
-    //   ateToValue: "getToDate",
-    //   imeFromValue: "getFromTime",
-    //   imeToValue: "getToTime",
-    //   onditionValue: "getCondition",
-    //   earchValue: "getSearchKeyword",
-    //   tFromValue: "getFromTimeTaken",
-    //   ttToValue: "getToTimeTaken",
-
-    // }),
 
     conditions() {
       let rtn = [];
@@ -96,14 +82,6 @@ export default {
   },
   methods: {
     initialize() {
-      console.log(this.dateFromValue);
-      console.log(this.dateToValue);
-      console.log(this.timeFromValue);
-      console.log(this.timeToValue);
-      console.log(this.conditionValue);
-      console.log(this.searchValue);
-      console.log(this.ttFromValue);
-      console.log(this.ttToValue);
 
       this.dateFromValue = "";
       this.dateToValue = "";

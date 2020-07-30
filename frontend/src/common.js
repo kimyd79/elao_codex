@@ -6,9 +6,44 @@ import axios from "axios";
 export var serverUrl = "http://127.0.0.1:8000"
 
 //////////////////////////////////////////////////////////////
+// Common Filter
+//////////////////////////////////////////////////////////////
+export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo){
+    
+    var filters=""
+
+    if ( dateFrom != '') {
+      filters = filters + "&dateFromValue="+dateFrom
+    }
+    if ( dateTo != '') {
+      filters = filters + "&dateToValue="+dateTo
+    }
+    if ( timeFrom != '') {
+      filters = filters + "&timeFromValue="+timeFrom
+    }
+    if ( timeTo != '') {
+      filters = filters + "&timeToValue="+timeTo
+    }
+    if ( condition != '') {
+      filters = filters + "&conditionValue="+condition
+    }
+    if ( search != '') {
+      filters = filters + "&searchValue="+search
+    }
+    if ( ttFrom != '') {
+      filters = filters + "&ttFromValue="+ttFrom
+    }
+    if ( ttTo != '') {
+      filters = filters + "&ttToValue="+ttTo
+    }
+
+    return filters;
+}
+
+//////////////////////////////////////////////////////////////
 // Common Chart Data
 //////////////////////////////////////////////////////////////
-export function getChartDataFromStatistics(type, logfile_id) {
+export function getChartDataFromStatistics(type, logfile_id, filter) {
 
     // Top 5 일때
     // type=1. Status Codes Top5
@@ -38,12 +73,12 @@ export function getChartDataFromStatistics(type, logfile_id) {
         default:
     }
 
-    //let logfile_id = this.$store.state.logFileID
     console.log(logfile_id)
 
     let postData = {
         logfile_id: logfile_id,
-        type: type
+        type: type,
+        filter: filter
     };
 
     let axiosConfig = {
@@ -79,7 +114,7 @@ export function getChartDataFromStatistics(type, logfile_id) {
 
 }
 
-export function getLineChartData(kind = 1, timeCondition, logfile_id) {
+export function getLineChartData(kind = 1, timeCondition, logfile_id, filter) {
     var url = serverUrl + "/logdetail/chartdata/"
 
     let postData = {
@@ -96,7 +131,8 @@ export function getLineChartData(kind = 1, timeCondition, logfile_id) {
         //   Kind3 : time-taken 시간(max, min, count)
 
         type: timeCondition,
-        kind: kind
+        kind: kind,
+        filter: filter
 
     };
 
