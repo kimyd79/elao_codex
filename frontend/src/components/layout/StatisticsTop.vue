@@ -1,4 +1,5 @@
 <template>
+  <div class="vld-parent">
     <div id="statistics">
         <table class="page-summary-table">
           <thead>
@@ -21,23 +22,40 @@
           </tbody>
         </table>
     </div>
+    <!-- Loading Spinner -->   
+    <loading :active.sync="isLoading"
+      :can-cancel="false"        
+      :is-full-page="false"></loading>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
 import { mapGetters } from "vuex";
 
+// Import Loading Spinner component, stylesheet
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 export default {
     name: 'Statistics',
     props: ['statisticsRow', 'statisticsKind'],
 
+    components: { 
+      // export Loading Spinner components
+      Loading,
+    },
+    
     data: function() {
       return {
         title: "",
         content: "",
         items: [
           { result: 'Loading...', result_count: '....',},          
-        ]
+        ],
+        // Loading Spinner data
+        isLoading: false,
+        fullPage: true
       }
     },
 
@@ -183,10 +201,15 @@ export default {
                 }
             };
 
+          // Start Loading Spinner
+          this.isLoading = true 
+          
           axios.post(url, postData, axiosConfig)
           .then(res => {
               console.log(res)
               this.setItems(res.data.results);
+              //Stop Loading Spinner
+              this.isLoading = false 
           })
           .catch(err => {
               console.error(err); 
