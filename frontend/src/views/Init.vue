@@ -1,8 +1,10 @@
 <template>
 
   <ui-container-box :columns="24" vertical align-center class="page-container-for-init">
+  <div class="vld-parent">
     <ui-container-box :columns=12 vertical class="popup-container">
-
+      <CommonPopup :is="currentView" v-on:popupClose="currentView=null"></CommonPopup>
+      
             <div class="popup-header">
                 <div class="popup-header__title">
                     Initialization
@@ -114,7 +116,12 @@
             </div>
 
         </ui-container-box>
-        </ui-container-box>
+        <!-- Loading Spinner --> 
+        <loading :active.sync="isLoading"
+          :can-cancel="false"        
+          :is-full-page="false"></loading>      
+    </div>
+  </ui-container-box>
 </template>
 
 <script>
@@ -129,6 +136,13 @@ import Statistics from '@/components/layout/Statistics'
 import * as types from "@/vuex/mutation_types";
 import { mapGetters } from "vuex";
 
+//Popup
+import CommonPopup from '@/components/layout/CommonPopup';
+
+// Import Loading Spinner component, stylesheet
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 export default {
   name: 'Init',
 
@@ -138,6 +152,9 @@ export default {
     'Notice': Notice, 
     'Search': Search, 
     'Statistics': Statistics,
+    'CommonPopup': CommonPopup, 
+    // export Loading Spinner components
+    'Loading': Loading,
 
   },
   data: function() {
@@ -190,7 +207,12 @@ export default {
             //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
             //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
             
-          ]
+          ],
+        // Loading Spinner data
+        isLoading: false,
+        fullPage: true,
+        // Popup view
+        currentView : null,
       }
   },
 
@@ -509,6 +531,8 @@ export default {
             };
 
           // TODO : Progress Bar가 필요하다.
+          // Start Loading Spinner
+          this.isLoading = true 
           axios.post(url+"/logdetail/", postData, axiosConfig )
             .then(res => {
                 console.log(res)
@@ -519,7 +543,9 @@ export default {
                 this.$store.dispatch("setToDate", res.data.start_date);
                 this.$store.dispatch("setFromTime", res.data.start_time);
                 this.$store.dispatch("setToTime", res.data.start_time);
-
+                
+                // Stop Loading Spinner
+                this.isLoading = false 
                 
             })
             .catch(err => {
@@ -572,6 +598,8 @@ export default {
           };
 
           // TODO : Progress Bar가 필요하다.
+          // Start Loading Spinner
+          this.isLoading = true 
            axios.get(url, axiosConfig)
             .then(res => {
                 console.log(res)
@@ -586,13 +614,22 @@ export default {
                 this.$store.dispatch("setFromTime", ftime);
                 this.$store.dispatch("setToTime", ftime);
 
-                alert('Get Data completed..!!')
+                // Stop Loading Spinner
+                this.isLoading = false 
+
+                this.$store.dispatch("setPopupKind", 'Noti');
+                this.$store.dispatch("setPopupHeader", 'Notification');
+                this.$store.dispatch("setPopupBody", 'Get Data completed..!!');
+                this.$store.dispatch("setPopupButton", 'Close');
+                this.currentView = 'CommonPopup';
+                
+                //alert('Get Data completed..!!')
                 
             })
             .catch(err => {
                 console.error(err); 
             })
-      }
+      },
   },
   watch: {
       isRowChecked(){
