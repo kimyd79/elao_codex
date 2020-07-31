@@ -74,25 +74,6 @@ export default {
 </script>
 
 <style scoped>
-/*
-.modal {
-    -webkit-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    -o-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    display: block;
-    z-index: 1;
-    position: fixed;
-    width: 704px;
-    left: 50%;
-    height: 300px;
-    top: 50%;
-
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-}*/
 .popup-container {
     padding: 32px;
     border: 1px solid #D0D0D0;
