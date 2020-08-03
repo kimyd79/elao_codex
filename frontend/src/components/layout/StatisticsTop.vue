@@ -125,12 +125,13 @@ export default {
           // type=2. Requests Top5
           // type=3. 최다 404 발생 URL Top5
           // type=4. Time Taken Top5
+          // type=5. Visitors Top5
         
           // CASE#2 - Top 1 일때
           // type=1. 전체 처리량(건수)
           // type=2. 최다접속 IP주소
           // type=3. 최다접속 사용자 요청(request)
-          // type=4. 최다 404 발생 URL
+          // type=4. 최다 404 발생 URL          
 
           // TODO : title, content
           if ( this.statisticsRow == 5){
@@ -150,6 +151,9 @@ export default {
               case 4:
                 this.content = "Requests Time-taken(ms/㎲)"
                 break;
+              case 5:
+                this.content = "Visitors(count)"
+                break;
               default:
             }
 
@@ -161,7 +165,7 @@ export default {
                 this.content = "Total Request(count)"
                 break;
               case 2:
-                this.content = "Top Request IP(count)"
+                this.content = "Top Visitor(count)"
                 break;
               case 3:
                 this.content = "Top Requests URI(count)"
@@ -182,16 +186,7 @@ export default {
                 
                 logfile_id: logfile_id,
                 type: this.statisticsKind,
-
-                // Filters
-                // dateFromValue: this.dateFromValue,
-                // dateToValue: this.dateToValue,
-                // timeFromValue: this.timeFromValue,
-                // timeToValue: this.timeToValue,
-                // ttFromValue: this.ttFromValue,
-                // ttToValue: this.ttToValue,
-                // conditionValue: this.conditionValue,
-                // searchValue: this.searchValue,
+                
                 filter: this.getFilter()
             };
 

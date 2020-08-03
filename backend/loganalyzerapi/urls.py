@@ -21,6 +21,12 @@ router.register(r'logdetail/statistics_top5', views.LogDetailViewSet)
 # For chart
 router.register(r'logdetail/chartdata', views.LogDetailViewSet)
 
+# For Initial Setting
+router.register(r'logdetail/start_end', views.LogDetailViewSet)
+
+# For Notice
+router.register(r'logdetail/notice', views.LogDetailViewSet)
+
 # For logformat
 router.register(r'logformat', views.LogFormatViewSet)
 router.register(r'logformatstring', views.LogFormatStringViewSet)

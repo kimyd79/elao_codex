@@ -503,6 +503,8 @@ export default {
                 }
             };
 
+            this.isLoading = true
+
             axios.post(url+'/logfile/', formData, axiosConfig)
             .then(res => {
                 console.log(res)
@@ -511,9 +513,20 @@ export default {
 
                 // Set in vuex
                 this.$store.dispatch("setLogFileID", this.logfileID);
+
+                // Stop Loading Spinner
+                this.isLoading = false 
+
+                this.$store.dispatch("setPopupKind", 'Noti');
+                this.$store.dispatch("setPopupHeader", 'Notification');
+                this.$store.dispatch("setPopupBody", 'Get Logfile Upload completed..!!');
+                this.$store.dispatch("setPopupButton", 'Close');
+                this.currentView = 'CommonPopup';
             })
             .catch(err => {
-                console.error(err); 
+                console.error(err);
+                // Stop Loading Spinner
+                this.isLoading = false 
             })
             
       },
@@ -540,16 +553,18 @@ export default {
                 // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
                 //        끝 시간은 동일 시간으로 설정(기본)
                 this.$store.dispatch("setFromDate", res.data.start_date);
-                this.$store.dispatch("setToDate", res.data.start_date);
+                this.$store.dispatch("setToDate", res.data.end_date);
                 this.$store.dispatch("setFromTime", res.data.start_time);
-                this.$store.dispatch("setToTime", res.data.start_time);
+                this.$store.dispatch("setToTime", res.data.end_time);
                 
                 // Stop Loading Spinner
                 this.isLoading = false 
                 
             })
             .catch(err => {
-                console.error(err); 
+                console.error(err);
+                // Stop Loading Spinner
+                this.isLoading = false 
             })
       },
       
@@ -588,47 +603,40 @@ export default {
 
       getLogDetail(logfileID){
 
-          var url = "http://127.0.0.1:8000/logdetail/?limit=1&offset=1&logfile="+logfileID
+          console.log("getLogDetail logfileID : "+logfileID)
 
-          // TODO : 초기 설정을 위해 시작 1건만 가져온다.
-          let axiosConfig = {
-              headers: {
-              //'Authorization': 'Token '+ this.token // For Django
-              }
-          };
+          var url = "http://127.0.0.1:8000/logdetail/start_end/"
 
-          // TODO : Progress Bar가 필요하다.
-          // Start Loading Spinner
+          let postData = {
+                logfile_id: logfileID
+            };
+
           this.isLoading = true 
-           axios.get(url, axiosConfig)
+          axios.post(url, postData)
             .then(res => {
                 console.log(res)
-
-                // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
-                //        끝 시간은 +1 시간으로 설정(기본)
-                let fdate = res.data.results[0].fdate               
-                let ftime = res.data.results[0].ftime
-
-                this.$store.dispatch("setFromDate", fdate);
-                this.$store.dispatch("setToDate", fdate);
-                this.$store.dispatch("setFromTime", ftime);
-                this.$store.dispatch("setToTime", ftime);
-
+                
+                this.$store.dispatch("setFromDate", res.data.start_date);
+                this.$store.dispatch("setFromTime", res.data.start_time);
+                this.$store.dispatch("setToDate", res.data.end_date);
+                this.$store.dispatch("setToTime", res.data.end_time);
+                
                 // Stop Loading Spinner
-                this.isLoading = false 
+                this.isLoading = false
 
                 this.$store.dispatch("setPopupKind", 'Noti');
                 this.$store.dispatch("setPopupHeader", 'Notification');
                 this.$store.dispatch("setPopupBody", 'Get Data completed..!!');
                 this.$store.dispatch("setPopupButton", 'Close');
                 this.currentView = 'CommonPopup';
-                
-                //alert('Get Data completed..!!')
-                
+        
             })
             .catch(err => {
-                console.error(err); 
+                console.error(err);
+                // Stop Loading Spinner
+                this.isLoading = false 
             })
+
       },
   },
   watch: {
@@ -640,10 +648,7 @@ export default {
         this.projectDescription = this.$store.state.projectDescription
         this.projectID = this.$store.state.projectID
         
-        this.getLogfile(this.projectID)     
-
-        this.getLogDetail(this.logfileID)
-          
+        this.getLogfile(this.projectID)
       }
   }
 

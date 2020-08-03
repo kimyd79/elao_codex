@@ -49,7 +49,8 @@ export function getChartDataFromStatistics(type, logfile_id, filter) {
     // type=1. Status Codes Top5
     // type=2. Requests Top5
     // type=3. 최다 404 발생 URL Top5
-    // type=4. Time Taken Top5        
+    // type=4. Time Taken Top5 
+    // type=5. Visitors Top5       
 
     //this.title = "Top 5"
 
@@ -69,6 +70,9 @@ export function getChartDataFromStatistics(type, logfile_id, filter) {
             break;
         case 4:
             label = "Requests Time-taken(ms/㎲)"
+            break;
+        case 5:
+            label = "Visitors(count)"
             break;
         default:
     }
@@ -157,6 +161,12 @@ export function getLineChartData(kind = 1, timeCondition, logfile_id, filter) {
                 res.sbarY_300 = res.data.resultY_300
                 res.sbarY_400 = res.data.resultY_400
                 res.sbarY_500 = res.data.resultY_500
+            } else if (kind == 3) {
+                
+                res.x = res.data.resultX
+                res.y = res.data.resultY
+                res.yt = res.data.resultY_time
+                res.time_unit = res.data.resultY_time_unit
             }
 
             return res
@@ -319,7 +329,7 @@ export function getLineChartTemplate(x, y, label) {
         datasets: [{
             label: label,
             fill: false,
-            backgroundColor: '#f87979',
+            backgroundColor: 'rgb(188, 207, 229)',
             borderColor: 'rgb(188, 207, 229)',
             data: y
         }, ]
@@ -430,6 +440,59 @@ export function getLineChartOptions() {
                     onZoomComplete: function({chart}) { console.log(`I was zoomed!!!`); }
                 }
             }
+        }
+    }
+
+    return options;
+}
+
+export function getMultiLineChartTemplate(x, y1, label1, y2, label2) {
+
+    var chartData = {
+
+        labels: x,
+
+        datasets: [{
+            label: label1,
+            fill: false,
+            backgroundColor: 'rgb(188, 207, 229)',
+            borderColor: 'rgb(188, 207, 229)',
+            data: y1,
+            yAxisID: "request"
+        }, {
+            label: label2,
+            fill: false,
+            backgroundColor: 'rgb(194, 157, 180)',
+            borderColor: 'rgb(194, 157, 180)',
+            data: y2,
+            yAxisID: "time_taken"
+        },]
+
+    }
+
+
+    
+    return chartData;
+}
+
+export function getMultiLineChartOptions() {
+
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        scales:{
+            yAxes:[{
+                type: 'linear',
+                display: true,
+                position: 'left',
+                id: "request"
+            },{
+                type: 'linear',
+                display: true,
+                position: 'right',
+                id: "time_taken"
+            }]
         }
     }
 

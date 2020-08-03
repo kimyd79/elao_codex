@@ -101,8 +101,36 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     # Reference API : http://www.cdrf.co/3.1/rest_framework.viewsets/ModelViewSet.html#get_queryset 
     # QuerySet(Field lookups) : https://docs.djangoproject.com/en/3.0/ref/models/querysets/#id4    
     
-    # For Statistics - chartdata
+    @action(methods=['post'], detail=False)
+    def notice(self, request, pk=None):
+        logfile_id = request.data['logfile_id']
+        
+        print('notice logfile_id : ', logfile_id)
+        
+        tempset = LogDetail.objects.filter(logfile_id=logfile_id).order_by('fdatetime')
+        
+        firstRow = tempset.first()
+        lastRow = tempset.last()
+        
+        response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime }        
+        return Response(response, status = status.HTTP_200_OK)
     
+    @action(methods=['post'], detail=False)
+    def start_end(self, request, pk=None):
+        logfile_id = request.data['logfile_id']
+        
+        print('start_end logfile_id : ', logfile_id)
+        
+        tempset = LogDetail.objects.filter(logfile_id=logfile_id).order_by('fdatetime')
+        
+        firstRow = tempset.first()
+        lastRow = tempset.last()
+        
+        response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime }        
+        return Response(response, status = status.HTTP_200_OK)
+        
+    
+    # For Statistics - chartdata    
     @action(methods=['post'], detail=False)
     def chartdata(self, request, pk=None):
         logfile_id = request.data['logfile_id']
@@ -117,18 +145,11 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
         queryset = queryset.filter(logfile_id__exact=logfile_id)        
         
-        #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
-        
-        
-        # https://docs.djangoproject.com/en/3.0/topics/db/sql/
-        #rows = []
-        #with connection.cursor() as cursor:
-        #    cursor.execute("select concat(fdate, fhour, fminute) f_date from loganalyzerapi_logdetail where logfile_id='04fdf860-ffe0-4e15-968d-595782a2e936' group by f_date order by f_date")        
-        #    rows = cursor.fetchall()
-        
         # 결과 처리
         resultX = []
         resultY = []
+        resultY_time = []
+        resultY_time_unit = 0
                 
         resultY_200 = []
         resultY_300 = []
@@ -154,7 +175,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                               
                 for row in rows:
                     print("type1, kind1 : request(요청) 건수(count) x - ",row['x'])
-                    print("type1, kind1 : request(요청) 건수(count) y - ",row['x'])
+                    print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
                     
                     resultX.append(row['x'])
                     resultY.append(row['y'])
@@ -205,8 +226,32 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 print("== 전체 시간 : ", time.time() - start_time)
                 
             elif(kind == 3):
-                # TODO : time-taken 존재여부 Check
-                pass
+                # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                # 0: None, 1 : second(%T), 2: microsecond(%D)
+                time_unit = 0
+                if file_format.find('%T') != -1:
+                    time_unit = 1 
+                elif file_format.find('%D') != -1:
+                    time_unit = 2
+                
+                resultY_time_unit = time_unit
+                                    
+                if time_unit != 0:
+                    hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                    rows = hhRequest.values('x','y', 'yt')
+                                
+                    for row in rows:
+                        print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
+                        print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])
+                        print("type1, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                        
+                        resultX.append(row['x'])
+                        resultY.append(row['y'])
+                        resultY_time.append(row['yt'])
+                else:
+                    pass
         
         # Type2 : 시분(HHMM)기준                    
         #   Kind1 : request(요청) 건수(count)
@@ -272,10 +317,34 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 print("== 전체 시간 : ", time.time() - start_time)
                     
             elif(kind == 3):
-                # TODO : time-taken 존재여부 Check
-                pass
+                # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                # 0: None, 1 : second(%T), 2: microsecond(%D)
+                time_unit = 0
+                if file_format.find('%T') != -1:
+                    time_unit = 1 
+                elif file_format.find('%D') != -1:
+                    time_unit = 2
                 
-        response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
+                resultY_time_unit = time_unit
+                                    
+                if time_unit != 0:
+                    hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                    rows = hhmmRequest.values('x','y', 'yt')
+                                
+                    for row in rows:
+                        print("type2, kind3 : request(요청) 건수(count) x - ",row['x'])
+                        print("type2, kind3 : request(요청) 건수(count) y - ",row['y'])
+                        print("type2, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                        
+                        resultX.append(row['x'])
+                        resultY.append(row['y'])
+                        resultY_time.append(row['yt'])
+                else:
+                    pass
+                
+        response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
         return Response(response, status = status.HTTP_200_OK)
     
     
@@ -354,8 +423,6 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
         queryset = queryset.filter(logfile_id__exact=logfile_id)        
                 
-        #2. TODO : 아래 결과 key 동일하게 맞추기 - for 화면처리 
-        
         results = []
         
         start_time = time.time()
@@ -373,7 +440,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         #type=2. Requests Top5
         elif type == 2:
-            top5_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
+            top5_request = queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
             rows = top5_request.values('frequest','frequest_count')
             
             for row in rows:
@@ -406,12 +473,24 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 print("type3 : TOP5 Timtaken REQUEST Count - ", row['ftime_taken'])
                 
                 results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']})             
+                
+        #type=5. Visitor(Unique IP) Top5
+        elif type == 5:
+            top5_visitor = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip')[0:5]
+            rows = top5_visitor.values('fip','fip_count')
+            
+            for row in rows:
+                print("type2 : TOP5 VISITOR - ", row['fip'])
+                print("type2 : TOP5 VISITOR Count - ", row['fip_count'])
+                
+                results.append({"result" : row['fip'], "result_count" : row['fip_count']})   
+        
+        #type=6. Search Terms Top5     
+        
         
         print("== statistics_top1 (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
-        #type=5. Search Terms Top5     
         
         # TODO : 결과값을 생성해서 보내야 한다 & Exception 처리
-        
         response = {'message': 'statistics returned', 'results': results}
         return Response(response, status = status.HTTP_200_OK)
         
@@ -510,19 +589,20 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         print("logfile :", logfile)     
         
         # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
-        firstRow = self.parse_log(logfile, logfile_id)      
+        result = self.parse_log(logfile, logfile_id)      
      
         # postgresql copy 실행
         LogDetail.objects.from_csv(logfile.name+'.csv', delimiter=',')        
             
         print("To DB, Total Duration :", time.time() - start)
         
-        response = {'message': 'logdetail created', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime }
+        response = {'message': 'logdetail created', 'start_date': result[0]['firstRow'].fdate, 'start_time': result[0]['firstRow'].ftime, 'end_date': result[0]['lastRow'].fdate, 'end_time': result[0]['lastRow'].ftime }
         return Response(response, status = status.HTTP_200_OK)
 
     def parse_log(self, logfile, logfile_id):
 
         log_lines = []
+        result = []
         count = 0               
         start = time.time()
         
@@ -632,15 +712,17 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 'logdetail_id' : UUID 생성
         df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4())         
                         
-        firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function                        
+        firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function       
+        lastRow = df_logs.iloc[-1,] #.to_json(orient='index'), head() function                        
                         
         # index 미사용  
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
         print("Duration to create temporary csv :", time.time() - start)        
         
-        # 화면에서 사용할 정보(시작시간 등)를 리턴하기 위해 1라인을 결과로 뽑는다.
-        return firstRow
+        result.append({'firstRow' : firstRow, 'lastRow' : lastRow})
+        
+        return result
     
     def get_logformat_index(self, log_format, format_kind):
         format_index = {}

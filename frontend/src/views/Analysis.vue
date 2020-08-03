@@ -47,6 +47,7 @@
       <ui-container-box :columns="10" vertical class="mt20">
         <statistics-top :statisticsRow="5" :statisticsKind="3"></statistics-top>
         <statistics-top :statisticsRow="5" :statisticsKind="4"></statistics-top>
+        <statistics-top :statisticsRow="5" :statisticsKind="5"></statistics-top>
       </ui-container-box>
       
     </ui-container-box>
@@ -58,7 +59,7 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line :chart-data="lChartData" :options="lOptions"></chart-line>
+        <chart-line :chart-data="lChartData" :options="lOptions"></chart-line>        
         <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
         <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
         <button @click="resetZoom">resetZoom Test</button>
@@ -81,13 +82,17 @@
         <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
         <chart-bar :chart-data="bChartData" :options="bOptions"></chart-bar>
         <button @click="barChartData">Get Data(Bar)</button>
+        <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
+        <button @click="pieChartData(5)">Get Data Visitor5(Pie)</button>
       </ui-container-box>      
 
       <ui-container-box :columns="10" vertical class="mt20">
+        <chart-line :chart-data="mlChartData" :options="mlOptions"></chart-line>
+        <button @click="multilineChartData">Get Data(Line)</button>
         <chart-stacked-bar :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>
         <button @click="stackedbarChartData">Get Data(StackedBar)</button>
         <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
-        <button @click="pieChartData">Get Data(Pie)</button>
+        <button @click="pieChartData(1)">Get Data(Pie)</button>        
       </ui-container-box>
 
     </ui-container-box>
@@ -117,7 +122,7 @@ import StatisticsTop from "@/components/layout/StatisticsTop";
 import { mapGetters } from "vuex";
 
 import { getPieChartTemplate, getBarChartTemplate, getStackedBarChartTemplate, getLineChartTemplate, 
-        getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions,
+        getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions, getMultiLineChartTemplate, getMultiLineChartOptions,
         getChartDataFromStatistics, getLineChartData, getSearchFilter } from "@/common"
 
 export default {
@@ -139,6 +144,9 @@ export default {
       lChartData: null,
       lOptions: getLineChartOptions(),
 
+      mlChartData: null,
+      mlOptions: getMultiLineChartOptions(),
+
       bChartData: null,
       bOptions: getBarChartOptions(),
 
@@ -146,6 +154,7 @@ export default {
       sbOptions: getStackedBarChartOptions(),
 
       pChartData: null,
+      pChartDataVisitorTop5: null,
       pOptions: getPieChartOptions(),
 
       logfile_id: '',
@@ -210,12 +219,17 @@ export default {
       return filter
     },
 
-    async pieChartData () { 
+    async pieChartData (type=1) { 
       let filter = this.getFilter()
-      let res = await getChartDataFromStatistics(1, this.logfile_id, filter)
-      this.pChartData = getPieChartTemplate(res.x, res.y)
+      let res = await getChartDataFromStatistics(type, this.logfile_id, filter)
+
+      if ( type == 1 ){
+        this.pChartData = getPieChartTemplate(res.x, res.y)
+      } else if ( type == 5 ){
+        this.pChartDataVisitorTop5 = getPieChartTemplate(res.x, res.y)
+      }
       
-    },
+    },    
   
     async barChartData () {
       let filter = this.getFilter()
@@ -235,6 +249,14 @@ export default {
       let filter = this.getFilter()
       let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
       this.lChartData = getLineChartTemplate(res.x, res.y, "Request")      
+
+    },
+
+    // 시계열 분석용 Line Chart
+    async multilineChartData () {
+      let filter = this.getFilter()
+      let res = await getLineChartData(3, this.timeCondition, this.logfile_id, filter)
+      this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")      
     },
     
   }
