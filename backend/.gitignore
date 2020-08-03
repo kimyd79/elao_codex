@@ -17,3 +17,6 @@ db.sqlite3
 *.njsproj
 *.sln
 *.sw?
+
+**/__pycache__
+**/migrations
