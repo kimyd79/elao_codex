@@ -103,6 +103,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     
     @action(methods=['post'], detail=False)
     def notice(self, request, pk=None):
+        
+        # TODO: 구현필요
         logfile_id = request.data['logfile_id']
         
         print('notice logfile_id : ', logfile_id)

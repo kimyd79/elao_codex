@@ -221,6 +221,7 @@ export default {
     
     // Initial Value Setting
     this.projectName = this.$store.state.projectName
+    this.projectDescription = this.$store.state.projectDescription
     this.fileName = this.$store.state.fileNames
     this.fileFormat = this.$store.state.logFormat
     
