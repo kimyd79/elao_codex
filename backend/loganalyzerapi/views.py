@@ -478,7 +478,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 
         #type=5. Visitor(Unique IP) Top5
         elif type == 5:
-            top5_visitor = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip')[0:5]
+            top5_visitor = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:5]
             rows = top5_visitor.values('fip','fip_count')
             
             for row in rows:
@@ -490,7 +490,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #type=6. Search Terms Top5     
         
         
-        print("== statistics_top1 (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
+        print("== statistics_top5 (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
         
         # TODO : 결과값을 생성해서 보내야 한다 & Exception 처리
         response = {'message': 'statistics returned', 'results': results}
