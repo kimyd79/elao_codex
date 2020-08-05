@@ -17,6 +17,7 @@
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
       <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
       <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
+      <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
@@ -90,7 +91,7 @@ export default {
 
   data(){
     return {
-      timeCondition: "1",
+      timeCondition: "2",
 
       // for chart reactivess Test
       lChartData1: null,

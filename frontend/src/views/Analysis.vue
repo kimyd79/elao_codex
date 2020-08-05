@@ -42,6 +42,7 @@
       <ui-container-box :columns="10" vertical class="mt20">
         <statistics-top :statisticsRow="5" :statisticsKind="1"></statistics-top>
         <statistics-top :statisticsRow="5" :statisticsKind="2"></statistics-top>
+        <statistics-top :statisticsRow="5" :statisticsKind="3"></statistics-top>
      </ui-container-box>
            
       <ui-container-box :columns="10" vertical class="mt20">
@@ -59,9 +60,10 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line :chart-data="lChartData" :options="lOptions"></chart-line>        
+        <chart-line id="test" ref='zoom' :chart-data="lChartData" :options="lOptions" ></chart-line>        
         <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
         <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
+        <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
         <button @click="resetZoom">resetZoom Test</button>
         <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
         <!-- 
@@ -80,14 +82,14 @@
           // type=4. Time Taken Top5 
         -->
         <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
-        <chart-bar :chart-data="bChartData" :options="bOptions"></chart-bar>
+        <chart-bar :chart-data="bChartData" :options="bOptions" ></chart-bar>
         <button @click="barChartData">Get Data(Bar)</button>
         <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
         <button @click="pieChartData(5)">Get Data Visitor5(Pie)</button>
       </ui-container-box>      
 
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line :chart-data="mlChartData" :options="mlOptions"></chart-line>
+        <chart-line :chart-data="mlChartData" :options="mlOptions" ></chart-line>
         <button @click="multilineChartData">Get Data(Line)</button>
         <chart-stacked-bar :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>
         <button @click="stackedbarChartData">Get Data(StackedBar)</button>
@@ -134,7 +136,7 @@ export default {
       // chartdata : [],
       // options : [],
 
-      timeCondition: "1",
+      timeCondition: "2",
 
       // For Statistics -> use 'props'
       statisticsRow: "1",   // Top or Top5 (Row 수)
@@ -199,12 +201,29 @@ export default {
 
   methods: {    
     resetZoom() {
+      //alert('Test : ')
+      //console.log(window.line-chart.resetZoom())
+      //console.log(document.getElementById('line-chart'))  // canvas
+      
+      // Sample Code : TODO: 구조가 다르다.
+      // window.resetZoom = function() {
+      //   window.myLine.resetZoom();
+      // };
+          
+      // var ctx = document.getElementById('canvas').getContext('2d');
+      // window.myLine = new window.Chart(ctx, config)
+
+      //console.log(window)      
+      console.log(this.$refs.zoom) //.resetZoom();
+      console.log(this.$refs.zoom.Test)
+      console.log(document.getElementById('test'))
+      console.log(document.getElementById('test').resetZoom)
 
     },
     getFilter() {
       
       let filter = {
-        dateFromValue: this.dateFromValue,
+        dateFromValue: this.dateFromValue, 
         dateToValue: this.dateToValue,
         timeFromValue: this.timeFromValue,
         timeToValue: this.timeToValue,

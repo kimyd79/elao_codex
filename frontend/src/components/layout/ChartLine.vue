@@ -5,6 +5,8 @@ import zoom from 'chartjs-plugin-zoom';
 const { reactiveProp } = mixins
 
 export default {
+
+  name : 'Test',
   extends: Line,
   mixins: [reactiveProp],
   props: ['chartData', 'options'],

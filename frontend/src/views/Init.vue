@@ -520,7 +520,7 @@ export default {
 
                 this.$store.dispatch("setPopupKind", 'Noti');
                 this.$store.dispatch("setPopupHeader", 'Notification');
-                this.$store.dispatch("setPopupBody", 'Get Logfile Upload completed..!!');
+                this.$store.dispatch("setPopupBody", 'Logfile Upload completed..!!');
                 this.$store.dispatch("setPopupButton", 'Close');
                 this.currentView = 'CommonPopup';
             })
@@ -560,6 +560,12 @@ export default {
                 
                 // Stop Loading Spinner
                 this.isLoading = false 
+
+                this.$store.dispatch("setPopupKind", 'Noti');
+                this.$store.dispatch("setPopupHeader", 'Notification');
+                this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
+                this.$store.dispatch("setPopupButton", 'Close');
+                this.currentView = 'CommonPopup';
                 
             })
             .catch(err => {
