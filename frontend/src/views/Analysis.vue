@@ -127,6 +127,10 @@ import { getPieChartTemplate, getBarChartTemplate, getStackedBarChartTemplate, g
         getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions, getMultiLineChartTemplate, getMultiLineChartOptions,
         getChartDataFromStatistics, getLineChartData, getSearchFilter } from "@/common"
 
+// Import Loading Spinner component, stylesheet
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 export default {
   name: "Analysis",
 
@@ -160,6 +164,16 @@ export default {
       pOptions: getPieChartOptions(),
 
       logfile_id: '',
+      
+      
+      // Loading Spinner data
+      isLoadingLine: false,
+      isLoadingMultiLine: false,
+      isLoadingBar: false,
+      isLoadingStackedBar: false,
+      isLoadingPie: false,
+      isLoadingPie5: false,
+      fullPage: true,
     }
   }, 
 
@@ -173,7 +187,9 @@ export default {
     ChartLine: ChartLine,
     ChartBar: ChartBar,
     ChartPie: ChartPie,
-    ChartStackedBar: ChartStackedBar
+    ChartStackedBar: ChartStackedBar,
+    // export Loading Spinner components
+    Loading: Loading,
   },
 
   created() {
@@ -239,43 +255,79 @@ export default {
     },
 
     async pieChartData (type=1) { 
+      // Start Loading Spinner
+      if ( type == 1 ){        
+        this.isLoadingPie = true
+      } else if ( type == 5 ){
+        this.isLoadingPie5 = true
+      }
+      
       let filter = this.getFilter()
       let res = await getChartDataFromStatistics(type, this.logfile_id, filter)
 
       if ( type == 1 ){
         this.pChartData = getPieChartTemplate(res.x, res.y)
+        //Stop Loading Spinner
+        this.isLoadingPie = false
       } else if ( type == 5 ){
         this.pChartDataVisitorTop5 = getPieChartTemplate(res.x, res.y)
+        //Stop Loading Spinner
+        this.isLoadingPie5 = false
       }
       
     },    
   
     async barChartData () {
+      // Start Loading Spinner
+      this.isLoadingBar = true
+      
       let filter = this.getFilter()
       let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
       this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
+      
+      //Stop Loading Spinner
+      this.isLoadingBar = false
 
     },
 
     async stackedbarChartData () {
+      // Start Loading Spinner
+      this.isLoadingStackedBar = true
+      
       let filter = this.getFilter()
       let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)      
       this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
+      
+      //Stop Loading Spinner
+      this.isLoadingStackedBar = false
+      
     },
 
     // 시계열 분석용 Line Chart
     async lineChartData () {
+      // Start Loading Spinner
+      this.isLoadingLine = true
+      
       let filter = this.getFilter()
       let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
-      this.lChartData = getLineChartTemplate(res.x, res.y, "Request")      
+      this.lChartData = getLineChartTemplate(res.x, res.y, "Request")   
+      
+      //Stop Loading Spinner
+      this.isLoadingLine = false 
 
     },
 
     // 시계열 분석용 Line Chart
     async multilineChartData () {
+      // Start Loading Spinner
+      this.isLoadingMultiLine = true
+      
       let filter = this.getFilter()
       let res = await getLineChartData(3, this.timeCondition, this.logfile_id, filter)
-      this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")      
+      this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")    
+      
+      //Stop Loading Spinner
+      this.isLoadingMultiLine = false 
     },
     
   }
