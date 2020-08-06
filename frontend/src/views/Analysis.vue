@@ -60,42 +60,76 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line id="test" ref='zoom' :chart-data="lChartData" :options="lOptions" ></chart-line>        
-        <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
-        <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
-        <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
-        <button @click="resetZoom">resetZoom Test</button>
-        <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
-        <!-- 
-          Type1 : 시(HH)기준
-             Kind1 : request(요청) 건수(count)
-             Kind2 : time-taken 시간(max, min, count)
-          Type2 : 시분(HHMM)기준                    
-             Kind1 : request(요청) 건수(count)
-             Kind2 : time-taken 시간(max, min, count)
-        -->  
-        <button @click="lineChartData">Get Data(Line)</button>                
-        <!--// Top 5 일때
-          // type=1. Status Codes Top5
-          // type=2. Requests Top5
-          // type=3. 최다 404 발생 URL Top5
-          // type=4. Time Taken Top5 
-        -->
-        <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
-        <chart-bar :chart-data="bChartData" :options="bOptions" ></chart-bar>
-        <button @click="barChartData">Get Data(Bar)</button>
-        <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
-        <button @click="pieChartData(5)">Get Data Visitor5(Pie)</button>
+        <div class="vld-parent">
+          <chart-line id="test" ref='zoom' :chart-data="lChartData" :options="lOptions" ></chart-line>        
+          <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
+          <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
+          <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
+          <button @click="resetZoom">resetZoom Test</button>
+          <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
+          <!-- 
+            Type1 : 시(HH)기준
+               Kind1 : request(요청) 건수(count)
+               Kind2 : time-taken 시간(max, min, count)
+            Type2 : 시분(HHMM)기준                    
+               Kind1 : request(요청) 건수(count)
+               Kind2 : time-taken 시간(max, min, count)
+          -->  
+          <button @click="lineChartData">Get Data(Line)</button>                
+          <!--// Top 5 일때
+            // type=1. Status Codes Top5
+            // type=2. Requests Top5
+            // type=3. 최다 404 발생 URL Top5
+            // type=4. Time Taken Top5 
+          -->
+          <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
+          <loading :active.sync="isLoadingLine"
+            :can-cancel="true"        
+            :is-full-page="false"></loading>
+        </div>
+        
+        <div class="vld-parent">
+          <chart-bar :chart-data="bChartData" :options="bOptions" ></chart-bar>
+          <button @click="barChartData">Get Data(Bar)</button>
+          <loading :active.sync="isLoadingBar"
+            :can-cancel="true"        
+            :is-full-page="false"></loading>
+        </div>
+          
+        <div class="vld-parent">
+          <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
+          <button @click="pieChartData(5)">Get Data Visitor5(Pie)</button>
+          <loading :active.sync="isLoadingPie5"
+            :can-cancel="true"        
+            :is-full-page="false"></loading>
+        </div>
       </ui-container-box>      
 
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line :chart-data="mlChartData" :options="mlOptions" ></chart-line>
-        <button @click="multilineChartData">Get Data(Line)</button>
-        <chart-stacked-bar :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>
-        <button @click="stackedbarChartData">Get Data(StackedBar)</button>
-        <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
-        <button @click="pieChartData(1)">Get Data(Pie)</button>        
-      </ui-container-box>
+        <div class="vld-parent">
+          <chart-line :chart-data="mlChartData" :options="mlOptions" ></chart-line>
+          <button @click="multilineChartData">Get Data(Line)</button>
+          <loading :active.sync="isLoadingMultiLine"
+            :can-cancel="true"        
+            :is-full-page="false"></loading>
+        </div>
+          
+        <div class="vld-parent">
+          <chart-stacked-bar :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>
+          <button @click="stackedbarChartData">Get Data(StackedBar)</button>
+          <loading :active.sync="isLoadingStackedBar"
+            :can-cancel="true"        
+            :is-full-page="false"></loading>
+        </div>
+          
+        <div class="vld-parent">
+          <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
+          <button @click="pieChartData(1)">Get Data(Pie)</button>   
+          <loading :active.sync="isLoadingPie"
+            :can-cancel="true"        
+            :is-full-page="false"></loading>
+        </div>
+      </ui-container-box>      
 
     </ui-container-box>
 
