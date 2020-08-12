@@ -455,10 +455,10 @@ export function getLineChartOptions() {
         
                     // Drag-to-zoom effect can be customized
                     drag: {
-                    	borderColor: 'rgba(180,180,180,0.3)',
-                    	borderWidth: 5,
-                    	backgroundColor: 'rgb(180,180,180)',
-                    	animationDuration: 100
+                    	// borderColor: 'rgba(180,180,180,0.3)',
+                    	// borderWidth: 5,
+                    	// backgroundColor: 'rgb(180,180,180)',
+                    	animationDuration: 1000
                     },
         
                     // Zooming directions. Remove the appropriate direction to disable
@@ -486,10 +486,10 @@ export function getLineChartOptions() {
                     //speed: 0.5,
         
                     // // Minimal zoom distance required before actually applying zoom
-                    // threshold: 2,
+                     //threshold: 2,
         
                     // // On category scale, minimal zoom level before actually applying zoom
-                    // sensitivity: 3,
+                     //sensitivity: 3,
         
                     // Function called while the user is zooming
                     onZoom: function({chart}) { console.log(`I'm zooming!!!`); },
@@ -647,9 +647,9 @@ export function getMultiLineChartOptions() {
         
                     // Drag-to-zoom effect can be customized
                     drag: {
-                    	borderColor: 'rgba(180,180,180,0.3)',
-                    	borderWidth: 5,
-                    	backgroundColor: 'rgb(180,180,180)',
+                    	// borderColor: 'rgba(180,180,180,0.3)',
+                    	// borderWidth: 5,
+                    	// backgroundColor: 'rgb(180,180,180)',
                     	animationDuration: 100
                     },
         

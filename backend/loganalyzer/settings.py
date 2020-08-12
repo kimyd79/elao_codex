@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [ u'172.16.1.110', u'localhost', u'127.0.0.1' ]
 MEDIA_URL = '/media/'
 #MEDIA_URL = 'E:\loganalyzerMedia'
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_ROOT = 'E:\loganalyzerMedia'
+MEDIA_ROOT = 'F:\loganalyzerMedia'
 
 # Application definition
 

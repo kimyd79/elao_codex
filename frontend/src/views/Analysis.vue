@@ -60,11 +60,11 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line id="test" ref='zoom' :chart-data="lChartData" :options="lOptions" ></chart-line>        
+        <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions" ></chart-line>        
         <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
         <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
         <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
-        <button @click="resetZoom">resetZoom Test</button>
+        <button @click="resetZoom(1)">resetZoom Test</button>
         <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
         <!-- 
           Type1 : 시(HH)기준
@@ -139,6 +139,8 @@ export default {
       // For Chart
       // chartdata : [],
       // options : [],
+
+      resetZoomV: "1",
 
       timeCondition: "2",
 
@@ -216,25 +218,16 @@ export default {
     }),
 
   methods: {    
-    resetZoom() {
-      //alert('Test : ')
-      //console.log(window.line-chart.resetZoom())
-      //console.log(document.getElementById('line-chart'))  // canvas
+    resetZoom(chart) {
       
-      // Sample Code : TODO: 구조가 다르다.
-      // window.resetZoom = function() {
-      //   window.myLine.resetZoom();
-      // };
-          
-      // var ctx = document.getElementById('canvas').getContext('2d');
-      // window.myLine = new window.Chart(ctx, config)
+      var comp;
 
-      //console.log(window)      
-      console.log(this.$refs.zoom) //.resetZoom();
-      console.log(this.$refs.zoom.Test)
-      console.log(document.getElementById('test'))
-      console.log(document.getElementById('test').resetZoom)
+      if ( chart == 1){
+        comp = this.$refs.lChart;
+      }
 
+      comp._data._chart.resetZoom()
+      
     },
     getFilter() {
       
