@@ -26,6 +26,8 @@
                 <ui-form-item :columns=11 label="Project" required-left left-label :label-width=144 :label-padding=16>
                     <lego-radio v-model="radioValue" value="1" >New</lego-radio>
                     <lego-radio v-model="radioValue" value="2" v-on:click="getProjects">Exist</lego-radio>
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                    <lego-checkbox v-model="checkValue" v-if="radioValue == 2" small >Add Log Files</lego-checkbox>
                 </ui-form-item>
 
                 <ui-form-item :columns=11 
@@ -149,6 +151,7 @@ export default {
     Search, 
     Statistics,
     CommonPopup, 
+    
     // export Loading Spinner components
     VueElementLoading,
   },
@@ -174,6 +177,7 @@ export default {
         timeToValue: "",
 
         radioValue: "1",
+        checkValue: false,
         dataRangeValue: "1",
 
         // for file format
@@ -400,11 +404,9 @@ export default {
                      isNext = false;
                  }
             }else if(this.radioValue == 2){   // Exist인 경우 기존 정보를 가져온다.
-                 
-                 // TODO: 팝업 추가 not default alert                
 
                  // 로그 파일을 추가할 것인가?
-                 if(confirm("Need to add another log file?")){
+                 if(this.checkValue) {
                 
                      // Step2로 이동
                      this.isNewFileAdded = true;

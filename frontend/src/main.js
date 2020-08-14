@@ -6,10 +6,13 @@ import LegoComponent from 'lego-component'
 import './styles/common.scss'
 import Layouts from './components/layout'
 
+import VueSimpleAlert from "vue-simple-alert";
+
 Vue.config.productionTip = false
 
 Vue.use(LegoComponent);
 Vue.use(Layouts);
+Vue.use(VueSimpleAlert);
 
 new Vue({
   router,
