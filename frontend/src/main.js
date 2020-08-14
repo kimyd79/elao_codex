@@ -4,7 +4,6 @@ import router from './router'
 
 import LegoComponent from 'lego-component'
 import './styles/common.scss'
-
 import Layouts from './components/layout'
 
 Vue.config.productionTip = false

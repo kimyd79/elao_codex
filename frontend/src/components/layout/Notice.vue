@@ -3,12 +3,20 @@
     <ui-card :columns="10" :height="200">
       <ui-card-item header>Notice</ui-card-item>
       <ui-card-item sub>
-        <span
-          style="color:red">
-          [CHECK] Long Transaction time [1,020 ms] : http://172.16.1.110:8080/#/analysis (Example)</span>
+
+        <!-- bar-fade-scale, color="#FF6700" -->
+        <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+        <span style="color:red">
+
+          [CHECK] Long Transaction time [1,020 ms] : http://172.16.1.110:8080/#/analysis (Example)         
+            
+          </span>
           
       </ui-card-item>      
       <ui-card-item body></ui-card-item>
+
+      
+
     </ui-card>
     
   </div>  
@@ -18,30 +26,25 @@
 
 import axios from "axios";
 import { mapGetters } from "vuex";
-
-// Import Loading Spinner component, stylesheet
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/vue-loading.css';
+import VueElementLoading from 'vue-element-loading'
 
 export default {
   name: "Notice",
 
     components:{    
     // export Loading Spinner components
-    'Loading': Loading,
+      VueElementLoading,
+
     },
 
   data() {
     return {
-      
-     // Loading Spinner data
-        isLoading: false,
-        fullPage: false
+      isActive: true,
     }
   },
 
   created(){
-    this.getNotice()
+    
   },
 
   computed: mapGetters({

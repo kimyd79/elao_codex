@@ -3,7 +3,7 @@
   <ui-container-box :columns="24" vertical align-center class="page-container-for-init">
   <div class="vld-parent">
     <ui-container-box :columns=12 vertical class="popup-container">
-      <CommonPopup :is="currentView" v-on:popupClose="currentView=null"></CommonPopup>
+      <CommonPopup :is="currentView" v-on:popupClose="popupClose()" v-on:popupOK="popupOK()"></CommonPopup>
       
             <div class="popup-header">
                 <div class="popup-header__title">
@@ -16,6 +16,8 @@
 
             <ui-tab box :tabs="tabs" v-on:tabChange="tabChange"/>
 
+            <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>  
+            
             <div class="popup-form">
 
                 <!-- STEP1 start -->
@@ -57,7 +59,7 @@
 
                 <ui-form-item :columns=11 
                     label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                  <lego-dropdown :items="items" v-model="fileFormat"/>
+                  <lego-dropdown :items="items" v-model="fileFormat" width="650px" />
                 </ui-form-item>
 
                 <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16 >
@@ -115,11 +117,7 @@
                 <lego-button v-on:click="deleteProjects" main>DelProjects</lego-button>
             </div>
 
-        </ui-container-box>
-        <!-- Loading Spinner --> 
-        <loading :active.sync="isLoading"
-          :can-cancel="false"        
-          :is-full-page="false"></loading>      
+        </ui-container-box>        
     </div>
   </ui-container-box>
 </template>
@@ -139,25 +137,22 @@ import { mapGetters } from "vuex";
 //Popup
 import CommonPopup from '@/components/layout/CommonPopup';
 
-// Import Loading Spinner component, stylesheet
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/vue-loading.css';
+import VueElementLoading from 'vue-element-loading'
 
 export default {
   name: 'Init',
 
      // 컴포넌트 등록
   components:{
-    'Info': Info,
-    'Notice': Notice, 
-    'Search': Search, 
-    'Statistics': Statistics,
-    'CommonPopup': CommonPopup, 
+    Info,
+    Notice, 
+    Search, 
+    Statistics,
+    CommonPopup, 
     // export Loading Spinner components
-    'Loading': Loading,
-
+    VueElementLoading,
   },
-  data: function() {
+  data() {
       return {
         buttonName: "Next",
         isPrevShow: false,
@@ -203,16 +198,14 @@ export default {
 
           // Grid Rows
           itemList: [
-            //{projectName:'MW LogAnalysys 1', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
-            //{projectName:'MW LogAnalysys 2', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},
-            //{projectName:'MW LogAnalysys 3', projectDescription:'LogAnalysys', creator:'Leehs', createdDate:'2020-06-29', isSelected: false},            
-            
           ],
-        // Loading Spinner data
-        isLoading: false,
-        fullPage: true,
+        
+        // Loading Spinner
+        isActive: false,
+        
         // Popup view
         currentView : null,
+        needToAdditionalFile : false,
       }
   },
 
@@ -258,9 +251,31 @@ export default {
       
   methods: {
 
+      popupOK(){
+          this.currentView = null
+          console.log("click popupOK")
+
+          this.needToAdditionalFile = true;
+      },    
+
+      popupClose(){
+          this.currentView = null
+          console.log("click popupClose")
+
+          this.needToAdditionalFile = false
+      },
+
       selectRow() {
 
       },
+
+        // TODO: common.js로 추출할 것
+      setNoticePopup(content){ 
+            this.$store.dispatch("setPopupKind", 'Noti');
+            this.$store.dispatch("setPopupHeader", 'Notification');
+            this.$store.dispatch("setPopupBody", content);
+            this.$store.dispatch("setPopupButton", 'Close');
+        },
 
       // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
       deleteProjects(projectID){
@@ -328,15 +343,25 @@ export default {
                 }
             };
 
-          axios.get(url,axiosConfig)
-          .then(res => {
-              console.log(res)
-              this.setItemList(res.data.results);
-              
-          })
-          .catch(err => {
-              console.error(err); 
-          })
+            this.isActive = true
+
+          return axios.get(url,axiosConfig)
+            .then(res => {
+                console.log(res)
+                this.setItemList(res.data.results);
+
+                this.isActive = false
+
+                this.setNoticePopup('Get project data completed..!!')
+                this.currentView = 'CommonPopup';
+
+                
+                
+            })
+            .catch(err => {
+                this.isActive = false
+                console.error(err); 
+            })
       },
 
       prevButton(){
@@ -351,7 +376,9 @@ export default {
 
       },
 
-      nextButton(){
+      async nextButton(){
+
+        var isNext = true;
 
         // Next 버튼 처리
         if(this.tabs[0].isSelected){
@@ -364,11 +391,21 @@ export default {
         if(this.tabs[1].isSelected){          // Step1 : logmaster    
 
             if(this.radioValue == 1){         // New인 경우 새로운 정보로 저장한다.
-                 this.createLogmaster(url);
+                
+                 try{
+                     await this.createLogmaster(url);
+                     isNext = true;
+                 } catch (err) {
+                     console.log(err)
+                     isNext = false;
+                 }
             }else if(this.radioValue == 2){   // Exist인 경우 기존 정보를 가져온다.
                  
+                 // TODO: 팝업 추가 not default alert                
+
                  // 로그 파일을 추가할 것인가?
                  if(confirm("Need to add another log file?")){
+                
                      // Step2로 이동
                      this.isNewFileAdded = true;
                  }else{
@@ -378,31 +415,58 @@ export default {
                      this.isNewFileAdded = false;
 
                      //선택한 project의 file 정보를 가져온다.
-                     this.getLogfile(this.projectID)
+                     try{
+                        await this.getLogfile(this.projectID);
+                        isNext = true;
+                    } catch (err) {
+                        console.log(err)
+                        isNext = false;
+                    }
                  }
             }
             
         } else if(this.tabs[2].isSelected){   // Step2 : this.projectID
 
-            this.createLogfile(url)
-            this.buttonName = "OK"
-            this.isNewFileAdded = true;
+            try{
+                await this.createLogfile(url)
+                this.buttonName = "OK"
+                this.isNewFileAdded = true;
+                isNext = true;
+
+            } catch (err) {
+                console.log(err)
+                isNext = false;
+            }
 
         } else if(this.tabs[3].isSelected){   // Step3 : this.logfileID
 
             // TODO : Multi-File 및 기존 project에 File Add시 처리
 
-            // CASE1 : File을 새로 추가한 경우
-            if (this.isNewFileAdded){
-                this.createLogdetail(url);        
-            }else{
-            // CASE2 : 기존 File을 이용하는 경우
-                this.getLogDetail(this.logfileID)
-            }            
+            try{
+                // CASE1 : File을 새로 추가한 경우            
+                if (this.isNewFileAdded){
+                    await this.createLogdetail(url);        
+                }else{
+                // CASE2 : 기존 File을 이용하는 경우
+                    await this.getLogDetail(this.logfileID)
+                }
+                isNext = true;
+            } catch (err) {
+                console.log(err)
+                isNext = false;
+            }
         }
 
         // Tab 변경 - Backward
-        this.tabChange(2)
+        if ( isNext ){
+            // 처리 성공한 경우
+            this.tabChange(2)            
+        } else {
+            this.setNoticePopup('Error Occured! Try again, please.')
+            this.currentView = 'CommonPopup';
+
+        }
+        
       },
 
       tabChange(dir){
@@ -450,17 +514,30 @@ export default {
                 }
             };
 
-            axios.post(url+"/logmaster/", postData, axiosConfig )
+            this.isActive = true 
+
+            return axios.post(url+"/logmaster/", postData, axiosConfig )
             .then(res => {
                 console.log(res)                
                 this.projectID = res.data.project_id
                 
                 // Set in vuex
                 this.$store.dispatch("setProjectID", this.projectID);
+
                 
+
+                // this.$store.dispatch("setPopupKind", 'Noti');
+                // this.$store.dispatch("setPopupHeader", 'Notification');
+                // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
+                // this.$store.dispatch("setPopupButton", 'Close');
+
+                this.isActive = false 
+                this.setNoticePopup('Create Logmaster Data completed..!!')
+                this.currentView = 'CommonPopup';
             })
             .catch(err => {
                 console.error(err); 
+                this.isActive = false 
             })
       },
 
@@ -504,9 +581,9 @@ export default {
                 }
             };
 
-            this.isLoading = true
+            this.isActive = true
 
-            axios.post(url+'/logfile/', formData, axiosConfig)
+            return axios.post(url+'/logfile/', formData, axiosConfig)
             .then(res => {
                 console.log(res)
                 
@@ -516,18 +593,20 @@ export default {
                 this.$store.dispatch("setLogFileID", this.logfileID);
 
                 // Stop Loading Spinner
-                this.isLoading = false 
+                this.isActive = false 
 
-                this.$store.dispatch("setPopupKind", 'Noti');
-                this.$store.dispatch("setPopupHeader", 'Notification');
-                this.$store.dispatch("setPopupBody", 'Logfile Upload completed..!!');
-                this.$store.dispatch("setPopupButton", 'Close');
+                // this.$store.dispatch("setPopupKind", 'Noti');
+                // this.$store.dispatch("setPopupHeader", 'Notification');
+                // this.$store.dispatch("setPopupBody", 'Logfile Upload completed..!!');
+                // this.$store.dispatch("setPopupButton", 'Close');
+
+                this.setNoticePopup('Create Logfile(File Upload) completed..!!')
                 this.currentView = 'CommonPopup';
             })
             .catch(err => {
                 console.error(err);
                 // Stop Loading Spinner
-                this.isLoading = false 
+                this.isActive = false 
             })
             
       },
@@ -546,32 +625,32 @@ export default {
 
           // TODO : Progress Bar가 필요하다.
           // Start Loading Spinner
-          this.isLoading = true 
-          axios.post(url+"/logdetail/", postData, axiosConfig )
+          this.isActive = true 
+          return axios.post(url+"/logdetail/", postData, axiosConfig )
             .then(res => {
                 console.log(res)
-
-                // TODO : 로그의 시작날짜와 시간을 받아와서 vuex에 입력한다.
-                //        끝 시간은 동일 시간으로 설정(기본)
+                
                 this.$store.dispatch("setFromDate", res.data.start_date);
                 this.$store.dispatch("setToDate", res.data.end_date);
                 this.$store.dispatch("setFromTime", res.data.start_time);
                 this.$store.dispatch("setToTime", res.data.end_time);
                 
                 // Stop Loading Spinner
-                this.isLoading = false 
+                this.isActive = false 
 
-                this.$store.dispatch("setPopupKind", 'Noti');
-                this.$store.dispatch("setPopupHeader", 'Notification');
-                this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
-                this.$store.dispatch("setPopupButton", 'Close');
+                // this.$store.dispatch("setPopupKind", 'Noti');
+                // this.$store.dispatch("setPopupHeader", 'Notification');
+                // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
+                // this.$store.dispatch("setPopupButton", 'Close');
+
+                this.setNoticePopup('Create Logdetail Data completed..!!')
                 this.currentView = 'CommonPopup';
                 
             })
             .catch(err => {
                 console.error(err);
                 // Stop Loading Spinner
-                this.isLoading = false 
+                this.isActive = false 
             })
       },
       
@@ -586,7 +665,9 @@ export default {
                 }
             };
 
-          axios.get(url,axiosConfig)
+            this.isActive = true 
+
+          return axios.get(url,axiosConfig)
           .then(res => {
               console.log(res.data)
               console.log(res.data.results[0])
@@ -602,9 +683,17 @@ export default {
               this.$store.dispatch("setFileNames", this.fileName);
               this.$store.dispatch("setLogFormat", this.fileFormat);
               this.$store.dispatch("setLogFileID", this.logfileID);
+              
+              // Stop Loading Spinner
+              this.isActive = false 
+
+              this.setNoticePopup('Get Logfile Data completed..!!')
+              this.currentView = 'CommonPopup';
           })
           .catch(err => {
               console.error(err); 
+              // Stop Loading Spinner
+              this.isActive = false 
           })
       },
 
@@ -618,8 +707,9 @@ export default {
                 logfile_id: logfileID
             };
 
-          this.isLoading = true 
-          axios.post(url, postData)
+          this.isActive = true 
+          
+          return axios.post(url, postData)
             .then(res => {
                 console.log(res)
                 
@@ -627,27 +717,30 @@ export default {
                 this.$store.dispatch("setFromTime", res.data.start_time);
                 this.$store.dispatch("setToDate", res.data.end_date);
                 this.$store.dispatch("setToTime", res.data.end_time);
-                
+                                
                 // Stop Loading Spinner
-                this.isLoading = false
+                this.isActive = false
 
-                this.$store.dispatch("setPopupKind", 'Noti');
-                this.$store.dispatch("setPopupHeader", 'Notification');
-                this.$store.dispatch("setPopupBody", 'Get Data completed..!!');
-                this.$store.dispatch("setPopupButton", 'Close');
-                this.currentView = 'CommonPopup';
+                // this.$store.dispatch("setPopupKind", 'Noti');
+                // this.$store.dispatch("setPopupHeader", 'Notification');
+                // this.$store.dispatch("setPopupBody", 'Get Data completed..!!');
+                // this.$store.dispatch("setPopupButton", 'Close');
+
+              
+              this.setNoticePopup('Get Logdetail Data completed..!!')
+              this.currentView = 'CommonPopup';
         
             })
             .catch(err => {
                 console.error(err);
                 // Stop Loading Spinner
-                this.isLoading = false 
+                this.isActive = false 
             })
 
       },
   },
   watch: {
-      isRowChecked(){
+      async isRowChecked(){
         console.log("Is isRowChecked?")
 
         // 초기정보 설정 : 기존 project 가져오기          
@@ -655,7 +748,7 @@ export default {
         this.projectDescription = this.$store.state.projectDescription
         this.projectID = this.$store.state.projectID
         
-        this.getLogfile(this.projectID)
+        await this.getLogfile(this.projectID)
       }
   }
 

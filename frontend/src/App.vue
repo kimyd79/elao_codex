@@ -41,9 +41,9 @@ export default {
           //{ label:'Template', linkto:'/template', key:'template', isSelected: false },
           // LogAnalyzer
           { label:'Initialization', linkto:'/initialization', key:'initialization', isSelected: false },
-          { label:'Analysis', linkto:'/analysis', key:'analysis', isSelected: false },
-          { label:'Comparison', linkto:'/comparison', key:'comparison', isSelected: false },
+          { label:'Analysis', linkto:'/analysis', key:'analysis', isSelected: false },          
           { label:'Detail', linkto:'/detail', key:'detail', isSelected: false },
+          { label:'Comparison', linkto:'/comparison', key:'comparison', isSelected: false },
           { label:'Management', linkto:'/management', key:'management', isSelected: false }
       ],
     }

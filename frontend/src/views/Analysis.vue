@@ -16,87 +16,118 @@
     </ui-container-box>
 
     <ui-container-box :columns="20" vertical align-left class="page-title">
-      <span class="page-title__label">Statistics - Top</span>
-    </ui-container-box>
-
-    <ui-container-box :columns="20" horizontal class="page-form-area">    
-      
-      <ui-container-box :columns="10" vertical class="mt20">
-        <statistics-top :statisticsRow="1" :statisticsKind="1"></statistics-top>
-        <statistics-top :statisticsRow="1" :statisticsKind="2"></statistics-top>
-     </ui-container-box>
-
-     <ui-container-box :columns="10" vertical class="mt20">
-        <statistics-top :statisticsRow="1" :statisticsKind="3"></statistics-top>
-        <statistics-top :statisticsRow="1" :statisticsKind="4"></statistics-top>
-      </ui-container-box>
-      
-    </ui-container-box>
-
-    <ui-container-box :columns="20" vertical align-left class="page-title">
-      <span class="page-title__label">Statistics - Top5</span>
-    </ui-container-box>
-
-    <ui-container-box :columns="20" horizontal class="page-form-area">    
-      
-      <ui-container-box :columns="10" vertical class="mt20">
-        <statistics-top :statisticsRow="5" :statisticsKind="1"></statistics-top>
-        <statistics-top :statisticsRow="5" :statisticsKind="2"></statistics-top>
-        <statistics-top :statisticsRow="5" :statisticsKind="3"></statistics-top>
-     </ui-container-box>
-           
-      <ui-container-box :columns="10" vertical class="mt20">
-        <statistics-top :statisticsRow="5" :statisticsKind="3"></statistics-top>
-        <statistics-top :statisticsRow="5" :statisticsKind="4"></statistics-top>
-        <statistics-top :statisticsRow="5" :statisticsKind="5"></statistics-top>
-      </ui-container-box>
-      
-    </ui-container-box>
-
-    <ui-container-box :columns="20" vertical align-left class="page-title">
       <span class="page-title__label">Charts</span>
+      
+      <ui-form-row>
+        <ui-form-item :columns="12" label="Timeline" align-left required-left >
+          <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
+          <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
+          <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
+        </ui-form-item>
+      </ui-form-row>
+
+      <ui-form-row>
+        <ui-form-item :columns="12" label="Charts" align-left required-left >       
+                  
+          <lego-button @click="lineChartData" main small >Line</lego-button>                
+          <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
+          <lego-button @click="barChartData" main small>Bar</lego-button>
+          <lego-button @click="stackedbarChartData" main small>StackedBar</lego-button>
+          <lego-button @click="pieChartData(5)" main small >Pie(5)</lego-button>
+          <lego-button @click="pieChartData(1)" main small>Pie</lego-button>
+          <lego-button @click="allChart()" small>ALL</lego-button>
+        </ui-form-item>
+      </ui-form-row>
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
           
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions" ></chart-line>        
-        <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
-        <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
-        <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
-        <button @click="resetZoom(1)">resetZoom Test</button>
-        <!-- TODO : 선택버튼*Dropdown 추가, 같이 그릴까? Time-taken은 없는 경우도 있다. -->
-        <!-- 
-          Type1 : 시(HH)기준
-             Kind1 : request(요청) 건수(count)
-             Kind2 : time-taken 시간(max, min, count)
-          Type2 : 시분(HHMM)기준                    
-             Kind1 : request(요청) 건수(count)
-             Kind2 : time-taken 시간(max, min, count)
-        -->  
-        <button @click="lineChartData">Get Data(Line)</button>                
-        <!--// Top 5 일때
-          // type=1. Status Codes Top5
-          // type=2. Requests Top5
-          // type=3. 최다 404 발생 URL Top5
-          // type=4. Time Taken Top5 
-        -->
-        <!-- <chart-line :chart-data="chartdata" :options="options"></chart-line>-->
-        <chart-bar :chart-data="bChartData" :options="bOptions" ></chart-bar>
-        <button @click="barChartData">Get Data(Bar)</button>
-        <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
-        <button @click="pieChartData(5)">Get Data Visitor5(Pie)</button>
+        <div class="vld-parent">
+          <vue-element-loading :active="isActiveLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          
+          <lego-button @click="resetZoom(1)" small >resetZoom</lego-button>          
+          <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions" ></chart-line>
+        </div>       
+
+        <div class="vld-parent">        
+          
+          <vue-element-loading :active="isActiveBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+
+          <!-- Dummy for Alignment -->
+          <lego-button hidden small >resetZoom</lego-button>
+          <chart-bar ref='bChart' :chart-data="bChartData" :options="bOptions" ></chart-bar>        
+        </div>
+
+        <div class="vld-parent">
+          <vue-element-loading :active="isActivePie5" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
+        </div>        
+        
       </ui-container-box>      
 
       <ui-container-box :columns="10" vertical class="mt20">
-        <chart-line :chart-data="mlChartData" :options="mlOptions" ></chart-line>
-        <button @click="multilineChartData">Get Data(Line)</button>
-        <chart-stacked-bar :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>
-        <button @click="stackedbarChartData">Get Data(StackedBar)</button>
-        <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
-        <button @click="pieChartData(1)">Get Data(Pie)</button>        
-      </ui-container-box>
+      
+        <div class="vld-parent">
+          <lego-button @click="resetZoom(2)" small >resetZoom</lego-button>
+          <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions" ></chart-line>                    
+        </div>
+          
+        <div class="vld-parent">
+          <vue-element-loading :active="isActiveStackedBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
 
+          <lego-button @click="resetZoom(3)" small >resetZoom</lego-button>
+          <chart-stacked-bar ref="sbChart" :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>          
+        </div>
+          
+        <div class="vld-parent">
+          <vue-element-loading :active="isActivePie" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>          
+        </div>
+      </ui-container-box>      
+
+    </ui-container-box>
+
+    <!-- Statisctic -->
+    <ui-container-box :columns="20" vertical align-left class="page-title">
+      <span class="page-title__label">Statistics - N</span>
+      <ui-form-row>
+        <ui-form-item :columns="12" label="Select N" align-left required-left >
+          <!-- TODO: 이벤트 처리, 숫자 바뀔 때 -->
+          <lego-dropdown :items="listN" v-model="valueN" width="100px" />
+        </ui-form-item>
+      </ui-form-row>
+    </ui-container-box>
+
+    <ui-container-box :columns="20" horizontal class="page-form-area">    
+      
+      <ui-container-box :columns="10" vertical class="mt20">
+        <statistics :statisticsRow="1" :statisticsKind="1"></statistics>
+        <statistics :statisticsRow="1" :statisticsKind="2"></statistics>
+     </ui-container-box>
+
+     <ui-container-box :columns="10" vertical class="mt20">
+        <statistics :statisticsRow="1" :statisticsKind="3"></statistics>
+        <statistics :statisticsRow="1" :statisticsKind="4"></statistics>
+      </ui-container-box>      
+      
+    </ui-container-box>    
+
+    <ui-container-box :columns="20" horizontal class="page-form-area">    
+      
+      <ui-container-box :columns="10" vertical class="mt20">
+        <statistics :statisticsRow="5" :statisticsKind="1"></statistics>
+        <statistics :statisticsRow="5" :statisticsKind="2"></statistics>
+        <statistics :statisticsRow="5" :statisticsKind="3"></statistics>
+     </ui-container-box>
+           
+      <ui-container-box :columns="10" vertical class="mt20">
+        <statistics :statisticsRow="5" :statisticsKind="3"></statistics>
+        <statistics :statisticsRow="5" :statisticsKind="4"></statistics>
+        <statistics :statisticsRow="5" :statisticsKind="5"></statistics>
+      </ui-container-box>
+      
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-tab-area">
@@ -112,14 +143,12 @@ import ChartBar from "@/components/layout/ChartBar";
 import ChartPie from "@/components/layout/ChartPie";
 import ChartStackedBar from "@/components/layout/ChartStackedBar";
 
-
 import GridTable from "@/components/layout/GridTable";
 import Info from "@/components/layout/Info";
 import Init from "@/components/layout/Init";
 import Notice from "@/components/layout/Notice";
 import Search from "@/components/layout/Search";
 import Statistics from "@/components/layout/Statistics";
-import StatisticsTop from "@/components/layout/StatisticsTop";
 
 import { mapGetters } from "vuex";
 
@@ -127,9 +156,7 @@ import { getPieChartTemplate, getBarChartTemplate, getStackedBarChartTemplate, g
         getPieChartOptions, getBarChartOptions, getStackedBarChartOptions, getLineChartOptions, getMultiLineChartTemplate, getMultiLineChartOptions,
         getChartDataFromStatistics, getLineChartData, getSearchFilter } from "@/common"
 
-// Import Loading Spinner component, stylesheet
-import Loading from 'vue-loading-overlay';
-import 'vue-loading-overlay/dist/vue-loading.css';
+import VueElementLoading from 'vue-element-loading'
 
 export default {
   name: "Analysis",
@@ -137,14 +164,10 @@ export default {
   data(){
     return {
       // For Chart
-      // chartdata : [],
-      // options : [],
-
       resetZoomV: "1",
-
       timeCondition: "2",
 
-      // For Statistics -> use 'props'
+      // For Statistics -> use 'props' : TODO: N으로 변경
       statisticsRow: "1",   // Top or Top5 (Row 수)
       statisticsKind: "1",  // 전체 처리량 (통계 종류)  
 
@@ -166,32 +189,31 @@ export default {
       pOptions: getPieChartOptions(),
 
       logfile_id: '',
-      
-      
-      // Loading Spinner data
-      isLoadingLine: false,
-      isLoadingMultiLine: false,
-      isLoadingBar: false,
-      isLoadingStackedBar: false,
-      isLoadingPie: false,
-      isLoadingPie5: false,
-      fullPage: true,
+            
+      // For Loading Spinner
+      isActiveLine: false,
+      isActiveMultiLine: false,
+      isActiveBar: false,
+      isActiveStackedBar: false,
+      isActivePie: false,
+      isActivePie5: false,
+
+      // For Statistics N
+      valueN: 1,
     }
   }, 
 
   // 컴포넌트 등록
   components: {
-    Info: Info,
-    Notice: Notice,
-    Search: Search,
-    Statistics: Statistics,
-    StatisticsTop: StatisticsTop,
-    ChartLine: ChartLine,
-    ChartBar: ChartBar,
-    ChartPie: ChartPie,
-    ChartStackedBar: ChartStackedBar,
-    // export Loading Spinner components
-    Loading: Loading,
+    Info,
+    Notice,
+    Search,
+    Statistics,
+    ChartLine,
+    ChartBar,
+    ChartPie,
+    ChartStackedBar,
+    VueElementLoading,
   },
 
   created() {
@@ -202,7 +224,18 @@ export default {
 
   },
 
-  computed: mapGetters({
+  computed: {
+
+    listN() {
+      let rtn = [];
+      rtn.push({ value: "1", text: "1" });
+      rtn.push({ value: "5", text: "5" });
+      rtn.push({ value: "10", text: "10" });
+      rtn.push({ value: "20", text: "20" });
+      return rtn;
+    },
+
+    ...mapGetters({
       
       dateFromValue: "getFromDate",
       dateToValue: "getToDate",
@@ -215,15 +248,32 @@ export default {
       ttFromValue: "getFromTimeTaken",
       ttToValue: "getToTimeTaken",
 
-    }),
+    })
+  },
 
-  methods: {    
+  methods: {
+
+    allChart(){
+
+      this.lineChartData();
+      this.multilineChartData();
+      this.barChartData();
+      this.stackedbarChartData();
+      this.pieChartData(5);
+      this.pieChartData(1);
+
+    },
+
     resetZoom(chart) {
       
       var comp;
 
       if ( chart == 1){
         comp = this.$refs.lChart;
+      } else if ( chart == 2){
+        comp = this.$refs.mlChart;
+      } else if ( chart == 3){
+        comp = this.$refs.sbChart;
       }
 
       comp._data._chart.resetZoom()
@@ -248,79 +298,116 @@ export default {
     },
 
     async pieChartData (type=1) { 
+      
       // Start Loading Spinner
       if ( type == 1 ){        
-        this.isLoadingPie = true
+        this.isActivePie = true
       } else if ( type == 5 ){
-        this.isLoadingPie5 = true
+        this.isActivePie5 = true
       }
       
       let filter = this.getFilter()
-      let res = await getChartDataFromStatistics(type, this.logfile_id, filter)
 
-      if ( type == 1 ){
-        this.pChartData = getPieChartTemplate(res.x, res.y)
+      try{
+        let res = await getChartDataFromStatistics(type, this.logfile_id, filter)
+
+        if ( type == 1 ){
+          this.pChartData = getPieChartTemplate(res.x, res.y)
+          
+          //Stop Loading Spinner
+          this.isActivePie = false
+        } else if ( type == 5 ){
+          this.pChartDataVisitorTop5 = getPieChartTemplate(res.x, res.y)
+          
+          //Stop Loading Spinner
+          this.isActivePie5 = false
+        }
+      }catch(err) {
+        console.log(err); // TypeError: failed to fatch
+
         //Stop Loading Spinner
-        this.isLoadingPie = false
-      } else if ( type == 5 ){
-        this.pChartDataVisitorTop5 = getPieChartTemplate(res.x, res.y)
-        //Stop Loading Spinner
-        this.isLoadingPie5 = false
-      }
+        if ( type == 1 ){        
+          this.isActivePie = false
+        } else if ( type == 5 ){
+          this.isActivePie5 = false
+        }
+      }     
       
     },    
   
     async barChartData () {
       // Start Loading Spinner
-      this.isLoadingBar = true
+      this.isActiveBar = true
       
       let filter = this.getFilter()
-      let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
-      this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
       
-      //Stop Loading Spinner
-      this.isLoadingBar = false
+      try{
+        let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
+        this.bChartData = getBarChartTemplate(res.x, res.y, res.label)        
+      } catch (err) {
+        console.log(err); // TypeError: failed to fatch
+      } finally {
+        //Stop Loading Spinner
+        this.isActiveBar = false
+      }   
+      
+      
 
     },
 
     async stackedbarChartData () {
       // Start Loading Spinner
-      this.isLoadingStackedBar = true
+      this.isActiveStackedBar = true
       
       let filter = this.getFilter()
-      let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)      
-      this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
       
-      //Stop Loading Spinner
-      this.isLoadingStackedBar = false
+      try{
+        let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)      
+        this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
+      } catch (err) {
+        console.log(err); // TypeError: failed to fatch
+      } finally {      
+        //Stop Loading Spinner
+        this.isActiveStackedBar = false
+      }
       
     },
 
     // 시계열 분석용 Line Chart
     async lineChartData () {
       // Start Loading Spinner
-      this.isLoadingLine = true
+      this.isActiveLine = true
       
       let filter = this.getFilter()
-      let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
-      this.lChartData = getLineChartTemplate(res.x, res.y, "Request")   
       
-      //Stop Loading Spinner
-      this.isLoadingLine = false 
-
+      try{
+        let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
+        this.lChartData = getLineChartTemplate(res.x, res.y, "Request")   
+      } catch (err) {
+        console.log(err); // TypeError: failed to fatch
+      } finally {  
+        //Stop Loading Spinner
+        this.isActiveLine = false 
+      }
+      
     },
 
     // 시계열 분석용 Line Chart
     async multilineChartData () {
       // Start Loading Spinner
-      this.isLoadingMultiLine = true
-      
+      this.isActiveMultiLine = true
+            
       let filter = this.getFilter()
-      let res = await getLineChartData(3, this.timeCondition, this.logfile_id, filter)
-      this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")    
-      
-      //Stop Loading Spinner
-      this.isLoadingMultiLine = false 
+
+      try{
+        let res = await getLineChartData(3, this.timeCondition, this.logfile_id, filter)
+        this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")    
+      } catch (err) {
+        console.log(err); // TypeError: failed to fatch
+      } finally {        
+        //Stop Loading Spinner
+        this.isActiveMultiLine = false
+      }
     },
     
   }

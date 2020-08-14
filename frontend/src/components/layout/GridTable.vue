@@ -65,8 +65,17 @@ export default {
       return str >= 10 ? str : "0" + str;
     },
 
+    nvl(str, defaultStr){
+         
+        if(typeof str == "undefined" || str == null || str == "")
+            str = defaultStr ;
+         
+        return str ;
+    },
+
     setItemList(results) {
       var dateString, timeString;
+
       this.items = [];
 
       for (let i = 0; i < results.length; i++) {
@@ -83,13 +92,18 @@ export default {
           "" +
           this.getDateTimeString(results[i].fsecond);
 
+        let frequest = results[i].frequest.substring(0,60)
+        let referrer = this.nvl(results[i].referrer, "N/A").substring(0,10)
+        let fuser_agent = this.nvl(results[i].fuser_agent, "N/A").substring(0,10)
+
         this.items.push({
           date: dateString,
           time: timeString,
           ip: results[i].fip,
-          request: results[i].frequest,
-          referrer: results[i].referrer,
-          useragent: results[i].fuser_agent,
+
+          request: frequest,
+          referrer: referrer,
+          useragent: fuser_agent,
           status: results[i].fstatus,
           timetaken: results[i].ftime_taken,
           isSelected: false
