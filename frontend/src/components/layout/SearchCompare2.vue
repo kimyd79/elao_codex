@@ -4,12 +4,11 @@
       <ui-form-box>
         <ui-form-row>
           <ui-form-item :columns="8" label="Date/Time" required-left>
-            <!--<lego-date-picker v-model="dateFromValue" />-->
-            <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
-            <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
-            <!--<lego-date-picker v-model="dateToValue" />-->
-            <lego-text-field v-model="dateToValue" placeholder="YYYYMMDD" />
-            <lego-text-field v-model="timeToValue" placeholder="hhmmss" />
+            <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateFromValue" default-value="dateFromValue" placeholder="YYYYMMDD" style="width:120px"></date-picker>&nbsp;&nbsp;
+            <date-picker type="time" value-type="format" format="HHmmss" v-model="timeFromValue" default-value="timeFromValue" placeholder="HHmmss" style="width:120px"></date-picker>                  
+            &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
+            <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateToValue" default-value="dateToValue" placeholder="YYYYMMDD" style="width:120px"></date-picker>&nbsp;&nbsp;
+            <date-picker type="time" value-type="format" format="HHmmss" v-model="timeToValue" default-value="timeToValue" placeholder="HHmmss" style="width:120px"></date-picker>
           </ui-form-item>
         </ui-form-row>
 
@@ -40,9 +39,18 @@
 // @ is an alias to /src
 import axios from "axios";
 
+// Timepicker
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
+
 export default {
   name: "Search",
-  data: function() {
+
+  components:{
+    DatePicker
+  },
+
+  data() {
     return {
 
       conditionValue: "",

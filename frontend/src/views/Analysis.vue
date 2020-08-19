@@ -15,80 +15,6 @@
       <search></search>
     </ui-container-box>
 
-    <ui-container-box :columns="20" vertical align-left class="page-title">
-      <span class="page-title__label">Charts</span>
-      
-      <ui-form-row>
-        <ui-form-item :columns="12" label="Timeline" align-left required-left >
-          <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
-          <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
-          <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
-        </ui-form-item>
-      </ui-form-row>
-
-      <ui-form-row>
-        <ui-form-item :columns="12" label="Charts" align-left required-left >       
-                  
-          <lego-button @click="lineChartData" main small >Line</lego-button>                
-          <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
-          <lego-button @click="barChartData" main small>Bar</lego-button>
-          <lego-button @click="stackedbarChartData" main small>StackedBar</lego-button>
-          <lego-button @click="pieChartData(5)" main small >Pie(5)</lego-button>
-          <lego-button @click="pieChartData(1)" main small>Pie</lego-button>
-          <lego-button @click="allChart()" small>ALL</lego-button>
-        </ui-form-item>
-      </ui-form-row>
-    </ui-container-box>
-
-    <ui-container-box :columns="20" horizontal class="page-form-area">
-          
-      <ui-container-box :columns="10" vertical class="mt20">
-        <div class="vld-parent">
-          <vue-element-loading :active="isActiveLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
-          
-          <lego-button @click="resetZoom(1)" small >resetZoom</lego-button>          
-          <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions" ></chart-line>
-        </div>       
-
-        <div class="vld-parent">        
-          
-          <vue-element-loading :active="isActiveBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
-
-          <!-- Dummy for Alignment -->
-          <lego-button hidden small >resetZoom</lego-button>
-          <chart-bar ref='bChart' :chart-data="bChartData" :options="bOptions" ></chart-bar>        
-        </div>
-
-        <div class="vld-parent">
-          <vue-element-loading :active="isActivePie5" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
-          <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
-        </div>        
-        
-      </ui-container-box>      
-
-      <ui-container-box :columns="10" vertical class="mt20">
-      
-        <div class="vld-parent">
-          <lego-button @click="resetZoom(2)" small >resetZoom</lego-button>
-          <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
-          <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions" ></chart-line>                    
-        </div>
-          
-        <div class="vld-parent">
-          <vue-element-loading :active="isActiveStackedBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
-
-          <lego-button @click="resetZoom(3)" small >resetZoom</lego-button>
-          <chart-stacked-bar ref="sbChart" :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>          
-        </div>
-          
-        <div class="vld-parent">
-          <vue-element-loading :active="isActivePie" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
-          <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>          
-        </div>
-      </ui-container-box>      
-
-    </ui-container-box>
-
     <!-- Statisctic -->
     <ui-container-box :columns="20" vertical align-left class="page-title">
       <span class="page-title__label">Statistics - N</span>
@@ -129,6 +55,81 @@
       </ui-container-box>
       
     </ui-container-box>
+
+    <!-- Charts 영역 -->
+    <ui-container-box :columns="20" vertical align-left class="page-title">
+      <span class="page-title__label">Charts</span>
+      
+      <ui-form-row>
+        <ui-form-item :columns="12" label="Timeline" align-left required-left >
+          <lego-radio v-model="timeCondition" value="1" >HH</lego-radio>
+          <lego-radio v-model="timeCondition" value="2" >HHMM</lego-radio>
+          <lego-radio v-model="timeCondition" value="3" >HHMMSS</lego-radio>
+        </ui-form-item>
+      </ui-form-row>
+
+      <ui-form-row>
+        <ui-form-item :columns="12" label="Charts" align-left required-left >       
+                  
+          <lego-button @click="lineChartData" main small >Line</lego-button>                
+          <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
+          <lego-button @click="barChartData" main small>Bar</lego-button>
+          <lego-button @click="stackedbarChartData" main small>StackedBar</lego-button>
+          <lego-button @click="pieChartData(5)" main small >Pie(5)</lego-button>
+          <lego-button @click="pieChartData(1)" main small>Pie</lego-button>
+          <lego-button @click="allChart()" small>ALL</lego-button>
+        </ui-form-item>
+      </ui-form-row>
+    </ui-container-box>
+
+    <ui-container-box :columns="20" horizontal class="page-form-area">
+          
+      <ui-container-box :columns="10" vertical class="mt20">
+        <div class="vld-parent">
+          <vue-element-loading :active="isActiveLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          
+          <lego-button @click="resetZoom(1)" small >resetZoom</lego-button>
+          <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions" ></chart-line>
+        </div>       
+
+        <div class="vld-parent">        
+          
+          <vue-element-loading :active="isActiveBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+
+          <!-- Dummy for Alignment -->
+          <lego-button hidden small >resetZoom</lego-button>
+          <chart-bar ref='bChart' :chart-data="bChartData" :options="bOptions" ></chart-bar>        
+        </div>
+
+        <div class="vld-parent">
+          <vue-element-loading :active="isActivePie5" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
+        </div>        
+        
+      </ui-container-box>      
+
+      <ui-container-box :columns="10" vertical class="mt20">
+      
+        <div class="vld-parent">
+          <lego-button @click="resetZoom(2)" small >resetZoom</lego-button>
+          <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions" ></chart-line>                    
+        </div>
+          
+        <div class="vld-parent">
+          <vue-element-loading :active="isActiveStackedBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+
+          <lego-button @click="resetZoom(3)" small >resetZoom</lego-button>
+          <chart-stacked-bar ref="sbChart" :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>          
+        </div>
+          
+        <div class="vld-parent">
+          <vue-element-loading :active="isActivePie" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
+          <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>          
+        </div>
+      </ui-container-box>      
+
+    </ui-container-box>    
 
     <ui-container-box :columns="20" horizontal class="page-tab-area">
       TODO : Footer 영역

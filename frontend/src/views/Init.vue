@@ -71,13 +71,14 @@
 
                 </ui-form-item>
 
-                <ui-form-item :columns="11" label="" required-left left-label :label-width=144 :label-padding=16 v-if="dataRangeValue == 2">
-                    <lego-text-field v-model="dateFromValue" placeholder="YYYYMMDD" />
-                    <lego-text-field v-model="timeFromValue" placeholder="hhmmss" />
-                    &nbsp;&nbsp;&nbsp;&nbsp;~            
-                    <lego-text-field v-model="dateToValue" placeholder="YYYYMMDD" />
-                    <lego-text-field v-model="timeToValue" placeholder="hhmmss" />
-                  
+                <ui-form-item :columns="8" label="From ~ To" left-label :label-width=144 :label-padding=16 v-if="dataRangeValue == 2">
+
+                    <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateFromValue" default-value="dateFromValue" placeholder="YYYYMMDD" style="width:140px"></date-picker>&nbsp;&nbsp;
+                    <date-picker type="time" value-type="format" format="HHmmss" v-model="timeFromValue" default-value="timeFromValue" placeholder="HHmmss" style="width:140px"></date-picker>                  
+                    &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
+                    <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateToValue" default-value="dateToValue" placeholder="YYYYMMDD" style="width:140px"></date-picker>&nbsp;&nbsp;
+                    <date-picker type="time" value-type="format" format="HHmmss" v-model="timeToValue" default-value="timeToValue" placeholder="HHmmss" style="width:140px"></date-picker>
+                 
                 </ui-form-item>
                 
                 <!-- STEP2 end -->
@@ -139,12 +140,17 @@ import { mapGetters } from "vuex";
 //Popup
 import CommonPopup from '@/components/layout/CommonPopup';
 
+// Spinner
 import VueElementLoading from 'vue-element-loading'
+
+// Timepicker
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 
 export default {
   name: 'Init',
 
-     // 컴포넌트 등록
+    // 컴포넌트 등록
   components:{
     Info,
     Notice, 
@@ -154,6 +160,8 @@ export default {
     
     // export Loading Spinner components
     VueElementLoading,
+
+    DatePicker,
   },
   data() {
       return {
