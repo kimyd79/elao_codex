@@ -311,7 +311,7 @@ export default {
       let filter = this.getFilter()
       
       try{
-        let res = await getChartDataFromStatistics(1, this.logfile_id, filter)
+        let res = await getChartDataFromStatistics(1, this.logfile_id, filter, 5)
 
         if ( searchArea == 1 ){
           this.pChartData1 = getPieChartTemplate(res.x, res.y)
@@ -344,7 +344,7 @@ export default {
       let filter = this.getFilter()
 
       try {
-        let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
+        let res = await getChartDataFromStatistics(1, this.logfile_id, filter, 5)      
         if ( searchArea == 1 ){
           this.bChartData1 = getBarChartTemplate(res.x, res.y, res.label)
           this.isActiveBar1 = false

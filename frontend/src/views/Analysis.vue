@@ -17,11 +17,11 @@
 
     <!-- Statisctic -->
     <ui-container-box :columns="20" vertical align-left class="page-title">
-      <span class="page-title__label">Statistics - N</span>
+      <span class="page-title__label">Statistics - Top {{ valueN == 0 ? "" : valueN }}</span>
       <ui-form-row>
         <ui-form-item :columns="12" label="Select N" align-left required-left >
           <!-- TODO: 이벤트 처리, 숫자 바뀔 때 -->
-          <lego-dropdown :items="listN" v-model="valueN" width="100px" />
+          <lego-dropdown :items="listN" v-model="valueN" width="100px" />          
         </ui-form-item>
       </ui-form-row>
     </ui-container-box>
@@ -29,29 +29,16 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">    
       
       <ui-container-box :columns="10" vertical class="mt20">
-        <statistics :statisticsRow="1" :statisticsKind="1"></statistics>
-        <statistics :statisticsRow="1" :statisticsKind="2"></statistics>
-     </ui-container-box>
-
-     <ui-container-box :columns="10" vertical class="mt20">
-        <statistics :statisticsRow="1" :statisticsKind="3"></statistics>
-        <statistics :statisticsRow="1" :statisticsKind="4"></statistics>
-      </ui-container-box>      
-      
-    </ui-container-box>    
-
-    <ui-container-box :columns="20" horizontal class="page-form-area">    
-      
-      <ui-container-box :columns="10" vertical class="mt20">
-        <statistics :statisticsRow="5" :statisticsKind="1"></statistics>
-        <statistics :statisticsRow="5" :statisticsKind="2"></statistics>
-        <statistics :statisticsRow="5" :statisticsKind="3"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="4"></statistics>
      </ui-container-box>
            
       <ui-container-box :columns="10" vertical class="mt20">
-        <statistics :statisticsRow="5" :statisticsKind="3"></statistics>
-        <statistics :statisticsRow="5" :statisticsKind="4"></statistics>
-        <statistics :statisticsRow="5" :statisticsKind="5"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="6"></statistics>
+        <statistics :statisticsRow="valueN" :statisticsKind="7"></statistics>
       </ui-container-box>
       
     </ui-container-box>
@@ -71,7 +58,7 @@
       <ui-form-row>
         <ui-form-item :columns="12" label="Charts" align-left required-left >       
                   
-          <lego-button @click="lineChartData" main small >Line</lego-button>                
+          <lego-button @click="lineChartData" main small >Line</lego-button>
           <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
           <lego-button @click="barChartData" main small>Bar</lego-button>
           <lego-button @click="stackedbarChartData" main small>StackedBar</lego-button>
@@ -200,7 +187,7 @@ export default {
       isActivePie5: false,
 
       // For Statistics N
-      valueN: 1,
+      valueN: 5,
     }
   }, 
 
@@ -310,7 +297,7 @@ export default {
       let filter = this.getFilter()
 
       try{
-        let res = await getChartDataFromStatistics(type, this.logfile_id, filter)
+        let res = await getChartDataFromStatistics(type, this.logfile_id, filter, this.valueN)
 
         if ( type == 1 ){
           this.pChartData = getPieChartTemplate(res.x, res.y)
@@ -343,7 +330,7 @@ export default {
       let filter = this.getFilter()
       
       try{
-        let res = await getChartDataFromStatistics(1, this.logfile_id, filter)      
+        let res = await getChartDataFromStatistics(1, this.logfile_id, filter, this.valueN)      
         this.bChartData = getBarChartTemplate(res.x, res.y, res.label)        
       } catch (err) {
         console.log(err); // TypeError: failed to fatch

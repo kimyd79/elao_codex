@@ -16,7 +16,7 @@
 
             <ui-tab box :tabs="tabs" v-on:tabChange="tabChange"/>
 
-            <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>  
+            <vue-element-loading :active="isActive" spinner="spinner" text="500MB 기준 약 100초" :is-full-screen="false" color="#553ca5"/>  
             
             <div class="popup-form">
 
@@ -366,8 +366,6 @@ export default {
 
                 this.setNoticePopup('Get project data completed..!!')
                 this.currentView = 'CommonPopup';
-
-                
                 
             })
             .catch(err => {
@@ -456,10 +454,11 @@ export default {
                 // CASE1 : File을 새로 추가한 경우            
                 if (this.isNewFileAdded){
                     await this.createLogdetail(url);        
-                }else{
-                // CASE2 : 기존 File을 이용하는 경우
-                    await this.getLogDetail(this.logfileID)
                 }
+                // TODO: 파일 추가했을때 잘 불러오는지 확인필요
+                // CASE2 : 기존 File을 이용하는 경우
+                await this.getLogDetail(this.projectID)
+                
                 isNext = true;
             } catch (err) {
                 console.log(err)
@@ -470,7 +469,11 @@ export default {
         // Tab 변경 - Backward
         if ( isNext ){
             // 처리 성공한 경우
-            this.tabChange(2)            
+            this.tabChange(2)
+
+            // TODO: 마지막 처리 후에는 다른 위치로 옮겨줘야 한다. 
+            //       또는 detail 만드는 작업을 하지 말아야 한다.(이거 추가)
+
         } else {
             this.setNoticePopup('Error Occured! Try again, please.')
             this.currentView = 'CommonPopup';
@@ -707,14 +710,14 @@ export default {
           })
       },
 
-      getLogDetail(logfileID){
+      getLogDetail(projectID){
 
-          console.log("getLogDetail logfileID : "+logfileID)
+          console.log("getLogDetail projectID : "+projectID)
 
           var url = "http://127.0.0.1:8000/logdetail/start_end/"
 
           let postData = {
-                logfile_id: logfileID
+                project_id: projectID
             };
 
           this.isActive = true 
@@ -727,15 +730,16 @@ export default {
                 this.$store.dispatch("setFromTime", res.data.start_time);
                 this.$store.dispatch("setToDate", res.data.end_date);
                 this.$store.dispatch("setToTime", res.data.end_time);
-                                
+
+                var file_list = ""
+                res.data.file_names.forEach(file => file_list = file_list + file+", ")
+
+                console.log("file_list - "+file_list)                
+
+                this.fileName = file_list
+                this.$store.dispatch("setFileNames", file_list);                                
                 // Stop Loading Spinner
                 this.isActive = false
-
-                // this.$store.dispatch("setPopupKind", 'Noti');
-                // this.$store.dispatch("setPopupHeader", 'Notification');
-                // this.$store.dispatch("setPopupBody", 'Get Data completed..!!');
-                // this.$store.dispatch("setPopupButton", 'Close');
-
               
               this.setNoticePopup('Get Logdetail Data completed..!!')
               this.currentView = 'CommonPopup';

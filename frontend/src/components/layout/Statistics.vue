@@ -1,12 +1,13 @@
 <template>
+  <keep-alive>
   <div class="vld-parent">
     <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>  
     <div id="statistics">
         <table class="page-summary-table">
           <thead>
             <tr>
-              <th rowspan="2" style="width: 180px;">{{ this.title }}</th>
-              <th rowspan="2" style="width: 460px;">{{ this.content }}</th>
+              <th rowspan="2" style="width: 60px;">{{ this.title }}</th>
+              <th rowspan="2" style="width: 580px;">{{ this.content }}</th>
               <th rowspan="2" style="width: 100px;">Result</th>            
             </tr>          
           </thead>
@@ -16,7 +17,7 @@
               <td >{{ index+1 }}</td>    
 
               <!-- TODO: content 종류에 따라 style= "text-align:left;" 적용할 것 -->          
-              <td v-on:click="getDetail(item)">{{ item.result }}</td>
+              <td  v-on:click="getDetail(item)">{{ item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" )}}</td>
               <td>{{ item.result_count }}</td>            
             </tr>
             
@@ -24,6 +25,7 @@
         </table>
     </div>    
   </div>
+  </keep-alive>
 </template>
 
 <script>
@@ -74,7 +76,8 @@ export default {
     }),
 
     methods: {
-
+      
+      // TODO: 팝업창(상세) 필요
       getDetail(item){
         alert('getDetail : '+item)
         console.log(item)
@@ -112,74 +115,55 @@ export default {
 
       getStatistics(){          
           
-          var url = "http://127.0.0.1:8000/logdetail/statistics_top"
-
-          // CASE#1 - Top 5 일때
-          // type=1. Status Codes Top5
-          // type=2. Requests Top5
+          // type=0. 전체 처리량(건수) --> Top N아님
+          // Top N으로 수정
+          
+          // type=1. Status Codes Top N
+          // type=2. Requests Top N
           // type=3. 최다 404 발생 URL Top5
-          // type=4. Time Taken Top5
-          // type=5. Visitors Top5
-        
-          // CASE#2 - Top 1 일때
-          // type=1. 전체 처리량(건수)
-          // type=2. 최다접속 IP주소
-          // type=3. 최다접속 사용자 요청(request)
-          // type=4. 최다 404 발생 URL          
+          // type=4. Time Taken Top N
+          // type=5. Visitors Top N
+          // type=6. Referers Top N
+          // type=7. User Agent Top N
 
-          // TODO : title, content
-          if ( this.statisticsRow == 5){
-            
-            this.title = "Top 5"
+ 
+          this.title = "Top "+ this.statisticsRow
 
-            switch(this.statisticsKind){
-              case 1:
-                this.content = "HTTP Status Codes(count)"
-                break;
-              case 2:
-                this.content = "Requests URI(count)"
-                break;
-              case 3:
-                this.content = "404 Requests URI(count)"
-                break;
-              case 4:
-                this.content = "Requests Time-taken(ms/㎲)"
-                break;
-              case 5:
-                this.content = "Visitors(count)"
-                break;
-              default:
-            }
-
-          }else if ( this.statisticsRow == 1){
-
-            this.title = "Top"
-            switch(this.statisticsKind){
-              case 1:
-                this.content = "Total Request(count)"
-                break;
-              case 2:
-                this.content = "Top Visitor(count)"
-                break;
-              case 3:
-                this.content = "Top Requests URI(count)"
-                break;
-              case 4:
-                this.content = "Top 404 Requests URI(count)"
-                break;
-              default:
-            }
-          }
+          switch(this.statisticsKind){
+            case 1:
+              this.content = "HTTP Status Codes (count)"
+              break;
+            case 2:
+              this.content = "Requests URI (count)"
+              break;
+            case 3:
+              this.content = "404 Requests URI (count)"
+              break;
+            case 4:
+              this.content = "Requests Time-taken (ms/㎲)"
+              break;
+            case 5:
+              this.content = "Visitors (count)"
+              break;
+            case 6:
+              this.content = "Referers (count)"
+              break;
+            case 7:
+              this.content = "User Agent (count)"
+              break;
+            default:
+          }         
               
           let logfile_id = this.$store.state.logFileID
           console.log(logfile_id)
 
-          var url = "http://127.0.0.1:8000/logdetail/statistics_top"+this.statisticsRow+"/"  // 1 or 5
+          var url = "http://127.0.0.1:8000/logdetail/statistics/"
 
           let postData = {
                 
                 logfile_id: logfile_id,
                 type: this.statisticsKind,
+                N: this.statisticsRow,
                 
                 filter: this.getFilter()
             };

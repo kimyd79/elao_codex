@@ -119,473 +119,485 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     
     @action(methods=['post'], detail=False)
     def start_end(self, request, pk=None):
-        logfile_id = request.data['logfile_id']
         
-        print('start_end logfile_id : ', logfile_id)
+        # logfile_id 1개의 경우
+        # logfile_id = request.data['logfile_id']        
+        # print('start_end logfile_id : ', logfile_id)
         
-        tempset = LogDetail.objects.filter(logfile_id=logfile_id).order_by('fdatetime')
+        # tempset = LogDetail.objects.filter(logfile_id=logfile_id).order_by('fdatetime')
         
-        firstRow = tempset.first()
-        lastRow = tempset.last()
-        
-        response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime }        
-        return Response(response, status = status.HTTP_200_OK)
+        # logfile_id 여러개의 경우 : project_id로 logfile_id 목록을 가져옴 from Logfile Model
+        try:
+            project_id = request.data['project_id']        
+            print('start_end project_id : ', project_id)
+            
+            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id', 'file_name')
+            list_logfile_id = []
+            list_file_name = []
+            
+            for logfile in logfiles:
+                list_logfile_id.append(str(logfile['logfile_id']))
+                list_file_name.append(logfile['file_name'])
+            
+            tempset = LogDetail.objects.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
+            
+            firstRow = tempset.first()
+            lastRow = tempset.last()
+            
+            response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime, 'file_names': list_file_name}        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            print('Error Occured while processing start_end...', ex)
+                    
+            response = {'message': 'start_end creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
         
     
     # For Statistics - chartdata    
     @action(methods=['post'], detail=False)
     def chartdata(self, request, pk=None):
-        logfile_id = request.data['logfile_id']
-        
-        type = request.data['type']
-        kind = request.data['kind']
-        print("** chartdata : type, kind --> ", type, kind)
-        
-        # 검색 조건 적용
-        queryset = self.get_queryset()
-        
-        #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-        queryset = queryset.filter(logfile_id__exact=logfile_id)        
-        
-        # 결과 처리
-        resultX = []
-        resultY = []
-        resultY_time = []
-        resultY_time_unit = 0
-                
-        resultY_200 = []
-        resultY_300 = []
-        resultY_400 = []
-        resultY_500 = []
-        
-        resultY_SCode = {}
 
-        # Type1 : 시(HH)기준
-        #   Kind1 : request(요청) 건수(count)        
-        #   Kind2 : status code 건수(count)
-        #   Kind3 : time-taken 시간(max, min, count)
-        
-        start_time = time.time()
-        
-        #type=1. 시(HH)기준
-        if type == '1':          
+        try:        
+            #TODO: project_id 가져와야 한다.(화면 연계필요)
+            logfile_id = request.data['logfile_id']
+            
+            type = request.data['type']
+            kind = request.data['kind']
+            print("** chartdata : type, kind --> ", type, kind)
+            
+            # 검색 조건 적용
+            queryset = self.get_queryset()
+            
+            # 결과 처리
+            resultX = []
+            resultY = []
+            resultY_time = []
+            resultY_time_unit = 0
+                    
+            resultY_200 = []
+            resultY_300 = []
+            resultY_400 = []
+            resultY_500 = []
+            
+            resultY_SCode = {}
+            
+            start_time = time.time()
+            
+            #1. TODO: project_id에 연관된 logfile_id들을 가져온다.        
+            #2. TODO: 아래 로직을 Loop 돌린다.
+            queryset = queryset.filter(logfile_id__exact=logfile_id)        
 
-            if(kind == 1):
-                
-                hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
-                rows = hhRequest.values('x','y')
-                              
-                for row in rows:
-                    print("type1, kind1 : request(요청) 건수(count) x - ",row['x'])
-                    print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
+            # Type1 : 시(HH)기준
+            #   Kind1 : request(요청) 건수(count)        
+            #   Kind2 : status code 건수(count)
+            #   Kind3 : time-taken 시간(max, min, count)
+            
+            #type=1. 시(HH)기준
+            if type == '1':          
+
+                if(kind == 1):
                     
-                    resultX.append(row['x'])
-                    resultY.append(row['y'])
-                    
-            elif(kind == 2):
-                
-                start_time = time.time()
-                 
-                hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                rows = hhRequest.values('f_date', 'f_status', 'status_count')
-                
-                dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                statusCount = {}
-                
-                resultStatusCode = []
-                                              
-                for row in rows:
-                    print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
-                    print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
-                    print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
-                    
-                    # x축 : 중복제거
-                    if row['f_date'] not in resultX:
-                        resultX.append(row['f_date'])
-                        
-                    # y축-1 : status 코드 중복제거
-                    if row['f_status'] not in resultStatusCode:
-                        resultStatusCode.append(row['f_status']) 
-                        
-                    # 전체 Map 구하기                    
-                    statusCount[row['f_status']] = row['status_count']
-                    dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
-                    
-                for xDate in resultX:
-                    for yStatusCode in resultStatusCode:
-                        
-                        if yStatusCode == '2':
-                            resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '3':
-                            resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '4':
-                            resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '5':
-                            resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                        else:
-                            print('There is no available status code.')
-                           
-                print("== 전체 시간 : ", time.time() - start_time)
-                
-            elif(kind == 3):
-                # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
-                # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
-                # 0: None, 1 : second(%T), 2: microsecond(%D)
-                time_unit = 0
-                if file_format.find('%T') != -1:
-                    time_unit = 1 
-                elif file_format.find('%D') != -1:
-                    time_unit = 2
-                
-                resultY_time_unit = time_unit
-                                    
-                if time_unit != 0:
-                    hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'), yt=Avg('ftime_taken'))
-                    rows = hhRequest.values('x','y', 'yt')
+                    hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
+                    rows = hhRequest.values('x','y')
                                 
                     for row in rows:
-                        print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
-                        print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])
-                        print("type1, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                        print("type1, kind1 : request(요청) 건수(count) x - ",row['x'])
+                        print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
                         
                         resultX.append(row['x'])
                         resultY.append(row['y'])
-                        resultY_time.append(row['yt'])
-                else:
-                    pass
-        
-        # Type2 : 시분(HHMM)기준                    
-        #   Kind1 : request(요청) 건수(count)
-        #   Kind2 : status code 건수(count)
-        #   Kind3 : time-taken 시간(max, min, count) 
-        elif type == '2':          
-                           
-            if(kind == 1):               
-                
-                hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
-                print("== 쿼리 시간 : ", time.time() - start_time)
-                rows = hhmmRequest.values('x','y')
-                
-                for row in rows:
-                    print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
-                    resultX.append(row['x'])
-                    resultY.append(row['y'])
-                                    
-                print("== 전체 시간 : ", time.time() - start_time)
-                
-            elif(kind == 2):
-                
-                hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
-                
-                dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                statusCount = {}
-                
-                resultStatusCode = []
-                                              
-                for row in rows:
-                    print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
-                    print("type2, kind2 : status code 건수(count) y - ",row['f_status'])
-                    print("type2, kind2 : status code 건수(count) y - ",row['status_count'])
-                    
-                    # x축 : 중복제거
-                    if row['f_date'] not in resultX:
-                        resultX.append(row['f_date'])
                         
-                    # y축-1 : status 코드 중복제거
-                    if row['f_status'] not in resultStatusCode:
-                        resultStatusCode.append(row['f_status']) 
-                        
-                    # 전체 Map 구하기                    
-                    statusCount[row['f_status']] = row['status_count']
-                    dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                elif(kind == 2):
                     
-                for xDate in resultX:
-                    for yStatusCode in resultStatusCode:
-                        
-                        if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                        else:
-                            #print('There is no available status code.')
-                            pass
-                           
-                print("== 전체 시간 : ", time.time() - start_time)
+                    start_time = time.time()
                     
-            elif(kind == 3):
-                # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
-                # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
-                # 0: None, 1 : second(%T), 2: microsecond(%D)
-                time_unit = 0
-                if file_format.find('%T') != -1:
-                    time_unit = 1 
-                elif file_format.find('%D') != -1:
-                    time_unit = 2
-                
-                resultY_time_unit = time_unit
-                                    
-                if time_unit != 0:
-                    hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Count('frequest'), yt=Avg('ftime_taken'))
-                    rows = hhmmRequest.values('x','y', 'yt')
-                                
+                    hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
+                    rows = hhRequest.values('f_date', 'f_status', 'status_count')
+                    
+                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
+                    statusCount = {}
+                    
+                    resultStatusCode = []
+                                                
                     for row in rows:
-                        print("type2, kind3 : request(요청) 건수(count) x - ",row['x'])
-                        print("type2, kind3 : request(요청) 건수(count) y - ",row['y'])
-                        print("type2, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                        print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
+                        print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
+                        print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
                         
-                        resultX.append(row['x'])
-                        resultY.append(row['y'])
-                        resultY_time.append(row['yt'])
-                else:
-                    pass
-        # Type3 : 시분초(HHMM)기준                    
-        #   Kind1 : request(요청) 건수(count)
-        #   Kind2 : status code 건수(count)
-        #   Kind3 : time-taken 시간(max, min, count) 
-        elif type == '3':          
-                           
-            if(kind == 1):               
-                
-                hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
-                print("== 쿼리 시간 : ", time.time() - start_time)
-                rows = hhmmssRequest.values('x','y')
-                
-                for row in rows:
-                    print("type3, kind1 : request(요청) 건수(count) x - ",row['x'])
-                    resultX.append(row['x'])
-                    resultY.append(row['y'])
-                                    
-                print("== 전체 시간 : ", time.time() - start_time)
-                
-            elif(kind == 2):
-                
-                hhmmssRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute','fsecond'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                rows = hhmmssRequest.values('f_date', 'f_status', 'status_count')
-                
-                dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                statusCount = {}
-                
-                resultStatusCode = []
-                                              
-                for row in rows:
-                    print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
-                    print("type3, kind2 : status code 건수(count) y - ",row['f_status'])
-                    print("type3, kind2 : status code 건수(count) y - ",row['status_count'])
-                    
-                    # x축 : 중복제거
-                    if row['f_date'] not in resultX:
-                        resultX.append(row['f_date'])
-                        
-                    # y축-1 : status 코드 중복제거
-                    if row['f_status'] not in resultStatusCode:
-                        resultStatusCode.append(row['f_status']) 
-                        
-                    # 전체 Map 구하기                    
-                    statusCount[row['f_status']] = row['status_count']
-                    dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
-                    
-                for xDate in resultX:
-                    for yStatusCode in resultStatusCode:
-                        
-                        if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                        elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                            resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                        else:
-                            #print('There is no available status code.')
-                            pass
-                           
-                print("== 전체 시간 : ", time.time() - start_time)
-                    
-            elif(kind == 3):
-                # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
-                # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
-                # 0: None, 1 : second(%T), 2: microsecond(%D)
-                time_unit = 0
-                if file_format.find('%T') != -1:
-                    time_unit = 1 
-                elif file_format.find('%D') != -1:
-                    time_unit = 2
-                
-                resultY_time_unit = time_unit
-                                    
-                if time_unit != 0:
-                    hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Count('frequest'), yt=Avg('ftime_taken'))
-                    rows = hhmmssRequest.values('x','y', 'yt')
-                                
-                    for row in rows:
-                        print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
-                        print("type3, kind3 : request(요청) 건수(count) y - ",row['y'])
-                        print("type3, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
-                        
-                        resultX.append(row['x'])
-                        resultY.append(row['y'])
-                        resultY_time.append(row['yt'])
-                else:
-                    pass
-                
-        response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
-        return Response(response, status = status.HTTP_200_OK)
-    
-    
-    # For Statistics - top1
-    @action(methods=['post'], detail=False)
-    def statistics_top1(self, request, pk=None):
-    
-        logfile_id = request.data['logfile_id']
-        
-        type = request.data['type']
-        print("** statistics_top1 : type --> ", type)
-        
-        # 결과 처리
-        result = []
-        
-        # 검색 조건 적용
-        queryset = self.get_queryset()
-        
-        #0. TODO: 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-        queryset = queryset.filter(logfile_id__exact=logfile_id)
-        
-        #2. TODO: 아래 결과 key 동일하게 맞추기 - for 화면처리 
-        
-        start_time = time.time()
-       
-        #type=1. 전체 처리량(건수)
-        if type == 1:
-            cnt = queryset.count()
-            print("type1 : queryset.count() - ", cnt)
-            result.append({"result" : 'Total', "result_count" : cnt})
-               
-        #type=2. 최다접속 IP주소
-        elif type == 2:
-            top_ip = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count').values('fip', 'fip_count')[0]
-            print("type2 : TOP IP - ", top_ip['fip'])
-            print("type2 : TOP IP Count - ", top_ip['fip_count'])
-            result.append({"result" : top_ip['fip'], "result_count" : top_ip['fip_count']})
-        
-        #type=3. 최다접속 사용자 요청(request)
-        elif type == 3:
-            top_request =  queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count').values('frequest', 'frequest_count')[0]
-            print("type3 : TOP REQUEST - ", top_request['frequest'])
-            print("type3 : TOP REQUEST Count - ", top_request['frequest_count'])
-            result.append({"result" :  top_request['frequest'], "result_count" : top_request['frequest_count']})
-            
-        #type=4. 최다 404 발생 URL
-        elif type == 4:
-            
-            try:
-                top_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count').values('frequest', 'frequest_404_count')[0]
-            
-                print("type4 : TOP 404 REQUEST - ", top_404_request['frequest'])
-                print("type4 : TOP 404 REQUEST Count - ", top_404_request['frequest_404_count'])
-                result.append({"result" :  top_404_request['frequest'], "result_count" : top_404_request['frequest_404_count']})
-            except :
-                print("Error occured!")
-                result.append({"result" : "-", "result_count" : "0"})                           
-        
-        print("== statistics_top1 (type="+str(type)+")걸린 시간 : ", time.time() - start_time) 
+                        # x축 : 중복제거
+                        if row['f_date'] not in resultX:
+                            resultX.append(row['f_date'])
                             
-        response = {'message': 'statistics returned', 'results': result}
-        return Response(response, status = status.HTTP_200_OK)
+                        # y축-1 : status 코드 중복제거
+                        if row['f_status'] not in resultStatusCode:
+                            resultStatusCode.append(row['f_status']) 
+                            
+                        # 전체 Map 구하기                    
+                        statusCount[row['f_status']] = row['status_count']
+                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                        
+                    for xDate in resultX:
+                        for yStatusCode in resultStatusCode:
+                            
+                            if yStatusCode == '2':
+                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '3':
+                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '4':
+                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '5':
+                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                            else:
+                                print('There is no available status code.')
+                            
+                    print("== 전체 시간 : ", time.time() - start_time)
+                    
+                elif(kind == 3):
+                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                    file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                    # 0: None, 1 : second(%T), 2: microsecond(%D)
+                    time_unit = 0
+                    if file_format.find('%T') != -1:
+                        time_unit = 1 
+                    elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    
+                    resultY_time_unit = time_unit
+                                        
+                    if time_unit != 0:
+                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                        rows = hhRequest.values('x','y', 'yt')
+                                    
+                        for row in rows:
+                            print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])
+                            print("type1, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                            
+                            resultX.append(row['x'])
+                            resultY.append(row['y'])
+                            resultY_time.append(row['yt'])
+                    else:
+                        pass
+            
+            # Type2 : 시분(HHMM)기준                    
+            #   Kind1 : request(요청) 건수(count)
+            #   Kind2 : status code 건수(count)
+            #   Kind3 : time-taken 시간(max, min, count) 
+            elif type == '2':          
+                            
+                if(kind == 1):               
+                    
+                    hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
+                    print("== 쿼리 시간 : ", time.time() - start_time)
+                    rows = hhmmRequest.values('x','y')
+                    
+                    for row in rows:
+                        print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
+                        resultX.append(row['x'])
+                        resultY.append(row['y'])
+                                        
+                    print("== 전체 시간 : ", time.time() - start_time)
+                    
+                elif(kind == 2):
+                    
+                    hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
+                    rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
+                    
+                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
+                    statusCount = {}
+                    
+                    resultStatusCode = []
+                                                
+                    for row in rows:
+                        print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
+                        print("type2, kind2 : status code 건수(count) y - ",row['f_status'])
+                        print("type2, kind2 : status code 건수(count) y - ",row['status_count'])
+                        
+                        # x축 : 중복제거
+                        if row['f_date'] not in resultX:
+                            resultX.append(row['f_date'])
+                            
+                        # y축-1 : status 코드 중복제거
+                        if row['f_status'] not in resultStatusCode:
+                            resultStatusCode.append(row['f_status']) 
+                            
+                        # 전체 Map 구하기                    
+                        statusCount[row['f_status']] = row['status_count']
+                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                        
+                    for xDate in resultX:
+                        for yStatusCode in resultStatusCode:
+                            
+                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                            else:
+                                #print('There is no available status code.')
+                                pass
+                            
+                    print("== 전체 시간 : ", time.time() - start_time)
+                        
+                elif(kind == 3):
+                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                    file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                    # 0: None, 1 : second(%T), 2: microsecond(%D)
+                    time_unit = 0
+                    if file_format.find('%T') != -1:
+                        time_unit = 1 
+                    elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    
+                    resultY_time_unit = time_unit
+                                        
+                    if time_unit != 0:
+                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                        rows = hhmmRequest.values('x','y', 'yt')
+                                    
+                        for row in rows:
+                            print("type2, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            print("type2, kind3 : request(요청) 건수(count) y - ",row['y'])
+                            print("type2, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                            
+                            resultX.append(row['x'])
+                            resultY.append(row['y'])
+                            resultY_time.append(row['yt'])
+                    else:
+                        pass
+            # Type3 : 시분초(HHMM)기준                    
+            #   Kind1 : request(요청) 건수(count)
+            #   Kind2 : status code 건수(count)
+            #   Kind3 : time-taken 시간(max, min, count) 
+            elif type == '3':          
+                            
+                if(kind == 1):               
+                    
+                    hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
+                    print("== 쿼리 시간 : ", time.time() - start_time)
+                    rows = hhmmssRequest.values('x','y')
+                    
+                    for row in rows:
+                        print("type3, kind1 : request(요청) 건수(count) x - ",row['x'])
+                        resultX.append(row['x'])
+                        resultY.append(row['y'])
+                                        
+                    print("== 전체 시간 : ", time.time() - start_time)
+                    
+                elif(kind == 2):
+                    
+                    hhmmssRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute','fsecond'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
+                    rows = hhmmssRequest.values('f_date', 'f_status', 'status_count')
+                    
+                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
+                    statusCount = {}
+                    
+                    resultStatusCode = []
+                                                
+                    for row in rows:
+                        print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
+                        print("type3, kind2 : status code 건수(count) y - ",row['f_status'])
+                        print("type3, kind2 : status code 건수(count) y - ",row['status_count'])
+                        
+                        # x축 : 중복제거
+                        if row['f_date'] not in resultX:
+                            resultX.append(row['f_date'])
+                            
+                        # y축-1 : status 코드 중복제거
+                        if row['f_status'] not in resultStatusCode:
+                            resultStatusCode.append(row['f_status']) 
+                            
+                        # 전체 Map 구하기                    
+                        statusCount[row['f_status']] = row['status_count']
+                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                        
+                    for xDate in resultX:
+                        for yStatusCode in resultStatusCode:
+                            
+                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
+                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                            else:
+                                #print('There is no available status code.')
+                                pass
+                            
+                    print("== 전체 시간 : ", time.time() - start_time)
+                        
+                elif(kind == 3):
+                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                    file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                    # 0: None, 1 : second(%T), 2: microsecond(%D)
+                    time_unit = 0
+                    if file_format.find('%T') != -1:
+                        time_unit = 1 
+                    elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    
+                    resultY_time_unit = time_unit
+                                        
+                    if time_unit != 0:
+                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                        rows = hhmmssRequest.values('x','y', 'yt')
+                                    
+                        for row in rows:
+                            print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            print("type3, kind3 : request(요청) 건수(count) y - ",row['y'])
+                            print("type3, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                            
+                            resultX.append(row['x'])
+                            resultY.append(row['y'])
+                            resultY_time.append(row['yt'])
+                    else:
+                        pass
+                    
+            response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
+            return Response(response, status = status.HTTP_200_OK)
+        
+        except Exception as ex:
+            print('Error Occured while creating linechartdata...', ex)
+                    
+            response = {'message': 'linechartdata creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-     # For Statistics - top5
+     # For Statistics
     @action(methods=['post'], detail=False)
-    def statistics_top5(self, request, pk=None):
+    def statistics(self, request, pk=None):
         
-        logfile_id = request.data['logfile_id']
-                       
-        type = request.data['type']
-        print("** statistics_top5 : type --> ", type)
-                
-        # 검색 조건 적용
-        queryset = self.get_queryset()
+        try:
         
-        #1. TODO : 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-        queryset = queryset.filter(logfile_id__exact=logfile_id)        
-                
-        results = []
-        
-        start_time = time.time()
-        
-        #type=1. Status Codes Top5        
-        if type == 1:
-            top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:5]                        
-            rows = top5_status.values('fstatus','fstatus_count')
-            
-            for row in rows:
-                print("type1 : TOP5 STATUS - ", row['fstatus'])
-                print("type1 : TOP5 STATUS Count - ", row['fstatus_count'])
-                
-                results.append({"result" : row['fstatus'], "result_count" : row['fstatus_count']})                      
-        
-        #type=2. Requests Top5
-        elif type == 2:
-            top5_request = queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:5]
-            rows = top5_request.values('frequest','frequest_count')
-            
-            for row in rows:
-                print("type2 : TOP5 REQUEST - ", row['frequest'])
-                print("type2 : TOP5 REQUEST Count - ", row['frequest_count'])
-                
-                results.append({"result" : row['frequest'], "result_count" : row['frequest_count']})   
+            logfile_id = request.data['logfile_id']
+                        
+            type = request.data['type']
+            N = request.data['N']
+            intN = int(N)
+            strN = str(N)
+            print("** statistics : type --> ", type)
+            print("** statistics : N --> ", N)
                     
-        #type=3. 최다 404 발생 URL Top5
-        elif type == 3:
-            top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')[0:5]
-            rows = top5_404_request.values('frequest','frequest_404_count')
-            
-            if rows.count() > 0 :
-                for row in rows:
-                    print("type3 : TOP5 404 REQUEST - ", row['frequest'])
-                    print("type3 : TOP5 404 REQUEST Count - ", row['frequest_404_count'])
-                    
-                    results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']}) 
+            # 검색 조건 적용
+            if type != 0:
+                queryset = self.get_queryset()
             else:
-                results.append({"result" : "-", "result_count" : "0" }) 
-            
-        #type=4. Time-taken Top5(오래 걸린시간)
-        elif type == 4:
-            top5_timetaken_request = queryset.order_by('-ftime_taken')[0:5]
-            rows = top5_timetaken_request.values('frequest','ftime_taken')
-            
-            for row in rows:
-                print("type3 : TOP5 Timtaken REQUEST - ", row['frequest'])
-                print("type3 : TOP5 Timtaken REQUEST Count - ", row['ftime_taken'])
+                queryset = self.queryset
                 
-                results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']})             
-                
-        #type=5. Visitor(Unique IP) Top5
-        elif type == 5:
-            top5_visitor = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:5]
-            rows = top5_visitor.values('fip','fip_count')
             
-            for row in rows:
-                print("type2 : TOP5 VISITOR - ", row['fip'])
-                print("type2 : TOP5 VISITOR Count - ", row['fip_count'])
+            #1. TODO: 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
+            queryset = queryset.filter(logfile_id__exact=logfile_id)        
+                    
+            results = []
+            
+            start_time = time.time()
+            
+            #type=0. 전체 처리량(건수)
+            if type == 0:
+                cnt = queryset.count()
+                print("type0 : queryset.count() - ", cnt)
+                results.append({"result" : 'Total', "result_count" : cnt})
+            
+            #type=1. Status Codes Top N       
+            elif type == 1:
+                top5_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:intN]                        
+                rows = top5_status.values('fstatus','fstatus_count')
                 
-                results.append({"result" : row['fip'], "result_count" : row['fip_count']})   
+                for row in rows:
+                    print("type1 : TOP"+strN+" STATUS - ", row['fstatus'])
+                    print("type1 : TOP"+strN+" STATUS Count - ", row['fstatus_count'])
+                    
+                    results.append({"result" : row['fstatus'], "result_count" : row['fstatus_count']})                      
+            
+            #type=2. Requests Top N
+            elif type == 2:
+                top5_request = queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]
+                rows = top5_request.values('frequest','frequest_count')
+                
+                for row in rows:
+                    print("type2 : TOP"+strN+"REQUEST - ", row['frequest'])
+                    print("type2 : TOP"+strN+"REQUEST Count - ", row['frequest_count'])
+                    
+                    results.append({"result" : row['frequest'], "result_count" : row['frequest_count']})   
+                        
+            #type=3. 최다 404 발생 URL Top5
+            elif type == 3:
+                top5_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')[0:intN]
+                rows = top5_404_request.values('frequest','frequest_404_count')
+                
+                if rows.count() > 0 :
+                    for row in rows:
+                        print("type3 : TOP"+strN+" 404 REQUEST - ", row['frequest'])
+                        print("type3 : TOP"+strN+" 404 REQUEST Count - ", row['frequest_404_count'])
+                        
+                        results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']}) 
+                else:
+                    results.append({"result" : "-", "result_count" : "0" }) 
+                
+            #type=4. Time-taken Top5(오래 걸린시간)
+            elif type == 4:
+                top5_timetaken_request = queryset.order_by('-ftime_taken')[0:intN]
+                rows = top5_timetaken_request.values('frequest','ftime_taken')
+                
+                for row in rows:
+                    print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
+                    print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
+                    
+                    results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']})             
+                    
+            #type=5. Visitor(Unique IP) Top5
+            elif type == 5:
+                top5_visitor = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]
+                rows = top5_visitor.values('fip','fip_count')
+                
+                for row in rows:
+                    print("type5 : TOP"+strN+" VISITOR - ", row['fip'])
+                    print("type5 : TOP"+strN+" VISITOR Count - ", row['fip_count'])
+                    
+                    results.append({"result" : row['fip'], "result_count" : row['fip_count']})   
+            
+            #type=6. Referers Top N
+            elif type == 6:
+                top5_visitor = queryset.values('freferer').annotate(freferer_count=Count('freferer')).order_by('-freferer_count')[0:intN]
+                rows = top5_visitor.values('freferer','freferer_count')
+                
+                for row in rows:
+                    print("type5 : TOP"+strN+" freferer - ", row['freferer'])
+                    print("type5 : TOP"+strN+" freferer Count - ", row['freferer_count'])
+                    
+                    results.append({"result" : row['freferer'], "result_count" : row['freferer_count']}) 
+            
+            #type=7. User Agent Top N               
+            elif type == 7:
+                top5_visitor = queryset.values('fuser_agent').annotate(fuser_agent_count=Count('fuser_agent')).order_by('-fuser_agent_count')[0:intN]
+                rows = top5_visitor.values('fuser_agent','fuser_agent_count')
+                
+                for row in rows:
+                    print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
+                    print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    
+                    results.append({"result" : row['fuser_agent'], "result_count" : row['fuser_agent_count']})  
+            
+            
+            print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
+            
+            response = {'message': 'statistics returned', 'results': results}
+            return Response(response, status = status.HTTP_200_OK)
         
-        #type=6. Search Terms Top5     
-        
-        
-        print("== statistics_top5 (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
-        
-        # TODO : 결과값을 생성해서 보내야 한다 & Exception 처리
-        response = {'message': 'statistics returned', 'results': results}
-        return Response(response, status = status.HTTP_200_OK)
-        
+        except Exception as ex:
+            print('Error Occured while creating statistics...', ex)
+                    
+            response = {'message': 'statistics creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     
     # For Filtering
@@ -672,24 +684,30 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         print("== LogDetailViewSet create!!")
         start = time.time()
         
-        # For UI
-        logfile_id = request.data['logfile']
-                
-        logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
-        logfile = logfile_model.file_object.file    
-        
-        print("logfile :", logfile)     
-        
-        # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
-        result = self.parse_log(logfile, logfile_id)      
-     
-        # postgresql copy 실행
-        LogDetail.objects.from_csv(logfile.name+'.csv', delimiter=',')        
+        try:
+            logfile_id = request.data['logfile']
+                    
+            logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
+            logfile = logfile_model.file_object.file    
             
-        print("To DB, Total Duration :", time.time() - start)
+            print("logfile :", logfile)     
+            
+            # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
+            #result = self.parse_log(logfile, logfile_id)
+            self.parse_log(logfile, logfile_id)
         
-        response = {'message': 'logdetail created', 'start_date': result[0]['firstRow'].fdate, 'start_time': result[0]['firstRow'].ftime, 'end_date': result[0]['lastRow'].fdate, 'end_time': result[0]['lastRow'].ftime }
-        return Response(response, status = status.HTTP_200_OK)
+            # postgresql copy 실행
+            LogDetail.objects.from_csv(logfile.name+'.csv', delimiter=',')        
+                
+            print("To DB, Total Duration :", time.time() - start)
+            
+            response = {'message': 'logdetail created successfully.'}
+            return Response(response, status = status.HTTP_200_OK)
+        except Exception as ex: 
+            print('Error Occured while creating logdetail...', ex)
+            
+            response = {'message': 'logdetail creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def parse_log(self, logfile, logfile_id):
 
@@ -700,11 +718,12 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         # Fileformat 가져온다.(from logfile DB using logfile_id)
         # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'      
-        log_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+        format_model = LogFile.objects.get(logfile_id=logfile_id)
+        log_format = format_model.file_format
         
         # format_kind : apache, nginx, IIS
-        format_kind = LogFile.objects.get(logfile_id=logfile_id).format_kind        
-        format_name = LogFile.objects.get(logfile_id=logfile_id).format_name
+        format_kind = format_model.format_kind        
+        format_name = format_model.format_name
                 
         # 임시 csv 파일생성 for copy to postgresql
         log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
@@ -804,17 +823,17 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 'logdetail_id' : UUID 생성
         df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4())         
                         
-        firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function       
-        lastRow = df_logs.iloc[-1,] #.to_json(orient='index'), head() function                        
+        #firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function       
+        #lastRow = df_logs.iloc[-1,] #.to_json(orient='index'), head() function                        
                         
         # index 미사용  
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
         print("Duration to create temporary csv :", time.time() - start)        
         
-        result.append({'firstRow' : firstRow, 'lastRow' : lastRow})
+        #result.append({'firstRow' : firstRow, 'lastRow' : lastRow})
         
-        return result
+        #return result
     
     def get_logformat_index(self, log_format, format_kind):
         format_index = {}

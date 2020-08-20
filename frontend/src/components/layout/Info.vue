@@ -4,7 +4,7 @@
         <ui-card-item header>Information</ui-card-item>
         <ui-card-item sub>
         <span style="color:gray">
-          Project Name : {{ this.projectName }}
+          Project Name (Total Log Lines) : {{ this.projectName }} ({{ totalLogLines }} lines)
           <br>
           Logfile Name : {{ this.fileNames }}
           <br>
@@ -22,15 +22,44 @@
 <script>
 
 import { mapGetters } from "vuex";
+import axios from "axios";
 
 export default {
   name: "Info",
   data: function() {
     return {
-
+      totalLogLines: "0"
     };
   },
   created() {
+
+    let logfile_id = this.logFileID
+    console.log(logfile_id)
+
+    var url = "http://127.0.0.1:8000/logdetail/statistics/"
+
+    let postData = {
+          
+          logfile_id: logfile_id,
+          type: 0,
+          N: 0,
+      };
+
+    let axiosConfig = {
+          headers: {
+          //'Authorization': 'Token '+ this.token // For Django
+          }
+      };
+
+    axios.post(url, postData, axiosConfig)
+    .then(res => {
+        console.log(res)
+        this.totalLogLines = res.data.results[0]["result_count"]
+
+    })
+    .catch(err => {
+        console.error(err); 
+    })
     
   },
 
@@ -39,6 +68,7 @@ export default {
       projectName: "getProjectName",
       fileNames: "getFileNames",
       logFormat: "getLogFormat",
+      logFileID: "getLogFileID",
 
       dateFromValue: "getFromDate",
       dateToValue: "getToDate",

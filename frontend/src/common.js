@@ -56,45 +56,54 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
 //////////////////////////////////////////////////////////////
 // Common Chart Data
 //////////////////////////////////////////////////////////////
-export function getChartDataFromStatistics(type, logfile_id, filter) {
+export function getChartDataFromStatistics(type, logfile_id, filter, N) {
 
-    // Top 5 일때
-    // type=1. Status Codes Top5
-    // type=2. Requests Top5
+    // type=0. 전체 처리량(건수) --> Top N아님
+    // Top N으로 수정
+    
+    // type=1. Status Codes Top N
+    // type=2. Requests Top N
     // type=3. 최다 404 발생 URL Top5
-    // type=4. Time Taken Top5 
-    // type=5. Visitors Top5       
+    // type=4. Time Taken Top N
+    // type=5. Visitors Top N
+    // type=6. Referers Top N
+    // type=7. User Agent Top N
 
-    //this.title = "Top 5"
+    var url = serverUrl + "/logdetail/statistics/"
 
-    var url = serverUrl + "/logdetail/statistics_top5/"
+    var label = ""
 
-    var label
-
-    switch (type) {
+    switch(type){
         case 1:
-            label = "HTTP Status Codes(count)"
-            break;
+          label = "HTTP Status Codes (count)"
+          break;
         case 2:
-            label = "Requests URI(count)"
-            break;
+          label = "Requests URI (count)"
+          break;
         case 3:
-            label = "404 Requests URI(count)"
-            break;
+          label = "404 Requests URI (count)"
+          break;
         case 4:
-            label = "Requests Time-taken(ms/㎲)"
-            break;
+          label = "Requests Time-taken (ms/㎲)"
+          break;
         case 5:
-            label = "Visitors(count)"
-            break;
+          label = "Visitors (count)"
+          break;
+        case 6:
+          label = "Referers (count)"
+          break;
+        case 7:
+          label = "User Agent (count)"
+          break;
         default:
-    }
+      }
 
     console.log(logfile_id)
 
     let postData = {
         logfile_id: logfile_id,
         type: type,
+        N: N,
         filter: filter
     };
 

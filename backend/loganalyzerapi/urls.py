@@ -15,8 +15,9 @@ router.register(r'logfile', views.LogFileViewSet)
 router.register(r'logdetail', views.LogDetailViewSet)
 
 # For statistics 
-router.register(r'logdetail/statistics_top1', views.LogDetailViewSet)
-router.register(r'logdetail/statistics_top5', views.LogDetailViewSet)
+#router.register(r'logdetail/statistics_top1', views.LogDetailViewSet)
+#router.register(r'logdetail/statistics_top5', views.LogDetailViewSet)
+router.register(r'logdetail/statistics', views.LogDetailViewSet)
 
 # For chart
 router.register(r'logdetail/chartdata', views.LogDetailViewSet)
