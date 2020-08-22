@@ -213,7 +213,8 @@ export default {
 
   },
 
-  computed: {
+  computed: {   
+    
 
     listN() {
       let rtn = [];
@@ -403,6 +404,12 @@ export default {
       }
     },
     
+  },
+
+  watch:{
+    valueN(){
+      this.$store.dispatch("setToggleSearch");
+    }
   }
 };
 </script>
