@@ -16,7 +16,7 @@
 
             <ui-tab box :tabs="tabs" v-on:tabChange="tabChange"/>
 
-            <vue-element-loading :active="isActive" spinner="spinner" text="500MB 기준 약 100초" :is-full-screen="false" color="#553ca5"/>  
+            <vue-element-loading :active="isActive" spinner="spinner" text="500MB 기준 약 100초 소요됩니다." :is-full-screen="false" color="#553ca5"/>  
             
             <div class="popup-form">
 
