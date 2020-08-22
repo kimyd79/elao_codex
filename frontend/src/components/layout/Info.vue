@@ -33,14 +33,14 @@ export default {
   },
   created() {
 
-    let logfile_id = this.logFileID
-    console.log(logfile_id)
+    let project_id = this.projectID
+    console.log(project_id)
 
     var url = "http://127.0.0.1:8000/logdetail/statistics/"
 
     let postData = {
           
-          logfile_id: logfile_id,
+          project_id: project_id,
           type: 0,
           N: 0,
       };
@@ -69,6 +69,7 @@ export default {
       fileNames: "getFileNames",
       logFormat: "getLogFormat",
       logFileID: "getLogFileID",
+      projectID: "getProjectID",
 
       dateFromValue: "getFromDate",
       dateToValue: "getToDate",

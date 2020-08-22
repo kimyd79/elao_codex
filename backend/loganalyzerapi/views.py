@@ -160,8 +160,11 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     def chartdata(self, request, pk=None):
 
         try:        
-            #TODO: project_id 가져와야 한다.(화면 연계필요)
-            logfile_id = request.data['logfile_id']
+            # project_id 가져와야 한다.(화면 연계필요)
+            #logfile_id = request.data['logfile_id']
+            
+            project_id = request.data['project_id']        
+            print('**chartdata project_id : ', project_id) 
             
             type = request.data['type']
             kind = request.data['kind']
@@ -185,9 +188,16 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             
             start_time = time.time()
             
-            #1. TODO: project_id에 연관된 logfile_id들을 가져온다.        
-            #2. TODO: 아래 로직을 Loop 돌린다.
-            queryset = queryset.filter(logfile_id__exact=logfile_id)        
+            #1. project_id에 연관된 logfile_id들을 가져온다.
+            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')                        
+            list_logfile_id = []         
+            
+            # logfile id 가져오기
+            for logfile in logfiles:    # Loop 시작구간
+                list_logfile_id.append(str(logfile['logfile_id']))   
+        
+            #2. 아래 로직을 Loop 돌린다.
+            queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
 
             # Type1 : 시(HH)기준
             #   Kind1 : request(요청) 건수(count)        
@@ -203,8 +213,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                     rows = hhRequest.values('x','y')
                                 
                     for row in rows:
-                        print("type1, kind1 : request(요청) 건수(count) x - ",row['x'])
-                        print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
+                        # print("type1, kind1 : request(요청) 건수(count) x - ",row['x'])
+                        # print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
                         
                         resultX.append(row['x'])
                         resultY.append(row['y'])
@@ -222,9 +232,9 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                     resultStatusCode = []
                                                 
                     for row in rows:
-                        print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
-                        print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
-                        print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
+                        # print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
+                        # print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
+                        # print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
                         
                         # x축 : 중복제거
                         if row['f_date'] not in resultX:
@@ -257,7 +267,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                    file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
                     # 0: None, 1 : second(%T), 2: microsecond(%D)
                     time_unit = 0
                     if file_format.find('%T') != -1:
@@ -272,9 +282,9 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                         rows = hhRequest.values('x','y', 'yt')
                                     
                         for row in rows:
-                            print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
-                            print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])
-                            print("type1, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                            # print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            # print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])
+                            # print("type1, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
                             
                             resultX.append(row['x'])
                             resultY.append(row['y'])
@@ -291,15 +301,15 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 if(kind == 1):               
                     
                     hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
-                    print("== 쿼리 시간 : ", time.time() - start_time)
+                    # print("== 쿼리 시간 : ", time.time() - start_time)
                     rows = hhmmRequest.values('x','y')
                     
                     for row in rows:
-                        print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
+                        # print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
                         resultX.append(row['x'])
                         resultY.append(row['y'])
                                         
-                    print("== 전체 시간 : ", time.time() - start_time)
+                    print("== 전체 시간 : ", time.time() - start_time)                    
                     
                 elif(kind == 2):
                     
@@ -312,9 +322,9 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                     resultStatusCode = []
                                                 
                     for row in rows:
-                        print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
-                        print("type2, kind2 : status code 건수(count) y - ",row['f_status'])
-                        print("type2, kind2 : status code 건수(count) y - ",row['status_count'])
+                        # print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
+                        # print("type2, kind2 : status code 건수(count) y - ",row['f_status'])
+                        # print("type2, kind2 : status code 건수(count) y - ",row['status_count'])
                         
                         # x축 : 중복제거
                         if row['f_date'] not in resultX:
@@ -348,7 +358,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                    file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
                     # 0: None, 1 : second(%T), 2: microsecond(%D)
                     time_unit = 0
                     if file_format.find('%T') != -1:
@@ -363,16 +373,16 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                         rows = hhmmRequest.values('x','y', 'yt')
                                     
                         for row in rows:
-                            print("type2, kind3 : request(요청) 건수(count) x - ",row['x'])
-                            print("type2, kind3 : request(요청) 건수(count) y - ",row['y'])
-                            print("type2, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                            # print("type2, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            # print("type2, kind3 : request(요청) 건수(count) y - ",row['y'])
+                            # print("type2, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
                             
                             resultX.append(row['x'])
                             resultY.append(row['y'])
                             resultY_time.append(row['yt'])
                     else:
                         pass
-            # Type3 : 시분초(HHMM)기준                    
+            # Type3 : 시분초(HHMMSS)기준                    
             #   Kind1 : request(요청) 건수(count)
             #   Kind2 : status code 건수(count)
             #   Kind3 : time-taken 시간(max, min, count) 
@@ -402,9 +412,9 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                     resultStatusCode = []
                                                 
                     for row in rows:
-                        print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
-                        print("type3, kind2 : status code 건수(count) y - ",row['f_status'])
-                        print("type3, kind2 : status code 건수(count) y - ",row['status_count'])
+                        # print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
+                        # print("type3, kind2 : status code 건수(count) y - ",row['f_status'])
+                        # print("type3, kind2 : status code 건수(count) y - ",row['status_count'])
                         
                         # x축 : 중복제거
                         if row['f_date'] not in resultX:
@@ -438,7 +448,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                    file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
+                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
                     # 0: None, 1 : second(%T), 2: microsecond(%D)
                     time_unit = 0
                     if file_format.find('%T') != -1:
@@ -453,23 +463,23 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                         rows = hhmmssRequest.values('x','y', 'yt')
                                     
                         for row in rows:
-                            print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
-                            print("type3, kind3 : request(요청) 건수(count) y - ",row['y'])
-                            print("type3, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
+                            # print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            # print("type3, kind3 : request(요청) 건수(count) y - ",row['y'])
+                            # print("type3, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
                             
                             resultX.append(row['x'])
                             resultY.append(row['y'])
                             resultY_time.append(row['yt'])
                     else:
-                        pass
+                        pass        
                     
             response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:
-            print('Error Occured while creating linechartdata...', ex)
+            print('Error Occured while creating chartdata...', ex)
                     
-            response = {'message': 'linechartdata creation failed.'}            
+            response = {'message': 'chartdata creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
     
      # For Statistics
@@ -478,28 +488,37 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         
         try:
         
-            logfile_id = request.data['logfile_id']
+            #logfile_id = request.data['logfile_id']
+            
+            project_id = request.data['project_id']        
+            # print('statistics project_id : ', project_id)
                         
             type = request.data['type']
             N = request.data['N']
             intN = int(N)
             strN = str(N)
-            print("** statistics : type --> ", type)
-            print("** statistics : N --> ", N)
+            
+            # print("** statistics : type --> ", type)
+            # print("** statistics : N --> ", N)
                     
             # 검색 조건 적용
             if type != 0:
                 queryset = self.get_queryset()
             else:
                 queryset = self.queryset
-                
-            
-            #1. TODO: 기본 조건 적용(file_id) -> Multi-file 일 경우 project_id까지 봐야한다.
-            queryset = queryset.filter(logfile_id__exact=logfile_id)        
-                    
+
             results = []
             
             start_time = time.time()
+            
+            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
+            list_logfile_id = []         
+            
+            # logfile id 가져오기
+            for logfile in logfiles:    # Loop 시작구간
+                list_logfile_id.append(str(logfile['logfile_id']))                
+            
+            queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
             
             #type=0. 전체 처리량(건수)
             if type == 0:
@@ -513,8 +532,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 rows = top5_status.values('fstatus','fstatus_count')
                 
                 for row in rows:
-                    print("type1 : TOP"+strN+" STATUS - ", row['fstatus'])
-                    print("type1 : TOP"+strN+" STATUS Count - ", row['fstatus_count'])
+                    # print("type1 : TOP"+strN+" STATUS - ", row['fstatus'])
+                    # print("type1 : TOP"+strN+" STATUS Count - ", row['fstatus_count'])
                     
                     results.append({"result" : row['fstatus'], "result_count" : row['fstatus_count']})                      
             
@@ -524,8 +543,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 rows = top5_request.values('frequest','frequest_count')
                 
                 for row in rows:
-                    print("type2 : TOP"+strN+"REQUEST - ", row['frequest'])
-                    print("type2 : TOP"+strN+"REQUEST Count - ", row['frequest_count'])
+                    # print("type2 : TOP"+strN+"REQUEST - ", row['frequest'])
+                    # print("type2 : TOP"+strN+"REQUEST Count - ", row['frequest_count'])
                     
                     results.append({"result" : row['frequest'], "result_count" : row['frequest_count']})   
                         
@@ -536,8 +555,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 
                 if rows.count() > 0 :
                     for row in rows:
-                        print("type3 : TOP"+strN+" 404 REQUEST - ", row['frequest'])
-                        print("type3 : TOP"+strN+" 404 REQUEST Count - ", row['frequest_404_count'])
+                        # print("type3 : TOP"+strN+" 404 REQUEST - ", row['frequest'])
+                        # print("type3 : TOP"+strN+" 404 REQUEST Count - ", row['frequest_404_count'])
                         
                         results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']}) 
                 else:
@@ -549,10 +568,10 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 rows = top5_timetaken_request.values('frequest','ftime_taken')
                 
                 for row in rows:
-                    print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
-                    print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
+                    # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
+                    # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
                     
-                    results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']})             
+                    results.append({"result" : row['frequest'], "result_count" : row['ftime_taken']})
                     
             #type=5. Visitor(Unique IP) Top5
             elif type == 5:
@@ -560,8 +579,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 rows = top5_visitor.values('fip','fip_count')
                 
                 for row in rows:
-                    print("type5 : TOP"+strN+" VISITOR - ", row['fip'])
-                    print("type5 : TOP"+strN+" VISITOR Count - ", row['fip_count'])
+                    # print("type5 : TOP"+strN+" VISITOR - ", row['fip'])
+                    # print("type5 : TOP"+strN+" VISITOR Count - ", row['fip_count'])
                     
                     results.append({"result" : row['fip'], "result_count" : row['fip_count']})   
             
@@ -571,8 +590,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 rows = top5_visitor.values('freferer','freferer_count')
                 
                 for row in rows:
-                    print("type5 : TOP"+strN+" freferer - ", row['freferer'])
-                    print("type5 : TOP"+strN+" freferer Count - ", row['freferer_count'])
+                    # print("type5 : TOP"+strN+" freferer - ", row['freferer'])
+                    # print("type5 : TOP"+strN+" freferer Count - ", row['freferer_count'])
                     
                     results.append({"result" : row['freferer'], "result_count" : row['freferer_count']}) 
             
@@ -582,12 +601,11 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                 rows = top5_visitor.values('fuser_agent','fuser_agent_count')
                 
                 for row in rows:
-                    print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
+                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
                     
                     results.append({"result" : row['fuser_agent'], "result_count" : row['fuser_agent_count']})  
-            
-            
+        
             print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
             
             response = {'message': 'statistics returned', 'results': results}
@@ -603,7 +621,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
     # For Filtering
     def get_queryset(self):
         
-        print("== LogDetailViewSet get_queryset!!")
+        # print("== LogDetailViewSet get_queryset!!")
         
         queryset = LogDetail.objects.all()
         
@@ -613,7 +631,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             if self.action_map[key] == self.action:
                 method = key
                 break
-        print("method = ", method)
+        #print("method = ", method)
         
         dateFromValue = ""
         dateToValue = ""
@@ -622,7 +640,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         ttFromValue = ""
         ttToValue = ""
         conditionValue = ""
-        searchValue = ""        
+        searchValue = ""
+        project_id = ""        
 
         # 조건 적용(GET)
         if method == 'get' :
@@ -636,6 +655,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             
             conditionValue = self.request.query_params.get('conditionValue', None)
             searchValue = self.request.query_params.get('searchValue', None)
+            
+            project_id = self.request.query_params.get('project_id', None)
         
         elif method == 'post':
             
@@ -649,23 +670,36 @@ class LogDetailViewSet(viewsets.ModelViewSet):
 
             conditionValue = self.request.data['filter']['conditionValue'] if self.request.data['filter']['conditionValue'] != '' else None
             searchValue = self.request.data['filter']['searchValue'] if self.request.data['filter']['searchValue'] != '' else None
+            
+            project_id = self.request.data['filter']['project_id'] if self.request.data['filter']['project_id'] != '' else None
+            
+        # 관련 project만 가져온다. : multifile 처리
+        if project_id is not None:        
+            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
+            list_logfile_id = []         
+            
+            # logfile id 가져오기
+            for logfile in logfiles:
+                list_logfile_id.append(str(logfile['logfile_id']))                
+            
+            queryset = queryset.filter(logfile_id__in=list_logfile_id)
         
         # Date, Time : Between
         if (dateFromValue is not None) and (dateToValue is not None) and (timeFromValue is not None) and (timeToValue is not None):
             start_datetime = dateFromValue + timeFromValue
             end_datetime = dateToValue + timeToValue
             queryset = queryset.filter(fdatetime__range=(start_datetime, end_datetime))
-            print('Date and Time applied!')
+            #print('Date and Time applied!')
         
         # Time-taken : Between
         if (ttFromValue is not None) and (ttToValue is not None):        
             queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
-            print('Time-taken applied!')
+            #print('Time-taken applied!')
             
         # conditionValue : Contain
         if conditionValue is not None :
-            print('conditionValue applied! (conditionValue) : ', conditionValue)
-            print('searchValue : ', searchValue)
+            #print('conditionValue applied! (conditionValue) : ', conditionValue)
+            #print('searchValue : ', searchValue)
             if conditionValue == 'I':
                 queryset = queryset.filter(fip__icontains=searchValue)
             elif conditionValue == 'R':
@@ -731,10 +765,10 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                            'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime']
         
         # pandas 활용 - 로그파일 읽기
-        # TODO : %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
+        # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
         df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False)
                 
-        # TODO : format_kind - Apache, Nginx, IIS를 구분해야 한다.
+        # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
         
         # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
         # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'

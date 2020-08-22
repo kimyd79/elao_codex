@@ -72,6 +72,7 @@ export default {
 
       ttFromValue: "getFromTimeTaken",
       ttToValue: "getToTimeTaken",
+      project_id: "getProjectID",
 
     }),
 
@@ -108,6 +109,8 @@ export default {
 
           ttFromValue: this.ttFromValue,
           ttToValue: this.ttToValue,
+          
+          project_id: this.project_id,
         }
         
         return filter
@@ -154,14 +157,14 @@ export default {
             default:
           }         
               
-          let logfile_id = this.$store.state.logFileID
-          console.log(logfile_id)
+          let project_id = this.$store.state.projectID
+          console.log(project_id)
 
           var url = "http://127.0.0.1:8000/logdetail/statistics/"
 
           let postData = {
                 
-                logfile_id: logfile_id,
+                project_id: project_id,
                 type: this.statisticsKind,
                 N: this.statisticsRow,
                 

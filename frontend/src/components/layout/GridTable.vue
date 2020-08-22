@@ -58,6 +58,8 @@ export default {
     ttFromValue: "getFromTimeTaken",
     ttToValue: "getToTimeTaken",
 
+    projectID: "getProjectID",
+
   }),
 
   methods: {
@@ -121,7 +123,7 @@ export default {
       // 1 : 0~9, 2 : 10~19,
       console.log("offset :" + offset);
 
-      let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue)
+      let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)
       console.log("filters : "+filters)
 
       var urlstring =

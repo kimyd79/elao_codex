@@ -206,6 +206,7 @@ export default {
 
   created() {
     this.logfile_id = this.$store.state.logFileID
+    this.project_id = this.$store.state.projectID
   },
 
   mounted () {
@@ -235,6 +236,8 @@ export default {
 
       ttFromValue: "getFromTimeTaken",
       ttToValue: "getToTimeTaken",
+
+      project_id: "getProjectID",
 
     })
   },
@@ -280,6 +283,8 @@ export default {
 
         ttFromValue: this.ttFromValue,
         ttToValue: this.ttToValue,
+
+        project_id: this.project_id,
       }
       
       return filter
@@ -297,7 +302,7 @@ export default {
       let filter = this.getFilter()
 
       try{
-        let res = await getChartDataFromStatistics(type, this.logfile_id, filter, this.valueN)
+        let res = await getChartDataFromStatistics(type, this.project_id, filter, this.valueN)
 
         if ( type == 1 ){
           this.pChartData = getPieChartTemplate(res.x, res.y)
@@ -330,7 +335,7 @@ export default {
       let filter = this.getFilter()
       
       try{
-        let res = await getChartDataFromStatistics(1, this.logfile_id, filter, this.valueN)      
+        let res = await getChartDataFromStatistics(1, this.project_id, filter, this.valueN)      
         this.bChartData = getBarChartTemplate(res.x, res.y, res.label)        
       } catch (err) {
         console.log(err); // TypeError: failed to fatch
@@ -350,7 +355,7 @@ export default {
       let filter = this.getFilter()
       
       try{
-        let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)      
+        let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)      
         this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
       } catch (err) {
         console.log(err); // TypeError: failed to fatch
@@ -369,7 +374,7 @@ export default {
       let filter = this.getFilter()
       
       try{
-        let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
+        let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
         this.lChartData = getLineChartTemplate(res.x, res.y, "Request")   
       } catch (err) {
         console.log(err); // TypeError: failed to fatch
@@ -388,7 +393,7 @@ export default {
       let filter = this.getFilter()
 
       try{
-        let res = await getLineChartData(3, this.timeCondition, this.logfile_id, filter)
+        let res = await getLineChartData(3, this.timeCondition, this.project_id, filter)
         this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")    
       } catch (err) {
         console.log(err); // TypeError: failed to fatch

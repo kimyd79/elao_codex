@@ -196,6 +196,7 @@ export default {
       pOptions: getPieChartOptions(),
 
       logfile_id: '',
+      project_id: '',
 
       // For Loading Spinner
       isActiveLine1: false,
@@ -219,6 +220,7 @@ export default {
   created() {
     console.log("serverUrl : ", serverUrl);
     this.logfile_id = this.$store.state.logFileID
+    this.project_id = this.$store.state.projectID
   },
   computed: {
     ...mapGetters({
@@ -271,6 +273,7 @@ export default {
 
         ttFromValue: this.ttFromValue,
         ttToValue: this.ttToValue,
+        project_id : this.project_id,
       }
       
       return filter
@@ -311,7 +314,7 @@ export default {
       let filter = this.getFilter()
       
       try{
-        let res = await getChartDataFromStatistics(1, this.logfile_id, filter, 5)
+        let res = await getChartDataFromStatistics(1, this.project_id, filter, 5)
 
         if ( searchArea == 1 ){
           this.pChartData1 = getPieChartTemplate(res.x, res.y)
@@ -344,7 +347,7 @@ export default {
       let filter = this.getFilter()
 
       try {
-        let res = await getChartDataFromStatistics(1, this.logfile_id, filter, 5)      
+        let res = await getChartDataFromStatistics(1, this.project_id, filter, 5)      
         if ( searchArea == 1 ){
           this.bChartData1 = getBarChartTemplate(res.x, res.y, res.label)
           this.isActiveBar1 = false
@@ -376,7 +379,7 @@ export default {
       let filter = this.getFilter()
       
       try {
-        let res = await getLineChartData(2, this.timeCondition, this.logfile_id, filter)
+        let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
         if ( searchArea == 1 ){
           this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
           this.isActiveStackedBar1 = false
@@ -407,7 +410,7 @@ export default {
 
       try {
         let filter = this.getFilter()
-        let res = await getLineChartData(1, this.timeCondition, this.logfile_id, filter)
+        let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
         if ( searchArea == 1 ){
           this.lChartData1 = getLineChartTemplate(res.x, res.y, "Request")
           this.isActiveLine1 = false
@@ -438,7 +441,7 @@ export default {
 
       try {
         let filter = this.getFilter()
-        let res = await getLineChartData(3, this.timeCondition, this.logfile_id, filter)
+        let res = await getLineChartData(3, this.timeCondition, this.project_id, filter)
         if ( searchArea == 1 ){
           this.mlChartData1 = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")
           this.isActiveMultiLine1 = false

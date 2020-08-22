@@ -62,6 +62,8 @@ export default {
       ttFromValue: "",
       ttToValue: "",
 
+      projectID: "",
+
     };
   },
   created() {
@@ -75,6 +77,8 @@ export default {
     this.searchValue = this.$store.state.searchKeyword
     this.ttFromValue = this.$store.state.fromTimeTaken
     this.ttToValue = this.$store.state.toTimeTaken
+
+    this.projectID = this.$store.state.projectID
   },
 
   computed: {

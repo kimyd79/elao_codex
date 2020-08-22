@@ -21,7 +21,7 @@ export var serverUrl = "http://127.0.0.1:8000"
 //////////////////////////////////////////////////////////////
 // Common Filter
 //////////////////////////////////////////////////////////////
-export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo){
+export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID){
     
     var filters=""
 
@@ -49,6 +49,9 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     if ( ttTo != '') {
       filters = filters + "&ttToValue="+ttTo
     }
+    if ( projectID != '') {
+        filters = filters + "&project_id="+projectID
+    }
 
     return filters;
 }
@@ -56,7 +59,7 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
 //////////////////////////////////////////////////////////////
 // Common Chart Data
 //////////////////////////////////////////////////////////////
-export function getChartDataFromStatistics(type, logfile_id, filter, N) {
+export function getChartDataFromStatistics(type, project_id, filter, N) {
 
     // type=0. 전체 처리량(건수) --> Top N아님
     // Top N으로 수정
@@ -98,10 +101,10 @@ export function getChartDataFromStatistics(type, logfile_id, filter, N) {
         default:
       }
 
-    console.log(logfile_id)
+    console.log(project_id)
 
     let postData = {
-        logfile_id: logfile_id,
+        project_id: project_id,
         type: type,
         N: N,
         filter: filter
@@ -140,12 +143,12 @@ export function getChartDataFromStatistics(type, logfile_id, filter, N) {
 
 }
 
-export function getLineChartData(kind = 1, timeCondition, logfile_id, filter) {
+export function getLineChartData(kind = 1, timeCondition, project_id, filter) {
     var url = serverUrl + "/logdetail/chartdata/"
 
     let postData = {
 
-        logfile_id: logfile_id,
+        project_id: project_id,
 
         //Type1 : 시(HH)기준
         //   Kind1 : request(요청) 건수(count)
