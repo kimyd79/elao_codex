@@ -1,5 +1,5 @@
 <template>
-    <ui-container-box :columns="24" vertical align-center class="page-container">
+    <ui-container-box :columns="22" vertical align-center class="page-container">
 
     <ui-container-box :columns="20" horizontal align-center class="page-title">
       <span class="page-title__label">Detail</span>
@@ -50,5 +50,9 @@ export default {
 </script>
 
 <style scoped>
-
+.page-container {
+    margin: 48px 80px 32px;
+    padding: 80px 80px;
+    background-color: white;
+}
 </style>

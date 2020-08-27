@@ -8,7 +8,7 @@
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5"/>
         <span style="color:red">
 
-          [CHECK] Long Transaction time [1,020 ms] : http://172.16.1.110:8080/#/analysis (Example)         
+          [CHECK] Long Transaction time [>= 3 seconds] : {{ this.LongTransactionCount }}
             
           </span>
           
@@ -39,12 +39,13 @@ export default {
 
   data() {
     return {
-      isActive: true,
+      isActive: false,
+      LongTransactionCount: 0,
     }
   },
 
   created(){
-    
+    this.getNotice()
   },
 
   computed: mapGetters({
@@ -52,6 +53,7 @@ export default {
     fileNames: "getFileNames",
     logFormat: "getLogFormat",
     logfileID: "getLogFileID",
+    projectID: "getProjectID",
 
     dateFromValue: "getFromDate",
     dateToValue: "getToDate",
@@ -66,7 +68,7 @@ export default {
 
       // TODO: common 파일로 뽑아내기, Spinner 추가하기
       let postData = {
-        logfile_id: this.logfileID
+        project_id: this.projectID
       };
 
       // Start Loading Spinner
@@ -75,6 +77,8 @@ export default {
         .post(url + "/logdetail/notice/", postData)
         .then(res => {
           console.log(res);
+
+          this.LongTransactionCount = res.data.tiemtakenResult
 
           // Stop Loading Spinner
           this.isLoading = false;

@@ -8,7 +8,7 @@
             <tr>
               <th rowspan="2" style="width: 60px;">{{ this.title }}</th>
               <th rowspan="2" style="width: 580px;">{{ this.content }}</th>
-              <th rowspan="2" style="width: 100px;">Result</th>            
+              <th rowspan="2" style="width: 100px;">Result {{ this.timetakenUnit }}</th>            
             </tr>          
           </thead>
           <tbody>
@@ -49,6 +49,9 @@ export default {
         items: [
           { result: '...', result_count: '....',},          
         ],
+
+        timetakenUnit: "",
+
         // Loading Spinner data
         isActive: false,
 
@@ -83,7 +86,7 @@ export default {
         alert('getDetail : '+item)
         console.log(item)
       },
-      // TODO : 데이터 가져오기 (기본 조건값 필요 - 그래야 변경분 반영된다.)    
+
       setItems(results) {
 
         this.items = []
@@ -93,6 +96,12 @@ export default {
                 result: results[i].result,
                 result_count: results[i].result_count
             })
+
+            if (results[i].timetakenUnit == 'D'){
+              this.timetakenUnit = "( ㎲ )"
+            }else if (results[i].timetakenUnit == 'T'){
+              this.timetakenUnit = "( s )"
+            }
         }
       },
 
@@ -143,7 +152,7 @@ export default {
               this.content = "404 Requests URI (count)"
               break;
             case 4:
-              this.content = "Requests Time-taken (ms/㎲)"
+              this.content = "Requests Time-taken (s/㎲)"
               break;
             case 5:
               this.content = "Visitors (count)"
