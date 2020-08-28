@@ -404,6 +404,8 @@ export default {
                 
                  try{
                      await this.createLogmaster(url);
+                     await this.createDynamicLogdetailSchema(url)
+                     
                      isNext = true;
                  } catch (err) {
                      console.log(err)
@@ -453,7 +455,8 @@ export default {
             try{
                 // CASE1 : File을 새로 추가한 경우            
                 if (this.isNewFileAdded){
-                    await this.createLogdetail(url);        
+                    //await this.createLogdetail(url);
+                    await this.createDynamicLogdetail(url);
                 }
                 // TODO: 파일 추가했을때 잘 불러오는지 확인필요
                 // CASE2 : 기존 File을 이용하는 경우
@@ -537,15 +540,36 @@ export default {
                 // Set in vuex
                 this.$store.dispatch("setProjectID", this.projectID);
 
-                
-
-                // this.$store.dispatch("setPopupKind", 'Noti');
-                // this.$store.dispatch("setPopupHeader", 'Notification');
-                // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
-                // this.$store.dispatch("setPopupButton", 'Close');
-
                 this.isActive = false 
                 this.setNoticePopup('Create Logmaster Data completed..!!')
+                this.currentView = 'CommonPopup';
+            })
+            .catch(err => {
+                console.error(err); 
+                this.isActive = false 
+            })
+      },
+
+      createDynamicLogdetailSchema(url){
+          let postData = {                
+                project_id: this.projectID,
+            };
+
+            let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+            this.isActive = true 
+
+            return axios.post(url+"/logmaster/create_dynamic_logdetail/", postData, axiosConfig )
+            .then(res => {
+                
+                console.log(res)                
+                
+                this.isActive = false 
+                this.setNoticePopup('Create Dynamic Logdetail completed..!!')
                 this.currentView = 'CommonPopup';
             })
             .catch(err => {
@@ -627,7 +651,8 @@ export default {
       createLogdetail(url){
 
             let postData = {
-                logfile: this.logfileID
+                logfile_id: this.logfileID,
+                project_id: this.projectID
             };
 
             let axiosConfig = {
@@ -636,10 +661,53 @@ export default {
                 }
             };
 
-          // TODO : Progress Bar가 필요하다.
           // Start Loading Spinner
           this.isActive = true 
           return axios.post(url+"/logdetail/", postData, axiosConfig )
+            .then(res => {
+                console.log(res)
+                
+                this.$store.dispatch("setFromDate", res.data.start_date);
+                this.$store.dispatch("setToDate", res.data.end_date);
+                this.$store.dispatch("setFromTime", res.data.start_time);
+                this.$store.dispatch("setToTime", res.data.end_time);
+                
+                // Stop Loading Spinner
+                this.isActive = false 
+
+                // this.$store.dispatch("setPopupKind", 'Noti');
+                // this.$store.dispatch("setPopupHeader", 'Notification');
+                // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
+                // this.$store.dispatch("setPopupButton", 'Close');
+
+                this.setNoticePopup('Create Logdetail Data completed..!!')
+                this.currentView = 'CommonPopup';
+                
+            })
+            .catch(err => {
+                console.error(err);
+                // Stop Loading Spinner
+                this.isActive = false 
+            })
+      },
+
+      createDynamicLogdetail(url){
+
+            let postData = {
+                logfile_id: this.logfileID,
+                project_id: this.projectID
+            };
+
+            let axiosConfig = {
+                headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+          // Start Loading Spinner
+          // TODO:여기
+          this.isActive = true 
+          return axios.post(url+"/logdetail_dynamic/", postData, axiosConfig )
             .then(res => {
                 console.log(res)
                 

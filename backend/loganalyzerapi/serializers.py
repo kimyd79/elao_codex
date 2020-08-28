@@ -37,3 +37,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'   
+        
+class DynamicLogDetailSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = None
+        fields = '__all__' 

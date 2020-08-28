@@ -54,7 +54,13 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'rest_auth.registration',
+    'dynamic_models',
 ]
+
+DYNAMIC_MODELS = {
+    'USE_APP_LABEL': 'loganalyzerapi'
+}
+
 
 SITE_ID = 1
 ACCOUNT_EMAIL_REQUIRED = False

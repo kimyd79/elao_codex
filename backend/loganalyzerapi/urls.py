@@ -1,4 +1,5 @@
 from django.urls import path, include
+
 from loganalyzerapi import views
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -14,9 +15,14 @@ router.register(r'logmaster', views.LogMasterViewSet)
 router.register(r'logfile', views.LogFileViewSet)
 router.register(r'logdetail', views.LogDetailViewSet)
 
+# For Ceating Dynamic Logdetail
+# TODO: Testing...
+router.register(r'logmaster/create_dynamic_logdetail', views.LogMasterViewSet)
+
+# TODO: For Dynamic LogDetail
+router.register(r'logdetail_dynamic', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
+
 # For statistics 
-#router.register(r'logdetail/statistics_top1', views.LogDetailViewSet)
-#router.register(r'logdetail/statistics_top5', views.LogDetailViewSet)
 router.register(r'logdetail/statistics', views.LogDetailViewSet)
 
 # For chart
@@ -41,3 +47,6 @@ urlpatterns = [
     path('rest-auth/', include('rest_auth.urls')),
     path('rest-auth/registration/', include('rest_auth.registration.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+
+
+#url(r'logdetail_test/<model>/', views.GeneralViewSet)
