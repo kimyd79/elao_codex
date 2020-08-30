@@ -26,7 +26,7 @@ from postgres_copy import CopyManager
 from dynamic_models.models import ModelSchema, FieldSchema
 from django.apps import apps
 
-
+    
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
     queryset = LogMaster.objects.all()
@@ -81,7 +81,7 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             
             # id 필드로 대체 : logdetail_id
             # ForeignKey 제외 : logfile
-            logfile_id = FieldSchema.objects.create(model_schema=logdetail_schema, name='logfile_id', data_type='character', max_length=30, null=True)
+            logfile_id = FieldSchema.objects.create(model_schema=logdetail_schema, name='logfile_id', data_type='character', max_length=64, null=True)
             log_line = FieldSchema.objects.create(model_schema=logdetail_schema, name='log_line', data_type='character', max_length=1000, null=True)
             
             # # Filters
@@ -122,7 +122,7 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             logdetail_dynamic.objects.create()
             
             # For postgresql copy            
-            logdetail_dynamic.objects = CopyManager()
+            # logdetail_dynamic.objects = CopyManager()                       
             
             response = {'message': 'Dynamic LogDetail created successfully', 'model_name': model_name}        
             return Response(response, status = status.HTTP_200_OK)
@@ -131,10 +131,9 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             print('Error Occured while creating Dynamic LogDetail...', ex)
                     
             response = {'message': 'Dynamic LogDetail creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    
-    
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)    
+
+  
 class LogFileViewSet(viewsets.ModelViewSet):
     queryset = LogFile.objects.all()
     serializer_class = LogFileSerializer
@@ -1041,6 +1040,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     
     # TODO: Paging 처리
     
+    vs_logdetail_dynamic = None
+    
     def get_queryset(self):
          
          #model_name = self.kwargs.get('model')
@@ -1049,7 +1050,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
          
          print("get_queryset model_name :", model_name)
          
-         model = ModelSchema.objects.get(name=model_name).as_model()
+         model = ModelSchema.objects.get(name=model_name).as_model()    
+         
+         # TODO: 필터 조건 적용
+         
          return model.objects.all()           
 
     def get_serializer_class(self):
@@ -1060,9 +1064,43 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
          model_name = "logdetail_"+project_id
          
          print("get_serializer_class model_name :", model_name)
+         
+         model = ModelSchema.objects.get(name=model_name).as_model()
+         #model.objects = CopyManager()
                          
-         GeneralSerializer.Meta.model = ModelSchema.objects.get(name=model_name).as_model()
-         return GeneralSerializer
+         DynamicLogDetailSerializer.Meta.model = model
+         return DynamicLogDetailSerializer
+     
+    @action(methods=['post'], detail=False)
+    def start_end(self, request, pk=None):        
+       
+        try:
+            project_id = request.data['project_id']        
+            print('start_end project_id : ', project_id)
+            
+            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id', 'file_name')
+            list_logfile_id = []
+            list_file_name = []
+            
+            for logfile in logfiles:
+                list_logfile_id.append(str(logfile['logfile_id']))
+                list_file_name.append(logfile['file_name'])
+            
+            model_name = "logdetail_"+project_id
+            LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+            tempset = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
+            
+            firstRow = tempset.first()
+            lastRow = tempset.last()
+            
+            response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime, 'file_names': list_file_name}        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            print('Error Occured while processing start_end...', ex)
+                    
+            response = {'message': 'start_end creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
      
     def create(self, request, *args, **kwargs):
             
@@ -1072,18 +1110,26 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         response = {}
         
         try:
+            
             logfile_id = request.data['logfile_id']
             project_id = request.data['project_id']
             
-            #TODO: Dynamic Model로 생성된 Detail Table을 가져온다.
             model_name = "logdetail_"+project_id
             
             print("create model_name :", model_name)
             
-            LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
             
-            # id=1인 행(null) 삭제
-            LogDetail_dynamic.objects.filter(id=1).delete() 
+            # TODO: 최초 저장은 실패한다. 여기 좀 이상하다. 제대로 못가져오는거 같다.            
+            LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()  
+                        
+            print("create model_name :", model_name)
+                        
+            #LogDetail_dynamic.objects.model = LogDetail_dynamic #ModelSchema.objects.get(name=model_name).as_model() 
+            #LogDetail_dynamic.objects.model.objects = CopyManager()
+            
+            # id=1인 행(null 행) 삭제
+            if LogDetail_dynamic.objects.count() == 1:
+                LogDetail_dynamic.objects.filter(id=1).delete()
             
             # 이미 생성되어 있는지 확인
             if LogDetail_dynamic.objects.filter(logfile_id=logfile_id).count() > 0:
@@ -1097,10 +1143,12 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 print("logfile :", logfile)     
                 
                 # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
-                #result = self.parse_log(logfile, logfile_id)
                 self.parse_log(logfile, logfile_id)
             
-                # postgresql copy 실행
+                # postgresql copy 실행                
+                LogDetail_dynamic.objects.model.objects = CopyManager()
+                LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
+                
                 LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',')        
                     
                 print("To DB, Total Duration :", time.time() - start)
@@ -1223,8 +1271,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
         df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
         
-        # Merge
-        df_logs = df_logs.rename_axis('logdetail_id').reset_index()
+        # Merge : logdetail_id -> id
+        df_logs = df_logs.rename_axis('id').reset_index()
         df_logs = pd.concat([df_logs, df_time], axis=1)
         
         # 'logdetail_id' : UUID 생성

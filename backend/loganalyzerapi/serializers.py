@@ -18,7 +18,7 @@ class LogDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = LogDetail
-        fields = '__all__' #('log_line','logfile')
+        fields = '__all__'
         
 class LogFormatSerializer(serializers.ModelSerializer):
     

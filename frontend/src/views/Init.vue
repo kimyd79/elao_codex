@@ -1,118 +1,108 @@
 <template>
+<ui-container-box :columns="24" vertical align-center class="page-container-for-init">
+    <div class="vld-parent">
+        <ui-container-box :columns=12 vertical class="popup-container">
+            <CommonPopup :is="currentView" v-on:popupClose="popupClose()" v-on:popupOK="popupOK()"></CommonPopup>
 
-  <ui-container-box :columns="24" vertical align-center class="page-container-for-init">
-  <div class="vld-parent">
-    <ui-container-box :columns=12 vertical class="popup-container">
-      <CommonPopup :is="currentView" v-on:popupClose="popupClose()" v-on:popupOK="popupOK()"></CommonPopup>
-      
             <div class="popup-header">
                 <div class="popup-header__title">
                     Initialization
                 </div>
                 <div class="popup-header__desc">
                     Set initial information for log analysis
-                </div>                
+                </div>
             </div>
 
-            <ui-tab box :tabs="tabs" v-on:tabChange="tabChange"/>
+            <ui-tab box :tabs="tabs" v-on:tabChange="tabChange" />
 
-            <vue-element-loading :active="isActive" spinner="spinner" text="500MB 기준 약 100초 소요됩니다." :is-full-screen="false" color="#553ca5"/>  
-            
+            <vue-element-loading :active="isActive" spinner="spinner" text="500MB 기준 약 100초 소요됩니다." :is-full-screen="false" color="#553ca5" />
+
             <div class="popup-form">
 
                 <!-- STEP1 start -->
                 <span id="step1" v-if="tabs[1].isSelected">
-                
-                <ui-form-item :columns=11 label="Project" required-left left-label :label-width=144 :label-padding=16>
-                    <lego-radio v-model="radioValue" value="1" >New</lego-radio>
-                    <lego-radio v-model="radioValue" value="2" v-on:click="getProjects">Exist</lego-radio>
-                    &nbsp; &nbsp; &nbsp; &nbsp;
-                    <lego-checkbox v-model="checkValue" v-if="radioValue == 2" small >Add Log Files</lego-checkbox>
-                </ui-form-item>
 
-                <ui-form-item :columns=11 
-                    label="Project Name" required-left left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field v-model="projectName"/>
-                </ui-form-item>
+                    <ui-form-item :columns=11 label="Project" required-left left-label :label-width=144 :label-padding=16>
+                        <lego-radio v-model="radioValue" value="1">New</lego-radio>
+                        <lego-radio v-model="radioValue" value="2" v-on:click="getProjects">Exist</lego-radio>
+                        &nbsp; &nbsp; &nbsp; &nbsp;
+                        <lego-checkbox v-model="checkValue" v-if="radioValue == 2" small>Add Log Files</lego-checkbox>
+                    </ui-form-item>
 
-                <ui-form-item :columns=11 
-                    label="Project Description" required-left left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field textarea rows="3" v-model="projectDescription"/>
-                </ui-form-item>
+                    <ui-form-item :columns=11 label="Project Name" required-left left-label :label-width=144 :label-padding=16>
+                        <lego-text-field v-model="projectName" />
+                    </ui-form-item>
 
-                <!-- GridTable for existing project -->
-                <ui-container-box :columns="11" vertical v-if="radioValue == 2">
-                  <ui-table header-divider no-action :columns="columns" :items="itemList" class="mt20"></ui-table>
-                </ui-container-box>
-                <!-- STEP1 end -->
+                    <ui-form-item :columns=11 label="Project Description" required-left left-label :label-width=144 :label-padding=16>
+                        <lego-text-field textarea rows="3" v-model="projectDescription" />
+                    </ui-form-item>
+
+                    <!-- GridTable for existing project -->
+                    <ui-container-box :columns="11" vertical v-if="radioValue == 2">
+                        <ui-table header-divider no-action :columns="columns" :items="itemList" class="mt20"></ui-table>
+                    </ui-container-box>
+                    <!-- STEP1 end -->
                 </span>
 
                 <!-- STEP2 start -->
                 <span id="step2" v-if="tabs[2].isSelected">
-                <ui-form-item :columns=11 
-                    label="File" required-left left-label :label-width=144 :label-padding=16 >
-                    <input type="file" id="file" ref="file" v-on:change="selectFile"/>
-                </ui-form-item>
+                    <ui-form-item :columns=11 label="File" required-left left-label :label-width=144 :label-padding=16>
+                        <input type="file" id="file" ref="file" v-on:change="selectFile" />
+                    </ui-form-item>
 
-                <ui-form-item :columns=11 
-                    label="File Size" required-left left-label :label-width=144 :label-padding=16 >
-                    {{ fileSize }} bytes
-                </ui-form-item>
+                    <ui-form-item :columns=11 label="File Size" required-left left-label :label-width=144 :label-padding=16>
+                        {{ fileSize }} bytes
+                    </ui-form-item>
 
-                <ui-form-item :columns=11 
-                    label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                  <lego-dropdown :items="items" v-model="fileFormat" width="650px" />
-                </ui-form-item>
+                    <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
+                        <lego-dropdown :items="items" v-model="fileFormat" width="650px" />
+                    </ui-form-item>
 
-                <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16 >
+                    <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16>
 
-                    <lego-radio v-model="dataRangeValue" value="1" >ALL</lego-radio>
-                    <lego-radio v-model="dataRangeValue" value="2">Select Range</lego-radio>  
+                        <lego-radio v-model="dataRangeValue" value="1">ALL</lego-radio>
+                        <lego-radio v-model="dataRangeValue" value="2">Select Range</lego-radio>
 
-                </ui-form-item>
+                    </ui-form-item>
 
-                <ui-form-item :columns="8" label="From ~ To" left-label :label-width=144 :label-padding=16 v-if="dataRangeValue == 2">
+                    <ui-form-item :columns="8" label="From ~ To" left-label :label-width=144 :label-padding=16 v-if="dataRangeValue == 2">
 
-                    <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateFromValue" default-value="dateFromValue" placeholder="YYYYMMDD" style="width:140px"></date-picker>&nbsp;&nbsp;
-                    <date-picker type="time" value-type="format" format="HHmmss" v-model="timeFromValue" default-value="timeFromValue" placeholder="HHmmss" style="width:140px"></date-picker>                  
-                    &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
-                    <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateToValue" default-value="dateToValue" placeholder="YYYYMMDD" style="width:140px"></date-picker>&nbsp;&nbsp;
-                    <date-picker type="time" value-type="format" format="HHmmss" v-model="timeToValue" default-value="timeToValue" placeholder="HHmmss" style="width:140px"></date-picker>
-                 
-                </ui-form-item>
-                
-                <!-- STEP2 end -->
-                </span>    
+                        <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateFromValue" default-value="dateFromValue" placeholder="YYYYMMDD" style="width:140px"></date-picker>&nbsp;&nbsp;
+                        <date-picker type="time" value-type="format" format="HHmmss" v-model="timeFromValue" default-value="timeFromValue" placeholder="HHmmss" style="width:140px"></date-picker>
+                        &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
+                        <date-picker type="date" value-type="format" format="YYYYMMDD" v-model="dateToValue" default-value="dateToValue" placeholder="YYYYMMDD" style="width:140px"></date-picker>&nbsp;&nbsp;
+                        <date-picker type="time" value-type="format" format="HHmmss" v-model="timeToValue" default-value="timeToValue" placeholder="HHmmss" style="width:140px"></date-picker>
+
+                    </ui-form-item>
+
+                    <!-- STEP2 end -->
+                </span>
 
                 <!-- Current Info / STEP3 start -->
                 <span id="step3" v-if="tabs[0].isSelected | tabs[3].isSelected">
-                <ui-form-item :columns=11 
-                    label="Project Name" required-left left-label :label-width=144 :label-padding=16 >
-                    {{ projectName }}
-                </ui-form-item>
-                <ui-form-item :columns=11 
-                    label="Project Description" required-left left-label :label-width=144 :label-padding=16 >
-                    {{ projectDescription }}
-                </ui-form-item>
-                <ui-form-item :columns=11 
-                    label="File" required-left left-label :label-width=144 :label-padding=16 >
-                    {{ fileName }}
-                </ui-form-item>
-                <ui-form-item :columns=11 
-                    label="File Format" required-left left-label :label-width=144 :label-padding=16 >
-                    {{ fileFormat }}
-                </ui-form-item>
-                
-                <!--
+                    <ui-form-item :columns=11 label="Project Name" required-left left-label :label-width=144 :label-padding=16>
+                        {{ projectName }}
+                    </ui-form-item>
+                    <ui-form-item :columns=11 label="Project Description" required-left left-label :label-width=144 :label-padding=16>
+                        {{ projectDescription }}
+                    </ui-form-item>
+                    <ui-form-item :columns=11 label="File" required-left left-label :label-width=144 :label-padding=16>
+                        {{ fileName }}
+                    </ui-form-item>
+                    <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
+                        {{ fileFormat }}
+                    </ui-form-item>
+
+                    <!--
                 <ui-form-item :columns=11 
                     label="Data range" required-left left-label :label-width=144 :label-padding=16 >
                     {{ this.dateFromValue }} {{timeFromValue}} ~ {{ dateToValue }} {{timeToValue}}
                 </ui-form-item>
                 -->
 
-                <!-- STEP3 end -->
+                    <!-- STEP3 end -->
                 </span>
-            </div>            
+            </div>
 
             <div class="popup-buttons">
                 <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
@@ -120,13 +110,12 @@
                 <lego-button v-on:click="deleteProjects" main>DelProjects</lego-button>
             </div>
 
-        </ui-container-box>        
+        </ui-container-box>
     </div>
-  </ui-container-box>
+</ui-container-box>
 </template>
 
 <script>
-
 import axios from "axios";
 import Info from '@/components/layout/Info'
 import Init from '@/components/layout/Init'
@@ -135,7 +124,9 @@ import Search from '@/components/layout/Search'
 import Statistics from '@/components/layout/Statistics'
 
 import * as types from "@/vuex/mutation_types";
-import { mapGetters } from "vuex";
+import {
+    mapGetters
+} from "vuex";
 
 //Popup
 import CommonPopup from '@/components/layout/CommonPopup';
@@ -148,376 +139,430 @@ import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 
 export default {
-  name: 'Init',
+    name: 'Init',
 
     // 컴포넌트 등록
-  components:{
-    Info,
-    Notice, 
-    Search, 
-    Statistics,
-    CommonPopup, 
-    
-    // export Loading Spinner components
-    VueElementLoading,
+    components: {
+        Info,
+        Notice,
+        Search,
+        Statistics,
+        CommonPopup,
 
-    DatePicker,
-  },
-  data() {
-      return {
-        buttonName: "Next",
-        isPrevShow: false,
+        // export Loading Spinner components
+        VueElementLoading,
 
-        projectName: "",
-        projectDescription: "",
-        creator: "Leehs",      // TODO : 인증처리 후 사용자 ID입력
-        projectID: "",
+        DatePicker,
+    },
+    data() {
+        return {
+            buttonName: "Next",
+            isPrevShow: false,
 
-        fileName: "",
-        fileSize: 0,
-        fileFormat: "",
-        logfileID: "",
-        isNewFileAdded: false,
+            projectName: "",
+            projectDescription: "",
+            creator: "Leehs", // TODO : 인증처리 후 사용자 ID입력
+            projectID: "",
 
-        dateFromValue: "",
-        dateToValue: "",
-        timeFromValue: "",
-        timeToValue: "",
+            fileName: "",
+            fileSize: 0,
+            fileFormat: "",
+            logfileID: "",
+            isNewFileAdded: false,
 
-        radioValue: "1",
-        checkValue: false,
-        dataRangeValue: "1",
+            dateFromValue: "",
+            dateToValue: "",
+            timeFromValue: "",
+            timeToValue: "",
 
-        // for file format
-        items: [],
+            radioValue: "1",
+            checkValue: false,
+            dataRangeValue: "1",
 
-          // For file upload
-          file: '',
+            // for file format
+            items: [],
 
-          tabs: [
-              { label: "Current Info",  isSelected: true },
-              { label: "Step1",  isSelected: false },
-              { label: "Step2",  isSelected: false },
-              { label: "Step3",  isSelected: false }
-          ],
+            // For file upload
+            file: '',
 
-          columns: [
-            {label: 'Project Name', key: "projectName", sortable: true, sortValue: "asc", filtable: false, alignRight: false, width: 30 },
-            {label: 'Project Description', key: "projectDescription", sortable: true, sortValue: "desc", filtable: true, filterValue:[], alignRight: false, width: 50 },
-            {label: 'Creator', key: "creator", sortable: false, filtable: true, filterValue:[], alignRight: false, width: 15, filterList: ["Success","Error","Processing"] },
-            {label: 'Created Date', key: "createdDate", sortable: false, filtable: false, alignRight: false, width: 30 },            
-          ],
+            tabs: [{
+                    label: "Current Info",
+                    isSelected: true
+                },
+                {
+                    label: "Step1",
+                    isSelected: false
+                },
+                {
+                    label: "Step2",
+                    isSelected: false
+                },
+                {
+                    label: "Step3",
+                    isSelected: false
+                }
+            ],
 
-          // Grid Rows
-          itemList: [
-          ],
-        
-        // Loading Spinner
-        isActive: false,
-        
-        // Popup view
-        currentView : null,
-        needToAdditionalFile : false,
-      }
-  },
+            columns: [{
+                    label: 'Project Name',
+                    key: "projectName",
+                    sortable: true,
+                    sortValue: "asc",
+                    filtable: false,
+                    alignRight: false,
+                    width: 30
+                },
+                {
+                    label: 'Project Description',
+                    key: "projectDescription",
+                    sortable: true,
+                    sortValue: "desc",
+                    filtable: true,
+                    filterValue: [],
+                    alignRight: false,
+                    width: 50
+                },
+                {
+                    label: 'Creator',
+                    key: "creator",
+                    sortable: false,
+                    filtable: true,
+                    filterValue: [],
+                    alignRight: false,
+                    width: 15,
+                    filterList: ["Success", "Error", "Processing"]
+                },
+                {
+                    label: 'Created Date',
+                    key: "createdDate",
+                    sortable: false,
+                    filtable: false,
+                    alignRight: false,
+                    width: 30
+                },
+            ],
 
-  created() {
-    // TODO : 인증에 대해 처리한다.  
-    
-    // Initial Value Setting
-    this.projectName = this.$store.state.projectName
-    this.projectDescription = this.$store.state.projectDescription
-    this.fileName = this.$store.state.fileNames
-    this.fileFormat = this.$store.state.logFormat
-    
-    // File format 가져오기
-    var url = "http://127.0.0.1:8000/logformat"
+            // Grid Rows
+            itemList: [],
 
-    let axiosConfig = {
-        headers: {
-        //'Authorization': 'Token '+ this.token // For Django
+            // Loading Spinner
+            isActive: false,
+
+            // Popup view
+            currentView: null,
+            needToAdditionalFile: false,
         }
-    };
+    },
 
-    axios.get(url,axiosConfig)
-    .then(res => {
-               
-        for(let i = 0; i < res.data.results.length; i++){
-            let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
-            this.items.push({value: tmp + '/' + res.data.results[i].format_strings, text: tmp + ' => ' + res.data.results[i].format_strings });
-        }
-                        
-    })
-    .catch(err => {
-        console.error(err); 
-    })
-    
-  },
+    created() {
+        // TODO : 인증에 대해 처리한다.  
 
-  computed: { 
-      
-      ...mapGetters({
-        isRowChecked: "getToggleSearch"
-      }),
-  },
-      
-  methods: {
+        // Initial Value Setting
+        this.projectName = this.$store.state.projectName
+        this.projectDescription = this.$store.state.projectDescription
+        this.fileName = this.$store.state.fileNames
+        this.fileFormat = this.$store.state.logFormat
 
-      popupOK(){
-          this.currentView = null
-          console.log("click popupOK")
+        // File format 가져오기
+        var url = "http://127.0.0.1:8000/logformat"
 
-          this.needToAdditionalFile = true;
-      },    
+        let axiosConfig = {
+            headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+            }
+        };
 
-      popupClose(){
-          this.currentView = null
-          console.log("click popupClose")
+        axios.get(url, axiosConfig)
+            .then(res => {
 
-          this.needToAdditionalFile = false
-      },
+                for (let i = 0; i < res.data.results.length; i++) {
+                    let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
+                    this.items.push({
+                        value: tmp + '/' + res.data.results[i].format_strings,
+                        text: tmp + ' => ' + res.data.results[i].format_strings
+                    });
+                }
 
-      selectRow() {
+            })
+            .catch(err => {
+                console.error(err);
+            })
 
-      },
+    },
+
+    computed: {
+
+        ...mapGetters({
+            isRowChecked: "getToggleSearch"
+        }),
+    },
+
+    methods: {
+
+        popupOK() {
+            this.currentView = null
+            console.log("click popupOK")
+
+            this.needToAdditionalFile = true;
+        },
+
+        popupClose() {
+            this.currentView = null
+            console.log("click popupClose")
+
+            this.needToAdditionalFile = false
+        },
+
+        selectRow() {
+
+        },
 
         // TODO: common.js로 추출할 것
-      setNoticePopup(content){ 
+        setNoticePopup(content) {
             this.$store.dispatch("setPopupKind", 'Noti');
             this.$store.dispatch("setPopupHeader", 'Notification');
             this.$store.dispatch("setPopupBody", content);
             this.$store.dispatch("setPopupButton", 'Close');
         },
 
-      // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
-      deleteProjects(projectID){
-          
-          
-          let projectIDList = []
+        // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
+        deleteProjects(projectID) {
 
-          // Get Projects
+            // TODO: For Testing...
+            this.$confirm("Are you sure?").then(() => {
+                //do something...
+                console.log("OK clicked")
+            }).catch(() => {
+                console.log("Cancel clicked");
+            });
 
-          let axiosConfig = {
+            let projectIDList = []
+
+            // Get Projects
+
+            let axiosConfig = {
                 headers: {
-                //'Authorization': 'Token '+ this.token // For Django
+                    //'Authorization': 'Token '+ this.token // For Django
                 }
             };
 
-          axios.get("http://127.0.0.1:8000/logmaster/",axiosConfig)
-          .then(res => {
-              console.log(res)
+            axios.get("http://127.0.0.1:8000/logmaster/", axiosConfig)
+                .then(res => {
+                    console.log(res)
 
-              for(let i = 0; i < res.data.results.length; i++){
-                    
-                    projectIDList.push(res.data.results[i].project_id);
+                    for (let i = 0; i < res.data.results.length; i++) {
 
-                    axios.delete('http://127.0.0.1:8000/logmaster/'+res.data.results[i].project_id+'/', axiosConfig)  // '가 아니라 `이다.
-                    .then(res => {
-                        console.log(res.data)
-                    })
-                    .catch(err => {
-                        console.error(err); 
-                    })  
-                }              
-              
-          })
-          .catch(err => {
-              console.error(err); 
-          })
+                        projectIDList.push(res.data.results[i].project_id);
 
-         //console.log(projectIDList)
+                        axios.delete('http://127.0.0.1:8000/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
+                            .then(res => {
+                                console.log(res.data)
+                            })
+                            .catch(err => {
+                                console.error(err);
+                            })
+                    }
 
-      },
-      
-      setItemList(results) {
+                })
+                .catch(err => {
+                    console.error(err);
+                })
 
-        this.itemList = [];
+            //console.log(projectIDList)
 
-        for (let i = 0; i < results.length; i++) {
-            this.itemList.push({
-                projectName: results[i].project_name,
-                projectDescription: results[i].project_description,
-                creator: results[i].creator,
-                createdDate: results[i].created,
-                isSelected: false,
-                projectID: results[i].project_id
-            })
-        }
-      },
+        },
 
-      getProjects(){          
+        setItemList(results) {
 
-          var url = "http://127.0.0.1:8000/logmaster/?search="+this.creator
+            this.itemList = [];
 
-          let axiosConfig = {
+            for (let i = 0; i < results.length; i++) {
+                this.itemList.push({
+                    projectName: results[i].project_name,
+                    projectDescription: results[i].project_description,
+                    creator: results[i].creator,
+                    createdDate: results[i].created,
+                    isSelected: false,
+                    projectID: results[i].project_id
+                })
+            }
+        },
+
+        getProjects() {
+
+            var url = "http://127.0.0.1:8000/logmaster/?search=" + this.creator
+
+            let axiosConfig = {
                 headers: {
-                //'Authorization': 'Token '+ this.token // For Django
+                    //'Authorization': 'Token '+ this.token // For Django
                 }
             };
 
             this.isActive = true
 
-          return axios.get(url,axiosConfig)
-            .then(res => {
-                console.log(res)
-                this.setItemList(res.data.results);
+            return axios.get(url, axiosConfig)
+                .then(res => {
+                    console.log(res)
+                    this.setItemList(res.data.results);
 
-                this.isActive = false
+                    this.isActive = false
 
-                this.setNoticePopup('Get project data completed..!!')
-                this.currentView = 'CommonPopup';
-                
-            })
-            .catch(err => {
-                this.isActive = false
-                console.error(err); 
-            })
-      },
+                    this.setNoticePopup('Get project data completed..!!')
+                    this.currentView = 'CommonPopup';
 
-      prevButton(){
-        if(this.tabs[1].isSelected){
-            this.isPrevShow = false
-        }else if(this.tabs[3].isSelected){
-            this.buttonName = "Next"
-            this.isPrevShow = true
-        }
+                })
+                .catch(err => {
+                    this.isActive = false
+                    console.error(err);
+                })
+        },
 
-        this.tabChange(1)
+        prevButton() {
+            if (this.tabs[1].isSelected) {
+                this.isPrevShow = false
+            } else if (this.tabs[3].isSelected) {
+                this.buttonName = "Next"
+                this.isPrevShow = true
+            }
 
-      },
+            this.tabChange(1)
 
-      async nextButton(){
+        },
 
-        var isNext = true;
+        async nextButton() {
 
-        // Next 버튼 처리
-        if(this.tabs[0].isSelected){
-            this.isPrevShow = true
-        }
+            var isNext = true;
 
-        // Logic 처리 : TODO - Global 변수로 뺄 것
-        var url = "http://127.0.0.1:8000"       
+            // Next 버튼 처리
+            if (this.tabs[0].isSelected) {
+                this.isPrevShow = true
+            }
 
-        if(this.tabs[1].isSelected){          // Step1 : logmaster    
+            // Logic 처리 : TODO - Global 변수로 뺄 것
+            var url = "http://127.0.0.1:8000"
 
-            if(this.radioValue == 1){         // New인 경우 새로운 정보로 저장한다.
-                
-                 try{
-                     await this.createLogmaster(url);
-                     await this.createDynamicLogdetailSchema(url)
-                     
-                     isNext = true;
-                 } catch (err) {
-                     console.log(err)
-                     isNext = false;
-                 }
-            }else if(this.radioValue == 2){   // Exist인 경우 기존 정보를 가져온다.
+            if (this.tabs[1].isSelected) { // Step1 : logmaster    
 
-                 // 로그 파일을 추가할 것인가?
-                 if(this.checkValue) {
-                
-                     // Step2로 이동
-                     this.isNewFileAdded = true;
-                 }else{
-                     // Step3으로 이동 :한번 더 이동시킨다.
-                     this.tabChange(2);
-                     this.buttonName = "OK"
-                     this.isNewFileAdded = false;
+                if (this.radioValue == 1) { // New인 경우 새로운 정보로 저장한다.
 
-                     //선택한 project의 file 정보를 가져온다.
-                     try{
-                        await this.getLogfile(this.projectID);
+                    try {
+                        await this.createLogmaster(url);
+                        // TODO: Check
+                        alert('confirm')
+                        await this.createDynamicLogdetailSchema(url)
+
                         isNext = true;
                     } catch (err) {
                         console.log(err)
                         isNext = false;
                     }
-                 }
-            }
-            
-        } else if(this.tabs[2].isSelected){   // Step2 : this.projectID
+                } else if (this.radioValue == 2) { // Exist인 경우 기존 정보를 가져온다.
 
-            try{
-                await this.createLogfile(url)
-                this.buttonName = "OK"
-                this.isNewFileAdded = true;
-                isNext = true;
+                    // 로그 파일을 추가할 것인가?
+                    if (this.checkValue) {
 
-            } catch (err) {
-                console.log(err)
-                isNext = false;
-            }
+                        // Step2로 이동
+                        this.isNewFileAdded = true;
+                    } else {
+                        // Step3으로 이동 :한번 더 이동시킨다.
+                        this.tabChange(2);
+                        this.buttonName = "OK"
+                        this.isNewFileAdded = false;
 
-        } else if(this.tabs[3].isSelected){   // Step3 : this.logfileID
-
-            // TODO : Multi-File 및 기존 project에 File Add시 처리
-
-            try{
-                // CASE1 : File을 새로 추가한 경우            
-                if (this.isNewFileAdded){
-                    //await this.createLogdetail(url);
-                    await this.createDynamicLogdetail(url);
-                }
-                // TODO: 파일 추가했을때 잘 불러오는지 확인필요
-                // CASE2 : 기존 File을 이용하는 경우
-                await this.getLogDetail(this.projectID)
-                
-                isNext = true;
-            } catch (err) {
-                console.log(err)
-                isNext = false;
-            }
-        }
-
-        // Tab 변경 - Backward
-        if ( isNext ){
-            // 처리 성공한 경우
-            this.tabChange(2)
-
-            // TODO: 마지막 처리 후에는 다른 위치로 옮겨줘야 한다. 
-            //       또는 detail 만드는 작업을 하지 말아야 한다.(이거 추가)
-
-        } else {
-            this.setNoticePopup('Error Occured! Try again, please.')
-            this.currentView = 'CommonPopup';
-
-        }
-        
-      },
-
-      tabChange(dir){
-        
-        if( dir == 1 ){ // Forward
-            for (let i = 0; i < this.tabs.length; i++) {
-                if (this.tabs[i].isSelected == true){
-                    if ( i-1 >= 0){
-                        this.tabs[i].isSelected = false
-                        this.tabs[i-1].isSelected = true
-                        break;
+                        //선택한 project의 file 정보를 가져온다.
+                        try {
+                            await this.getLogfile(this.projectID);
+                            isNext = true;
+                        } catch (err) {
+                            console.log(err)
+                            isNext = false;
+                        }
                     }
                 }
-                    
-            }
-        } else {    // Backward
-            for (let i = 0; i < this.tabs.length; i++) {
-                if (this.tabs[i].isSelected == true){
-                    if ( i+1 < this.tabs.length){
-                        this.tabs[i].isSelected = false
-                        this.tabs[i+1].isSelected = true
-                        break;
-                    }
+
+            } else if (this.tabs[2].isSelected) { // Step2 : this.projectID
+
+                try {
+                    await this.createLogfile(url)
+                    this.buttonName = "OK"
+                    this.isNewFileAdded = true;
+                    isNext = true;
+
+                } catch (err) {
+                    console.log(err)
+                    isNext = false;
                 }
-                    
+
+            } else if (this.tabs[3].isSelected) { // Step3 : this.logfileID
+
+                // TODO : Multi-File 및 기존 project에 File Add시 처리
+
+                try {
+                    // CASE1 : File을 새로 추가한 경우            
+                    if (this.isNewFileAdded) {
+                        //await this.createLogdetail(url);
+                        await this.createDynamicLogdetail(url);
+                    }
+                    // TODO: 파일 추가했을때 잘 불러오는지 확인필요
+                    // CASE2 : 기존 File을 이용하는 경우
+                    alert('confirm')
+                    await this.getLogDetail(this.projectID)
+
+                    isNext = true;
+                } catch (err) {
+                    console.log(err)
+                    isNext = false;
+                }
             }
-        }
 
+            // Tab 변경 - Backward
+            if (isNext) {
+                // 처리 성공한 경우
+                this.tabChange(2)
 
-      },
+                // TODO: 마지막 처리 후에는 다른 위치로 옮겨줘야 한다. 
+                //       또는 detail 만드는 작업을 하지 말아야 한다.(이거 추가)
 
-      createLogmaster(url){
-          let postData = {
-                
-                project_name: this.projectName,        
+            } else {
+                this.setNoticePopup('Error Occured! Try again, please.')
+                this.currentView = 'CommonPopup';
+
+            }
+
+        },
+
+        tabChange(dir) {
+
+            if (dir == 1) { // Forward
+                for (let i = 0; i < this.tabs.length; i++) {
+                    if (this.tabs[i].isSelected == true) {
+                        if (i - 1 >= 0) {
+                            this.tabs[i].isSelected = false
+                            this.tabs[i - 1].isSelected = true
+                            break;
+                        }
+                    }
+
+                }
+            } else { // Backward
+                for (let i = 0; i < this.tabs.length; i++) {
+                    if (this.tabs[i].isSelected == true) {
+                        if (i + 1 < this.tabs.length) {
+                            this.tabs[i].isSelected = false
+                            this.tabs[i + 1].isSelected = true
+                            break;
+                        }
+                    }
+
+                }
+            }
+
+        },
+
+        createLogmaster(url) {
+            let postData = {
+
+                project_name: this.projectName,
                 project_description: this.projectDescription,
                 creator: this.creator
             };
@@ -526,90 +571,89 @@ export default {
 
             let axiosConfig = {
                 headers: {
-                //'Authorization': 'Token '+ this.token // For Django
+                    //'Authorization': 'Token '+ this.token // For Django
                 }
             };
 
-            this.isActive = true 
+            this.isActive = true
 
-            return axios.post(url+"/logmaster/", postData, axiosConfig )
-            .then(res => {
-                console.log(res)                
-                this.projectID = res.data.project_id
-                
-                // Set in vuex
-                this.$store.dispatch("setProjectID", this.projectID);
+            return axios.post(url + "/logmaster/", postData, axiosConfig)
+                .then(res => {
+                    console.log(res)
+                    this.projectID = res.data.project_id
 
-                this.isActive = false 
-                this.setNoticePopup('Create Logmaster Data completed..!!')
-                this.currentView = 'CommonPopup';
-            })
-            .catch(err => {
-                console.error(err); 
-                this.isActive = false 
-            })
-      },
+                    // Set in vuex
+                    this.$store.dispatch("setProjectID", this.projectID);
 
-      createDynamicLogdetailSchema(url){
-          let postData = {                
+                    this.isActive = false
+                    this.setNoticePopup('Create Logmaster Data completed..!!')
+                    this.currentView = 'CommonPopup';
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.isActive = false
+                })
+        },
+
+        createDynamicLogdetailSchema(url) {
+            let postData = {
                 project_id: this.projectID,
             };
 
             let axiosConfig = {
                 headers: {
-                //'Authorization': 'Token '+ this.token // For Django
+                    //'Authorization': 'Token '+ this.token // For Django
                 }
             };
 
-            this.isActive = true 
+            this.isActive = true
 
-            return axios.post(url+"/logmaster/create_dynamic_logdetail/", postData, axiosConfig )
-            .then(res => {
-                
-                console.log(res)                
-                
-                this.isActive = false 
-                this.setNoticePopup('Create Dynamic Logdetail completed..!!')
-                this.currentView = 'CommonPopup';
-            })
-            .catch(err => {
-                console.error(err); 
-                this.isActive = false 
-            })
-      },
+            return axios.post(url + "/logmaster/create_dynamic_logdetail/", postData, axiosConfig)
+                .then(res => {
 
-      selectFile(){
+                    console.log(res)
 
-        this.file = this.$refs.file.files[0];
-        console.log('size=' + this.file.size);
-        console.log('name=' + this.file.name);
+                    this.isActive = false
+                    this.setNoticePopup('Create Dynamic Logdetail completed..!!')
+                    this.currentView = 'CommonPopup';
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.isActive = false
+                })
+        },
 
-        this.fileName = this.file.name
-        this.fileSize = this.file.size
+        selectFile() {
 
-        this.$store.dispatch("setFileNames", this.fileName);
+            this.file = this.$refs.file.files[0];
+            console.log('size=' + this.file.size);
+            console.log('name=' + this.file.name);
 
-      },
+            this.fileName = this.file.name
+            this.fileSize = this.file.size
 
-      createLogfile(url){
+            this.$store.dispatch("setFileNames", this.fileName);
+
+        },
+
+        createLogfile(url) {
 
             // TODO : Multi-file upload 필요
 
             let formData = new FormData();
             formData.append('file_object', this.file);
             formData.append('file_name', this.fileName);
-            formData.append('file_size', this.fileSize);     
-
+            formData.append('file_size', this.fileSize);
 
             let splitedFormat = this.fileFormat.split("/")
 
             formData.append('format_kind', splitedFormat[0]);
             formData.append('format_name', splitedFormat[1]);
             formData.append('file_format', splitedFormat[2]);
-            
-            formData.append('project', this.projectID);  
-            
-            this.$store.dispatch("setLogFormat", this.fileFormat);            
+
+            formData.append('project', this.projectID);
+
+            this.$store.dispatch("setLogFormat", this.fileFormat);
 
             let axiosConfig = {
                 headers: {
@@ -620,78 +664,35 @@ export default {
 
             this.isActive = true
 
-            return axios.post(url+'/logfile/', formData, axiosConfig)
-            .then(res => {
-                console.log(res)
-                
-                this.logfileID = res.data.logfile_id
+            return axios.post(url + '/logfile/', formData, axiosConfig)
+                .then(res => {
+                    console.log(res)
 
-                // Set in vuex
-                this.$store.dispatch("setLogFileID", this.logfileID);
+                    this.logfileID = res.data.logfile_id
 
-                // Stop Loading Spinner
-                this.isActive = false 
+                    // Set in vuex
+                    this.$store.dispatch("setLogFileID", this.logfileID);
 
-                // this.$store.dispatch("setPopupKind", 'Noti');
-                // this.$store.dispatch("setPopupHeader", 'Notification');
-                // this.$store.dispatch("setPopupBody", 'Logfile Upload completed..!!');
-                // this.$store.dispatch("setPopupButton", 'Close');
+                    // Stop Loading Spinner
+                    this.isActive = false
 
-                this.setNoticePopup('Create Logfile(File Upload) completed..!!')
-                this.currentView = 'CommonPopup';
-            })
-            .catch(err => {
-                console.error(err);
-                // Stop Loading Spinner
-                this.isActive = false 
-            })
-            
-      },
+                    // this.$store.dispatch("setPopupKind", 'Noti');
+                    // this.$store.dispatch("setPopupHeader", 'Notification');
+                    // this.$store.dispatch("setPopupBody", 'Logfile Upload completed..!!');
+                    // this.$store.dispatch("setPopupButton", 'Close');
 
-      createLogdetail(url){
+                    this.setNoticePopup('Create Logfile(File Upload) completed..!!')
+                    this.currentView = 'CommonPopup';
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
 
-            let postData = {
-                logfile_id: this.logfileID,
-                project_id: this.projectID
-            };
+        },
 
-            let axiosConfig = {
-                headers: {
-                //'Authorization': 'Token '+ this.token // For Django
-                }
-            };
-
-          // Start Loading Spinner
-          this.isActive = true 
-          return axios.post(url+"/logdetail/", postData, axiosConfig )
-            .then(res => {
-                console.log(res)
-                
-                this.$store.dispatch("setFromDate", res.data.start_date);
-                this.$store.dispatch("setToDate", res.data.end_date);
-                this.$store.dispatch("setFromTime", res.data.start_time);
-                this.$store.dispatch("setToTime", res.data.end_time);
-                
-                // Stop Loading Spinner
-                this.isActive = false 
-
-                // this.$store.dispatch("setPopupKind", 'Noti');
-                // this.$store.dispatch("setPopupHeader", 'Notification');
-                // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
-                // this.$store.dispatch("setPopupButton", 'Close');
-
-                this.setNoticePopup('Create Logdetail Data completed..!!')
-                this.currentView = 'CommonPopup';
-                
-            })
-            .catch(err => {
-                console.error(err);
-                // Stop Loading Spinner
-                this.isActive = false 
-            })
-      },
-
-      createDynamicLogdetail(url){
+        createLogdetail(url) {
 
             let postData = {
                 logfile_id: this.logfileID,
@@ -700,139 +701,182 @@ export default {
 
             let axiosConfig = {
                 headers: {
-                //'Authorization': 'Token '+ this.token // For Django
+                    //'Authorization': 'Token '+ this.token // For Django
                 }
             };
 
-          // Start Loading Spinner
-          // TODO:여기
-          this.isActive = true 
-          return axios.post(url+"/logdetail_dynamic/", postData, axiosConfig )
-            .then(res => {
-                console.log(res)
-                
-                this.$store.dispatch("setFromDate", res.data.start_date);
-                this.$store.dispatch("setToDate", res.data.end_date);
-                this.$store.dispatch("setFromTime", res.data.start_time);
-                this.$store.dispatch("setToTime", res.data.end_time);
-                
-                // Stop Loading Spinner
-                this.isActive = false 
+            // Start Loading Spinner
+            this.isActive = true
+            return axios.post(url + "/logdetail/", postData, axiosConfig)
+                .then(res => {
+                    console.log(res)
 
-                // this.$store.dispatch("setPopupKind", 'Noti');
-                // this.$store.dispatch("setPopupHeader", 'Notification');
-                // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
-                // this.$store.dispatch("setPopupButton", 'Close');
+                    this.$store.dispatch("setFromDate", res.data.start_date);
+                    this.$store.dispatch("setToDate", res.data.end_date);
+                    this.$store.dispatch("setFromTime", res.data.start_time);
+                    this.$store.dispatch("setToTime", res.data.end_time);
 
-                this.setNoticePopup('Create Logdetail Data completed..!!')
-                this.currentView = 'CommonPopup';
-                
-            })
-            .catch(err => {
-                console.error(err);
-                // Stop Loading Spinner
-                this.isActive = false 
-            })
-      },
-      
-      getLogfile(projectID){
-          
-          // http://127.0.0.1:8000/logfile?project=ce447191-fd2c-48b2-8ad6-732e8f7a8543
-          var url = "http://127.0.0.1:8000/logfile?project="+projectID
+                    // Stop Loading Spinner
+                    this.isActive = false
 
-          let axiosConfig = {
+                    // this.$store.dispatch("setPopupKind", 'Noti');
+                    // this.$store.dispatch("setPopupHeader", 'Notification');
+                    // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
+                    // this.$store.dispatch("setPopupButton", 'Close');
+
+                    this.setNoticePopup('Create Logdetail Data completed..!!')
+                    this.currentView = 'CommonPopup';
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
+        },
+
+        createDynamicLogdetail(url) {
+
+            let postData = {
+                logfile_id: this.logfileID,
+                project_id: this.projectID
+            };
+
+            let axiosConfig = {
                 headers: {
-                //'Authorization': 'Token '+ this.token // For Django
+                    //'Authorization': 'Token '+ this.token // For Django
                 }
             };
 
-            this.isActive = true 
+            // Start Loading Spinner
+            // TODO:여기
+            this.isActive = true
+            return axios.post(url + "/logdetail_dynamic/", postData, axiosConfig)
+                .then(res => {
+                    console.log(res)
 
-          return axios.get(url,axiosConfig)
-          .then(res => {
-              console.log(res.data)
-              console.log(res.data.results[0])
-              console.log(res.data.results[0].file_format)
-              console.log(res.data.results[0].file_name)
-              
-              // TODO : 파일이 없는 경우도 있다. (프로젝트만 만들어놓은 경우)
-              //        오류처리 해야 한다.
-              this.fileName = res.data.results[0].file_name
-              this.fileFormat = res.data.results[0].file_format
-              this.logfileID = res.data.results[0].logfile_id
+                    this.$store.dispatch("setFromDate", res.data.start_date);
+                    this.$store.dispatch("setToDate", res.data.end_date);
+                    this.$store.dispatch("setFromTime", res.data.start_time);
+                    this.$store.dispatch("setToTime", res.data.end_time);
 
-              this.$store.dispatch("setFileNames", this.fileName);
-              this.$store.dispatch("setLogFormat", this.fileFormat);
-              this.$store.dispatch("setLogFileID", this.logfileID);
-              
-              // Stop Loading Spinner
-              this.isActive = false 
+                    // Stop Loading Spinner
+                    this.isActive = false
 
-              this.setNoticePopup('Get Logfile Data completed..!!')
-              this.currentView = 'CommonPopup';
-          })
-          .catch(err => {
-              console.error(err); 
-              // Stop Loading Spinner
-              this.isActive = false 
-          })
-      },
+                    // this.$store.dispatch("setPopupKind", 'Noti');
+                    // this.$store.dispatch("setPopupHeader", 'Notification');
+                    // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
+                    // this.$store.dispatch("setPopupButton", 'Close');
 
-      getLogDetail(projectID){
+                    this.setNoticePopup('Create Logdetail Data completed..!!')
+                    this.currentView = 'CommonPopup';
 
-          console.log("getLogDetail projectID : "+projectID)
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
+        },
 
-          var url = "http://127.0.0.1:8000/logdetail/start_end/"
+        getLogfile(projectID) {
 
-          let postData = {
+            // http://127.0.0.1:8000/logfile?project=ce447191-fd2c-48b2-8ad6-732e8f7a8543
+            var url = "http://127.0.0.1:8000/logfile?project=" + projectID
+
+            let axiosConfig = {
+                headers: {
+                    //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+            this.isActive = true
+
+            return axios.get(url, axiosConfig)
+                .then(res => {
+                    console.log(res.data)
+                    console.log(res.data.results[0])
+                    console.log(res.data.results[0].file_format)
+                    console.log(res.data.results[0].file_name)
+
+                    // TODO : 파일이 없는 경우도 있다. (프로젝트만 만들어놓은 경우)
+                    //        오류처리 해야 한다.
+                    this.fileName = res.data.results[0].file_name
+                    this.fileFormat = res.data.results[0].file_format
+                    this.logfileID = res.data.results[0].logfile_id
+
+                    this.$store.dispatch("setFileNames", this.fileName);
+                    this.$store.dispatch("setLogFormat", this.fileFormat);
+                    this.$store.dispatch("setLogFileID", this.logfileID);
+
+                    // Stop Loading Spinner
+                    this.isActive = false
+
+                    this.setNoticePopup('Get Logfile Data completed..!!')
+                    this.currentView = 'CommonPopup';
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
+        },
+
+        getLogDetail(projectID) {
+
+            console.log("getLogDetail projectID : " + projectID)
+
+            var url = "http://127.0.0.1:8000/logdetail_dynamic/start_end/"
+
+            let postData = {
                 project_id: projectID
             };
 
-          this.isActive = true 
-          
-          return axios.post(url, postData)
-            .then(res => {
-                console.log(res)
-                
-                this.$store.dispatch("setFromDate", res.data.start_date);
-                this.$store.dispatch("setFromTime", res.data.start_time);
-                this.$store.dispatch("setToDate", res.data.end_date);
-                this.$store.dispatch("setToTime", res.data.end_time);
+            this.isActive = true
 
-                var file_list = ""
-                res.data.file_names.forEach(file => file_list = file_list + file+", ")
+            return axios.post(url, postData)
+                .then(res => {
+                    console.log(res)
 
-                console.log("file_list - "+file_list)                
+                    this.$store.dispatch("setFromDate", res.data.start_date);
+                    this.$store.dispatch("setFromTime", res.data.start_time);
+                    this.$store.dispatch("setToDate", res.data.end_date);
+                    this.$store.dispatch("setToTime", res.data.end_time);
 
-                this.fileName = file_list
-                this.$store.dispatch("setFileNames", file_list);                                
-                // Stop Loading Spinner
-                this.isActive = false
-              
-              this.setNoticePopup('Get Logdetail Data completed..!!')
-              this.currentView = 'CommonPopup';
-        
-            })
-            .catch(err => {
-                console.error(err);
-                // Stop Loading Spinner
-                this.isActive = false 
-            })
+                    var file_list = ""
+                    res.data.file_names.forEach(file => file_list = file_list + file + ", ")
 
-      },
-  },
-  watch: {
-      async isRowChecked(){
-        console.log("Is isRowChecked?")
+                    console.log("file_list - " + file_list)
 
-        // 초기정보 설정 : 기존 project 가져오기          
-        this.projectName = this.$store.state.projectName
-        this.projectDescription = this.$store.state.projectDescription
-        this.projectID = this.$store.state.projectID
-        
-        await this.getLogfile(this.projectID)
-      }
-  }
+                    this.fileName = file_list
+                    this.$store.dispatch("setFileNames", file_list);
+                    // Stop Loading Spinner
+                    this.isActive = false
+
+                    this.setNoticePopup('Get Logdetail Data completed..!!')
+                    this.currentView = 'CommonPopup';
+
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
+
+        },
+    },
+    watch: {
+        async isRowChecked() {
+            console.log("Is isRowChecked?")
+
+            // 초기정보 설정 : 기존 project 가져오기          
+            this.projectName = this.$store.state.projectName
+            this.projectDescription = this.$store.state.projectDescription
+            this.projectID = this.$store.state.projectID
+
+            await this.getLogfile(this.projectID)
+        }
+    }
 
 }
 </script>
@@ -843,36 +887,44 @@ export default {
     border: 1px solid #D0D0D0;
     background-color: white;
 }
+
 .popup-header {
     position: relative;
     display: flex;
     flex-flow: column nowrap;
     margin-bottom: 32px;
 }
+
 .popup-header__title {
     font-size: 24px;
     font-weight: bold;
 }
+
 .popup-header__desc {
     color: #767676;
     margin-top: 16px;
 }
+
 .popup-header__close {
     position: absolute;
     top: 0;
     right: 0;
 }
+
 .popup-header__close:hover {
     cursor: pointer;
 }
+
 .popup-step {
     margin-top: 48px;
 }
+
 .popup-buttons {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
 }
+
 .popup-form .ui-form-item {
     margin-top: 32px;
 }

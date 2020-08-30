@@ -12,7 +12,7 @@ Vue.config.productionTip = false
 
 Vue.use(LegoComponent);
 Vue.use(Layouts);
-Vue.use(VueSimpleAlert);
+Vue.use(VueSimpleAlert, { reverseButtons: true });
 
 new Vue({
   router,
