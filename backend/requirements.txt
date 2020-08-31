@@ -9,6 +9,7 @@ Django==3.0.4
 django-allauth==0.42.0
 django-cors-headers==3.4.0
 django-crispy-forms==1.9.0
+django-dynamic-model==0.2.0
 django-filter==2.2.0
 django-postgres-copy==2.4.2
 django-rest-auth==0.9.5
