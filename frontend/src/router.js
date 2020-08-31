@@ -22,6 +22,7 @@ import Template from './views/Template.vue'
 import Init from "./views/Init.vue"
 import Analysis from "./views/Analysis.vue"
 import Comparison from "./views/Comparison.vue"
+import ComparisonStatistic from "./views/ComparisonStatistic.vue"
 import Detail from "./views/Detail.vue"
 import Management from "./views/Management.vue"
 import Logformat from "./views/Logformat.vue"
@@ -65,9 +66,14 @@ export default new Router({
       component: Detail,
     },
     {
-      path: '/comparison',
-      name: 'Comparison',
+      path: '/comparison_chart',
+      name: 'comparison_chart',
       component: Comparison,
+    },
+    {
+      path: '/comparison_statistic',
+      name: 'comparison_statistic',
+      component: ComparisonStatistic,
     },
     {
       path: '/management',
