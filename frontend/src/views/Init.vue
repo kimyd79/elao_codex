@@ -108,6 +108,7 @@
                 <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
                 <lego-button v-on:click="deleteProjects" main>DelProjects</lego-button>
+                <lego-button v-on:click="newProject">newProject</lego-button>
             </div>
 
         </ui-container-box>
@@ -158,6 +159,7 @@ export default {
         return {
             buttonName: "Next",
             isPrevShow: false,
+            isNewProject: false,
 
             projectName: "",
             projectDescription: "",
@@ -325,16 +327,38 @@ export default {
             this.$store.dispatch("setPopupButton", 'Close');
         },
 
-        // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
-        deleteProjects(projectID) {
+        // New Project
+        newProject() {
 
-            // TODO: For Testing...
-            this.$confirm("Are you sure?").then(() => {
+            this.$confirm("Do you want to start new project?", "Are you sure?", "question").then(() => {
                 //do something...
                 console.log("OK clicked")
+
+                this.isNewProject = true
+                localStorage.removeItem("vuex")
+                this.$store.reset()
+                this.projectName = ""
+                this.projectDescription = ""
+                this.fileName = ""
+                this.fileFormat = ""
+
+                for (let i = 0; i < this.tabs.length; i++) {
+                    if (this.tabs[i].isSelected == true) {
+                        this.tabs[i].isSelected = false
+                        this.tabs[0].isSelected = true
+                        break;
+                    }
+                }
+                //this.isNewProject = false
+
             }).catch(() => {
                 console.log("Cancel clicked");
             });
+
+        },
+
+        // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
+        deleteProjects(projectID) {
 
             let projectIDList = []
 
@@ -406,14 +430,13 @@ export default {
                     this.setItemList(res.data.results);
 
                     this.isActive = false
-
-                    this.setNoticePopup('Get project data completed..!!')
-                    this.currentView = 'CommonPopup';
+                    this.$alert("Get project data completed..!!", "Notification", "success");
 
                 })
                 .catch(err => {
                     this.isActive = false
                     console.error(err);
+                    this.$alert("Get project data failed..!!", "Notification", "error");
                 })
         },
 
@@ -447,9 +470,9 @@ export default {
 
                     try {
                         await this.createLogmaster(url);
-                        // TODO: Check
-                        alert('confirm')
-                        await this.createDynamicLogdetailSchema(url)
+
+                        // TODO: Check                        
+                        //await this.createDynamicLogdetailSchema(url)
 
                         isNext = true;
                     } catch (err) {
@@ -500,12 +523,13 @@ export default {
                 try {
                     // CASE1 : File을 새로 추가한 경우            
                     if (this.isNewFileAdded) {
-                        //await this.createLogdetail(url);
-                        await this.createDynamicLogdetail(url);
+                        await this.createLogdetail(url);
+
+                        // TODO: Dynamic
+                        //await this.createDynamicLogdetail(url);
                     }
                     // TODO: 파일 추가했을때 잘 불러오는지 확인필요
-                    // CASE2 : 기존 File을 이용하는 경우
-                    alert('confirm')
+                    // CASE2 : 기존 File을 이용하는 경우                    
                     await this.getLogDetail(this.projectID)
 
                     isNext = true;
@@ -522,10 +546,6 @@ export default {
 
                 // TODO: 마지막 처리 후에는 다른 위치로 옮겨줘야 한다. 
                 //       또는 detail 만드는 작업을 하지 말아야 한다.(이거 추가)
-
-            } else {
-                this.setNoticePopup('Error Occured! Try again, please.')
-                this.currentView = 'CommonPopup';
 
             }
 
@@ -586,12 +606,16 @@ export default {
                     this.$store.dispatch("setProjectID", this.projectID);
 
                     this.isActive = false
-                    this.setNoticePopup('Create Logmaster Data completed..!!')
-                    this.currentView = 'CommonPopup';
+
+                    this.$alert("Create Logmaster Data completed.", "Notification", "success");
                 })
                 .catch(err => {
                     console.error(err);
                     this.isActive = false
+
+                    this.$alert("Create Logmaster Data failed.", "Notification", "error");
+
+                    throw err
                 })
         },
 
@@ -638,7 +662,7 @@ export default {
 
         createLogfile(url) {
 
-            // TODO : Multi-file upload 필요
+            // TODO: Multi-file upload 필요
 
             let formData = new FormData();
             formData.append('file_object', this.file);
@@ -676,18 +700,16 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    // this.$store.dispatch("setPopupKind", 'Noti');
-                    // this.$store.dispatch("setPopupHeader", 'Notification');
-                    // this.$store.dispatch("setPopupBody", 'Logfile Upload completed..!!');
-                    // this.$store.dispatch("setPopupButton", 'Close');
-
-                    this.setNoticePopup('Create Logfile(File Upload) completed..!!')
-                    this.currentView = 'CommonPopup';
+                    this.$alert("Create Logfile(File Upload) completed..!!", "Notification", "success");
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
+
+                    this.$alert("Create Logfile(File Upload) failed..!!", "Notification", "error");
+
+                    throw err
                 })
 
         },
@@ -719,19 +741,17 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    // this.$store.dispatch("setPopupKind", 'Noti');
-                    // this.$store.dispatch("setPopupHeader", 'Notification');
-                    // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
-                    // this.$store.dispatch("setPopupButton", 'Close');
-
-                    this.setNoticePopup('Create Logdetail Data completed..!!')
-                    this.currentView = 'CommonPopup';
+                    this.$alert("Create Logdetail Data completed..!!", "Notification", "success");
 
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
+
+                    this.$alert("Create Logdetail Data failed..!!", "Notification", "error");
+
+                    throw err
                 })
         },
 
@@ -812,13 +832,16 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.setNoticePopup('Get Logfile Data completed..!!')
-                    this.currentView = 'CommonPopup';
+                    this.$alert("Get Logfile Data completed..!!", "Notification", "success");
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
+
+                    this.$alert("Get Logfile Data completed..!!", "Notification", "error");
+
+                    throw err
                 })
         },
 
@@ -826,7 +849,9 @@ export default {
 
             console.log("getLogDetail projectID : " + projectID)
 
-            var url = "http://127.0.0.1:8000/logdetail_dynamic/start_end/"
+            // TODO: Dynamic
+            //var url = "http://127.0.0.1:8000/logdetail_dynamic/start_end/"
+            var url = "http://127.0.0.1:8000/logdetail/start_end/"
 
             let postData = {
                 project_id: projectID
@@ -853,14 +878,17 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.setNoticePopup('Get Logdetail Data completed..!!')
-                    this.currentView = 'CommonPopup';
+                    this.$alert("Get Logdetail Data completed..!!", "Notification", "success");
 
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
+
+                    this.$alert("Get Logdetail Data failed..!!", "Notification", "error");
+
+                    throw err
                 })
 
         },
@@ -868,13 +896,19 @@ export default {
     watch: {
         async isRowChecked() {
             console.log("Is isRowChecked?")
+            console.log("this.isNewProject : " + this.isNewProject)
 
-            // 초기정보 설정 : 기존 project 가져오기          
-            this.projectName = this.$store.state.projectName
-            this.projectDescription = this.$store.state.projectDescription
-            this.projectID = this.$store.state.projectID
+            if (this.isNewProject == false) {
 
-            await this.getLogfile(this.projectID)
+                // 초기정보 설정 : 기존 project 가져오기          
+                this.projectName = this.$store.state.projectName
+                this.projectDescription = this.$store.state.projectDescription
+                this.projectID = this.$store.state.projectID
+
+                await this.getLogfile(this.projectID)
+            } else {
+                this.isNewProject = false
+            }
         }
     }
 

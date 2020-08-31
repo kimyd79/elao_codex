@@ -22,6 +22,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from postgres_copy import CopyManager
+import copy
 
 from dynamic_models.models import ModelSchema, FieldSchema
 from django.apps import apps
@@ -825,7 +826,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         response = {}
       
         try:
-            logfile_id = request.data['logfile']
+            logfile_id = request.data['logfile_id']
             
             # 이미 생성되어 있는지 확인
             if LogDetail.objects.filter(logfile_id=logfile_id).count() > 0:
@@ -1035,7 +1036,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]   
 
-# Dynamic Model
+# TODO: Dynamic Model
 class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     
     # TODO: Paging 처리

@@ -5,6 +5,9 @@ import getters from './getters'
 import actions from './actions'
 import * as types from './mutation_types'
 
+import createPersistedState from "vuex-persistedstate";
+import { createStore } from 'vuex-extensions'
+
 Vue.use(Vuex)
 
 // state
@@ -94,9 +97,14 @@ const mutations = {
 }
 
 // 저장소 초기화
-export default new Vuex.Store({
+export default createStore(Vuex.Store, {
     state: state,
     mutations: mutations,
     getters: getters,
-    actions: actions
+    actions: actions,
+
+    plugins: [createPersistedState()],
 })
+
+
+
