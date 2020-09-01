@@ -1,0 +1,41 @@
+<template>
+  <div id="projectsearch">
+    <ui-form-box>
+      <ui-form-row>
+        <ui-form-item :columns=8 
+          label="project name" required left-label :label-width=144 :label-padding=16 >
+          <lego-text-field v-model="project_name" placeholder="enter project name" />
+        </ui-form-item>
+        <ui-form-item :columns=12 align-right margin-right>
+            <lego-button main v-on:click="getData">Search</lego-button>
+        </ui-form-item>
+      </ui-form-row>
+    </ui-form-box>
+  </div>
+</template>
+
+<script>
+import EventBus from '../../EventBus';
+
+export default {
+  name: "ProjectSearch",
+
+  data: function() {
+      return {
+        project_name : ''
+      }
+    },
+    methods: {
+      getData: function() {
+        if( this.project_name == 'ALL') {
+          this.project_name = ''
+        }
+        EventBus.$emit("searchProject", this.project_name);
+        console.log(this.project_name);
+      }
+    }
+};
+</script>
+
+<style scoped>
+</style>
