@@ -2,16 +2,11 @@
   <div id="logformatsearch">
     <ui-form-box>
       <ui-form-row>
-        <ui-form-item :columns=6 label="제품명" align-left>
+        <ui-form-item :columns=6 label="format kind" align-left>
             <lego-dropdown :items="[{value: 'ALL', text: 'ALL'}, {value: 'apache', text: 'apache'}, {value: 'nginx', text: 'nginx'}, {value: 'IIS', text: 'IIS'}]" v-model='format_kind'/>
         </ui-form-item>
-        <!--
-        <ui-form-item :columns=6 label="포맷명">
-            <lego-dropdown :items="[{value: 'common', text: 'common'}, {value: 'commbined', text: 'combined'}, {value: 'custom', text: 'custom'}]" value="common"/>
-        </ui-form-item>
-        -->
         <ui-form-item :columns=14 align-right margin-right>
-            <lego-button main v-on:click="getData">조회</lego-button>
+            <lego-button main v-on:click="getData">Search</lego-button>
         </ui-form-item>
       </ui-form-row>
     </ui-form-box>
