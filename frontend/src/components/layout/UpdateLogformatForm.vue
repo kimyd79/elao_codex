@@ -3,7 +3,7 @@
         <ui-container-box :columns=9 vertical class="popup-container">
             <div class="popup-header">
                 <div class="popup-header__title"> 
-                    Logformat 수정
+                    Update Logformat
                 </div>
                 <div class="popup-header__close">
                     <lego-icon small v-on:click="clickCancle">close</lego-icon>
@@ -12,26 +12,26 @@
 
             <div class="popup-form">
                 <ui-form-item :columns=8
-                    label="로그포멧ID" required left-label :label-width=144 :label-padding=16 >
+                    label="format id" required left-label :label-width=144 :label-padding=16 >
                     <lego-text-field disabled v-model="format.format_id" />
                 </ui-form-item>
 
                 <ui-form-item :columns=8
-                    label="제품명" required left-label :label-width=144 :label-padding=16 >
+                    label="format kind" required left-label :label-width=144 :label-padding=16 >
                     <lego-text-field v-model="format.format_kind" />
                 </ui-form-item>
 
                 <ui-form-item :columns=8
-                    label="포맷명" required left-label :label-width=144 :label-padding=16 >
+                    label="format name" required left-label :label-width=144 :label-padding=16 >
                     <lego-text-field v-model="format.format_name"  />
                 </ui-form-item>
 
                 <ui-form-item :columns=8
-                    label="로그포맷" required left-label :label-width=144 :label-padding=16 >
+                    label="format strings" required left-label :label-width=144 :label-padding=16 >
                     <lego-text-field v-model="format.format_strings" />
                 </ui-form-item>
                 <ui-form-item :columns=8
-                    label="생성자" required left-label :label-width=144 :label-padding=16 >
+                    label="creator" required left-label :label-width=144 :label-padding=16 >
                     <lego-text-field disabled v-model="format.creator" />
                 </ui-form-item>
 
@@ -39,8 +39,8 @@
             </div>
 
             <div class="popup-buttons">
-                <lego-button v-on:click="clickCancle">취소</lego-button>
-                <lego-button main v-on:click="clickSave">저장</lego-button>
+                <lego-button v-on:click="clickCancle">Cancle</lego-button>
+                <lego-button main v-on:click="clickSave">Save</lego-button>
             </div>
 
         </ui-container-box>
