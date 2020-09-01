@@ -1,26 +1,26 @@
 <template>
     <div id="logformatresult">
 
-      <div class="page-summary-title">Logformat 조회 결과</div>
+      <div class="page-summary-title">Logformat Search Result</div>
 
       <!-- component :is="currentView"></component -->
       <component :is="currentView" v-on:popupClose="currentView=null" :format="format" v-on:popupOK="popupOK"></component>   
 
       <ui-form-item :columns=20 align-right margin-right>
-          <lego-button main v-on:click="clickUpdate">수정</lego-button>
-          <lego-button main v-on:click="clickAdd">추가</lego-button>
-          <lego-button main v-on:click="clickDelete">삭제</lego-button>
+          <lego-button main v-on:click="clickUpdate">Update</lego-button>
+          <lego-button main v-on:click="clickAdd">Add</lego-button>
+          <lego-button main v-on:click="clickDelete">Delete</lego-button>
       </ui-form-item>    
       <div class="tb_box">
       <table class="page-summary-table">
           <thead>
               <tr>
-                  <th>ID</th>
-                  <th>제품명</th>
-                  <th>포맷명</th>
-                  <th>로그포맷</th>
-                  <th>생성자</th>
-                  <th>생성일시</th>
+                  <th>format id</th>
+                  <th>format kind</th>
+                  <th>format name</th>
+                  <th>format strings</th>
+                  <th>creator</th>
+                  <th>created</th>
               </tr>
           </thead>
           <tbody id="list">
