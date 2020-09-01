@@ -29,6 +29,7 @@ import Logformat from "./views/Logformat.vue"
 import Register from "./components/layout/Register.vue"
 import LogIn from "./components/layout/LogIn.vue"
 import LogOut from "./components/layout/LogOut.vue"
+import Project from "./views/Project.vue"
 
 Vue.use(Router)
 
@@ -99,6 +100,11 @@ export default new Router({
           path: '/logout',
           name: 'logout',
           component: LogOut
+        },
+        {
+          path: '/project',
+          name: 'project',
+          component: Project
         },
       ]
     },
