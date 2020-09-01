@@ -37,7 +37,7 @@ export default {
                   label: 'Setting' ,
                   menus: [
                     { label:'LogFormat', linkto:'/logformat', key:'logformat', isSelected: false },
-                    { label:'Language', linkto:'/template/LNBStack02', key:'LNBStack02', isSelected: false },                    
+                    { label:'Project', linkto:'/project', key:'project', isSelected: false },                    
                   ]
                 },
                 
