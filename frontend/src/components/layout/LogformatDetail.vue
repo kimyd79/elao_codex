@@ -1,13 +1,13 @@
 <template>
     <div id="LogformatDetail">
-      <div class="page-summary-title">Logformat 항목 설명</div>
+      <div class="page-summary-title">Logformat Detail</div>
       <div class="tb_box">
       <table class="page-summary-table">
           <thead>
               <tr>
-                  <th>제품명</th>
-                  <th>항목</th>
-                  <th>설명</th>
+                  <th>format kind</th>
+                  <th>format string</th>
+                  <th>format definition</th>
               </tr>
           </thead>
           <tbody>
