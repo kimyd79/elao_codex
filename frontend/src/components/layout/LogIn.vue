@@ -9,7 +9,7 @@
                     LogIn
                 </div>
                 <div class="popup-header__close">
-                    <lego-icon small>close</lego-icon>
+                    <lego-icon small v-on:click="clickCancle">close</lego-icon>
                 </div>
             </div>
 
