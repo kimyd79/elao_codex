@@ -3,7 +3,7 @@
         <ui-container-box :columns=9 vertical class="popup-container">
             <div class="popup-header">
                 <div class="popup-header__title">
-                    Logformat 추가
+                    Add Logformat
                 </div>
                 <div class="popup-header__close">
                     <lego-icon small v-on:click="clickCancle">close</lego-icon>
@@ -13,29 +13,29 @@
             <div class="popup-form">
 
                 <ui-form-item :columns=8
-                    label="제품명" required left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field v-model="format.format_kind" placeholder="제품명을 입력해주세요. apache, nginx, IIS..." />
+                    label="format kind" required left-label :label-width=144 :label-padding=16 >
+                    <lego-text-field v-model="format.format_kind" placeholder="enter format kind. ex)apache, nginx, IIS..." />
                 </ui-form-item>
 
                 <ui-form-item :columns=8
-                    label="포맷명" required left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field v-model="format.format_name" placeholder="포맷명을 입력해주세요. 커스텀로그1..." />
+                    label="format name" required left-label :label-width=144 :label-padding=16 >
+                    <lego-text-field v-model="format.format_name" placeholder="enter format name. ex)common, combined..." />
                 </ui-form-item>
 
                 <ui-form-item :columns=8
-                    label="로그포맷" required left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field v-model="format.format_strings" placeholder="로그포맷을 입력해주세요." />
+                    label="format strings" required left-label :label-width=144 :label-padding=16 >
+                    <lego-text-field v-model="format.format_strings" placeholder="enter log format. ex)%h %l %u %t \%r\ %>s %b" />
                 </ui-form-item>
                 <ui-form-item :columns=8
-                    label="생성자" required left-label :label-width=144 :label-padding=16 >
-                    <lego-text-field disabled v-model='samplecreator' />
+                    label="creator" required left-label :label-width=144 :label-padding=16 >
+                    <lego-text-field disabled v-model='creator' />
                 </ui-form-item>
 
             </div>
 
             <div class="popup-buttons">
-                <lego-button v-on:click="clickCancle">취소</lego-button>
-                <lego-button main v-on:click="clickSave">저장</lego-button>
+                <lego-button v-on:click="clickCancle">Cancel</lego-button>
+                <lego-button main v-on:click="clickSave">Save</lego-button>
             </div>
 
         </ui-container-box>
@@ -49,7 +49,7 @@ export default {
     name: 'AddLogformatFrom',
     data: function() {
         return {
-            samplecreator: 'tester',
+            creator: 'tester',
             format : {
                 type : Object,
                 default : function() {
