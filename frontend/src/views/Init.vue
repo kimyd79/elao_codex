@@ -139,6 +139,10 @@ import VueElementLoading from 'vue-element-loading'
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 
+import {
+    serverUrl
+} from "@/common";
+
 export default {
     name: 'Init',
 
@@ -266,7 +270,7 @@ export default {
         this.fileFormat = this.$store.state.logFormat
 
         // File format 가져오기
-        var url = "http://127.0.0.1:8000/logformat"
+        var url = serverUrl + "/logformat"
 
         let axiosConfig = {
             headers: {
@@ -370,7 +374,7 @@ export default {
                 }
             };
 
-            axios.get("http://127.0.0.1:8000/logmaster/", axiosConfig)
+            axios.get(serverUrl + "/logmaster/", axiosConfig)
                 .then(res => {
                     console.log(res)
 
@@ -378,7 +382,7 @@ export default {
 
                         projectIDList.push(res.data.results[i].project_id);
 
-                        axios.delete('http://127.0.0.1:8000/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
+                        axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
                             .then(res => {
                                 console.log(res.data)
                             })
@@ -391,9 +395,6 @@ export default {
                 .catch(err => {
                     console.error(err);
                 })
-
-            //console.log(projectIDList)
-
         },
 
         setItemList(results) {
@@ -414,7 +415,7 @@ export default {
 
         getProjects() {
 
-            var url = "http://127.0.0.1:8000/logmaster/?search=" + this.creator
+            var url = serverUrl + "/logmaster/?search=" + this.creator
 
             let axiosConfig = {
                 headers: {
@@ -461,18 +462,15 @@ export default {
                 this.isPrevShow = true
             }
 
-            // Logic 처리 : TODO - Global 변수로 뺄 것
-            var url = "http://127.0.0.1:8000"
-
             if (this.tabs[1].isSelected) { // Step1 : logmaster    
 
                 if (this.radioValue == 1) { // New인 경우 새로운 정보로 저장한다.
 
                     try {
-                        await this.createLogmaster(url);
+                        await this.createLogmaster(serverUrl);
 
                         // TODO: Check                        
-                        //await this.createDynamicLogdetailSchema(url)
+                        //await this.createDynamicLogdetailSchema(serverUrl)
 
                         isNext = true;
                     } catch (err) {
@@ -506,7 +504,7 @@ export default {
             } else if (this.tabs[2].isSelected) { // Step2 : this.projectID
 
                 try {
-                    await this.createLogfile(url)
+                    await this.createLogfile(serverUrl)
                     this.buttonName = "OK"
                     this.isNewFileAdded = true;
                     isNext = true;
@@ -523,10 +521,10 @@ export default {
                 try {
                     // CASE1 : File을 새로 추가한 경우            
                     if (this.isNewFileAdded) {
-                        await this.createLogdetail(url);
+                        await this.createLogdetail(serverUrl);
 
                         // TODO: Dynamic
-                        //await this.createDynamicLogdetail(url);
+                        //await this.createDynamicLogdetail(serverUrl);
                     }
                     // TODO: 파일 추가했을때 잘 불러오는지 확인필요
                     // CASE2 : 기존 File을 이용하는 경우                    
@@ -801,8 +799,7 @@ export default {
 
         getLogfile(projectID) {
 
-            // http://127.0.0.1:8000/logfile?project=ce447191-fd2c-48b2-8ad6-732e8f7a8543
-            var url = "http://127.0.0.1:8000/logfile?project=" + projectID
+            var url = serverUrl + "/logfile?project=" + projectID
 
             let axiosConfig = {
                 headers: {
@@ -850,8 +847,8 @@ export default {
             console.log("getLogDetail projectID : " + projectID)
 
             // TODO: Dynamic
-            //var url = "http://127.0.0.1:8000/logdetail_dynamic/start_end/"
-            var url = "http://127.0.0.1:8000/logdetail/start_end/"
+            //var url = serverUrl+"/logdetail_dynamic/start_end/"
+            var url = serverUrl + "/logdetail/start_end/"
 
             let postData = {
                 project_id: projectID

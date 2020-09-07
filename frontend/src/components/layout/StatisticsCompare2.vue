@@ -35,6 +35,10 @@ import {
 } from "vuex";
 import VueElementLoading from 'vue-element-loading'
 
+import {
+    serverUrl
+} from "@/common";
+
 export default {
     name: 'Statistics',
     props: ['statisticsRow', 'statisticsKind'],
@@ -171,7 +175,7 @@ export default {
             let project_id = this.$store.state.projectID
             console.log(project_id)
 
-            var url = "http://127.0.0.1:8000/logdetail/statistics/"
+            var url = serverUrl + "/logdetail/statistics/"
 
             let postData = {
 

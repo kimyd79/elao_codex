@@ -25,6 +25,10 @@ import {
 } from "vuex";
 import axios from "axios";
 
+import {
+    serverUrl
+} from "@/common";
+
 export default {
     name: "Info",
     data: function () {
@@ -37,7 +41,7 @@ export default {
         let project_id = this.projectID
         console.log(project_id)
 
-        var url = "http://127.0.0.1:8000/logdetail/statistics/"
+        var url = serverUrl + "/logdetail/statistics/"
 
         let postData = {
 

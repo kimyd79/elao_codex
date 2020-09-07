@@ -76,14 +76,6 @@ import SearchCompare2 from "@/components/layout/SearchCompare2";
 import StatisticsCompare1 from "@/components/layout/StatisticsCompare1";
 import StatisticsCompare2 from "@/components/layout/StatisticsCompare2";
 
-import {
-    serverUrl
-} from "@/common";
-
-import {
-
-} from "@/common"
-
 import * as types from "@/vuex/mutation_types";
 import {
     mapGetters
@@ -118,7 +110,7 @@ export default {
     },
 
     created() {
-        console.log("serverUrl : ", serverUrl);
+
         this.logfile_id = this.$store.state.logFileID
         this.project_id = this.$store.state.projectID
     },
