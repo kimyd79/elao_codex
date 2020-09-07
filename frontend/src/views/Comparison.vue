@@ -120,7 +120,9 @@
         </div>
     </ui-container-box>
 
-    <ui-container-box :columns="20" horizontal class="page-tab-area">TODO : Footer 영역</ui-container-box>
+    <ui-container-box :columns="20" horizontal class="page-tab-area">
+        <img src="@/assets/ico_footer.png" alt="Samsung SDS" />
+    </ui-container-box>
 </ui-container-box>
 </template>
 
