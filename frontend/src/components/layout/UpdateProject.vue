@@ -33,7 +33,7 @@
         </div>
 
         <div class="popup-buttons">
-            <lego-button v-on:click="clickCancle">Cancle</lego-button>
+            <lego-button v-on:click="clickCancle">Cancel</lego-button>
             <lego-button main v-on:click="clickSave">Save</lego-button>
         </div>
 

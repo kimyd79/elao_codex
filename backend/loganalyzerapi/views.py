@@ -23,6 +23,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from postgres_copy import CopyManager
 import copy
+import numpy as np
 
 from dynamic_models.models import ModelSchema, FieldSchema
 from django.apps import apps
@@ -877,12 +878,17 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # 임시 csv 파일생성 for copy to postgresql
         log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
                            'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
-                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime']
+                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime', 'fbyte', 'fextension']
         
         # pandas 활용 - 로그파일 읽기
         # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
-        df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False)
-                
+        df_logs = None
+        try:
+            df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+        except Exception as ex: 
+            print('Error Occured while creating logdetail read_csv#1...', ex)
+            raise ex
+        
         # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
         
         # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
@@ -890,7 +896,13 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         format_index = self.get_logformat_index(log_format, format_kind)
         
         # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?)
-        df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)                
+        df_logs_all = None
+        try:
+            df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
+        except Exception as ex: 
+            print('Error Occured while creating logdetail read_csv#2...', ex)
+            raise ex
+        
         df_logs['log_line'] = df_logs_all
         
         # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
@@ -913,6 +925,12 @@ class LogDetailViewSet(viewsets.ModelViewSet):
             df_logs.rename(columns = {format_index['s'] : 'fstatus'}, inplace = True)
         else:
             df_logs['fstatus'] = 'NA'
+        
+        # bytes    
+        if log_format.find('b') != -1 or log_format.find('B') != -1:
+            df_logs.rename(columns = {format_index['b'] : 'fbyte'}, inplace = True)
+        else:
+            df_logs['fbyte'] = 0
 
         if log_format.find('Referer') != -1:
             df_logs.rename(columns = {format_index['Referer'] : 'freferer'}, inplace = True)
@@ -953,17 +971,26 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         series = df_datetime.str.split(' ')
         df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
 
+        # TODO: Welstorymall Log Error - None인 경우 00으로??
         month_map = {
             'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
-            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
+            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12'
         }
-
+        # TODO: Welstorymall Log Error
         df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])
         
         # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
         df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
         df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
         df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+        
+        # fbyte 처리 : - 를 0으로 처리
+        df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
+        
+        # fextension 처리 : frequest로부터 처리한다.
+        # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
+        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)', re.DOTALL )
+        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
         
         # Merge
         df_logs = df_logs.rename_axis('logdetail_id').reset_index()
@@ -983,7 +1010,12 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         #result.append({'firstRow' : firstRow, 'lastRow' : lastRow})
         
         #return result
-    
+        
+    # def getStaticFileExtension(request):
+        
+    #     m = p.findall(request)
+    #     return m[0][1:] if len(m(request)) > 0 else '-'
+
     def get_logformat_index(self, log_format, format_kind):
         format_index = {}
         index = 0
@@ -1003,6 +1035,8 @@ class LogDetailViewSet(viewsets.ModelViewSet):
                     format_index['r'] = index
                 elif "%s" in tmp or "%>s" in tmp:
                     format_index['s'] = index
+                elif "%b" in tmp or "%B" in tmp:
+                    format_index['b'] = index
                 elif "%D" in tmp:
                     format_index['D'] = index
                 elif "%T" in tmp:
@@ -1188,7 +1222,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         # pandas 활용 - 로그파일 읽기
         # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
-        df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False)
+        df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, dtype={'freferer':np.str})
                 
         # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
         

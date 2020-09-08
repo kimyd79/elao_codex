@@ -77,6 +77,10 @@ class LogDetail(models.Model):
     fstatus = models.CharField(max_length=10, null=True, blank=True)
     ftime_taken = models.IntegerField(default=0)
     
+    # Add Filters
+    fbyte = models.IntegerField(default=0)
+    fextension = models.CharField(max_length=10, null=True, blank=True)
+    
     # Reservation Fields
     freserve1 = models.CharField(max_length=200, null=True, blank=True)
     freserve2 = models.CharField(max_length=200, null=True, blank=True)
