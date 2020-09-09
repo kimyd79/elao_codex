@@ -1863,7 +1863,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             print("create model_name :", model_name)
             
-            # TODO: 최초 저장은 실패한다. 여기 좀 이상하다. 제대로 못가져오는거 같다.            
+      
             LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()  
            
             # id=1인 행(null 행) 삭제
@@ -1882,7 +1882,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 print("logfile :", logfile)     
                 
                 # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
-                id_startnum = LogDetail_dynamic.objects.all().order_by("-id")[0].id + 1
+                id_startnum = 0
+                if LogDetail_dynamic.objects.count() > 0:
+                    id_startnum = LogDetail_dynamic.objects.all().order_by("-id")[0].id + 1
+                
                 self.parse_log(logfile, logfile_id, id_startnum)
             
                 # postgresql copy 실행                

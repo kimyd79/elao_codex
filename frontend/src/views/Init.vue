@@ -470,8 +470,7 @@ export default {
 
                         await this.createLogmaster(serverUrl);
 
-                        // TODO: Check                        
-                        await this.createDynamicLogdetailSchema(serverUrl)
+                        await this.createLogdetailSchema(serverUrl)
 
                         isNext = true;
                     } catch (err) {
@@ -523,12 +522,10 @@ export default {
                     // CASE1 : File을 새로 추가한 경우            
                     if (this.isNewFileAdded) {
 
-                        //await this.createLogdetail(serverUrl);
+                        await this.createLogdetail(serverUrl);
 
-                        // TODO: Dynamic
-                        await this.createDynamicLogdetail(serverUrl);
                     }
-                    // TODO: 파일 추가했을때 잘 불러오는지 확인필요
+
                     // CASE2 : 기존 File을 이용하는 경우                    
                     await this.getLogDetail(this.projectID)
 
@@ -619,7 +616,7 @@ export default {
                 })
         },
 
-        createDynamicLogdetailSchema(url) {
+        createLogdetailSchema(url) {
             let postData = {
                 project_id: this.projectID,
             };
@@ -638,12 +635,17 @@ export default {
                     console.log(res)
 
                     this.isActive = false
-                    this.setNoticePopup('Create Dynamic Logdetail completed..!!')
-                    this.currentView = 'CommonPopup';
+
+                    this.$alert("Create Dynamic Logdetail completed..", "Notification", "success");
+
                 })
                 .catch(err => {
                     console.error(err);
                     this.isActive = false
+
+                    this.$alert("Create Dynamic Logdetail failed.", "Notification", "error");
+
+                    throw err
                 })
         },
 
@@ -729,7 +731,7 @@ export default {
 
             // Start Loading Spinner
             this.isActive = true
-            return axios.post(url + "/logdetail/", postData, axiosConfig)
+            return axios.post(url + "/logdetail_dynamic/", postData, axiosConfig)
                 .then(res => {
                     console.log(res)
 
@@ -752,50 +754,6 @@ export default {
                     this.$alert("Create Logdetail Data failed..!!", "Notification", "error");
 
                     throw err
-                })
-        },
-
-        createDynamicLogdetail(url) {
-
-            let postData = {
-                logfile_id: this.logfileID,
-                project_id: this.projectID
-            };
-
-            let axiosConfig = {
-                headers: {
-                    //'Authorization': 'Token '+ this.token // For Django
-                }
-            };
-
-            // Start Loading Spinner
-            // TODO:여기
-            this.isActive = true
-            return axios.post(url + "/logdetail_dynamic/", postData, axiosConfig)
-                .then(res => {
-                    console.log(res)
-
-                    this.$store.dispatch("setFromDate", res.data.start_date);
-                    this.$store.dispatch("setToDate", res.data.end_date);
-                    this.$store.dispatch("setFromTime", res.data.start_time);
-                    this.$store.dispatch("setToTime", res.data.end_time);
-
-                    // Stop Loading Spinner
-                    this.isActive = false
-
-                    // this.$store.dispatch("setPopupKind", 'Noti');
-                    // this.$store.dispatch("setPopupHeader", 'Notification');
-                    // this.$store.dispatch("setPopupBody", 'Create Data completed..!!');
-                    // this.$store.dispatch("setPopupButton", 'Close');
-
-                    this.setNoticePopup('Create Logdetail Data completed..!!')
-                    this.currentView = 'CommonPopup';
-
-                })
-                .catch(err => {
-                    console.error(err);
-                    // Stop Loading Spinner
-                    this.isActive = false
                 })
         },
 
