@@ -1935,8 +1935,19 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs = None
         try:
             df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+            
+        except UnicodeDecodeError as ude:
+            
+            print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
+            
+            try:
+                df_logs = pd.read_csv(logfile.name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+            except Exception as uex:
+                print('UnicodeDecodeError Occured AGAIN!')
+                raise uex            
+            
         except Exception as ex: 
-            print('Error Occured while creating logdetail read_csv#1...', ex)
+            print('Error Occured while creating logdetail read_csv#1...', ex)            
             raise ex
                         
         # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
@@ -1946,7 +1957,25 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         format_index = self.get_logformat_index(log_format, format_kind)
         
         # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?)
-        df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)                
+        
+        df_logs_all = None
+        try:
+            df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
+            
+        except UnicodeDecodeError as ude:
+            
+            print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
+            
+            try:
+                df_logs_all = pd.read_csv(logfile.name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
+            except Exception as uex:
+                print('UnicodeDecodeError Occured AGAIN!')
+                raise uex            
+            
+        except Exception as ex: 
+            print('Error Occured while creating logdetail read_csv#2 whole lines...', ex)            
+            raise ex
+        
         df_logs['log_line'] = df_logs_all
         
         # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
