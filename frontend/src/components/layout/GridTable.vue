@@ -192,7 +192,8 @@ export default {
             //console.log("filters : " + filters)
 
             var urlstring =
-                serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
+                //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
+                serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
 
             // TODO : Set axiosConfig to set headers
             //let axiosConfig = {

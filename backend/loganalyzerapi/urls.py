@@ -16,10 +16,7 @@ router.register(r'logfile', views.LogFileViewSet)
 router.register(r'logdetail', views.LogDetailViewSet)
 
 # For Ceating Dynamic Logdetail
-# TODO: Testing...
 router.register(r'logmaster/create_dynamic_logdetail', views.LogMasterViewSet)
-
-# TODO: For Dynamic LogDetail
 router.register(r'logdetail_dynamic', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/start_end', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/notice', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')

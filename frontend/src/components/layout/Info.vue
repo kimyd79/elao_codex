@@ -41,7 +41,8 @@ export default {
         let project_id = this.projectID
         console.log(project_id)
 
-        var url = serverUrl + "/logdetail/statistics/"
+        //var url = serverUrl + "/logdetail/statistics/"
+        var url = serverUrl + "/logdetail_dynamic/statistics/"
 
         let postData = {
 

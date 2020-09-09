@@ -467,10 +467,11 @@ export default {
                 if (this.radioValue == 1) { // New인 경우 새로운 정보로 저장한다.
 
                     try {
+
                         await this.createLogmaster(serverUrl);
 
                         // TODO: Check                        
-                        //await this.createDynamicLogdetailSchema(serverUrl)
+                        await this.createDynamicLogdetailSchema(serverUrl)
 
                         isNext = true;
                     } catch (err) {
@@ -521,10 +522,11 @@ export default {
                 try {
                     // CASE1 : File을 새로 추가한 경우            
                     if (this.isNewFileAdded) {
-                        await this.createLogdetail(serverUrl);
+
+                        //await this.createLogdetail(serverUrl);
 
                         // TODO: Dynamic
-                        //await this.createDynamicLogdetail(serverUrl);
+                        await this.createDynamicLogdetail(serverUrl);
                     }
                     // TODO: 파일 추가했을때 잘 불러오는지 확인필요
                     // CASE2 : 기존 File을 이용하는 경우                    
@@ -847,8 +849,8 @@ export default {
             console.log("getLogDetail projectID : " + projectID)
 
             // TODO: Dynamic
-            //var url = serverUrl+"/logdetail_dynamic/start_end/"
-            var url = serverUrl + "/logdetail/start_end/"
+            var url = serverUrl + "/logdetail_dynamic/start_end/"
+            //var url = serverUrl + "/logdetail/start_end/"
 
             let postData = {
                 project_id: projectID

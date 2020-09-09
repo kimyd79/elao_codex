@@ -73,7 +73,8 @@ export function getChartDataFromStatistics(type, project_id, filter, N) {
     // type=6. Referers Top N
     // type=7. User Agent Top N
 
-    var url = serverUrl + "/logdetail/statistics/"
+    //var url = serverUrl + "/logdetail/statistics/"
+    var url = serverUrl + "/logdetail_dynamic/statistics/"
 
     var label = ""
 
@@ -145,7 +146,9 @@ export function getChartDataFromStatistics(type, project_id, filter, N) {
 }
 
 export function getLineChartData(kind = 1, timeCondition, project_id, filter) {
-    var url = serverUrl + "/logdetail/chartdata/"
+    
+    var url = serverUrl + "/logdetail_dynamic/chartdata/"
+    //var url = serverUrl + "/logdetail/chartdata/"
 
     let postData = {
 
@@ -421,6 +424,7 @@ export function getBarChartOptions() {
 
 export function getStackedBarChartTemplate(x, y200, y300, y400, y500) {
 
+    
     var chartData = {
 
         labels: x,

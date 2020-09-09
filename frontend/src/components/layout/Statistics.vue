@@ -169,13 +169,26 @@ export default {
                 case 7:
                     this.content = "User Agent (count)"
                     break;
+                case 8:
+                    this.content = "Requests URI (Total Bytes)"
+                    break;
+                case 9:
+                    this.content = "Static files (count)"
+                    break;
+                case 10:
+                    this.content = "Requests URI (Average Bytes)"
+                    break;
+                case 11:
+                    this.content = "Requests Average Time-taken (s/㎲)"
+                    break;
                 default:
             }
 
             let project_id = this.$store.state.projectID
             console.log(project_id)
 
-            var url = serverUrl + "/logdetail/statistics/"
+            //var url = serverUrl + "/logdetail/statistics/"
+            var url = serverUrl + "/logdetail_dynamic/statistics/"
 
             let postData = {
 

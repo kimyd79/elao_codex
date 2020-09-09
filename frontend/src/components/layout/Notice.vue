@@ -74,7 +74,8 @@ export default {
             // Start Loading Spinner
             this.isLoading = true;
             axios
-                .post(serverUrl + "/logdetail/notice/", postData)
+                //.post(serverUrl + "/logdetail/notice/", postData)
+                .post(serverUrl + "/logdetail_dynamic/notice/", postData)
                 .then(res => {
                     console.log(res);
 

@@ -32,12 +32,16 @@
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="4"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="11"></statistics>
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="6"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="7"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
         </ui-container-box>
 
     </ui-container-box>
@@ -166,7 +170,7 @@ export default {
         return {
             // For Chart
             resetZoomV: "1",
-            timeCondition: "2",
+            timeCondition: "1", // "Hour(시) 기준"
 
             // For Statistics -> use 'props' : TODO: N으로 변경
             statisticsRow: "1", // Top or Top5 (Row 수)

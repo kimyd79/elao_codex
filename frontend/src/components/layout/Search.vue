@@ -115,10 +115,10 @@ export default {
     methods: {
         initialize() {
 
-            this.dateFromValue = "";
-            this.dateToValue = "";
-            this.timeFromValue = "";
-            this.timeToValue = "";
+            // this.dateFromValue = "";
+            // this.dateToValue = "";
+            // this.timeFromValue = "";
+            // this.timeToValue = "";
             this.conditionValue = "";
             this.searchValue = "";
             this.ttFromValue = "";
