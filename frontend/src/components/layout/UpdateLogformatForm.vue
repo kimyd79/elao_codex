@@ -12,22 +12,22 @@
 
         <div class="popup-form">
             <ui-form-item :columns=8 label="format id" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field disabled v-model="format.format_id" />
+                <lego-text-field disabled v-model=format.format_id />
             </ui-form-item>
 
             <ui-form-item :columns=8 label="format kind" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="format.format_kind" />
+                <lego-text-field v-model=format.format_kind />
             </ui-form-item>
 
             <ui-form-item :columns=8 label="format name" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="format.format_name" />
+                <lego-text-field v-model=format.format_name />
             </ui-form-item>
 
             <ui-form-item :columns=8 label="format strings" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="format.format_strings" />
+                <lego-text-field v-model=format.format_strings />
             </ui-form-item>
             <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field disabled v-model="format.creator" />
+                <lego-text-field disabled v-model=format.creator />
             </ui-form-item>
 
         </div>

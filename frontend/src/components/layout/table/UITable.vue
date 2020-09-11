@@ -276,9 +276,11 @@ export default {
             console.log('item : ', item)
 
             // TODO : project_id 등 설정 필요 - vuex 사용
-            console.log('item : ', item.projectID)
+            console.log('item : ', item.logline)
             console.log('item : ', item.projectName)
             console.log('item : ', item.projectDescription)
+            this.$alert(item.logline, "Access Log", "info");
+
 
             this.$store.dispatch("setProjectName", item.projectName);
             this.$store.dispatch("setProjectDescription", item.projectDescription);
