@@ -4,7 +4,7 @@
     <div class="page-summary-title">Logformat Search Result</div>
 
     <!-- component :is="currentView"></component -->
-    <component :is="currentView" v-on:popupClose="currentView=null" :format="format" v-on:popupOK="popupOK"></component>
+    <component :is="currentView" v-on:popupClose="currentView=null" :format="format"></component>
 
     <ui-form-item :columns=20 align-right margin-right>
         <lego-button main v-on:click="clickUpdate">Update</lego-button>
@@ -123,8 +123,7 @@ export default {
             axios.get(urlStr + id)
                 .then((response) => {
                     console.log(response);
-                    this.format = response.data.results;
-
+                    this.format_lists = response.data;
                 })
                 .catch((ex) => {
                     console.log('getData failed', ex);
@@ -135,7 +134,7 @@ export default {
             axios.delete(urlStr + format.format_id)
                 .then((response) => {
                     console.log(response);
-                    this.getData(format.format_kind);
+                    this.getData("");
                 })
                 .catch((ex) => {
                     console.log('deleteData failed', ex);
@@ -146,7 +145,7 @@ export default {
             axios.post(urlStr, format)
                 .then((response) => {
                     console.log(response);
-                    this.getData(format.format_kind);
+                    this.getData("");
                 })
                 .catch((ex) => {
                     console.log('addData failed', ex);
@@ -157,7 +156,7 @@ export default {
             axios.put(urlStr + format.format_id + '/', format)
                 .then((response) => {
                     console.log(response);
-                    this.getData(format.format_kind);
+                    this.getData("");
                 })
                 .catch((ex) => {
                     console.log('updateData failed', ex);
@@ -176,41 +175,25 @@ export default {
 
         },
         clickDelete: function () {
-            this.$store.state.popupKind = 'Delete';
-            this.$store.state.popupHeader = 'Confirm Delete';
             if (this.format.format_id != '') {
-                this.$store.state.popupBody = 'Are you sure want to Delete? </p> ID : ' + this.selected_format_id;
-                this.$store.state.popupFormatId = this.format.format_id;
-                this.$store.state.popupFormatKind = this.format.format_kind;
-                this.$store.state.popupButton = 'CancelOK';
-                this.currentView = 'CommonPopup';
+                 this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
+                    console.log("OK clicked");
+                    this.deleteData(this.format);
+                }).catch(() => {
+                    console.log("Cancel clicked");
+                });
             } else {
-                this.$store.state.popupBody = 'No LogFormat selected.';
-                this.$store.state.popupButton = 'Close';
-                this.currentView = 'CommonPopup';
+                this.$alert("No Logformat selected", "Confirm Update", "error");
             }
         },
         clickAdd: function () {
             this.currentView = 'AddLogformatForm';
         },
         clickUpdate: function () {
-            this.$store.state.popupKind = 'Update';
-            this.$store.state.popupHeader = 'Confirm Update';
             if (this.format.format_id != '') {
                 this.currentView = 'updateLogformatForm';
             } else {
-                this.$store.state.popupBody = 'No LogFormat selected.';
-                this.$store.state.popupButton = 'Close';
-                this.currentView = 'CommonPopup';
-            }
-        },
-        popupOK: function () {
-            if (this.$store.state.popupKind == 'Delete') {
-                console.log(this.format.format_id);
-                this.deleteData(this.format);
-                this.currentView = null;
-            } else if (this.$store.state.popupKind == 'Update') {
-                this.updateData(this.format);
+                this.$alert("No Logformat selected", "Confirm Update", "error");
             }
         },
     }

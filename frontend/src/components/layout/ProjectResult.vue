@@ -74,7 +74,7 @@ export default {
     },
     mounted() {
         EventBus.$on("searchProject", this.getData);
-        EventBus.$on("cancel", () => {
+        EventBus.$on("cancelUpdateProject", () => {
             this.currentView = null;
         });
         EventBus.$on("updateOK", (project) => {
@@ -85,11 +85,6 @@ export default {
             this.updateData(project);
             this.currentView = null;
         });
-        EventBus.$on("deleteProject", (project) => {
-            this.deleteData(project);
-            this.currentView = null;
-        });
-
     },
 
     methods: {
@@ -113,7 +108,7 @@ export default {
             axios.delete(urlStr + project.project_id)
                 .then((response) => {
                     console.log(response);
-                    this.getData(project.project_name);
+                    this.getData("");
                 })
                 .catch((ex) => {
                     console.log('deleteData failed', ex);
@@ -123,7 +118,7 @@ export default {
             axios.put(urlStr + project.project_id + '/', project)
                 .then((response) => {
                     console.log(response);
-                    this.getData(project.project_name);
+                    this.getData("");
                 })
                 .catch((ex) => {
                     console.log('updateData failed', ex);
@@ -141,38 +136,22 @@ export default {
 
         },
         clickDelete: function () {
-            this.$store.state.popupKind = 'Delete';
-            this.$store.state.popupHeader = 'Confirm Delete';
             if (this.project.project_id != '') {
-                this.$store.state.popupBody = 'Are you sure want to Delete? </p> ID : ' + this.selected_project_id;
-                this.$store.state.popupprojectId = this.project.project_id;
-                this.$store.state.popupprojectKind = this.project.project_name;
-                this.$store.state.popupButton = 'CancelOK';
-                this.currentView = 'CommonPopup';
+                this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
+                    console.log("OK clicked");
+                    this.deleteData(this.project);
+                }).catch(() => {
+                    console.log("Cancel clicked");
+                });
             } else {
-                this.$store.state.popupBody = 'No Project selected.';
-                this.$store.state.popupButton = 'Close';
-                this.currentView = 'CommonPopup';
+                this.$alert("No Project selected", "Confirm Delete", "error");
             }
         },
         clickUpdate: function () {
-            this.$store.state.popupKind = 'Update';
-            this.$store.state.popupHeader = 'Confirm Update';
             if (this.project.project_id != '') {
                 this.currentView = 'UpdateProject';
             } else {
-                this.$store.state.popupBody = 'No Project selected.';
-                this.$store.state.popupButton = 'Close';
-                this.currentView = 'CommonPopup';
-            }
-        },
-        popupOK: function () {
-            if (this.$store.state.popupKind == 'Delete') {
-                console.log(this.project.project_id);
-                this.deleteData(this.project);
-                this.currentView = null;
-            } else if (this.$store.state.popupKind == 'Update') {
-                this.updateData(this.project);
+                this.$alert("No Project selected", "Confirm Update", "error");
             }
         },
     }

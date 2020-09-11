@@ -174,7 +174,8 @@ export default {
                     useragent: fuser_agent,
                     status: results[i].fstatus,
                     timetaken: results[i].ftime_taken,
-                    isSelected: false
+                    isSelected: false,
+                    logline: results[i].log_line
                 });
             }
 
@@ -208,6 +209,7 @@ export default {
                 .then(res => {
 
                     console.log(res.data.count); // 전체건수
+                    console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
 

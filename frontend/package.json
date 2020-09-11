@@ -15,9 +15,14 @@
     "mixins": "0.0.1",
     "vue": "^2.6.10",
     "vue-chartjs": "^3.5.0",
+    "vue-element-loading": "^1.1.6",
     "vue-loading-overlay": "^3.3.2",
     "vue-router": "^3.0.3",
-    "vuex": "^3.4.0"
+    "vue-simple-alert": "^1.1.1",
+    "vue2-datepicker": "^3.6.2",
+    "vuex": "^3.4.0",
+    "vuex-extensions": "^1.1.5",
+    "vuex-persistedstate": "^3.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",

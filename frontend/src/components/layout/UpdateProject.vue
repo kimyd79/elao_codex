@@ -69,16 +69,6 @@ export default {
     },
 
     methods: {
-        getDataOne: function (id) {
-            axios.get(urlStr + id)
-                .then((response) => {
-                    console.log(response);
-                    this.select_project = response.data;
-                })
-                .catch((ex) => {
-                    console.log('getDataOne failed', ex);
-                })
-        },
         clickCancle: function () {
             console.log("click Cancel Button");
             this.$emit('popupClose');
