@@ -4,7 +4,7 @@
     <div class="page-summary-title">Project Result</div>
 
     <!-- component :is="currentView"></component -->
-    <component :is="currentView" v-on:popupClose="currentView=null" :project="project" v-on:popupOK="popupOK"></component>
+    <component :is="currentView" v-on:popupClose="currentView=null" :project="project"></component>
 
     <ui-form-item :columns=20 align-right margin-right>
         <lego-button main v-on:click="clickUpdate">Update</lego-button>
@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody id="list">
-                <tr v-for="project_list in project_lists" :key="project_list" v-on:click="clickList(project_list)" :class="{'highlight': (project_list.project_id == selected_project_id) }">
+            <tr v-for="(project_list, idx) in project_lists" :key="idx" v-on:click="clickList(project_list)" :class="{'highlight': (project_list.project_id == selected_project_id) }">
                     <td>{{project_list.project_id}}</td>
                     <td>{{project_list.project_name}}</td>
                     <td>{{project_list.project_description}}</td>
