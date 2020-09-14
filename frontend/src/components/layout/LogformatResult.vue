@@ -23,8 +23,8 @@
                     <th>created</th>
                 </tr>
             </thead>
-            <tbody id="list">
-                <tr v-for="format_list in format_lists" :key="format_list" v-on:click="clickList(format_list)" :class="{'highlight': (format_list.format_id == selected_format_id) }">
+            <tbody id="list">                
+                <tr v-for="(format_list, idx) in format_lists" :key="idx" v-on:click="clickList(format_list)" :class="{'highlight': (format_list.format_id == selected_format_id) }">
                     <td>{{format_list.format_id}}</td>
                     <td>{{format_list.format_kind}}</td>
                     <td>{{format_list.format_name}}</td>
