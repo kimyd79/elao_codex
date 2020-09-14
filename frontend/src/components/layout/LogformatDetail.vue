@@ -11,7 +11,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="formatdetail_list in formatdetail_lists" :key="formatdetail_list">
+                <tr v-for="(formatdetail_list, idx) in formatdetail_lists" :key="idx">
                     <td>{{formatdetail_list.format_kind}}</td>
                     <td>{{formatdetail_list.format_string}}</td>
                     <td>{{formatdetail_list.format_definition}}</td>
