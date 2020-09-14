@@ -2,6 +2,7 @@
 <div id="gridtable">
     <!-- This page is GridTable - {{ isSearch }} -->
     <ui-container-box :columns="20" vertical title="Details" class="mb50">
+        <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-container-box :columns="20" vertical>
             <ui-table header-divider no-action :columns="columns" :items="items" class="mt20"></ui-table>
         </ui-container-box>
@@ -20,12 +21,19 @@ import {
     getSearchFilter,
     serverUrl
 } from "@/common"
+import VueElementLoading from 'vue-element-loading'
 
 export default {
     name: "GridTable",
-
+    components: {
+        // export Loading Spinner components
+        VueElementLoading,
+    },
     data: function () {
         return {
+
+            // Loading Spinner
+            isActive: false,
 
             pagingInfo: {
                 rowsPerPage: 10,
@@ -175,7 +183,8 @@ export default {
                     status: results[i].fstatus,
                     timetaken: results[i].ftime_taken,
                     isSelected: false,
-                    logline: results[i].log_line
+                    logline: results[i].log_line,
+                    viewname: 'detail'
                 });
             }
 
@@ -204,6 +213,10 @@ export default {
             //};
 
             // TODO : Set GET parametes, ex) /logdetail/?limit=10&offset=20
+            
+            // Start Loading Spinner
+            this.isActive = true
+            
             axios
                 .get(urlstring)
                 .then(res => {
@@ -212,9 +225,12 @@ export default {
                     console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
-
+                    // Stop Loading Spinner
+                    this.isActive = false
                 })
                 .catch(err => {
+                    // Stop Loading Spinner
+                    this.isActive = false
                     console.error(err);
                 });
         },
