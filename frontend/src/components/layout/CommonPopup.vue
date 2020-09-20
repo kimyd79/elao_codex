@@ -1,20 +1,22 @@
 <template>
 <div class="modal-mask" transition="modal">
     <div class="modal-wrapper">
-        <ui-container-box :columns=9 vertical class="modal-container">
+        <ui-container-box :columns=12 vertical class="modal-container">
             <div class="popup-header">
                 <div class="popup-header__title">
-                    {{ this.$store.state.popupHeader }}
+                    Log Detail
                 </div>
             </div>
 
-            <div class="popup-body" v-html="this.$store.state.popupBody">
+            <!--div class="popup-body" v-html="this.$store.state.popupLog">
+            </div-->
+            <div class="popup-body" v-html="this.logLine">
             </div>
 
             <div class="popup-buttons">
-                <lego-button v-on:click="clickCancel" v-if="buttonClose">Close</lego-button>
+                <lego-button main v-on:click="clickCancel" v-if="buttonClose">Close</lego-button>
                 <lego-button v-on:click="clickCancel" v-if="buttonCancel">Cancel</lego-button>
-                <lego-button main v-on:click="clickOK" v-if="buttonOK">OK</lego-button>
+                <lego-button v-on:click="clickOK" v-if="buttonOK">OK</lego-button>
             </div>
         </ui-container-box>
     </div>
@@ -33,18 +35,7 @@ import {
 export default {
     name: 'CommonPopup',
     props: {
-        format: {
-            type: Object,
-            default: function () {
-                return {
-                    format_id: '',
-                    format_kind: '',
-                    format_name: '',
-                    format_strings: '',
-                    creator: ''
-                }
-            }
-        },
+        logLine: '',
         popupState: ''
     },
 
@@ -67,13 +58,11 @@ export default {
         clickCancel: function () {
             console.log("click Popup Close/Cancel Button");
             this.$emit('popupClose');
-            //EventBus.$emit("cancel");
         },
         clickOK: function () {
             console.log("click Popup OK Button");
             this.$emit('popupOK');
         },
-
     }
 };
 </script>
