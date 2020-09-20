@@ -1150,7 +1150,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         ttToValue = ""
         conditionValue = ""
         searchValue = ""
-        project_id = ""        
+        project_id = ""
+        
+        #statistic detailpopup
+        detailconditionValue = ""
+        detailsearchValue = ""
 
         # 조건 적용(GET)
         if method == 'get' :
@@ -1166,6 +1170,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             searchValue = self.request.query_params.get('searchValue', None)
             
             project_id = self.request.query_params.get('project_id', None)
+            
+            #statistic detailpopup
+            detailconditionValue = self.request.query_params.get('detailconditionValue', None)
+            detailsearchValue = self.request.query_params.get('detailsearchValue', None)
         
         elif method == 'post':
             
@@ -1227,7 +1235,22 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             elif conditionValue == 'U':
                 queryset = queryset.filter(fuser_agent__icontains=searchValue)
             elif conditionValue == 'S':
-                queryset = queryset.filter(fstatus__icontains=searchValue)                
+                queryset = queryset.filter(fstatus__icontains=searchValue)      
+                
+        # conditionValue : statistic detailpopup
+        if detailconditionValue is not None :
+            #print('conditionValue applied! (conditionValue) : ', conditionValue)
+            #print('searchValue : ', searchValue)
+            if detailconditionValue == 'I':
+                queryset = queryset.filter(fip__icontains=detailsearchValue)
+            elif detailconditionValue == 'R':
+                queryset = queryset.filter(frequest__icontains=detailsearchValue)
+            elif detailconditionValue == 'E':
+                queryset = queryset.filter(freferer__icontains=detailsearchValue)
+            elif detailconditionValue == 'U':
+                queryset = queryset.filter(fuser_agent__icontains=detailsearchValue)
+            elif detailconditionValue == 'S':
+                queryset = queryset.filter(fstatus__icontains=detailsearchValue)  
         
         return queryset           
 
@@ -1277,6 +1300,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             timetakenUnit = "" 
             
             tiemtakenResult = 0
+            threshold = 0
             
             for logfile in logfiles:
                 list_logfile_id.append(str(logfile['logfile_id']))
@@ -1284,9 +1308,12 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 
             #CASE1 : TimeTaken 3초 이상 건수(%T : seconds, %D : microseconds)
             #TODO: Threshold 설정값 관리
+            threshold = int(request.data['threshold'])
+            
             if timetakenUnit is not None:
-                threshold = 3 if timetakenUnit == 'T' else 3*1000000
-                
+                #threshold = 3 if timetakenUnit == 'T' else 3*1000000
+                threshold = threshold if timetakenUnit == 'T' else threshold*1000000   
+
                 model_name = "logdetail_"+project_id
                 LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
             
