@@ -1,6 +1,7 @@
 <template>
 <keep-alive>
     <div class="vld-parent">
+        <component :is="currentView" v-on:popupClose="currentView=null" :item="item"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <div id="statistics">
             <table class="page-summary-table">
@@ -18,7 +19,7 @@
 
                         <!-- TODO: content 종류에 따라 style= "text-align:left;" 적용할 것 -->
                         <td v-on:click="getDetail(item)">{{ item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" )}}</td>
-                        <td>{{ item.result_count }}</td>
+                        <td v-on:click="getDetail(item)">{{ item.result_count }}</td>
                     </tr>
 
                 </tbody>
@@ -34,7 +35,7 @@ import {
     mapGetters
 } from "vuex";
 import VueElementLoading from 'vue-element-loading'
-
+import DetailPopup from './DetailPopup';
 import {
     serverUrl
 } from "@/common";
@@ -46,6 +47,7 @@ export default {
     components: {
 
         VueElementLoading,
+        DetailPopup,
     },
 
     data: function () {
@@ -61,6 +63,7 @@ export default {
 
             // Loading Spinner data
             isActive: false,
+            currentView : null,
 
         }
     },
@@ -89,9 +92,23 @@ export default {
     methods: {
 
         // TODO: 팝업창(상세) 필요
+        /*
         getDetail(item) {
-            alert('getDetail : ' + item)
-            console.log(item)
+            alert('getDetail : ' + item.result)
+            console.log(this.items)
+        },
+        */
+
+        getDetail(item) {
+            this.$store.state.popupKind = 'Statistics';
+            this.$store.state.popupHeader = 'Statistics Detail';
+            this.$store.state.detailcondition = this.statisticsKind;
+            this.$store.state.detailsearchKeyword = item.result;
+            
+            this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
+            this.$store.state.popupButton = 'Close';
+            console.log(this.items)
+            this.currentView = 'DetailPopup';
         },
 
         setItems(results) {
