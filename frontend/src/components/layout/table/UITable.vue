@@ -92,6 +92,9 @@
             </div>
         </div>
         <div class="ui-table-body">
+            <!-- log detail popup -->
+            <component :is="currentView" :logLine="logLine" v-on:popupClose="currentView=null"></component>
+            
             <div class="ui-table-body__list">
                     
                 <div v-for="group in groups" class="ui-table-body__list-group" :key="group.key" >
@@ -190,8 +193,14 @@
 </template>
 
 <script>
+import CommonPopup from '../CommonPopup';
+import store from '@/vuex/store';
+
 export default {
     name: 'ui-table',
+    components: { 
+      CommonPopup, 
+    },
     props: {
         perPageItems : { type: Array, default: function() {
             return [
@@ -234,7 +243,10 @@ export default {
             headerToolLeft: 0,
 
             editingItem: null,
-            expandingItem: null
+            expandingItem: null,
+
+            currentView : null,
+            logLine: '',
         }
     },
     computed: {
@@ -281,10 +293,13 @@ export default {
             console.log('item : ', item.projectDescription)
             console.log('item : ', item.logline)            
             console.log('item.viewname : ', item.viewname) 
-
+            // log detail table에서만 Popup 생성
             if( item.viewname == 'detail'){
-                this.$alert(item.logline, "Access Log", "info");
-            }else {                 
+                //this.$alert(item.logline, "Access Log", "info");
+                //this.$store.state.popupLog = item.logline;
+                this.logLine = item.logline;
+                this.currentView = 'CommonPopup';
+            }else {              
                 this.$store.dispatch("setProjectName", item.projectName);
                 this.$store.dispatch("setProjectDescription", item.projectDescription);
                 this.$store.dispatch("setProjectID", item.projectID);
