@@ -17,6 +17,10 @@ export default {
     setToTimeTaken({commit}, value) { commit(types.SET_TOTIMETAKEN, value) },
     setCondition({commit}, value) { commit(types.SET_CONDITION, value) },
     setSearchKeyword({commit}, value) { commit(types.SET_SEARCHKEYWORD, value) },
+    //statistic detailpopup
+    setDetailCondition({commit}, value) { commit(types.SET_DETAILCONDITION, value) },
+    setDetailSearchKeyword({commit}, value) { commit(types.SET_DETAILSEARCHKEYWORD, value) },
+    setThreshold({commit}, value) { commit(types.SET_THRESHOLD, value) },
     
     setToggleSearch({commit}) { commit(types.TOGGLE_SEARCH) },
     setToggleSearch1({commit}) { commit(types.TOGGLE_SEARCH1) },
