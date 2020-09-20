@@ -31,6 +31,11 @@ const state = {
     toTimeTaken: '',
     condition: '',
     searchKeyword: '',
+    // statistic detailpopup
+    detailcondition: '',
+    detailsearchKeyword: '',
+    threshold: 3,
+
 
     // check
     toggleSearch: '0',  //  0 or 1 변경사항 확인용
