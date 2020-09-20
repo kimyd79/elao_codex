@@ -57,6 +57,47 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch,){
+    
+    var filters=""
+
+    if ( dateFrom != '') {
+      filters = filters + "&dateFromValue="+dateFrom
+    }
+    if ( dateTo != '') {
+      filters = filters + "&dateToValue="+dateTo
+    }
+    if ( timeFrom != '') {
+      filters = filters + "&timeFromValue="+timeFrom
+    }
+    if ( timeTo != '') {
+      filters = filters + "&timeToValue="+timeTo
+    }
+    if ( condition != '') {
+      filters = filters + "&conditionValue="+condition
+    }
+    if ( search != '') {
+      filters = filters + "&searchValue="+search
+    }
+    if ( ttFrom != '') {
+      filters = filters + "&ttFromValue="+ttFrom
+    }
+    if ( ttTo != '') {
+      filters = filters + "&ttToValue="+ttTo
+    }
+    if ( projectID != '') {
+        filters = filters + "&project_id="+projectID
+    }
+    if ( detailcondition != '') {
+        filters = filters + "&detailconditionValue="+detailcondition
+    }
+    if ( detailsearch != '') {
+        filters = filters + "&detailsearchValue="+detailsearch
+    }
+
+    return filters;
+}
+
 //////////////////////////////////////////////////////////////
 // Common Chart Data
 //////////////////////////////////////////////////////////////
