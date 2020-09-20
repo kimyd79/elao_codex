@@ -14,7 +14,11 @@ export default {
     getFromTimeTaken: state => state.fromTimeTaken ,
     getToTimeTaken: state => state.toTimeTaken ,
     getCondition: state => state.condition ,
-    getSearchKeyword: state => state.searchKeyword ,    
+    getSearchKeyword: state => state.searchKeyword ,
+    // statistic detailpopup
+    getDetailCondition: state => state.detailcondition ,
+    getDetailSearchKeyword: state => state.detailsearchKeyword ,   
+    getThreshold: state => state.threshold ,
 
     getToggleSearch: state => state.toggleSearch ,
     getToggleSearch1: state => state.toggleSearch1 ,
