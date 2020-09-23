@@ -11,13 +11,13 @@
             <div class="popup-body" v-html="this.$store.state.popupBody">
             </div>
 
-            <div id="gridtable">         
+            <div id="gridtable">
                 <!--ui-container-box :columns="20" vertical title="Access Log Details" class="mb50"-->
-                <ui-container-box :columns="20" vertical class="mb50">     
+                <ui-container-box :columns="20" vertical class="mb50">
                     <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                     <ui-container-box :columns="20" vertical>
                         <ui-table header-divider no-action :columns="columns" :items="items" class="mt20"></ui-table>
-                    </ui-container-box>      
+                    </ui-container-box>
                     <lego-pagination :pagination="pagingInfo" @move="pageChange" class="mt20" />
                 </ui-container-box>
             </div>
@@ -40,6 +40,7 @@ import {
     mapGetters
 } from 'vuex';
 import {
+    getSearchFilter,
     getDetailSearchFilter,
     serverUrl
 } from "@/common"
@@ -54,10 +55,10 @@ export default {
         item: {
             type: Object,
             default: function () {
-                
+
                 return {
                     result: '',
-                    result_count: '',                 
+                    result_count: '',
                 }
             }
         },
@@ -222,7 +223,7 @@ export default {
                     isSelected: false,
                     logline: results[i].log_line,
                     viewname: 'detail'
-                    
+
                 });
             }
         },
@@ -331,7 +332,7 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
                 })
-                .catch(err => {                    
+                .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
@@ -346,7 +347,7 @@ export default {
             //console.log("offset :" + offset);
 
             //let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)  
-            
+
             var ttFromValueThreshold = this.threshold * 1000000
             var ttToValueThreshold = 99999 * 1000000
             //let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
@@ -383,7 +384,7 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
                 })
-                .catch(err => {                    
+                .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false

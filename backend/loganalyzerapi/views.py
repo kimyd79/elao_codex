@@ -1682,7 +1682,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultY.append(row['y'])
                             resultY_time.append(row['yt'])
                     else:
-                        pass
+                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
+                        rows = hhRequest.values('x','y')
+                                    
+                        for row in rows:
+                            # print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            # print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])                            
+                            resultX.append(row['x'])
+                            resultY.append(row['y'])
             
             # Type2 : 시분(HHMM)기준                    
             #   Kind1 : request(요청) 건수(count)
@@ -1773,7 +1780,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultY.append(row['y'])
                             resultY_time.append(row['yt'])
                     else:
-                        pass
+                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
+                        # print("== 쿼리 시간 : ", time.time() - start_time)
+                        rows = hhmmRequest.values('x','y')
+                        
+                        for row in rows:
+                            # print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
+                            resultX.append(row['x'])
+                            resultY.append(row['y'])
+                            
             # Type3 : 시분초(HHMMSS)기준                    
             #   Kind1 : request(요청) 건수(count)
             #   Kind2 : status code 건수(count)
@@ -1787,7 +1802,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     rows = hhmmssRequest.values('x','y')
                     
                     for row in rows:
-                        print("type3, kind1 : request(요청) 건수(count) x - ",row['x'])
+                        print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
                         resultX.append(row['x'])
                         resultY.append(row['y'])
                                         
@@ -1863,7 +1878,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultY.append(row['y'])
                             resultY_time.append(row['yt'])
                     else:
-                        pass        
+                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
+                        print("== 쿼리 시간 : ", time.time() - start_time)
+                        rows = hhmmssRequest.values('x','y')
+                        
+                        for row in rows:
+                            print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            resultX.append(row['x'])
+                            resultY.append(row['y'])        
                     
             response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
             return Response(response, status = status.HTTP_200_OK)

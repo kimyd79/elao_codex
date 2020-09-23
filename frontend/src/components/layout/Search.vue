@@ -23,6 +23,7 @@
             <ui-form-row>
                 <ui-form-item :columns="6" label="TimeTaken">
                     <lego-text-field v-model="ttFromValue" placeholder="ms" />
+                    &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
                     <lego-text-field v-model="ttToValue" placeholder="ms" />
                 </ui-form-item>
                 <ui-form-item :columns="8" align-right margin-right>

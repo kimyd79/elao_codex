@@ -37,7 +37,8 @@ import {
 import VueElementLoading from 'vue-element-loading'
 import DetailPopup from './DetailPopup';
 import {
-    serverUrl
+    serverUrl,
+    setCommonStatisticInfo
 } from "@/common";
 
 export default {
@@ -63,7 +64,7 @@ export default {
 
             // Loading Spinner data
             isActive: false,
-            currentView : null,
+            currentView: null,
 
         }
     },
@@ -91,20 +92,12 @@ export default {
 
     methods: {
 
-        // TODO: 팝업창(상세) 필요
-        /*
-        getDetail(item) {
-            alert('getDetail : ' + item.result)
-            console.log(this.items)
-        },
-        */
-
         getDetail(item) {
             this.$store.state.popupKind = 'Statistics';
             this.$store.state.popupHeader = 'Statistics Detail';
             this.$store.state.detailcondition = this.statisticsKind;
             this.$store.state.detailsearchKeyword = item.result;
-            
+
             this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
             this.$store.state.popupButton = 'Close';
             console.log(this.items)
@@ -151,81 +144,14 @@ export default {
 
         getStatistics() {
 
-            // type=0. 전체 처리량(건수) --> Top N아님
-            // Top N으로 수정
-
-            // type=1. Status Codes Top N
-            // type=2. Requests Top N
-            // type=3. 최다 404 발생 URL Top5
-            // type=4. Time Taken Top N
-            // type=5. Visitors Top N
-            // type=6. Referers Top N
-            // type=7. User Agent Top N
+            let commonInfo = setCommonStatisticInfo(this.statisticsKind, this.project_id, this.getFilter(), this.statisticsRow);
 
             this.title = "Top " + this.statisticsRow
-
-            switch (this.statisticsKind) {
-                case 1:
-                    this.content = "HTTP Status Codes (count)"
-                    break;
-                case 2:
-                    this.content = "Requests URI (count)"
-                    break;
-                case 3:
-                    this.content = "404 Requests URI (count)"
-                    break;
-                case 4:
-                    this.content = "Requests Time-taken (s/㎲)"
-                    break;
-                case 5:
-                    this.content = "Visitors (count)"
-                    break;
-                case 6:
-                    this.content = "Referers (count)"
-                    break;
-                case 7:
-                    this.content = "User Agent (count)"
-                    break;
-                case 8:
-                    this.content = "Requests URI (Total Bytes)"
-                    break;
-                case 9:
-                    this.content = "Static files (count)"
-                    break;
-                case 10:
-                    this.content = "Requests URI (Average Bytes)"
-                    break;
-                case 11:
-                    this.content = "Requests Average Time-taken (s/㎲)"
-                    break;
-                default:
-            }
-
-            let project_id = this.$store.state.projectID
-            console.log(project_id)
-
-            //var url = serverUrl + "/logdetail/statistics/"
-            var url = serverUrl + "/logdetail_dynamic/statistics/"
-
-            let postData = {
-
-                project_id: project_id,
-                type: this.statisticsKind,
-                N: this.statisticsRow,
-
-                filter: this.getFilter()
-            };
-
-            let axiosConfig = {
-                headers: {
-                    //'Authorization': 'Token '+ this.token // For Django
-                }
-            };
-
+            this.content = commonInfo.content
             // Start Loading Spinner
             this.isActive = true
 
-            axios.post(url, postData, axiosConfig)
+            axios.post(commonInfo.url, commonInfo.postData, commonInfo.axiosConfig)
                 .then(res => {
                     console.log(res)
                     this.setItems(res.data.results);

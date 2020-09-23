@@ -4,7 +4,7 @@
 import axios from "axios";
 import * as store from "@/vuex/store";
 
-export var serverUrl = "http://127.0.0.1:8000"
+export var serverUrl = "http://127.0.0.1:8000";
 //export var serverUrl = "http://172.16.1.109"
 
 //////////////////////////////////////////////////////////////
@@ -57,37 +57,12 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch,){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch){
     
-    var filters=""
+    var filters="";
 
-    if ( dateFrom != '') {
-      filters = filters + "&dateFromValue="+dateFrom
-    }
-    if ( dateTo != '') {
-      filters = filters + "&dateToValue="+dateTo
-    }
-    if ( timeFrom != '') {
-      filters = filters + "&timeFromValue="+timeFrom
-    }
-    if ( timeTo != '') {
-      filters = filters + "&timeToValue="+timeTo
-    }
-    if ( condition != '') {
-      filters = filters + "&conditionValue="+condition
-    }
-    if ( search != '') {
-      filters = filters + "&searchValue="+search
-    }
-    if ( ttFrom != '') {
-      filters = filters + "&ttFromValue="+ttFrom
-    }
-    if ( ttTo != '') {
-      filters = filters + "&ttToValue="+ttTo
-    }
-    if ( projectID != '') {
-        filters = filters + "&project_id="+projectID
-    }
+    filters = getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID);
+
     if ( detailcondition != '') {
         filters = filters + "&detailconditionValue="+detailcondition
     }
@@ -101,50 +76,60 @@ export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condit
 //////////////////////////////////////////////////////////////
 // Common Chart Data
 //////////////////////////////////////////////////////////////
-export function getChartDataFromStatistics(type, project_id, filter, N) {
 
-    // type=0. 전체 처리량(건수) --> Top N아님
-    // Top N으로 수정
+export function setCommonStatisticInfo(type, project_id, filter, N) {
     
+    // Top N으로 수정
     // type=1. Status Codes Top N
     // type=2. Requests Top N
-    // type=3. 최다 404 발생 URL Top5
-    // type=4. Time Taken Top N
+    // type=3. 최다 404 발생 URL TopN
+    // type=4. Time Taken (s/㎲) Top N
     // type=5. Visitors Top N
     // type=6. Referers Top N
     // type=7. User Agent Top N
+    // type=8. Requests URI (Total Bytes) Top N
+    // type=9. Static files (count) Top N
+    // type=10. Requests URI (Average Bytes) Top N
+    // type=11. Requests Average Time-taken (s/㎲)  Top N
 
-    //var url = serverUrl + "/logdetail/statistics/"
-    var url = serverUrl + "/logdetail_dynamic/statistics/"
+    var content = "";
 
-    var label = ""
-
-    switch(type){
+    switch (type) {
         case 1:
-          label = "HTTP Status Codes (count)"
-          break;
+            content = "HTTP Status Codes (count)";
+            break;
         case 2:
-          label = "Requests URI (count)"
-          break;
+            content = "Requests URI (count)";
+            break;
         case 3:
-          label = "404 Requests URI (count)"
-          break;
+            content = "404 Requests URI (count)";
+            break;
         case 4:
-          label = "Requests Time-taken (ms/㎲)"
-          break;
+            content = "Requests Time-taken (s/㎲)";
+            break;
         case 5:
-          label = "Visitors (count)"
-          break;
+            content = "Visitors (count)";
+            break;
         case 6:
-          label = "Referers (count)"
-          break;
+            content = "Referers (count)";
+            break;
         case 7:
-          label = "User Agent (count)"
-          break;
+            content = "User Agent (count)";
+            break;
+        case 8:
+            content = "Requests URI (Total Bytes)";
+            break;
+        case 9:
+            content = "Static files (count)";
+            break;
+        case 10:
+            content = "Requests URI (Average Bytes)";
+            break;
+        case 11:
+            content = "Requests Average Time-taken (s/㎲)";
+            break;
         default:
-      }
-
-    console.log(project_id)
+    };
 
     let postData = {
         project_id: project_id,
@@ -159,13 +144,37 @@ export function getChartDataFromStatistics(type, project_id, filter, N) {
         }
     };
 
-    // For Await
-    return axios.post(url, postData, axiosConfig)
-        .then(res => {
-            console.log(res)
+    let url = serverUrl + "/logdetail_dynamic/statistics/";
 
-            var x = []
-            var y = []
+    // Set result
+    let result = {
+        content: content,
+        url: url,
+        postData: postData,
+        axiosConfig: axiosConfig,        
+    };  
+
+    // return values
+    // 1. content
+    // 2. url
+    // 3. postData
+    // 4. axiosConfig
+
+    return result;
+    
+}
+
+export function getChartDataFromStatistics(type, project_id, filter, N) {
+
+    let commonInfo = setCommonStatisticInfo(type, project_id, filter, N);
+
+    // For Await
+    return axios.post(commonInfo.url, commonInfo.postData, commonInfo.axiosConfig)
+        .then(res => {
+            console.log(res);
+
+            var x = [];
+            var y = [];
 
             for (let i = 0; i < res.data.results.length; i++) {
 
@@ -173,17 +182,15 @@ export function getChartDataFromStatistics(type, project_id, filter, N) {
                 y.push(res.data.results[i].result_count);
             }
 
-            res.x = x
-            res.y = y
-            res.label = label
+            res.x = x;
+            res.y = y;
+            res.label = commonInfo.content;
 
-            return res
+            return res;
         })
         .catch(err => {
             console.error(err);
         })
-
-
 }
 
 export function getLineChartData(kind = 1, timeCondition, project_id, filter) {
@@ -403,7 +410,7 @@ export function getPieChartTemplate(x, y) {
     return chartData;
 }
 
-export function getPieChartOptions() {
+export function getPieChartOptions(title) {
 
     var options = {
         responsive: true,
@@ -411,7 +418,7 @@ export function getPieChartOptions() {
 
         title: {
             display: true,
-            text: 'Status Code '
+            text: title
         },
     }
 
@@ -425,7 +432,7 @@ export function getBarChartTemplate(x, y, label) {
         labels: x,
 
         datasets: [{
-                label: label,
+                label: 'label',
                 fill: true,
                 data: y,
                 backgroundColor: bgColors(y),
@@ -438,7 +445,7 @@ export function getBarChartTemplate(x, y, label) {
     return chartData;
 }
 
-export function getBarChartOptions() {
+export function getBarChartOptions(title) {
 
     var options = {
         responsive: true,
@@ -446,7 +453,7 @@ export function getBarChartOptions() {
 
         title: {
             display: true,
-            text: 'Status Code '
+            text: title
         },
 
         scales: {
@@ -500,7 +507,7 @@ export function getStackedBarChartTemplate(x, y200, y300, y400, y500) {
     return chartData;
 }
 
-export function getStackedBarChartOptions() {
+export function getStackedBarChartOptions(title) {
 
     var options = {
         responsive: true,
@@ -508,7 +515,7 @@ export function getStackedBarChartOptions() {
 
         title: {
             display: true,
-            text: 'Status Code '
+            text: title
         },
 
         scales: {

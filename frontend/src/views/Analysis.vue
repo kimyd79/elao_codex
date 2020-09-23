@@ -61,12 +61,14 @@
         <ui-form-row>
             <ui-form-item :columns="12" label="Charts" align-left required-left>
 
-                <lego-button @click="lineChartData" main small>Line</lego-button>
+                <!-- <lego-button @click="lineChartData" main small>Line</lego-button> -->
+
                 <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
                 <lego-button @click="barChartData" main small>Bar</lego-button>
                 <lego-button @click="stackedbarChartData" main small>StackedBar</lego-button>
                 <lego-button @click="pieChartData(5)" main small>Pie(5)</lego-button>
                 <lego-button @click="pieChartData(1)" main small>Pie</lego-button>
+                <lego-button @click="pieChartData(9)" main small>Pie(9)</lego-button>
                 <lego-button @click="allChart()" small>ALL</lego-button>
             </ui-form-item>
         </ui-form-row>
@@ -75,11 +77,18 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
 
         <ui-container-box :columns="10" vertical class="mt20">
-            <div class="vld-parent">
+
+            <!--div class="vld-parent">
                 <vue-element-loading :active="isActiveLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
 
                 <lego-button @click="resetZoom(1)" small>resetZoom</lego-button>
                 <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions"></chart-line>
+            </div-->
+
+            <div class="vld-parent">
+                <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
+                <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions"></chart-line>
             </div>
 
             <div class="vld-parent">
@@ -101,12 +110,6 @@
         <ui-container-box :columns="10" vertical class="mt20">
 
             <div class="vld-parent">
-                <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
-                <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
-                <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions"></chart-line>
-            </div>
-
-            <div class="vld-parent">
                 <vue-element-loading :active="isActiveStackedBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
 
                 <lego-button @click="resetZoom(3)" small>resetZoom</lego-button>
@@ -117,6 +120,12 @@
                 <vue-element-loading :active="isActivePie" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                 <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
             </div>
+
+            <div class="vld-parent">
+                <vue-element-loading :active="isActivePieExtension" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                <chart-pie :chart-data="pChartDataExtension" :options="pOptions"></chart-pie>
+            </div>
+
         </ui-container-box>
 
     </ui-container-box>
@@ -156,6 +165,7 @@ import {
     getLineChartOptions,
     getMultiLineChartTemplate,
     getMultiLineChartOptions,
+    setCommonStatisticInfo,
     getChartDataFromStatistics,
     getLineChartData,
     getSearchFilter
@@ -172,7 +182,7 @@ export default {
             resetZoomV: "1",
             timeCondition: "1", // "Hour(시) 기준"
 
-            // For Statistics -> use 'props' : TODO: N으로 변경
+            // For Statistics
             statisticsRow: "1", // Top or Top5 (Row 수)
             statisticsKind: "1", // 전체 처리량 (통계 종류)  
 
@@ -184,14 +194,15 @@ export default {
             mlOptions: getMultiLineChartOptions(),
 
             bChartData: null,
-            bOptions: getBarChartOptions(),
+            bOptions: getBarChartOptions('Waiting..'),
 
             sbChartData: null,
-            sbOptions: getStackedBarChartOptions(),
+            sbOptions: getStackedBarChartOptions('Waiting..'),
 
             pChartData: null,
             pChartDataVisitorTop5: null,
-            pOptions: getPieChartOptions(),
+            pChartDataExtension: null,
+            pOptions: getPieChartOptions('Waiting..'),
 
             logfile_id: '',
 
@@ -202,6 +213,7 @@ export default {
             isActiveStackedBar: false,
             isActivePie: false,
             isActivePie5: false,
+            isActivePieExtension: false,
 
             // For Statistics N
             valueN: 5,
@@ -281,6 +293,7 @@ export default {
             this.stackedbarChartData();
             this.pieChartData(5);
             this.pieChartData(1);
+            this.pieChartData(9)
 
         },
 
@@ -319,13 +332,15 @@ export default {
             return filter
         },
 
-        async pieChartData(type = 1) {
+        async pieChartData(type) {
 
             // Start Loading Spinner
             if (type == 1) {
                 this.isActivePie = true
             } else if (type == 5) {
                 this.isActivePie5 = true
+            } else if (type == 9) {
+                this.isActivePieExtension = true
             }
 
             let filter = this.getFilter()
@@ -335,23 +350,33 @@ export default {
 
                 if (type == 1) {
                     this.pChartData = getPieChartTemplate(res.x, res.y)
+                    this.pOptions = getPieChartOptions("HTTP Status Codes");
 
                     //Stop Loading Spinner
                     this.isActivePie = false
                 } else if (type == 5) {
                     this.pChartDataVisitorTop5 = getPieChartTemplate(res.x, res.y)
+                    this.pOptions = getPieChartOptions("Visitor IP Top5");
 
                     //Stop Loading Spinner
                     this.isActivePie5 = false
+                } else if (type == 9) {
+                    this.pChartDataExtension = getPieChartTemplate(res.x, res.y)
+                    this.pOptions = getPieChartOptions("Static File Types");
+
+                    //Stop Loading Spinner
+                    this.isActivePieExtension = false
                 }
             } catch (err) {
                 console.log(err); // TypeError: failed to fatch
 
                 //Stop Loading Spinner
                 if (type == 1) {
-                    this.isActivePie = false
+                    this.isActivePie = false;
                 } else if (type == 5) {
-                    this.isActivePie5 = false
+                    this.isActivePie5 = false;
+                } else if (type == 9) {
+                    this.isActivePieExtension = false;
                 }
             }
 
@@ -366,6 +391,7 @@ export default {
             try {
                 let res = await getChartDataFromStatistics(1, this.project_id, filter, this.valueN)
                 this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
+                this.bOptions = getBarChartOptions(res.label)
             } catch (err) {
                 console.log(err); // TypeError: failed to fatch
             } finally {
@@ -384,6 +410,7 @@ export default {
             try {
                 let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
                 this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
+                this.sbOptions = getStackedBarChartOptions('Http Status Code');
             } catch (err) {
                 console.log(err); // TypeError: failed to fatch
             } finally {
