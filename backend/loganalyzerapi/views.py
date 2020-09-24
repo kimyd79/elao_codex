@@ -1250,7 +1250,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             elif detailconditionValue == 'U':
                 queryset = queryset.filter(fuser_agent__icontains=detailsearchValue)
             elif detailconditionValue == 'S':
-                queryset = queryset.filter(fstatus__icontains=detailsearchValue)  
+                queryset = queryset.filter(fstatus__icontains=detailsearchValue)
+            elif detailconditionValue == 'F':
+                queryset = queryset.filter(fextension__icontains=detailsearchValue) 
         
         return queryset           
 
