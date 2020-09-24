@@ -191,7 +191,7 @@ export default {
             lOptions: getLineChartOptions(),
 
             mlChartData: null,
-            mlOptions: getMultiLineChartOptions(),
+            mlOptions: getMultiLineChartOptions('Waiting..'),
 
             bChartData: null,
             bOptions: getBarChartOptions('Waiting..'),
@@ -447,8 +447,9 @@ export default {
             let filter = this.getFilter()
 
             try {
-                let res = await getLineChartData(3, this.timeCondition, this.project_id, filter)
-                this.mlChartData = getMultiLineChartTemplate(res.x, res.y, "Request", res.yt, "Time-Taken")
+                let res = await getLineChartData(3, this.timeCondition, this.project_id, filter);
+                this.mlChartData = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, 'Time-Taken');
+                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken');
             } catch (err) {
                 console.log(err); // TypeError: failed to fatch
             } finally {

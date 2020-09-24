@@ -56,8 +56,8 @@ export default {
             title: "",
             content: "",
             items: [{
-                result: '...',
-                result_count: '....',
+                result: 'Waiting...',
+                result_count: '...',
             }, ],
 
             timetakenUnit: "",

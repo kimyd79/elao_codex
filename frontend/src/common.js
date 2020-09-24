@@ -628,7 +628,7 @@ export function getMultiLineChartTemplate(x, y1, label1, y2, label2) {
     return chartData;
 }
 
-export function getMultiLineChartOptions() {
+export function getMultiLineChartOptions(title) {
 
     var options = {
         responsive: true,
@@ -636,7 +636,7 @@ export function getMultiLineChartOptions() {
 
         title: {
             display: true,
-            text: 'Request (count) / Time-Taken '
+            text: title
         },
 
         scales:{
@@ -646,7 +646,7 @@ export function getMultiLineChartOptions() {
 
                 scaleLabel: {
                     display: true,
-                    labelString: 'Date'
+                    labelString: 'Date/Time'
                 },
                 // ticks: {
                 //     maxRotation: 0
@@ -659,7 +659,7 @@ export function getMultiLineChartOptions() {
                     id: "request",
                     scaleLabel: {
                         display: true,
-                        labelString: 'value'
+                        labelString: 'value(count)'
                     }
                 },{
                     type: 'linear',
@@ -668,7 +668,7 @@ export function getMultiLineChartOptions() {
                     id: "time_taken",
                     scaleLabel: {
                         display: true,
-                        labelString: 'value'
+                        labelString: 'value(㎲/s)'
                     }
             }]
         },
