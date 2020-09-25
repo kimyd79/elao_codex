@@ -1979,36 +1979,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                            'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
                            'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime','fbyte', 'fextension']
         
-        # pandas 활용 - 로그파일 읽기
-        # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
-        # df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, dtype={'freferer':np.str})
-                
-        df_logs = None
-        try:
-            df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
-            
-        except UnicodeDecodeError as ude:
-            
-            print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
-            
-            try:
-                df_logs = pd.read_csv(logfile.name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
-            except Exception as uex:
-                print('UnicodeDecodeError Occured AGAIN!')
-                raise uex            
-            
-        except Exception as ex: 
-            print('Error Occured while creating logdetail read_csv#1...', ex)            
-            raise ex
-                        
         # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
         
         # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
         # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
-        format_index = self.get_logformat_index(log_format, format_kind)
+        format_index = self.get_logformat_index(log_format, format_kind)     
         
-        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?)
-        
+        # X-Forwarded-For 처리 위해 전체라인을 먼저 처리한다.
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?) 
+        df_logs = None
         df_logs_all = None
         try:
             df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
@@ -2027,6 +2006,34 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             print('Error Occured while creating logdetail read_csv#2 whole lines...', ex)            
             raise ex
         
+        # X-Forwarded-For 처리부분
+        if log_format.find('X-Forwarded-For') != -1:
+            repl = lambda m: m.group(0)[:-1:]
+            df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\,\ )+', repl)            
+            np.savetxt(logfile.name, df_logs_re.values, fmt="%s")
+            
+        
+        # pandas 활용 - 로그파일 읽기
+        # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
+        # df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, dtype={'freferer':np.str})                
+        
+        try:
+            df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+            
+        except UnicodeDecodeError as ude:
+            
+            print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
+            
+            try:
+                df_logs = pd.read_csv(logfile.name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+            except Exception as uex:
+                print('UnicodeDecodeError Occured AGAIN!')
+                raise uex            
+            
+        except Exception as ex: 
+            print('Error Occured while creating logdetail read_csv#1...', ex)            
+            raise ex                      
+                  
         df_logs['log_line'] = df_logs_all
         
         # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
@@ -2036,7 +2043,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         if log_format.find('h') != -1:
             df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
         else:
-            df_logs['fip'] = 'NA' 
+            #  %{X-Forwarded-For}i의 맨 앞은 사용자 IP, %h와 같이 사용하지 않을 것임   
+            if log_format.find('X-Forwarded-For') != -1:
+                df_logs['fip'] = df_logs[format_index['X-Forwarded-For']].str.split(',').str[0]            
+            else:
+                df_logs['fip'] = 'NA'
             
         # if 'r' in log_format:
         if log_format.find('r') != -1:
@@ -2143,6 +2154,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     format_index['Referer'] = index
                 elif tmp.find('User-Agent') != -1:
                     format_index['User-Agent'] = index
+                elif tmp.find('X-Forwarded-For') != -1:
+                    format_index['X-Forwarded-For'] = index                    
                 elif "%h" in tmp:
                     format_index['h'] = index
                 elif "%t" in tmp:
@@ -2157,7 +2170,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 elif "%D" in tmp:
                     format_index['D'] = index
                 elif "%T" in tmp:
-                    format_index['T'] = index                
+                    format_index['T'] = index   
+                             
             
             # TODO : nginx, IIS                    
             elif format_kind == 'nginx':
