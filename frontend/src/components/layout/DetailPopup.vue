@@ -6,19 +6,21 @@
                 <div class="popup-header__title">
                     {{ this.$store.state.popupHeader }}
                 </div>
+                <div class="popup-header__close">
+                    <lego-icon small v-on:click="clickClose">close</lego-icon>
+                </div>
             </div>
 
             <div class="popup-body" v-html="this.$store.state.popupBody">
             </div>
 
             <div id="gridtable">
-                <!--ui-container-box :columns="20" vertical title="Access Log Details" class="mb50"-->
-                <ui-container-box :columns="20" vertical class="mb50">
+                <ui-container-box :columns="20" vertical>     
                     <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                     <ui-container-box :columns="20" vertical>
-                        <ui-table header-divider no-action :columns="columns" :items="items" class="mt20"></ui-table>
-                    </ui-container-box>
-                    <lego-pagination :pagination="pagingInfo" @move="pageChange" class="mt20" />
+                        <ui-table header-divider no-action :columns="columns" :items="items" class="mt8"></ui-table>
+                    </ui-container-box>      
+                    <lego-pagination :pagination="pagingInfo" @move="pageChange" class="mt8" />
                 </ui-container-box>
             </div>
 
@@ -232,57 +234,46 @@ export default {
 
             switch (this.$store.state.detailcondition) {
                 case 1:
-                    //"HTTP Status Codes (count)"
                     this.$store.state.popupHeader = "HTTP Status Codes (count)"
                     this.$store.state.detailcondition = "S"
                     break;
                 case 2:
-                    //"Requests URI (count)"
                     this.$store.state.popupHeader = "Requests URI (count)"
                     this.$store.state.detailcondition = "R"
                     break;
                 case 3:
-                    //"404 Requests URI (count)"
                     this.$store.state.popupHeader = "404 Requests URI (count)"
                     this.$store.state.detailcondition = "R"
                     break;
                 case 4:
-                    //"Requests Time-taken (s/㎲)"
                     this.$store.state.popupHeader = "Requests Time-taken (s/㎲)"
                     this.$store.state.detailcondition = "R"
                     break;
                 case 5:
-                    //"Visitors (count)"
                     this.$store.state.popupHeader = "Visitors (count)"
                     this.$store.state.detailcondition = "I"
                     break;
                 case 6:
-                    //"Referers (count)"
                     this.$store.state.popupHeader = "Referers (count)"
                     this.$store.state.detailcondition = "E"
                     break;
                 case 7:
-                    //"User Agent (count)"
                     this.$store.state.popupHeader = "User Agent (count)"
                     this.$store.state.detailcondition = "U"
                     break;
                 case 8:
-                    //"Requests URI (Total Bytes)"
                     this.$store.state.popupHeader = "Requests URI (Total Bytes)"
                     this.$store.state.detailcondition = "R"
                     break;
                 case 9:
-                    //"Static files (count)"
                     this.$store.state.popupHeader = "Static files (count)"
-                    //this.$store.state.detailcondition = "R"
+                    this.$store.state.detailcondition = "F"
                     break;
                 case 10:
-                    //"Requests URI (Average Bytes)"
                     this.$store.state.popupHeader = "Requests URI (Average Bytes)"
                     this.$store.state.detailcondition = "R"
                     break;
                 case 11:
-                    //"Requests Average Time-taken (s/㎲)"
                     this.$store.state.popupHeader = "Requests Average Time-taken (s/㎲)"
                     this.$store.state.detailcondition = "R"
                     break;
@@ -406,15 +397,6 @@ export default {
             this.$emit('popupClose');
             //EventBus.$emit("cancel");
         },
-        clickOK: function () {
-            console.log("click Popup OK Button");
-            if (this.$store.state.popupKind == 'Statistics') {
-                this.getStatisticsLogDetails();
-            } else if (this.$store.state.popupKind == 'LongTransaction') {
-                this.getLongTransactionLogDetails();
-            }
-        },
-
     },
 
     created() {
@@ -445,7 +427,7 @@ export default {
 }
 
 .popup-header {
-    /*   position: relative; */
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
 
@@ -474,7 +456,7 @@ export default {
 .popup-buttons {
     display: flex;
     justify-content: flex-end;
-    margin-top: 16px;
+    margin-top: 0px;
 }
 
 .popup-form .ui-form-item {
@@ -502,7 +484,7 @@ export default {
     width: 500px;
     height: 100%;
     margin: 0px auto;
-    padding: 20px 30px 30px;
+    padding: 20px 20px 20px 20;
     background-color: #fff;
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);

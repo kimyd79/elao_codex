@@ -6,6 +6,9 @@
                 <div class="popup-header__title">
                     Log Detail
                 </div>
+                <div class="popup-header__close">
+                    <lego-icon small v-on:click="clickClose">close</lego-icon>
+                </div> 
             </div>
 
             <!--div class="popup-body" v-html="this.$store.state.popupLog">
@@ -75,10 +78,9 @@ export default {
 }
 
 .popup-header {
-    /*   position: relative; */
+    position: relative;
     display: flex;
     flex-flow: column nowrap;
-
 }
 
 .popup-header__title {
@@ -131,7 +133,7 @@ export default {
 .modal-container {
     width: 500px;
     margin: 0px auto;
-    padding: 20px 30px 30px;
+    padding: 20px 20px 20px 20px;
     background-color: #fff;
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
