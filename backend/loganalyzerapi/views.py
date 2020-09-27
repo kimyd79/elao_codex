@@ -1986,18 +1986,19 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         format_index = self.get_logformat_index(log_format, format_kind)     
         
         # X-Forwarded-For 처리 위해 전체라인을 먼저 처리한다.
-        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?) 
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.(\t 사용)
+        # 전체 읽을 때에는 escapechar="\\" 불필요하다.
         df_logs = None
         df_logs_all = None
         try:
-            df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
+            df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, na_filter=False)
             
         except UnicodeDecodeError as ude:
             
             print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
             
             try:
-                df_logs_all = pd.read_csv(logfile.name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
+                df_logs_all = pd.read_csv(logfile.name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, na_filter=False)
             except Exception as uex:
                 print('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -2006,26 +2007,26 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             print('Error Occured while creating logdetail read_csv#2 whole lines...', ex)            
             raise ex
         
+        file_name = logfile.name
+        
         # X-Forwarded-For 처리부분
-        if log_format.find('X-Forwarded-For') != -1:
+        # 성능 때문에 %h가 없는 경우에만 일단 처리
+        if log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1:
             repl = lambda m: m.group(0)[:-1:]
-            df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\,\ )+', repl)            
-            np.savetxt(logfile.name, df_logs_re.values, fmt="%s")
-            
-        
-        # pandas 활용 - 로그파일 읽기
-        # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
-        # df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, dtype={'freferer':np.str})                
-        
-        try:
-            df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+            df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\, )+', repl)            
+            np.savetxt(logfile.name+"_X-Forwarded-For", df_logs_re.values, fmt="%s")
+            file_name = logfile.name+"_X-Forwarded-For"
+                        
+        try:           
+                
+            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
             
         except UnicodeDecodeError as ude:
             
             print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
             
             try:
-                df_logs = pd.read_csv(logfile.name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
             except Exception as uex:
                 print('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
