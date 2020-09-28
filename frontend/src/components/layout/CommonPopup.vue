@@ -17,7 +17,7 @@
             </div>
 
             <div class="popup-buttons">
-                <lego-button main v-on:click="clickCancel" v-if="buttonClose">Close</lego-button>
+                <lego-button main v-on:click="clickClose" v-if="buttonClose">Close</lego-button>
                 <lego-button v-on:click="clickCancel" v-if="buttonCancel">Cancel</lego-button>
                 <lego-button v-on:click="clickOK" v-if="buttonOK">OK</lego-button>
             </div>
@@ -58,7 +58,7 @@ export default {
     },
 
     methods: {
-        clickCancel: function () {
+        clickClose: function () {
             console.log("click Popup Close/Cancel Button");
             this.$emit('popupClose');
         },
@@ -101,6 +101,7 @@ export default {
 .popup-body {
     font-size: 18px;
     margin: 20px 0;
+    word-break: break-all;
 }
 
 .popup-buttons {
