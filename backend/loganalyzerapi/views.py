@@ -2079,11 +2079,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs['fuser_agent'] = 'NA'
 
         time_taken_flag = False    
-        if log_format.find('T') != -1:
+        if log_format.find('%T') != -1:
             df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
             time_taken_flag = True
 
-        if (not time_taken_flag) & (log_format.find('D') != -1):
+        if (not time_taken_flag) & (log_format.find('%D') != -1):
             df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
         else:
             df_logs['ftime_taken'] = -1
