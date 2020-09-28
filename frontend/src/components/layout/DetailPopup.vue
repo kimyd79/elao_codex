@@ -484,7 +484,7 @@ export default {
     width: 500px;
     height: 100%;
     margin: 0px auto;
-    padding: 20px 20px 20px 20;
+    padding: 20px 20px 20px 20px;
     background-color: #fff;
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
