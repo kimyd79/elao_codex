@@ -1133,8 +1133,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
          
         print("== DynamicLogDetailViewSet get_queryset!!")
          
-        # TODO: 필터 조건 적용
-         
         # Request Method 확인
         method = ""
         for key in self.action_map:
@@ -1197,8 +1195,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         print("get_queryset model_name :", model_name)
          
         LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
-        queryset = LogDetail_dynamic.objects.all()    
-            
+        queryset = LogDetail_dynamic.objects.all()
+        
+        timeTakenUnit = ""            
         # 관련 project만 가져온다. : multifile 처리
         if project_id is not None:        
             logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
@@ -1206,7 +1205,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # logfile id 가져오기
             for logfile in logfiles:
-                list_logfile_id.append(str(logfile['logfile_id']))                
+                list_logfile_id.append(str(logfile['logfile_id']))
+                # timeTakenUnit 가져오기
+                timeTakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))                
             
             queryset = queryset.filter(logfile_id__in=list_logfile_id)
         
@@ -1218,7 +1219,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             #print('Date and Time applied!')
         
         # Time-taken : Between
-        if (ttFromValue is not None) and (ttToValue is not None):        
+        if (ttFromValue is not None) and (ttToValue is not None):
+            # Time Unit 구분 : %T -> ms / 1000, %D (micros) -> ms * 1000            
+            if timeTakenUnit == 'D':
+                ttFromValue = int(ttFromValue) * 1000
+                ttToValue   = int(ttToValue) * 1000                 
+            elif timeTakenUnit == 'T':
+                ttFromValue = int(ttFromValue) / 1000
+                ttToValue = int(ttToValue) / 1000
+                    
             queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
             #print('Time-taken applied!')
             
@@ -1450,7 +1459,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 else:
                     results.append({"result" : "-", "result_count" : "0" }) 
                 
-            #type=4. Time-taken Top5(오래 걸린시간)
+            #type=4. Time-taken Top5(오래 걸린시간) -> 초(second)로 통일
             elif type == 4:
                 topn_timetaken_request = queryset.order_by('-ftime_taken')[0:intN]
                 rows = topn_timetaken_request.values('frequest','ftime_taken')
@@ -1459,7 +1468,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
                     # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
                     
-                    results.append({"result" : row['frequest'], "result_count" : row['ftime_taken'], "timetakenUnit" : timetakenUnit})
+                    # 초(second)로 통일
+                    duration_sec = round(row['ftime_taken']/1000000, 1) if timetakenUnit == 'D' else row['ftime_taken']
+                    results.append({"result" : row['frequest'], "result_count" : duration_sec, "timetakenUnit" : 'T'})
                     
             #type=5. Visitor(Unique IP) Top5
             elif type == 5:
@@ -1525,7 +1536,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
                     # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
                     
-                    results.append({"result" : row['requestURL'], "result_count" : row['fbyte_avg']})
+                    results.append({"result" : row['requestURL'], "result_count" : round(row['fbyte_avg'], 1)})
                     
             #type=11. URI Average Time-taken Top N
             elif type == 11:
@@ -1536,7 +1547,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
                     # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
                     
-                    results.append({"result" : row['requestURL'], "result_count" : row['ftime_taken_avg'], "timetakenUnit" : timetakenUnit})
+                    # 초(second)로 통일
+                    duration_sec = round(row['ftime_taken_avg']/1000000, 1) if timetakenUnit == 'D' else row['ftime_taken_avg']
+                    results.append({"result" : row['requestURL'], "result_count" : duration_sec, "timetakenUnit" : 'T'})
         
             print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
             
@@ -1611,7 +1624,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         # print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
                         
                         resultX.append(row['x'])
-                        resultY.append(row['y'])
+                        resultY.append(round(row['y']/3600,1))  # TPS
                         
                 elif(kind == 2):
                     
@@ -1682,7 +1695,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             
                             resultX.append(row['x'])
                             resultY.append(row['y'])
-                            resultY_time.append(row['yt'])
+                            
+                            # 시간은 초단위로 환산한다.      
+                            resultY_time.append(round(row['yt']/1000000, 1) if time_unit == 2 else row['yt'])
+                            
+                            #resultY_time.append(row['yt'])
                     else:
                         hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
                         rows = hhRequest.values('x','y')
@@ -1708,7 +1725,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     for row in rows:
                         # print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
                         resultX.append(row['x'])
-                        resultY.append(row['y'])
+                        #resultY.append(row['y'])
+                        resultY.append(round(row['y']/60,1))  # TPS
+                        
                                         
                     print("== 전체 시간 : ", time.time() - start_time)                    
                     
@@ -1780,7 +1799,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             
                             resultX.append(row['x'])
                             resultY.append(row['y'])
-                            resultY_time.append(row['yt'])
+                            #resultY_time.append(row['yt'])
+                            
+                            # 시간은 초단위로 환산한다.      
+                            resultY_time.append(round(row['yt']/1000000, 1) if time_unit == 2 else row['yt'])
                     else:
                         hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
                         # print("== 쿼리 시간 : ", time.time() - start_time)
@@ -1806,7 +1828,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     for row in rows:
                         print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
                         resultX.append(row['x'])
-                        resultY.append(row['y'])
+                        resultY.append(row['y'])    # TPS
                                         
                     print("== 전체 시간 : ", time.time() - start_time)
                     
@@ -1878,7 +1900,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             
                             resultX.append(row['x'])
                             resultY.append(row['y'])
-                            resultY_time.append(row['yt'])
+                            #resultY_time.append(row['yt'])
+                            
+                            # 시간은 초단위로 환산한다.      
+                            resultY_time.append(round(row['yt']/1000000, 1) if time_unit == 2 else row['yt'])
                     else:
                         hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
                         print("== 쿼리 시간 : ", time.time() - start_time)

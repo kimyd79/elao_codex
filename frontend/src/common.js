@@ -558,14 +558,14 @@ export function getLineChartTemplate(x, y, label) {
     return chartData;
 }
 
-export function getLineChartOptions() {
+export function getLineChartOptions(title) {
 
     var options = {
         responsive: true,
         maintainAspectRatio: false,
         title: {
             display: true,
-            text: 'Request (count)'
+            text: title
         },
 
         scales: {
@@ -584,7 +584,7 @@ export function getLineChartOptions() {
             yAxes: [{
                 scaleLabel: {
                     display: true,
-                    labelString: 'value'
+                    labelString: 'tps'
                 }
             }]
         },
@@ -659,7 +659,7 @@ export function getMultiLineChartOptions(title) {
                     id: "request",
                     scaleLabel: {
                         display: true,
-                        labelString: 'value(count)'
+                        labelString: 'Request(count)'
                     }
                 },{
                     type: 'linear',
@@ -668,7 +668,7 @@ export function getMultiLineChartOptions(title) {
                     id: "time_taken",
                     scaleLabel: {
                         display: true,
-                        labelString: 'value(㎲/s)'
+                        labelString: 'Duration(s)'
                     }
             }]
         },

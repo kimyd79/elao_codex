@@ -61,7 +61,7 @@
         <ui-form-row>
             <ui-form-item :columns="12" label="Charts" align-left required-left>
 
-                <!-- <lego-button @click="lineChartData" main small>Line</lego-button> -->
+                <lego-button @click="lineChartData" main small>Line</lego-button>
 
                 <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
                 <lego-button @click="barChartData" main small>Bar</lego-button>
@@ -78,12 +78,12 @@
 
         <ui-container-box :columns="10" vertical class="mt20">
 
-            <!--div class="vld-parent">
+            <div class="vld-parent">
                 <vue-element-loading :active="isActiveLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
 
                 <lego-button @click="resetZoom(1)" small>resetZoom</lego-button>
                 <chart-line ref='lChart' :chart-data="lChartData" :options="lOptions"></chart-line>
-            </div-->
+            </div>
 
             <div class="vld-parent">
                 <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
@@ -188,7 +188,7 @@ export default {
 
             // for chart reactivess Test
             lChartData: null,
-            lOptions: getLineChartOptions(),
+            lOptions: getLineChartOptions('Waiting..'),
 
             mlChartData: null,
             mlOptions: getMultiLineChartOptions('Waiting..'),
@@ -429,7 +429,9 @@ export default {
 
             try {
                 let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
-                this.lChartData = getLineChartTemplate(res.x, res.y, "Request")
+                this.lChartData = getLineChartTemplate(res.x, res.y, "TPS")
+
+                this.lOptions = getLineChartOptions('Transaction Per Second');
             } catch (err) {
                 console.log(err); // TypeError: failed to fatch
             } finally {
