@@ -28,20 +28,21 @@
     <ui-container-box :columns="20" horizontal class="page-form-area">
 
         <ui-container-box :columns="10" vertical class="mt20">
-            <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="4"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="11"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="6"></statistics>
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="6"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="7"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="11"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="7"></statistics>
         </ui-container-box>
 
     </ui-container-box>
@@ -86,19 +87,18 @@
             </div>
 
             <div class="vld-parent">
-                <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
-                <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
-                <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions"></chart-line>
+                <vue-element-loading :active="isActivePie" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
             </div>
 
-            <div class="vld-parent">
+            <!--div class="vld-parent">
 
                 <vue-element-loading :active="isActiveBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
 
-                <!-- Dummy for Alignment -->
+                Dummy for Alignment
                 <lego-button hidden small>resetZoom</lego-button>
                 <chart-bar ref='bChart' :chart-data="bChartData" :options="bOptions"></chart-bar>
-            </div>
+            </div-->
 
             <div class="vld-parent">
                 <vue-element-loading :active="isActivePie5" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
@@ -108,17 +108,17 @@
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
+            <div class="vld-parent">
+                <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
+                <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions"></chart-line>
+            </div>
 
             <div class="vld-parent">
                 <vue-element-loading :active="isActiveStackedBar" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
 
                 <lego-button @click="resetZoom(3)" small>resetZoom</lego-button>
                 <chart-stacked-bar ref="sbChart" :chart-data="sbChartData" :options="sbOptions"></chart-stacked-bar>
-            </div>
-
-            <div class="vld-parent">
-                <vue-element-loading :active="isActivePie" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
-                <chart-pie :chart-data="pChartData" :options="pOptions"></chart-pie>
             </div>
 
             <div class="vld-parent">
@@ -289,7 +289,7 @@ export default {
 
             this.lineChartData();
             this.multilineChartData();
-            this.barChartData();
+            //this.barChartData();
             this.stackedbarChartData();
             this.pieChartData(5);
             this.pieChartData(1);
