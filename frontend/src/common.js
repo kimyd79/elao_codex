@@ -128,6 +128,9 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
         case 11:
             content = "Requests Average Time-taken (s/㎲)";
             break;
+        case 12:
+            content = "Static file Names (count)";
+            break;
         default:
     };
 

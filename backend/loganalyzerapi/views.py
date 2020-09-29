@@ -1417,7 +1417,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
             
-            #type=0. 전체 처리량(건수)
+            #type=0. 전체 처리량(건수)  TODO:
             if type == 0:
                 cnt = queryset.count()
                 print("type0 : queryset.count() - ", cnt)
@@ -1550,6 +1550,18 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     # 초(second)로 통일
                     duration_sec = round(row['ftime_taken_avg']/1000000, 1) if timetakenUnit == 'D' else row['ftime_taken_avg']
                     results.append({"result" : row['requestURL'], "result_count" : duration_sec, "timetakenUnit" : 'T'})
+                    
+            #type=9. Static filenames Top N               
+            elif type == 12:
+                
+                topn_static_filenames = queryset.filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css']).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]
+                rows = topn_static_filenames.values('frequest','frequest_count')
+                
+                for row in rows:
+                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
+                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    
+                    results.append({"result" : row['frequest'].split(' ')[1], "result_count" : row['frequest_count']})                    
         
             print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
             
@@ -2152,7 +2164,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         # fextension 처리 : frequest로부터 처리한다.
         # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
-        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)', re.DOTALL )
+        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)\s', re.DOTALL )
         df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
         
         # Merge : logdetail_id -> id

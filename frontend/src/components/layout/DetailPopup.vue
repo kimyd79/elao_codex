@@ -15,11 +15,11 @@
             </div>
 
             <div id="gridtable">
-                <ui-container-box :columns="20" vertical>     
+                <ui-container-box :columns="20" vertical>
                     <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                     <ui-container-box :columns="20" vertical>
                         <ui-table header-divider no-action :columns="columns" :items="items" class="mt8"></ui-table>
-                    </ui-container-box>      
+                    </ui-container-box>
                     <lego-pagination :pagination="pagingInfo" @move="pageChange" class="mt8" />
                 </ui-container-box>
             </div>
@@ -339,8 +339,9 @@ export default {
 
             //let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)  
 
-            var ttFromValueThreshold = this.threshold * 1000000
-            var ttToValueThreshold = 99999 * 1000000
+            // sec -> ms 단위로 처리한다.(*1000)
+            var ttFromValueThreshold = this.threshold * 1000
+            var ttToValueThreshold = 99999 * 1000
             //let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
             let filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '')
             //let filters = getDetailSearchFilter(ttFromValueThreshold, ttToValueThreshold, this.projectID)
