@@ -1416,12 +1416,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 timetakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))           
             
             queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
+            totalCnt = queryset.count()
             
             #type=0. 전체 처리량(건수)  TODO:
             if type == 0:
-                cnt = queryset.count()
-                print("type0 : queryset.count() - ", cnt)
-                results.append({"result" : 'Total', "result_count" : cnt})
+                #cnt = queryset.count()
+                print("type0 : queryset.count() - ", totalCnt)
+                results.append({"result" : 'Total', "result_count" : totalCnt})
             
             #type=1. Status Codes Top N       
             elif type == 1:
@@ -1565,7 +1566,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
             print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
             
-            response = {'message': 'statistics returned', 'results': results}
+            response = {'message': 'statistics returned', 'resultType': type, 'results': results, 'totalCnt': totalCnt}
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:

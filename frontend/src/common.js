@@ -91,6 +91,7 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
     // type=9. Static files (count) Top N
     // type=10. Requests URI (Average Bytes) Top N
     // type=11. Requests Average Time-taken (s/㎲)  Top N
+    // type=12. Static file Names (count) Top N
 
     var content = "";
 
