@@ -113,9 +113,17 @@ export default {
 
                 var ratio = ""
                 if (resultType != '4' && resultType != '8' && resultType != '10' && resultType != '11') {
-                    //let percentile = Math.round((results[i].result_count / totalCnt) * 100);
-                    let percentile = (results[i].result_count / totalCnt).toFixed(4) * 100;
-                    ratio = "(" + percentile + "%)"
+
+                    //let percentile = (results[i].result_count / totalCnt).toFixed(4) * 100;
+                    //console.log("percentile = " + percentile);
+
+                    // 소수 3째자리에서 반올림
+                    let pos = Math.pow(10, 3);
+                    let val = Math.round((results[i].result_count / totalCnt) * pos * 100) / pos;
+                    let percentile = val.toFixed(2);
+                    console.log("percentile = " + percentile);
+
+                    ratio = "(" + percentile + "%)";
                 }
 
                 this.items.push({

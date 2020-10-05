@@ -18,7 +18,7 @@
 
                         <!-- TODO: content 종류에 따라 style= "text-align:left;" 적용할 것 -->
                         <td v-on:click="getDetail(item)">{{ item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" )}}</td>
-                        <td>{{ item.result_count }}</td>
+                        <td>{{ item.result_count }} <br> {{ item.ratio }}</td>
                     </tr>
 
                 </tbody>
@@ -95,14 +95,28 @@ export default {
             console.log(item)
         },
 
-        setItems(results) {
+        setItems(results, totalCnt, resultType) {
 
             this.items = []
 
             for (let i = 0; i < results.length; i++) {
+
+                var ratio = ""
+                if (resultType != '4' && resultType != '8' && resultType != '10' && resultType != '11') {
+
+                    // 소수 3째자리에서 반올림
+                    let pos = Math.pow(10, 3);
+                    let val = Math.round((results[i].result_count / totalCnt) * pos * 100) / pos;
+                    let percentile = val.toFixed(2);
+                    console.log("percentile = " + percentile);
+
+                    ratio = "(" + percentile + "%)";
+                }
+
                 this.items.push({
                     result: results[i].result,
-                    result_count: results[i].result_count
+                    result_count: results[i].result_count,
+                    ratio: ratio
                 })
 
                 if (results[i].timetakenUnit == 'D') {
@@ -146,7 +160,7 @@ export default {
             axios.post(commonInfo.url, commonInfo.postData, commonInfo.axiosConfig)
                 .then(res => {
                     console.log(res)
-                    this.setItems(res.data.results);
+                    this.setItems(res.data.results, res.data.totalCnt, res.data.resultType);
                     //Stop Loading Spinner
                     this.isActive = false
                 })

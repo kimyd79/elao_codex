@@ -62,14 +62,16 @@
         <ui-form-row>
             <ui-form-item :columns="12" label="Charts" align-left required-left>
 
-                <lego-button @click="lineChartData" main small>Line</lego-button>
+                <lego-button @click="lineChartData" main small>TPS</lego-button>
 
-                <lego-button @click="multilineChartData" main small>MultiLine</lego-button>
+                <lego-button @click="multilineChartData" main small>Req/Duration</lego-button>
                 <!--<lego-button @click="barChartData" main small>Bar</lego-button>-->
-                <lego-button @click="stackedbarChartData" main small>StackedBar</lego-button>
-                <lego-button @click="pieChartData(5)" main small>Pie(5)</lego-button>
-                <lego-button @click="pieChartData(1)" main small>Pie</lego-button>
-                <lego-button @click="pieChartData(9)" main small>Pie(9)</lego-button>
+                <lego-button @click="pieChartData(1)" main small>Http Status(P)</lego-button>
+                <lego-button @click="stackedbarChartData" main small>Http Status(T)</lego-button>
+
+                <lego-button @click="pieChartData(5)" main small>Visitor IP(5)</lego-button>
+
+                <lego-button @click="pieChartData(9)" main small>Static Files</lego-button>
                 <lego-button @click="allChart()" small>ALL</lego-button>
             </ui-form-item>
         </ui-form-row>
@@ -234,8 +236,8 @@ export default {
     },
 
     created() {
-        this.logfile_id = this.$store.state.logFileID
-        this.project_id = this.$store.state.projectID
+        //this.logfile_id = this.$store.state.logFileID
+        //this.project_id = this.$store.state.projectID
     },
 
     mounted() {
@@ -278,6 +280,7 @@ export default {
             ttFromValue: "getFromTimeTaken",
             ttToValue: "getToTimeTaken",
 
+            logfile_id: "getLogFileID",
             project_id: "getProjectID",
             logFormat: "getLogFormat",
 
@@ -354,23 +357,23 @@ export default {
                     this.pOptions = getPieChartOptions("HTTP Status Codes");
 
                     //Stop Loading Spinner
-                    this.isActivePie = false
+                    //this.isActivePie = false
                 } else if (type == 5) {
                     this.pChartDataVisitorTop5 = getPieChartTemplate(res.x, res.y)
                     this.pOptions = getPieChartOptions("Visitor IP Top5");
 
                     //Stop Loading Spinner
-                    this.isActivePie5 = false
+                    //this.isActivePie5 = false
                 } else if (type == 9) {
                     this.pChartDataExtension = getPieChartTemplate(res.x, res.y)
                     this.pOptions = getPieChartOptions("Static File Types");
 
                     //Stop Loading Spinner
-                    this.isActivePieExtension = false
+                    //this.isActivePieExtension = false
                 }
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch
-
+                console.log(err); // TypeError: failed to fatch                
+            } finally {
                 //Stop Loading Spinner
                 if (type == 1) {
                     this.isActivePie = false;
