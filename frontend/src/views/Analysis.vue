@@ -132,8 +132,12 @@
 
     </ui-container-box>
 
-    <ui-container-box :columns="20" horizontal class="page-tab-area">
-        <img src="@/assets/ico_footer.png" alt="Samsung SDS" />
+    <ui-container-box :columns="20" horizontal>
+        <ui-container-box :columns="10" vertical class="mt20">
+        </ui-container-box>
+        <ui-container-box :columns="3" vertical class="mt20">
+            <img src="@/assets/ico_footer.png" alt="Samsung SDS" />
+        </ui-container-box>
     </ui-container-box>
 
 </ui-container-box>
