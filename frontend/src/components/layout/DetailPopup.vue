@@ -277,6 +277,10 @@ export default {
                     this.$store.state.popupHeader = "Requests Average Time-taken (s/㎲)"
                     this.$store.state.detailcondition = "R"
                     break;
+                case 12:
+                    this.$store.state.popupHeader = "Static file Names (count)"
+                    this.$store.state.detailcondition = "R"
+                    break;
                 default:
             }
         },
@@ -452,6 +456,7 @@ export default {
 .popup-body {
     font-size: 18px;
     margin: 20px 0;
+    word-break: break-all;
 }
 
 .popup-buttons {
