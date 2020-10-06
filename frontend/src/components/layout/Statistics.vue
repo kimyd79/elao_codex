@@ -1,7 +1,7 @@
 <template>
 <keep-alive>
     <div class="vld-parent">
-        <component :is="currentView" v-on:popupClose="currentView=null" :item="item"></component>
+        <component :is="currentView" v-on:popupClose="currentView=null"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <div id="statistics">
             <table class="page-summary-table">
@@ -65,6 +65,7 @@ export default {
 
             // Loading Spinner data
             isActive: false,
+            
             currentView: null,
 
         }
