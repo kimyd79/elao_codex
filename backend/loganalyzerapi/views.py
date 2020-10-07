@@ -1037,7 +1037,7 @@ class LogDetailViewSet(viewsets.ModelViewSet):
         # fextension 처리 : frequest로부터 처리한다.
         # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
         p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)', re.DOTALL )
-        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if (len(p.findall(x)) > 0 and p.findall(x) != 'jsp') > 0 else '-')
+        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
         
         # Merge
         df_logs = df_logs.rename_axis('logdetail_id').reset_index()
