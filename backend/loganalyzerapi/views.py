@@ -48,14 +48,15 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     # http://127.0.0.1:8000/logmaster/?search=aa,22
     
     #filterset_fields = ['project_name', 'uploader']
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    
+    #filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator']
     # Multiple Search
     # http://127.0.0.1:8000/logmaster/?search=aa,22
-    search_fields = ['project_name', 'project_description', 'creator']
+    #search_fields = ['project_name', 'project_description', 'creator']
     
-    ordering_fields = ['project_name', 'project_description', 'created']
-    ordering = ['created']
+    #ordering_fields = ['project_name', 'project_description', 'created']
+    #ordering = ['created']
     
     # Multiple Order
     # http://127.0.0.1:8000/logmaster/?ordering=project_name,-created
@@ -120,8 +121,75 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             freserve2 = FieldSchema.objects.create(model_schema=logdetail_schema, name='freserve2', data_type='character', max_length=200, null=True)
             freserve3 = FieldSchema.objects.create(model_schema=logdetail_schema, name='freserve3', data_type='character', max_length=200, null=True)
             
+<<<<<<< HEAD
             # created = models.DateTimeField(auto_now=True, verbose_name="date create")
             created = FieldSchema.objects.create(model_schema=logdetail_schema, name='created', data_type='date', null=True) 
+=======
+        if log_format.find('User-Agent') != -1:
+            df_logs.rename(columns = {format_index['User-Agent'] : 'fuser_agent'}, inplace = True)
+        else:
+            df_logs['fuser_agent'] = 'NA'
+
+        time_taken_flag = False    
+        if log_format.find('T') != -1:
+            df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
+            time_taken_flag = True
+
+        if (not time_taken_flag) & (log_format.find('D') != -1):
+            df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
+        else:
+            df_logs['ftime_taken'] = -1
+        
+        #'freserve1', 'freserve2', 'freserve3'
+        df_logs['freserve1'] = ''
+        df_logs['freserve2'] = ''
+        df_logs['freserve3'] = ''
+        
+        #'created'
+        datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        df_logs['created'] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
+                
+        #'logfile_id'
+        df_logs['logfile_id'] = logfile_id
+        
+        #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
+        # 시간관련, dummy는 , 때문에
+        time_index = format_index['t']
+        df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
+        series = df_datetime.str.split(' ')
+        df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
+
+        # TODO: Welstorymall Log Error - None인 경우 00으로??
+        month_map = {
+            'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
+            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12'
+        }
+        # TODO: Welstorymall Log Error
+        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])
+        
+        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
+        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+        
+        # fbyte 처리 : - 를 0으로 처리
+        df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
+        
+        # fextension 처리 : frequest로부터 처리한다.
+        # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
+        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)', re.DOTALL )
+        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
+        
+        # Merge
+        df_logs = df_logs.rename_axis('logdetail_id').reset_index()
+        df_logs = pd.concat([df_logs, df_time], axis=1)
+        
+        # 'logdetail_id' : UUID 생성
+        df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4())         
+                        
+        #firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function       
+        #lastRow = df_logs.iloc[-1,] #.to_json(orient='index'), head() function                        
+>>>>>>> 0151c985bbf24f73b3908f0cca55466320800b24
                         
             
             # Field정의 end

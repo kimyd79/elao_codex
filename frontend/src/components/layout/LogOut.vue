@@ -65,15 +65,14 @@ export default {
 
             axios.post(url, null, axiosConfig)
                 .then((response) => {
-                    console.log(response);
-                    this.$store.dispatch("setUserName", 'Not logged in');
-                    this.$store.dispatch("setUserToken", '');
-                    localStorage.setItem('user-token', '');
+                    //console.log(response);
+                    localStorage.removeItem("vuex")
+                    this.$store.reset()
                     delete axios.defaults.headers.common['Authorization'];
                     this.$router.push('/');
                 })
-                .catch((ex) => {
-                    console.log('user logout failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         }
     }

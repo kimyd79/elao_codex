@@ -72,7 +72,7 @@ export default {
     },
 
     created() {
-        console.log(this.statisticsRow, this.statisticsKind)
+        //console.log(this.statisticsRow, this.statisticsKind)
     },
 
     computed: mapGetters({
@@ -102,7 +102,7 @@ export default {
 
             this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
             this.$store.state.popupButton = 'Close';
-            console.log(this.items)
+            //console.log(this.items)
             this.currentView = 'DetailPopup';
         },
 
@@ -122,7 +122,7 @@ export default {
                     let pos = Math.pow(10, 3);
                     let val = Math.round((results[i].result_count / totalCnt) * pos * 100) / pos;
                     let percentile = val.toFixed(2);
-                    console.log("percentile = " + percentile);
+                    //console.log("percentile = " + percentile);
 
                     ratio = "(" + percentile + "%)";
                 }
@@ -172,7 +172,7 @@ export default {
 
             axios.post(commonInfo.url, commonInfo.postData, commonInfo.axiosConfig)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
                     this.setItems(res.data.results, res.data.totalCnt, res.data.resultType);
                     //Stop Loading Spinner
                     this.isActive = false

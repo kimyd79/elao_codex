@@ -167,7 +167,8 @@ export default {
 
             projectName: "",
             projectDescription: "",
-            creator: "Leehs", // TODO : 인증처리 후 사용자 ID입력
+            //creator: "Leehs", // TODO : 인증처리 후 사용자 ID입력
+            creator: this.$store.state.userName,
             projectID: "",
 
             fileName: "",
@@ -307,14 +308,14 @@ export default {
 
         popupOK() {
             this.currentView = null
-            console.log("click popupOK")
+            //console.log("click popupOK")
 
             this.needToAdditionalFile = true;
         },
 
         popupClose() {
             this.currentView = null
-            console.log("click popupClose")
+            //console.log("click popupClose")
 
             this.needToAdditionalFile = false
         },
@@ -336,11 +337,16 @@ export default {
 
             this.$confirm("Do you want to start new project?", "Are you sure?", "question").then(() => {
                 //do something...
-                console.log("OK clicked")
+                //("OK clicked")
 
                 this.isNewProject = true
+                // 로그인 풀림 방지
+                userToken = this.$store.state.userToken
+                userName = this.$store.state.userName
                 localStorage.removeItem("vuex")
                 this.$store.reset()
+                this.$store.dispatch("setUserToken", userToken)
+                this.$store.dispatch("seUserName", userName)
                 this.projectName = ""
                 this.projectDescription = ""
                 this.fileName = ""
@@ -356,7 +362,7 @@ export default {
                 //this.isNewProject = false
 
             }).catch(() => {
-                console.log("Cancel clicked");
+                //console.log("Cancel clicked");
             });
 
         },
@@ -376,7 +382,7 @@ export default {
 
             axios.get(serverUrl + "/logmaster/", axiosConfig)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
 
                     for (let i = 0; i < res.data.results.length; i++) {
 
@@ -384,7 +390,7 @@ export default {
 
                         axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
                             .then(res => {
-                                console.log(res.data)
+                                //console.log(res.data)
                             })
                             .catch(err => {
                                 console.error(err);
@@ -415,7 +421,8 @@ export default {
 
         getProjects() {
 
-            var url = serverUrl + "/logmaster/?search=" + this.creator
+            //var url = serverUrl + "/logmaster/?search=" + this.creator
+            var url = serverUrl + "/logmaster/?creator=" + this.creator
 
             let axiosConfig = {
                 headers: {
@@ -427,7 +434,7 @@ export default {
 
             return axios.get(url, axiosConfig)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
                     this.setItemList(res.data.results);
 
                     this.isActive = false
@@ -474,7 +481,7 @@ export default {
 
                         isNext = true;
                     } catch (err) {
-                        console.log(err)
+                        console.error(err);
                         isNext = false;
                     }
                 } else if (this.radioValue == 2) { // Exist인 경우 기존 정보를 가져온다.
@@ -495,7 +502,7 @@ export default {
                             await this.getLogfile(this.projectID);
                             isNext = true;
                         } catch (err) {
-                            console.log(err)
+                            console.error(err);
                             isNext = false;
                         }
                     }
@@ -510,7 +517,7 @@ export default {
                     isNext = true;
 
                 } catch (err) {
-                    console.log(err)
+                    console.error(err);
                     isNext = false;
                 }
 
@@ -531,7 +538,7 @@ export default {
 
                     isNext = true;
                 } catch (err) {
-                    console.log(err)
+                    console.error(err);
                     isNext = false;
                 }
             }
@@ -596,7 +603,7 @@ export default {
 
             return axios.post(url + "/logmaster/", postData, axiosConfig)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
                     this.projectID = res.data.project_id
 
                     // Set in vuex
@@ -632,7 +639,7 @@ export default {
             return axios.post(url + "/logmaster/create_dynamic_logdetail/", postData, axiosConfig)
                 .then(res => {
 
-                    console.log(res)
+                    //console.log(res)
 
                     this.isActive = false
 
@@ -652,8 +659,8 @@ export default {
         selectFile() {
 
             this.file = this.$refs.file.files[0];
-            console.log('size=' + this.file.size);
-            console.log('name=' + this.file.name);
+            //console.log('size=' + this.file.size);
+            //console.log('name=' + this.file.name);
 
             this.fileName = this.file.name
             this.fileSize = this.file.size
@@ -692,7 +699,7 @@ export default {
 
             return axios.post(url + '/logfile/', formData, axiosConfig)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
 
                     this.logfileID = res.data.logfile_id
 
@@ -733,7 +740,7 @@ export default {
             this.isActive = true
             return axios.post(url + "/logdetail_dynamic/", postData, axiosConfig)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
 
                     this.$store.dispatch("setFromDate", res.data.start_date);
                     this.$store.dispatch("setToDate", res.data.end_date);
@@ -771,10 +778,10 @@ export default {
 
             return axios.get(url, axiosConfig)
                 .then(res => {
-                    console.log(res.data)
-                    console.log(res.data.results[0])
-                    console.log(res.data.results[0].file_format)
-                    console.log(res.data.results[0].file_name)
+                    //console.log(res.data)
+                    //console.log(res.data.results[0])
+                    //console.log(res.data.results[0].file_format)
+                    //console.log(res.data.results[0].file_name)
 
                     // TODO : 파일이 없는 경우도 있다. (프로젝트만 만들어놓은 경우)
                     //        오류처리 해야 한다.
@@ -804,7 +811,7 @@ export default {
 
         getLogDetail(projectID) {
 
-            console.log("getLogDetail projectID : " + projectID)
+            //console.log("getLogDetail projectID : " + projectID)
 
             // TODO: Dynamic
             var url = serverUrl + "/logdetail_dynamic/start_end/"
@@ -818,7 +825,7 @@ export default {
 
             return axios.post(url, postData)
                 .then(res => {
-                    console.log(res)
+                    //console.log(res)
 
                     this.$store.dispatch("setFromDate", res.data.start_date);
                     this.$store.dispatch("setFromTime", res.data.start_time);
@@ -828,7 +835,7 @@ export default {
                     var file_list = ""
                     res.data.file_names.forEach(file => file_list = file_list + file + ", ")
 
-                    console.log("file_list - " + file_list)
+                    //("file_list - " + file_list)
 
                     this.fileName = file_list
                     this.$store.dispatch("setFileNames", file_list);
@@ -852,8 +859,8 @@ export default {
     },
     watch: {
         async isRowChecked() {
-            console.log("Is isRowChecked?")
-            console.log("this.isNewProject : " + this.isNewProject)
+            //console.log("Is isRowChecked?")
+            //console.log("this.isNewProject : " + this.isNewProject)
 
             if (this.isNewProject == false) {
 

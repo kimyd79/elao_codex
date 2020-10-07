@@ -105,7 +105,7 @@ export default {
             //axios.get( 'http://127.0.0.1:8000/logformat/?format_kind='+format_kind)
             axios.get(urlStr + '?format_kind=' + format_kind)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.format_lists = response.data.results;
                     this.selected_format_id = '';
                     this.format.format_id = '';
@@ -114,52 +114,52 @@ export default {
                     this.format.format_strings = '';
                     this.format.creator = '';
                 })
-                .catch((ex) => {
-                    console.log('getData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         getDataOne: function (id) {
             //axios.get( 'http://127.0.0.1:8000/logformat/'+id)
             axios.get(urlStr + id)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.format_lists = response.data;
                 })
-                .catch((ex) => {
-                    console.log('getData failed', ex);
+                .catch((err) => {
+                   console.error(err);
                 })
         },
         deleteData: function (format) {
             //axios.delete( 'http://127.0.0.1:8000/logformat/'+format.format_id)
             axios.delete(urlStr + format.format_id)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.getData("");
                 })
-                .catch((ex) => {
-                    console.log('deleteData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         addData: function (format) {
             //axios.post( 'http://127.0.0.1:8000/logformat/', format)
             axios.post(urlStr, format)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.getData("");
                 })
-                .catch((ex) => {
-                    console.log('addData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         updateData: function (format) {
             //axios.put('http://127.0.0.1:8000/logformat/'+format.format_id+'/', format)
             axios.put(urlStr + format.format_id + '/', format)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.getData("");
                 })
-                .catch((ex) => {
-                    console.log('updateData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         clickList: function (format_list) {
@@ -170,17 +170,17 @@ export default {
             this.format.format_strings = format_list.format_strings;
             this.format.creator = format_list.creator;
             EventBus.$emit("searchFormatDetail", format_list.format_kind);
-            console.log(this.format_kind);
-            console.log("click ID : " + format_list.format_id);
+            //console.log(this.format_kind);
+            //console.log("click ID : " + format_list.format_id);
 
         },
         clickDelete: function () {
             if (this.format.format_id != '') {
                  this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                    console.log("OK clicked");
+                    //console.log("OK clicked");
                     this.deleteData(this.format);
                 }).catch(() => {
-                    console.log("Cancel clicked");
+                    //console.log("Cancel clicked");
                 });
             } else {
                 this.$alert("No Logformat selected", "Confirm Update", "error");

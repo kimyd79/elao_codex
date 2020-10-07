@@ -82,7 +82,7 @@ export default {
                 //.post(serverUrl + "/logdetail/notice/", postData)
                 .post(serverUrl + "/logdetail_dynamic/notice/", postData)
                 .then(res => {
-                    console.log(res);
+                    //console.log(res);
 
                     this.LongTransactionCount = res.data.tiemtakenResult
 
@@ -97,7 +97,7 @@ export default {
         },
         getLongTransactionDetail: function () {
             //alert('LongTransactionCount : ' + this.LongTransactionCount)
-            console.log(this.LongTransactionCount +', ' + this.threshold)
+            //console.log(this.LongTransactionCount +', ' + this.threshold)
             this.$store.state.popupKind = 'LongTransaction';
             this.$store.state.popupHeader = 'Long Transaction Detail'; 
             this.$store.state.popupBody = 'threshold : >= ' + this.threshold +'seconds';

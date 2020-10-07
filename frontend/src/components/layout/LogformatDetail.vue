@@ -46,7 +46,7 @@ export default {
         getData: function (format_kind) {
             axios.get(urlStr + '?format_kind=' + format_kind)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.formatdetail_lists = response.data.results;
                 });
         }

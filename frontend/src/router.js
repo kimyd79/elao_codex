@@ -30,15 +30,24 @@ import Register from "./components/layout/Register.vue"
 import LogIn from "./components/layout/LogIn.vue"
 import LogOut from "./components/layout/LogOut.vue"
 import Project from "./views/Project.vue"
+import store from "@/vuex/store";
 
 Vue.use(Router)
+
+const requireAuth = () => (to, from, next) => {
+  if(store.state.userName == 'Not logged in') {
+    next('/login');
+  } else {
+    next();
+  }
+};
 
 export default new Router({
   routes: [
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: Home,
     },
 
     // LogAnalyzer
@@ -46,13 +55,14 @@ export default new Router({
       path: '/initialization',
       name: 'initialization',
       component: Init,
-      /* 메뉴 이동 시 로그인 여부 체크
+      beforeEnter: requireAuth(),
+      /*/ 메뉴 이동 시 로그인 여부 체크
       beforeEnter(to, from, next) {
-        console.log(localStorage.getItem('user-token'));
-        if(localStorage.getItem('user-token') != '') {
-          next();
+        console.log(store.state.userName);
+        if(store.state.userName == 'Not logged in') {
+          next('/login');
         } else {
-          next('/Login');
+          next();
         }
       } */
     },
@@ -60,21 +70,25 @@ export default new Router({
       path: '/analysis',
       name: 'analysis',
       component: Analysis,
+      beforeEnter: requireAuth(),
     },
     {
       path: '/detail',
       name: 'detail',
       component: Detail,
+      beforeEnter: requireAuth(),
     },
     {
       path: '/comparison_chart',
       name: 'comparison_chart',
       component: Comparison,
+      beforeEnter: requireAuth(),
     },
     {
       path: '/comparison_statistic',
       name: 'comparison_statistic',
       component: ComparisonStatistic,
+      beforeEnter: requireAuth(),
     },
     {
       path: '/management',
@@ -84,7 +98,8 @@ export default new Router({
         {
           path: '/logformat',
           name: 'logformat',
-          component: Logformat
+          component: Logformat,
+          beforeEnter: requireAuth(),
         },
                 {
           path: '/register',
@@ -99,15 +114,17 @@ export default new Router({
         {
           path: '/logout',
           name: 'logout',
-          component: LogOut
+          component: LogOut,
+          beforeEnter: requireAuth(),
         },
         {
           path: '/project',
           name: 'project',
-          component: Project
+          component: Project,
+          beforeEnter: requireAuth(),
         },
       ]
-    },
-
+    },    
+    
   ]
-})
+});

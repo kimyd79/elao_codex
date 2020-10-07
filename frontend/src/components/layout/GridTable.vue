@@ -221,8 +221,8 @@ export default {
                 .get(urlstring)
                 .then(res => {
 
-                    console.log(res.data.count); // 전체건수
-                    console.log(res);
+                    //console.log(res.data.count); // 전체건수
+                    //console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
@@ -236,7 +236,7 @@ export default {
         },
 
         pageChange(page) {
-            console.log(page);
+            //console.log(page);
             this.pagingInfo.currentPage = page;
             this.getLogDetails();
         }

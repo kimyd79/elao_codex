@@ -39,7 +39,7 @@ export default {
     created() {
 
         let project_id = this.projectID
-        console.log(project_id)
+        //console.log(project_id)
 
         //var url = serverUrl + "/logdetail/statistics/"
         var url = serverUrl + "/logdetail_dynamic/statistics/"
@@ -59,7 +59,7 @@ export default {
 
         axios.post(url, postData, axiosConfig)
             .then(res => {
-                console.log(res)
+                //console.log(res)
                 this.totalLogLines = res.data.results[0]["result_count"]
 
             })
