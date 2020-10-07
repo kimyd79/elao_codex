@@ -59,11 +59,11 @@ export default {
 
     methods: {
         clickClose: function () {
-            console.log("click Popup Close/Cancel Button");
+            //console.log("click Popup Close/Cancel Button");
             this.$emit('popupClose');
         },
         clickOK: function () {
-            console.log("click Popup OK Button");
+            //console.log("click Popup OK Button");
             this.$emit('popupOK');
         },
     }

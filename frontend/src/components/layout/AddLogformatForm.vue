@@ -60,7 +60,7 @@ export default {
     },
     methods: {
         clickCancle: function() {
-            console.log("click Cancel Button");
+            //console.log("click Cancel Button");
             this.$emit('popupClose');
         },
         

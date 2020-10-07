@@ -285,14 +285,14 @@ export default {
                 item.isSelected = false
             }
 
-            console.log('item : ', item)
+            //console.log('item : ', item)
 
             // TODO : project_id 등 설정 필요 - vuex 사용
-            console.log('item : ', item.projectID)
-            console.log('item : ', item.projectName)
-            console.log('item : ', item.projectDescription)
-            console.log('item : ', item.logline)            
-            console.log('item.viewname : ', item.viewname) 
+            //console.log('item : ', item.projectID)
+            //console.log('item : ', item.projectName)
+            //console.log('item : ', item.projectDescription)
+            //console.log('item : ', item.logline)            
+            //console.log('item.viewname : ', item.viewname) 
             // log detail table에서만 Popup 생성
             if( item.viewname == 'detail'){
                 //this.$alert(item.logline, "Access Log", "info");

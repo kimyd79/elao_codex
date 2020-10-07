@@ -376,7 +376,7 @@ export default {
                     //this.isActivePieExtension = false
                 }
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch                
+                console.error(err); // TypeError: failed to fatch                
             } finally {
                 //Stop Loading Spinner
                 if (type == 1) {
@@ -401,7 +401,7 @@ export default {
                 this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
                 this.bOptions = getBarChartOptions(res.label)
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch
+               console.error(err); // TypeError: failed to fatch
             } finally {
                 //Stop Loading Spinner
                 this.isActiveBar = false
@@ -420,7 +420,7 @@ export default {
                 this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
                 this.sbOptions = getStackedBarChartOptions('Http Status Code');
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
             } finally {
                 //Stop Loading Spinner
                 this.isActiveStackedBar = false
@@ -441,7 +441,7 @@ export default {
 
                 this.lOptions = getLineChartOptions('Transaction Per Second');
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
             } finally {
                 //Stop Loading Spinner
                 this.isActiveLine = false
@@ -461,7 +461,7 @@ export default {
                 this.mlChartData = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, 'Time-Taken');
                 this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken');
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
             } finally {
                 //Stop Loading Spinner
                 this.isActiveMultiLine = false

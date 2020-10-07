@@ -347,7 +347,7 @@ export default {
 
         search1Chart() {
 
-            console.log("search1Chart")
+            //console.log("search1Chart")
 
             this.lineChartData(1)
             this.multilineChartData(1)
@@ -361,7 +361,7 @@ export default {
 
         search2Chart() {
 
-            console.log("search2Chart")
+            //console.log("search2Chart")
 
             this.lineChartData(2)
             this.multilineChartData(2)
@@ -455,7 +455,7 @@ export default {
                 //this.pOptions = getPieChartOptions("HTTP Status Codes");
 
             } catch (err) {
-                console.log(err); // TypeError: failed to fatch                
+                console.error(err); // TypeError: failed to fatch                
             } finally {
                 //Stop Loading Spinner
                 if (searchArea == 1) {
@@ -503,7 +503,7 @@ export default {
                 }
             } catch (err) {
 
-                console.log(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
 
                 if (searchArea == 1) {
                     this.isActiveBar1 = false
@@ -536,7 +536,7 @@ export default {
                 this.sbOptions = getStackedBarChartOptions('Http Status Code');
             } catch (err) {
 
-                console.log(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
 
             } finally {
                 if (searchArea == 1) {
@@ -569,7 +569,7 @@ export default {
                 this.lOptions = getLineChartOptions('Transaction Per Second');
             } catch (err) {
 
-                console.log(err); // TypeError: failed to fatch               
+                console.error(err); // TypeError: failed to fatch               
             } finally {
                 if (searchArea == 1) {
                     this.isActiveLine1 = false
@@ -601,7 +601,7 @@ export default {
                 this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken');
             } catch (err) {
 
-                console.log(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
 
             } finally {
                 if (searchArea == 1) {

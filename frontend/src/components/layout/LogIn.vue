@@ -19,7 +19,7 @@
             </ui-form-item>
 
             <ui-form-item :columns=8 label="Password" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="login.password" v-on:keyup.enter="clickLogin" placeholder="enter password" />
+                <lego-text-field v-model="login.password" v-on:keyup.enter="clickLogin" placeholder="enter password" password/>
             </ui-form-item>
 
         </div>
@@ -70,16 +70,16 @@ export default {
 
             axios.post(url, this.login)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     //토큰을 로컬스토리지에 저장
                     localStorage.setItem('user-token', response.data.key);
                     this.$store.dispatch("setUserToken", response.data.key);
                     axios.defaults.headers.common['Authorization'] = 'Token ' + response.data.key;
-                    console.log(this.$store.state.userToken);
+                    //console.log(this.$store.state.userToken);
                     this.getUserInfo();
                 })
-                .catch((ex) => {
-                    console.log('user login failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
 
@@ -91,19 +91,19 @@ export default {
                     'Authorization': 'Token ' + this.$store.state.userToken
                 }
             };
-            console.log(this.$store.state.userName);
-            console.log(axiosConfig);
+            //console.log(this.$store.state.userName);
+            //console.log(axiosConfig);
             axios.get(url, axiosConfig)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     //토큰을 로컬스토리지에 저장
                     localStorage.setItem('user-name', response.data.username);
                     this.$store.dispatch("setUserName", response.data.username);
-                    console.log(this.$store.state.userName);
-                    this.$router.push('/');
+                    //console.log(this.$store.state.userName);
+                    this.$router.push('/initialization');
                 })
-                .catch((ex) => {
-                    console.log('get user info failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
     }

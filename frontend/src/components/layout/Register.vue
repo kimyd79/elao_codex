@@ -19,11 +19,11 @@
             </ui-form-item>
 
             <ui-form-item :columns=8 label="Password" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="register.password1" placeholder="enter password" />
+                <lego-text-field v-model="register.password1" placeholder="enter password" password/>
             </ui-form-item>
 
             <ui-form-item :columns=8 label="Confirm Password" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="register.password2" placeholder="confirm password" />
+                <lego-text-field v-model="register.password2" placeholder="confirm password" password/>
             </ui-form-item>
 
             <ui-form-item :columns=8 label="email" required left-label :label-width=144 :label-padding=16>
@@ -74,11 +74,11 @@ export default {
         clickRegister: function () {
             axios.post(serverUrl + '/rest-auth/registration/', this.register)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.$router.push('/Login');
                 })
-                .catch((ex) => {
-                    console.log('user register failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
     }

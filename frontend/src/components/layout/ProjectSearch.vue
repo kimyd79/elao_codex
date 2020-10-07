@@ -31,7 +31,7 @@ export default {
           this.project_name = ''
         }
         EventBus.$emit("searchProject", this.project_name);
-        console.log(this.project_name);
+        //console.log(this.project_name);
       }
     }
 };

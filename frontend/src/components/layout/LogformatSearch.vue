@@ -31,7 +31,7 @@ export default {
         }
         EventBus.$emit("searchFormat", this.format_kind);
         EventBus.$emit("searchFormatDetail", 'Clear');
-        console.log(this.format_kind);
+        //console.log(this.format_kind);
       }
     }
 };

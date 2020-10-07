@@ -155,7 +155,7 @@ export default {
     },
 
     computed: mapGetters({
-        isSearch: "getToggleSearch",
+        //isSearch: "getToggleSearch",
 
         dateFromValue: "getFromDate",
         dateToValue: "getToDate",
@@ -296,9 +296,9 @@ export default {
 
             //let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)
             let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
-            console.log("DetailPopUp detailconditionValue : " + this.detailconditionValue)
-            console.log("DetailPopUp detailsearchValue : " + this.detailsearchValue)
-            console.log("DetailPopUp filters : " + filters)
+            //console.log("DetailPopUp detailconditionValue : " + this.detailconditionValue)
+            //console.log("DetailPopUp detailsearchValue : " + this.detailsearchValue)
+            //console.log("DetailPopUp filters : " + filters)
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -320,8 +320,8 @@ export default {
                 .get(urlstring)
                 .then(res => {
 
-                    console.log(res.data.count); // 전체건수
-                    console.log(res);
+                    //console.log(res.data.count); // 전체건수
+                    //console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
@@ -349,9 +349,9 @@ export default {
             //let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
             let filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '')
             //let filters = getDetailSearchFilter(ttFromValueThreshold, ttToValueThreshold, this.projectID)
-            console.log("LongTransactionDetailPopUp ttFromValueThreshold : " + ttFromValueThreshold)
-            console.log("LongTransactionDetailPopUp ttToValueThreshold : " + ttToValueThreshold)
-            console.log("LongTransactionDetailPopUp filters : " + filters)
+            //console.log("LongTransactionDetailPopUp ttFromValueThreshold : " + ttFromValueThreshold)
+            //console.log("LongTransactionDetailPopUp ttToValueThreshold : " + ttToValueThreshold)
+            //console.log("LongTransactionDetailPopUp filters : " + filters)
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -373,8 +373,8 @@ export default {
                 .get(urlstring)
                 .then(res => {
 
-                    console.log(res.data.count); // 전체건수
-                    console.log(res);
+                    //console.log(res.data.count); // 전체건수
+                    //console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
@@ -388,7 +388,7 @@ export default {
         },
 
         pageChange(page) {
-            console.log(page);
+            //console.log(page);
             this.pagingInfo.currentPage = page;
             if (this.$store.state.popupKind == 'Statistics') {
                 this.getStatisticsLogDetails();
@@ -398,7 +398,7 @@ export default {
         },
 
         clickClose: function () {
-            console.log("click Popup Close/Cancel Button");
+            //("click Popup Close/Cancel Button");
             this.$emit('popupClose');
             //EventBus.$emit("cancel");
         },

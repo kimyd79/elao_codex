@@ -91,7 +91,7 @@ export default {
         getData: function (project_name) {
             axios.get(urlStr + '?search=' + project_name)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.project_lists = response.data.results;
                     this.selected_project_id = '';
                     this.project.project_id = '';
@@ -100,28 +100,28 @@ export default {
                     this.project.creator = '';
                     this.project.created = '';
                 })
-                .catch((ex) => {
-                    console.log('getData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         deleteData: function (project) {
             axios.delete(urlStr + project.project_id)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.getData("");
                 })
-                .catch((ex) => {
-                    console.log('deleteData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         updateData: function (project) {
             axios.put(urlStr + project.project_id + '/', project)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.getData("");
                 })
-                .catch((ex) => {
-                    console.log('updateData failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         clickList: function (project_list) {
@@ -131,17 +131,17 @@ export default {
             this.project.project_description = project_list.project_description;
             this.project.creator = project_list.creator;
             this.project.created = project_list.created;
-            console.log(this.project_name);
-            console.log("click ID : " + project_list.project_id);
+            //console.log(this.project_name);
+            //console.log("click ID : " + project_list.project_id);
 
         },
         clickDelete: function () {
             if (this.project.project_id != '') {
                 this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                    console.log("OK clicked");
+                    //console.log("OK clicked");
                     this.deleteData(this.project);
                 }).catch(() => {
-                    console.log("Cancel clicked");
+                    //console.log("Cancel clicked");
                 });
             } else {
                 this.$alert("No Project selected", "Confirm Delete", "error");

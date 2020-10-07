@@ -72,15 +72,15 @@ export default {
         getDataOne: function (id) {
             axios.get(urlStr + id)
                 .then((response) => {
-                    console.log(response);
+                    //console.log(response);
                     this.select_format = response.data;
                 })
-                .catch((ex) => {
-                    console.log('getDataOne failed', ex);
+                .catch((err) => {
+                    console.error(err);
                 })
         },
         clickCancle: function () {
-            console.log("click Cancel Button");
+            //console.log("click Cancel Button");
             this.$emit('popupClose');
         },
 
