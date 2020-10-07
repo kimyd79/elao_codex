@@ -341,12 +341,12 @@ export default {
 
                 this.isNewProject = true
                 // 로그인 풀림 방지
-                userToken = this.$store.state.userToken
-                userName = this.$store.state.userName
+                let userToken = this.$store.state.userToken
+                let userName = this.$store.state.userName
                 localStorage.removeItem("vuex")
                 this.$store.reset()
                 this.$store.dispatch("setUserToken", userToken)
-                this.$store.dispatch("seUserName", userName)
+                this.$store.dispatch("setUserName", userName)
                 this.projectName = ""
                 this.projectDescription = ""
                 this.fileName = ""
