@@ -45,14 +45,15 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     # http://127.0.0.1:8000/logmaster/?search=aa,22
     
     #filterset_fields = ['project_name', 'uploader']
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    
+    #filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['creator']
     # Multiple Search
     # http://127.0.0.1:8000/logmaster/?search=aa,22
-    search_fields = ['project_name', 'project_description', 'creator']
+    #search_fields = ['project_name', 'project_description', 'creator']
     
-    ordering_fields = ['project_name', 'project_description', 'created']
-    ordering = ['created']
+    #ordering_fields = ['project_name', 'project_description', 'created']
+    #ordering = ['created']
     
     # Multiple Order
     # http://127.0.0.1:8000/logmaster/?ordering=project_name,-created
