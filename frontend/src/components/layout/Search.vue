@@ -1,6 +1,7 @@
 <template>
 <div id="search">
-    <ui-container-box :columns="20" vertical title="Search" class="mb50">
+    <ui-container-box :columns="20" vertical title="Search">
+        <!-- class="mb50" -->
         <ui-form-box>
             <ui-form-row>
                 <ui-form-item :columns="12" label="Date/Time" required-left>

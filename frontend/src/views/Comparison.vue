@@ -30,29 +30,39 @@
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
 
         <ui-form-item :columns="10" label="Select" align-left required-left>
-            <lego-button @click="lineChartData(1)" main small>TPS</lego-button>
-            <lego-button @click="multilineChartData(1)" main small>Req/Duration</lego-button>
-            <!-- <lego-button @click="barChartData(1)" main small>Bar</lego-button> -->
-            <lego-button @click="stackedbarChartData(1)" main small>Http Status(T)</lego-button>
-            <lego-button @click="pieChartData(1)" main small>Http Status(P)</lego-button>
-
-            <lego-button @click="pieChartData(5)" main small>Visitor IP(5)</lego-button>
-            <lego-button @click="pieChartData(9)" main small>Static Files</lego-button>
-
-            <lego-button @click="search1Chart" small>ALL</lego-button>
+            <ui-form-box>
+                <ui-form-row>
+                    <lego-button @click="lineChartData(1)" main small>TPS</lego-button>
+                    <lego-button @click="multilineChartData(1)" main small>Req/Duration</lego-button>
+                    <!-- <lego-button @click="barChartData(1)" main small>Bar</lego-button> -->
+                    <lego-button @click="stackedbarChartData(1)" main small>Http Status(T)</lego-button>
+                    <lego-button @click="pieChartData(1,1)" main small>Http Status(P)</lego-button>
+                    <lego-button @click="pieChartData(1,5)" main small>Visitor IP(5)</lego-button>
+                </ui-form-row>
+                <br>
+                <ui-form-row>
+                    <lego-button @click="pieChartData(1,9)" main small>Static Files</lego-button>
+                    <lego-button @click="search1Chart" small>ALL</lego-button>
+                </ui-form-row>
+            </ui-form-box>
         </ui-form-item>
 
         <ui-form-item :columns="10" label="Select" align-left required-left>
-            <lego-button @click="lineChartData(2)" main small>TPS</lego-button>
-            <lego-button @click="multilineChartData(2)" main small>Req/Duration</lego-button>
-            <!--<lego-button @click="barChartData(2)" main small>Bar</lego-button> -->
-            <lego-button @click="stackedbarChartData(2)" main small>Http Status(T)</lego-button>
-            <lego-button @click="pieChartData(2)" main small>Http Status(P)</lego-button>
-
-            <lego-button @click="pieChartData(5)" main small>Visitor IP(5)</lego-button>
-            <lego-button @click="pieChartData(9)" main small>Static Files</lego-button>
-
-            <lego-button @click="search2Chart" small>ALL</lego-button>
+            <ui-form-box>
+                <ui-form-row>
+                    <lego-button @click="lineChartData(2)" main small>TPS</lego-button>
+                    <lego-button @click="multilineChartData(2)" main small>Req/Duration</lego-button>
+                    <!--<lego-button @click="barChartData(2)" main small>Bar</lego-button> -->
+                    <lego-button @click="stackedbarChartData(2)" main small>Http Status(T)</lego-button>
+                    <lego-button @click="pieChartData(2,1)" main small>Http Status(P)</lego-button>
+                    <lego-button @click="pieChartData(2,5)" main small>Visitor IP(5)</lego-button>
+                </ui-form-row>
+                <br>
+                <ui-form-row>
+                    <lego-button @click="pieChartData(2,9)" main small>Static Files</lego-button>
+                    <lego-button @click="search2Chart" small>ALL</lego-button>
+                </ui-form-row>
+            </ui-form-box>
         </ui-form-item>
 
     </ui-container-box>

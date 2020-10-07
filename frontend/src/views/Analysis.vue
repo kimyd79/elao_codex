@@ -14,39 +14,6 @@
         <search></search>
     </ui-container-box>
 
-    <!-- Statisctic -->
-    <ui-container-box :columns="20" vertical align-left class="page-title">
-        <span class="page-title__label">Statistics - Top {{ valueN == 0 ? "" : valueN }}</span>
-        <ui-form-row>
-            <ui-form-item :columns="12" label="Select N" align-left required-left>
-                <!-- TODO: 이벤트 처리, 숫자 바뀔 때 -->
-                <lego-dropdown :items="listN" v-model="valueN" width="100px" />
-            </ui-form-item>
-        </ui-form-row>
-    </ui-container-box>
-
-    <ui-container-box :columns="20" horizontal class="page-form-area">
-
-        <ui-container-box :columns="10" vertical class="mt20">
-            <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="12"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1"></statistics>
-        </ui-container-box>
-
-        <ui-container-box :columns="10" vertical class="mt20">
-            <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1"></statistics>
-        </ui-container-box>
-
-    </ui-container-box>
-
     <!-- Charts 영역 -->
     <ui-container-box :columns="20" vertical align-left class="page-title">
         <span class="page-title__label">Charts</span>
@@ -128,6 +95,39 @@
                 <chart-pie :chart-data="pChartDataExtension" :options="pOptions"></chart-pie>
             </div>
 
+        </ui-container-box>
+
+    </ui-container-box>
+
+    <!-- Statisctic -->
+    <ui-container-box :columns="20" vertical align-left class="page-title">
+        <span class="page-title__label">Statistics - Top {{ valueN == 0 ? "" : valueN }}</span>
+        <ui-form-row>
+            <ui-form-item :columns="12" label="Select N" align-left required-left>
+                <!-- TODO: 이벤트 처리, 숫자 바뀔 때 -->
+                <lego-dropdown :items="listN" v-model="valueN" width="100px" />
+            </ui-form-item>
+        </ui-form-row>
+    </ui-container-box>
+
+    <ui-container-box :columns="20" horizontal class="page-form-area">
+
+        <ui-container-box :columns="10" vertical class="mt20">
+            <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="12"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1"></statistics>
+        </ui-container-box>
+
+        <ui-container-box :columns="10" vertical class="mt20">
+            <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1"></statistics>
         </ui-container-box>
 
     </ui-container-box>
@@ -401,7 +401,7 @@ export default {
                 this.bChartData = getBarChartTemplate(res.x, res.y, res.label)
                 this.bOptions = getBarChartOptions(res.label)
             } catch (err) {
-               console.error(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fatch
             } finally {
                 //Stop Loading Spinner
                 this.isActiveBar = false
