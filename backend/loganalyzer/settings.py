@@ -177,3 +177,44 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(levelname)s][%(asctime)s,%(msecs)3d][%(process)d|%(thread)d][%(name)s|%(funcName)s|%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            #'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',            
+            'filename': os.path.join(BASE_DIR, 'logs', 'mwla.log'),   
+            'formatter': 'verbose',
+            'when': 'midnight',
+            'backupCount': '30',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'loganalyzerapi': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}

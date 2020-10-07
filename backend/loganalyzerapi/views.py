@@ -28,6 +28,9 @@ import numpy as np
 from dynamic_models.models import ModelSchema, FieldSchema
 from django.apps import apps
 
+from django.conf import settings
+import logging
+logger = logging.getLogger(__name__)
     
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
@@ -66,7 +69,8 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     def create_dynamic_logdetail(self, request, pk=None):
         
         try:
-            project_id = request.data['project_id']        
+            project_id = request.data['project_id']
+                    
             print('create_dynamic_logdetail project_id : ', project_id)
             
             # TODO: 동적테이블 생성
@@ -153,951 +157,6 @@ class LogFileViewSet(viewsets.ModelViewSet):
     '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
     '$' Regex search. : default
     '''   
-    
-class LogDetailViewSet(viewsets.ModelViewSet):
-    queryset = LogDetail.objects.all()
-    serializer_class = LogDetailSerializer
-    
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    
-    # filterset_fields 사용
-    # -> http://example.com/api/products?category=clothing&in_stock=True
-    # 정확한 검색
-    filterset_fields = ['fdate', 'ftime', 'fyear', 'fmonth', 'fday', 'fhour', 'fminute', 'fsecond', 'ftime_taken']
-    search_fields = ['fdate', 'ftime', 'fyear', 'fmonth', 'fday', 'fhour', 'fminute', 'fsecond', 'frequest', 'fip', 'freferer', 'fuser_agent', 'fstatus']    
-    
-    ordering_fields = ['fdate', 'ftime', 'fyear', 'fmonth', 'fday', 'fhour', 'fminute', 'fsecond', 'frequest', 'fip', 'freferer', 'fuser_agent', 'fstatus', 'ftime_taken']
-    ordering = ['fdate', 'ftime']
-    
-    # Multiple Order
-    # http://127.0.0.1:8000/logdetail/?ordering=project_name,-created
-    
-    # search + pagination + ordering
-    # http://127.0.0.1:8000/logdetail/?search=te&ordering=-created&limit=10&offset=1
-    
-    # Pagination : LimitOffsetPagination
-    # http://127.0.0.1:8000/logdetail/?limit=10&offset=20
-    
-    
-    # Reference API : http://www.cdrf.co/3.1/rest_framework.viewsets/ModelViewSet.html#get_queryset 
-    # QuerySet(Field lookups) : https://docs.djangoproject.com/en/3.0/ref/models/querysets/#id4    
-    
-    def getTimetakenUnit(self, logfile_id):
-        file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
-        
-        if file_format.find('D') != -1:
-            return 'D'
-        elif file_format.find('T') != -1:
-            return 'T'
-        else:
-            return None
-        
-    @action(methods=['post'], detail=False)
-    def notice(self, request, pk=None):
-        
-        try:
-            project_id = request.data['project_id']        
-            print('notice project_id : ', project_id)
-            
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')
-            list_logfile_id = []
-            timetakenUnit = "" 
-            
-            tiemtakenResult = 0
-            
-            for logfile in logfiles:
-                list_logfile_id.append(str(logfile['logfile_id']))
-                timetakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))
-                
-            #CASE1 : TimeTaken 3초 이상 건수(%T : seconds, %D : microseconds)
-            #TODO: Threshold 설정값 관리
-            if timetakenUnit is not None:
-                threshold = 3 if timetakenUnit == 'T' else 3*1000000    
-                tiemtakenResult = LogDetail.objects.filter(logfile_id__in=list_logfile_id).filter(ftime_taken__gt=threshold).count()
-            else:
-                tiemtakenResult = "N/A"
-            
-            response = {'message': 'notice returned successfully', 'tiemtakenResult': tiemtakenResult}        
-            return Response(response, status = status.HTTP_200_OK)
-            
-        except Exception as ex:
-            print('Error Occured while processing notice...', ex)
-                    
-            response = {'message': 'notice creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    @action(methods=['post'], detail=False)
-    def start_end(self, request, pk=None):
-        
-        # logfile_id 1개의 경우
-        # logfile_id = request.data['logfile_id']        
-        # print('start_end logfile_id : ', logfile_id)
-        
-        # tempset = LogDetail.objects.filter(logfile_id=logfile_id).order_by('fdatetime')
-        
-        # logfile_id 여러개의 경우 : project_id로 logfile_id 목록을 가져옴 from Logfile Model
-        try:
-            project_id = request.data['project_id']        
-            print('start_end project_id : ', project_id)
-            
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id', 'file_name')
-            list_logfile_id = []
-            list_file_name = []
-            
-            for logfile in logfiles:
-                list_logfile_id.append(str(logfile['logfile_id']))
-                list_file_name.append(logfile['file_name'])
-            
-            tempset = LogDetail.objects.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
-            
-            firstRow = tempset.first()
-            lastRow = tempset.last()
-            
-            response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime, 'file_names': list_file_name}        
-            return Response(response, status = status.HTTP_200_OK)
-            
-        except Exception as ex:
-            print('Error Occured while processing start_end...', ex)
-                    
-            response = {'message': 'start_end creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-           
-    
-    # For Statistics - chartdata    
-    @action(methods=['post'], detail=False)
-    def chartdata(self, request, pk=None):
-
-        try:        
-            # project_id 가져와야 한다.(화면 연계필요)
-            #logfile_id = request.data['logfile_id']
-            
-            project_id = request.data['project_id']        
-            print('**chartdata project_id : ', project_id) 
-            
-            type = request.data['type']
-            kind = request.data['kind']
-            print("** chartdata : type, kind --> ", type, kind)
-            
-            # 검색 조건 적용
-            queryset = self.get_queryset()
-            
-            # 결과 처리
-            resultX = []
-            resultY = []
-            resultY_time = []
-            resultY_time_unit = 0
-                    
-            resultY_200 = []
-            resultY_300 = []
-            resultY_400 = []
-            resultY_500 = []
-            
-            resultY_SCode = {}
-            
-            start_time = time.time()
-            
-            #1. project_id에 연관된 logfile_id들을 가져온다.
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')                        
-            list_logfile_id = []         
-            
-            # logfile id 가져오기
-            for logfile in logfiles:    # Loop 시작구간
-                list_logfile_id.append(str(logfile['logfile_id']))   
-        
-            #2. 아래 로직을 Loop 돌린다.
-            queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
-
-            # Type1 : 시(HH)기준
-            #   Kind1 : request(요청) 건수(count)        
-            #   Kind2 : status code 건수(count)
-            #   Kind3 : time-taken 시간(max, min, count)
-            
-            #type=1. 시(HH)기준
-            if type == '1':          
-
-                if(kind == 1):
-                    
-                    hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
-                    rows = hhRequest.values('x','y')
-                                
-                    for row in rows:
-                        # print("type1, kind1 : request(요청) 건수(count) x - ",row['x'])
-                        # print("type1, kind1 : request(요청) 건수(count) y - ",row['y'])
-                        
-                        resultX.append(row['x'])
-                        resultY.append(row['y'])
-                        
-                elif(kind == 2):
-                    
-                    start_time = time.time()
-                    
-                    hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                    rows = hhRequest.values('f_date', 'f_status', 'status_count')
-                    
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    statusCount = {}
-                    
-                    resultStatusCode = []
-                                                
-                    for row in rows:
-                        # print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
-                        # print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
-                        # print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
-                        
-                        # x축 : 중복제거
-                        if row['f_date'] not in resultX:
-                            resultX.append(row['f_date'])
-                            
-                        # y축-1 : status 코드 중복제거
-                        if row['f_status'] not in resultStatusCode:
-                            resultStatusCode.append(row['f_status']) 
-                            
-                        # 전체 Map 구하기                    
-                        statusCount[row['f_status']] = row['status_count']
-                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
-                        
-                    for xDate in resultX:
-                        for yStatusCode in resultStatusCode:
-                            
-                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                            else:
-                                print('There is no available status code.')
-                            
-                    print("== 전체 시간 : ", time.time() - start_time)
-                    
-                elif(kind == 3):
-                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
-                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
-                    # 0: None, 1 : second(%T), 2: microsecond(%D)
-                    time_unit = 0
-                    if file_format.find('%T') != -1:
-                        time_unit = 1 
-                    elif file_format.find('%D') != -1:
-                        time_unit = 2
-                    
-                    resultY_time_unit = time_unit
-                                        
-                    if time_unit != 0:
-                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'), yt=Avg('ftime_taken'))
-                        rows = hhRequest.values('x','y', 'yt')
-                                    
-                        for row in rows:
-                            # print("type1, kind3 : request(요청) 건수(count) x - ",row['x'])
-                            # print("type1, kind3 : request(요청) 건수(count) y - ",row['y'])
-                            # print("type1, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
-                            
-                            resultX.append(row['x'])
-                            resultY.append(row['y'])
-                            resultY_time.append(row['yt'])
-                    else:
-                        pass
-            
-            # Type2 : 시분(HHMM)기준                    
-            #   Kind1 : request(요청) 건수(count)
-            #   Kind2 : status code 건수(count)
-            #   Kind3 : time-taken 시간(max, min, count) 
-            elif type == '2':          
-                            
-                if(kind == 1):               
-                    
-                    hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
-                    # print("== 쿼리 시간 : ", time.time() - start_time)
-                    rows = hhmmRequest.values('x','y')
-                    
-                    for row in rows:
-                        # print("type2, kind1 : request(요청) 건수(count) x - ",row['x'])
-                        resultX.append(row['x'])
-                        resultY.append(row['y'])
-                                        
-                    print("== 전체 시간 : ", time.time() - start_time)                    
-                    
-                elif(kind == 2):
-                    
-                    hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                    rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
-                    
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    statusCount = {}
-                    
-                    resultStatusCode = []
-                                                
-                    for row in rows:
-                        # print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
-                        # print("type2, kind2 : status code 건수(count) y - ",row['f_status'])
-                        # print("type2, kind2 : status code 건수(count) y - ",row['status_count'])
-                        
-                        # x축 : 중복제거
-                        if row['f_date'] not in resultX:
-                            resultX.append(row['f_date'])
-                            
-                        # y축-1 : status 코드 중복제거
-                        if row['f_status'] not in resultStatusCode:
-                            resultStatusCode.append(row['f_status']) 
-                            
-                        # 전체 Map 구하기                    
-                        statusCount[row['f_status']] = row['status_count']
-                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
-                        
-                    for xDate in resultX:
-                        for yStatusCode in resultStatusCode:
-                            
-                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                            else:
-                                #print('There is no available status code.')
-                                pass
-                            
-                    print("== 전체 시간 : ", time.time() - start_time)
-                        
-                elif(kind == 3):
-                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
-                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
-                    # 0: None, 1 : second(%T), 2: microsecond(%D)
-                    time_unit = 0
-                    if file_format.find('%T') != -1:
-                        time_unit = 1 
-                    elif file_format.find('%D') != -1:
-                        time_unit = 2
-                    
-                    resultY_time_unit = time_unit
-                                        
-                    if time_unit != 0:
-                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Count('frequest'), yt=Avg('ftime_taken'))
-                        rows = hhmmRequest.values('x','y', 'yt')
-                                    
-                        for row in rows:
-                            # print("type2, kind3 : request(요청) 건수(count) x - ",row['x'])
-                            # print("type2, kind3 : request(요청) 건수(count) y - ",row['y'])
-                            # print("type2, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
-                            
-                            resultX.append(row['x'])
-                            resultY.append(row['y'])
-                            resultY_time.append(row['yt'])
-                    else:
-                        pass
-            # Type3 : 시분초(HHMMSS)기준                    
-            #   Kind1 : request(요청) 건수(count)
-            #   Kind2 : status code 건수(count)
-            #   Kind3 : time-taken 시간(max, min, count) 
-            elif type == '3':          
-                            
-                if(kind == 1):               
-                    
-                    hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
-                    print("== 쿼리 시간 : ", time.time() - start_time)
-                    rows = hhmmssRequest.values('x','y')
-                    
-                    for row in rows:
-                        print("type3, kind1 : request(요청) 건수(count) x - ",row['x'])
-                        resultX.append(row['x'])
-                        resultY.append(row['y'])
-                                        
-                    print("== 전체 시간 : ", time.time() - start_time)
-                    
-                elif(kind == 2):
-                    
-                    hhmmssRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute','fsecond'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                    rows = hhmmssRequest.values('f_date', 'f_status', 'status_count')
-                    
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    statusCount = {}
-                    
-                    resultStatusCode = []
-                                                
-                    for row in rows:
-                        # print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
-                        # print("type3, kind2 : status code 건수(count) y - ",row['f_status'])
-                        # print("type3, kind2 : status code 건수(count) y - ",row['status_count'])
-                        
-                        # x축 : 중복제거
-                        if row['f_date'] not in resultX:
-                            resultX.append(row['f_date'])
-                            
-                        # y축-1 : status 코드 중복제거
-                        if row['f_status'] not in resultStatusCode:
-                            resultStatusCode.append(row['f_status']) 
-                            
-                        # 전체 Map 구하기                    
-                        statusCount[row['f_status']] = row['status_count']
-                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
-                        
-                    for xDate in resultX:
-                        for yStatusCode in resultStatusCode:
-                            
-                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                            else:
-                                #print('There is no available status code.')
-                                pass
-                            
-                    print("== 전체 시간 : ", time.time() - start_time)
-                        
-                elif(kind == 3):
-                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
-                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
-                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
-                    # 0: None, 1 : second(%T), 2: microsecond(%D)
-                    time_unit = 0
-                    if file_format.find('%T') != -1:
-                        time_unit = 1 
-                    elif file_format.find('%D') != -1:
-                        time_unit = 2
-                    
-                    resultY_time_unit = time_unit
-                                        
-                    if time_unit != 0:
-                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Count('frequest'), yt=Avg('ftime_taken'))
-                        rows = hhmmssRequest.values('x','y', 'yt')
-                                    
-                        for row in rows:
-                            # print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
-                            # print("type3, kind3 : request(요청) 건수(count) y - ",row['y'])
-                            # print("type3, kind3 : time-taken(요청) 건수(count) y - ",row['yt'])
-                            
-                            resultX.append(row['x'])
-                            resultY.append(row['y'])
-                            resultY_time.append(row['yt'])
-                    else:
-                        pass        
-                    
-            response = {'message': 'linechartdata returned successfully', 'resultX': resultX, 'resultY': resultY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultY_200': resultY_200, 'resultY_300': resultY_300, 'resultY_400': resultY_400, 'resultY_500': resultY_500}        
-            return Response(response, status = status.HTTP_200_OK)
-        
-        except Exception as ex:
-            print('Error Occured while creating chartdata...', ex)
-                    
-            response = {'message': 'chartdata creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-     # For Statistics
-    @action(methods=['post'], detail=False)
-    def statistics(self, request, pk=None):
-        
-        try:
-        
-            #logfile_id = request.data['logfile_id']
-            
-            project_id = request.data['project_id']        
-            # print('statistics project_id : ', project_id)
-                        
-            type = request.data['type']
-            N = request.data['N']
-            intN = int(N)
-            strN = str(N)
-            
-            # print("** statistics : type --> ", type)
-            # print("** statistics : N --> ", N)
-                    
-            # 검색 조건 적용
-            if type != 0:
-                queryset = self.get_queryset()
-            else:
-                queryset = self.queryset
-
-            results = []
-            timetakenUnit = ""
-            
-            start_time = time.time()
-            
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
-            list_logfile_id = []         
-            
-            # logfile id 가져오기
-            for logfile in logfiles:    # Loop 시작구간
-                list_logfile_id.append(str(logfile['logfile_id']))
-                timetakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))           
-            
-            queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
-            
-            #type=0. 전체 처리량(건수)
-            if type == 0:
-                cnt = queryset.count()
-                print("type0 : queryset.count() - ", cnt)
-                results.append({"result" : 'Total', "result_count" : cnt})
-            
-            #type=1. Status Codes Top N       
-            elif type == 1:
-                topn_status = queryset.values('fstatus').annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count')[0:intN]                        
-                rows = topn_status.values('fstatus','fstatus_count')
-                
-                for row in rows:
-                    # print("type1 : TOP"+strN+" STATUS - ", row['fstatus'])
-                    # print("type1 : TOP"+strN+" STATUS Count - ", row['fstatus_count'])
-                    
-                    results.append({"result" : row['fstatus'], "result_count" : row['fstatus_count']})                      
-            
-            #type=2. Requests Top N
-            elif type == 2:
-                topn_request = queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]
-                rows = topn_request.values('frequest','frequest_count')
-                
-                for row in rows:
-                    # print("type2 : TOP"+strN+"REQUEST - ", row['frequest'])
-                    # print("type2 : TOP"+strN+"REQUEST Count - ", row['frequest_count'])
-                    
-                    results.append({"result" : row['frequest'], "result_count" : row['frequest_count']})   
-                        
-            #type=3. 최다 404 발생 URL Top5
-            elif type == 3:
-                topn_404_request = queryset.filter(fstatus__startswith='404').values('frequest').annotate(frequest_404_count=Count('frequest')).order_by('-frequest_404_count')[0:intN]
-                rows = topn_404_request.values('frequest','frequest_404_count')
-                
-                if rows.count() > 0 :
-                    for row in rows:
-                        # print("type3 : TOP"+strN+" 404 REQUEST - ", row['frequest'])
-                        # print("type3 : TOP"+strN+" 404 REQUEST Count - ", row['frequest_404_count'])
-                        
-                        results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']}) 
-                else:
-                    results.append({"result" : "-", "result_count" : "0" }) 
-                
-            #type=4. Time-taken Top5(오래 걸린시간)
-            elif type == 4:
-                topn_timetaken_request = queryset.order_by('-ftime_taken')[0:intN]
-                rows = topn_timetaken_request.values('frequest','ftime_taken')
-                
-                for row in rows:
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
-                    
-                    results.append({"result" : row['frequest'], "result_count" : row['ftime_taken'], "timetakenUnit" : timetakenUnit})
-                    
-            #type=5. Visitor(Unique IP) Top5
-            elif type == 5:
-                topn_visitor = queryset.values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]
-                rows = topn_visitor.values('fip','fip_count')
-                
-                for row in rows:
-                    # print("type5 : TOP"+strN+" VISITOR - ", row['fip'])
-                    # print("type5 : TOP"+strN+" VISITOR Count - ", row['fip_count'])
-                    
-                    results.append({"result" : row['fip'], "result_count" : row['fip_count']})   
-            
-            #type=6. Referers Top N
-            elif type == 6:
-                topn_referer = queryset.values('freferer').annotate(freferer_count=Count('freferer')).order_by('-freferer_count')[0:intN]
-                rows = topn_referer.values('freferer','freferer_count')
-                
-                for row in rows:
-                    # print("type5 : TOP"+strN+" freferer - ", row['freferer'])
-                    # print("type5 : TOP"+strN+" freferer Count - ", row['freferer_count'])
-                    
-                    results.append({"result" : row['freferer'], "result_count" : row['freferer_count']}) 
-            
-            #type=7. User Agent Top N               
-            elif type == 7:
-                topn_useragent = queryset.values('fuser_agent').annotate(fuser_agent_count=Count('fuser_agent')).order_by('-fuser_agent_count')[0:intN]
-                rows = topn_useragent.values('fuser_agent','fuser_agent_count')
-                
-                for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
-                    
-                    results.append({"result" : row['fuser_agent'], "result_count" : row['fuser_agent_count']})  
-                    
-            #type=8. URI Total Byte Top N               
-            elif type == 8:
-                topn_byte = queryset.values('frequest').annotate(requestURL=F('frequest'), fbyte_sum=Sum('fbyte')).order_by('-fbyte_sum')[0:intN]
-                rows = topn_byte.values('requestURL','fbyte_sum')
-                
-                for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
-                    
-                    results.append({"result" : row['requestURL'], "result_count" : row['fbyte_sum']})
-                    
-            #type=9. Static files Top N               
-            elif type == 9:
-                topn_static = queryset.values('fextension').annotate(fextension_count=Count('fextension')).order_by('-fextension_count')[0:intN]
-                rows = topn_static.values('fextension','fextension_count')
-                
-                for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
-                    
-                    results.append({"result" : row['fextension'], "result_count" : row['fextension_count']})  
-                    
-            #type=10. URI Average Byte Top N               
-            elif type == 10:
-                topn_avgbyte = queryset.values('frequest').annotate(requestURL=F('frequest'), fbyte_avg=Avg('fbyte')).order_by('-fbyte_avg')[0:intN]
-                rows = topn_avgbyte.values('requestURL','fbyte_avg')
-                
-                for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
-                    
-                    results.append({"result" : row['requestURL'], "result_count" : row['fbyte_avg']})
-                    
-            #type=11. URI Average Time-taken Top N
-            elif type == 11:
-                topn_avg_timetaken_request = queryset.values('frequest').annotate(requestURL=F('frequest'), ftime_taken_avg=Avg('ftime_taken')).order_by('-ftime_taken_avg')[0:intN]
-                rows = topn_avg_timetaken_request.values('requestURL','ftime_taken_avg')
-                
-                for row in rows:
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
-                    
-                    results.append({"result" : row['requestURL'], "result_count" : row['ftime_taken_avg'], "timetakenUnit" : timetakenUnit})
-        
-            print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
-            
-            response = {'message': 'statistics returned', 'results': results}
-            return Response(response, status = status.HTTP_200_OK)
-        
-        except Exception as ex:
-            print('Error Occured while creating statistics...', ex)
-                    
-            response = {'message': 'statistics creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-    
-    # For Filtering
-    def get_queryset(self):
-        
-        # print("== LogDetailViewSet get_queryset!!")
-        
-        queryset = LogDetail.objects.all()
-        
-        # Request Method 확인
-        method = ""
-        for key in self.action_map:
-            if self.action_map[key] == self.action:
-                method = key
-                break
-        #print("method = ", method)
-        
-        dateFromValue = ""
-        dateToValue = ""
-        timeFromValue = ""
-        timeToValue = ""
-        ttFromValue = ""
-        ttToValue = ""
-        conditionValue = ""
-        searchValue = ""
-        project_id = ""        
-
-        # 조건 적용(GET)
-        if method == 'get' :
-            dateFromValue = self.request.query_params.get('dateFromValue', None)
-            dateToValue = self.request.query_params.get('dateToValue', None)
-            timeFromValue = self.request.query_params.get('timeFromValue', None)
-            timeToValue = self.request.query_params.get('timeToValue', None)
-            
-            ttFromValue = self.request.query_params.get('ttFromValue', None)
-            ttToValue = self.request.query_params.get('ttToValue', None)
-            
-            conditionValue = self.request.query_params.get('conditionValue', None)
-            searchValue = self.request.query_params.get('searchValue', None)
-            
-            project_id = self.request.query_params.get('project_id', None)
-        
-        elif method == 'post':
-            
-            dateFromValue = self.request.data['filter']['dateFromValue'] if self.request.data['filter']['dateFromValue'] != '' else None
-            dateToValue = self.request.data['filter']['dateToValue'] if self.request.data['filter']['dateToValue'] != '' else None
-            timeFromValue = self.request.data['filter']['timeFromValue'] if self.request.data['filter']['timeFromValue'] != '' else None
-            timeToValue = self.request.data['filter']['timeToValue'] if self.request.data['filter']['timeToValue'] != '' else None
-
-            ttFromValue = self.request.data['filter']['ttFromValue'] if self.request.data['filter']['ttFromValue'] != '' else None
-            ttToValue = self.request.data['filter']['ttToValue'] if self.request.data['filter']['ttToValue'] != '' else None
-
-            conditionValue = self.request.data['filter']['conditionValue'] if self.request.data['filter']['conditionValue'] != '' else None
-            searchValue = self.request.data['filter']['searchValue'] if self.request.data['filter']['searchValue'] != '' else None
-            
-            project_id = self.request.data['filter']['project_id'] if self.request.data['filter']['project_id'] != '' else None
-            
-        # 관련 project만 가져온다. : multifile 처리
-        if project_id is not None:        
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
-            list_logfile_id = []         
-            
-            # logfile id 가져오기
-            for logfile in logfiles:
-                list_logfile_id.append(str(logfile['logfile_id']))                
-            
-            queryset = queryset.filter(logfile_id__in=list_logfile_id)
-        
-        # Date, Time : Between
-        if (dateFromValue is not None) and (dateToValue is not None) and (timeFromValue is not None) and (timeToValue is not None):
-            start_datetime = dateFromValue + timeFromValue
-            end_datetime = dateToValue + timeToValue
-            queryset = queryset.filter(fdatetime__range=(start_datetime, end_datetime))
-            #print('Date and Time applied!')
-        
-        # Time-taken : Between
-        if (ttFromValue is not None) and (ttToValue is not None):        
-            queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
-            #print('Time-taken applied!')
-            
-        # conditionValue : Contain
-        if conditionValue is not None :
-            #print('conditionValue applied! (conditionValue) : ', conditionValue)
-            #print('searchValue : ', searchValue)
-            if conditionValue == 'I':
-                queryset = queryset.filter(fip__icontains=searchValue)
-            elif conditionValue == 'R':
-                queryset = queryset.filter(frequest__icontains=searchValue)
-            elif conditionValue == 'E':
-                queryset = queryset.filter(freferer__icontains=searchValue)
-            elif conditionValue == 'U':
-                queryset = queryset.filter(fuser_agent__icontains=searchValue)
-            elif conditionValue == 'S':
-                queryset = queryset.filter(fstatus__icontains=searchValue)                
-        
-        return queryset
-
-    def create(self, request, *args, **kwargs):
-        
-        print("== LogDetailViewSet create!!")
-        start = time.time()
-        response = {}
-      
-        try:
-            logfile_id = request.data['logfile_id']
-            
-            # 이미 생성되어 있는지 확인
-            if LogDetail.objects.filter(logfile_id=logfile_id).count() > 0:
-                response = {'message': 'logdetail already created.'}
-                
-            else:                  
-                        
-                logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
-                logfile = logfile_model.file_object.file    
-                
-                print("logfile :", logfile)     
-                
-                # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
-                #result = self.parse_log(logfile, logfile_id)
-                self.parse_log(logfile, logfile_id)
-            
-                # postgresql copy 실행
-                LogDetail.objects.from_csv(logfile.name+'.csv', delimiter=',')        
-                    
-                print("To DB, Total Duration :", time.time() - start)
-                
-                response = {'message': 'logdetail created successfully.'}
-                
-            return Response(response, status = status.HTTP_200_OK)
-        
-        except Exception as ex: 
-            print('Error Occured while creating logdetail...', ex)
-            
-            response = {'message': 'logdetail creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def parse_log(self, logfile, logfile_id):
-
-        log_lines = []
-        result = []
-        count = 0               
-        start = time.time()
-        
-        # Fileformat 가져온다.(from logfile DB using logfile_id)
-        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'      
-        format_model = LogFile.objects.get(logfile_id=logfile_id)
-        log_format = format_model.file_format
-        
-        # format_kind : apache, nginx, IIS
-        format_kind = format_model.format_kind        
-        format_name = format_model.format_name
-                
-        # 임시 csv 파일생성 for copy to postgresql
-        log_line_header = ['logdetail_id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
-                           'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
-                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime', 'fbyte', 'fextension']
-        
-        # pandas 활용 - 로그파일 읽기
-        # TODO: %{X-Forwarded-For}i 의 경우 열의 개수가 늘어나는데...전처리를 어떻게 해야 하나? => 이거 일단 패스(error line 빼고 처리)
-        df_logs = None
-        try:
-            df_logs = pd.read_csv(logfile.name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
-        except Exception as ex: 
-            print('Error Occured while creating logdetail read_csv#1...', ex)
-            raise ex
-        
-        # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
-        
-        # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
-        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
-        format_index = self.get_logformat_index(log_format, format_kind)
-        
-        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.("@" 명시, @ 사용하지 않을 것임...오류나는지 확인필요, \t 이런걸로?)
-        df_logs_all = None
-        try:
-            df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, escapechar="\\", na_filter=False)
-        except Exception as ex: 
-            print('Error Occured while creating logdetail read_csv#2...', ex)
-            raise ex
-        
-        df_logs['log_line'] = df_logs_all
-        
-        # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
-        #df_logs['log_line'] = df_logs[df_logs.columns[0:]].apply(lambda x: ' '.join(x.astype(str)), axis=1)              
-                
-        # if 'h' in log_format:
-        if log_format.find('h') != -1:
-            df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
-        else:
-            df_logs['fip'] = 'NA' 
-            
-        # if 'r' in log_format:
-        if log_format.find('r') != -1:
-            df_logs.rename(columns = {format_index['r'] : 'frequest'}, inplace = True)
-        else:
-            df_logs['frequest'] = 'NA'    
-
-        # if 's' in log_format:
-        if log_format.find('s') != -1:
-            df_logs.rename(columns = {format_index['s'] : 'fstatus'}, inplace = True)
-        else:
-            df_logs['fstatus'] = 'NA'
-        
-        # bytes    
-        if log_format.find('b') != -1 or log_format.find('B') != -1:
-            df_logs.rename(columns = {format_index['b'] : 'fbyte'}, inplace = True)
-        else:
-            df_logs['fbyte'] = 0
-
-        if log_format.find('Referer') != -1:
-            df_logs.rename(columns = {format_index['Referer'] : 'freferer'}, inplace = True)
-        else:
-            df_logs['freferer'] = 'NA'
-            
-        if log_format.find('User-Agent') != -1:
-            df_logs.rename(columns = {format_index['User-Agent'] : 'fuser_agent'}, inplace = True)
-        else:
-            df_logs['fuser_agent'] = 'NA'
-
-        time_taken_flag = False    
-        if log_format.find('T') != -1:
-            df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
-            time_taken_flag = True
-
-        if (not time_taken_flag) & (log_format.find('D') != -1):
-            df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
-        else:
-            df_logs['ftime_taken'] = -1
-        
-        #'freserve1', 'freserve2', 'freserve3'
-        df_logs['freserve1'] = ''
-        df_logs['freserve2'] = ''
-        df_logs['freserve3'] = ''
-        
-        #'created'
-        datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        df_logs['created'] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
-                
-        #'logfile_id'
-        df_logs['logfile_id'] = logfile_id
-        
-        #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
-        # 시간관련, dummy는 , 때문에
-        time_index = format_index['t']
-        df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
-        series = df_datetime.str.split(' ')
-        df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
-
-        # TODO: Welstorymall Log Error - None인 경우 00으로??
-        month_map = {
-            'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
-            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12'
-        }
-        # TODO: Welstorymall Log Error
-        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])
-        
-        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
-        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
-        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
-        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
-        
-        # fbyte 처리 : - 를 0으로 처리
-        df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
-        
-        # fextension 처리 : frequest로부터 처리한다.
-        # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
-        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)', re.DOTALL )
-        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if (len(p.findall(x)) > 0 and p.findall(x) != 'jsp') > 0 else '-')
-        
-        # Merge
-        df_logs = df_logs.rename_axis('logdetail_id').reset_index()
-        df_logs = pd.concat([df_logs, df_time], axis=1)
-        
-        # 'logdetail_id' : UUID 생성
-        df_logs['logdetail_id'] = df_logs['logdetail_id'].apply(lambda x : uuid.uuid4())         
-                        
-        #firstRow = df_logs.iloc[0,] #.to_json(orient='index'), head() function       
-        #lastRow = df_logs.iloc[-1,] #.to_json(orient='index'), head() function                        
-                        
-        # index 미사용  
-        df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
-       
-        print("Duration to create temporary csv :", time.time() - start)        
-        
-        #result.append({'firstRow' : firstRow, 'lastRow' : lastRow})
-        
-        #return result
-        
-    # def getStaticFileExtension(request):
-        
-    #     m = p.findall(request)
-    #     return m[0][1:] if len(m(request)) > 0 else '-'
-
-    def get_logformat_index(self, log_format, format_kind):
-        format_index = {}
-        index = 0
-        for tmp in log_format.split(sep=' '):
-            
-            if format_kind == 'apache':
-                if tmp.find('Referer') != -1:
-                    format_index['Referer'] = index
-                elif tmp.find('User-Agent') != -1:
-                    format_index['User-Agent'] = index
-                elif "%h" in tmp:
-                    format_index['h'] = index
-                elif "%t" in tmp:
-                    format_index['t'] = index
-                    index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
-                elif "%r" in tmp:
-                    format_index['r'] = index
-                elif "%s" in tmp or "%>s" in tmp:
-                    format_index['s'] = index
-                elif "%b" in tmp or "%B" in tmp:
-                    format_index['b'] = index
-                elif "%D" in tmp:
-                    format_index['D'] = index
-                elif "%T" in tmp:
-                    format_index['T'] = index                
-            
-            # TODO : nginx, IIS                    
-            elif format_kind == 'nginx':
-                pass
-            elif format_kind == 'IIS':
-                pass
-                
-            index = index + 1 
-            
-        return format_index    
 
 class LogFormatViewSet(viewsets.ModelViewSet):
     queryset = LogFormat.objects.all()
@@ -1117,21 +176,25 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]   
 
-# TODO: Dynamic Model
+# Dynamic Model
 class DynamicLogDetailViewSet(viewsets.ModelViewSet):
-    
-    # TODO: Paging 처리
     
     # For GridTable
     def retrieve(self, request, *args, **kwargs):
         
-        print("== DynamicLogDetailViewSet retrieve!!")
+        if settings.DEBUG:
+        	logger.debug("DynamicLogDetailViewSet : %s !!" % "retrieve" )
+         
+        #print("== DynamicLogDetailViewSet retrieve!!")
         
         return super().retrieve(request, *args, **kwargs)
     
     def get_queryset(self):
-         
-        print("== DynamicLogDetailViewSet get_queryset!!")
+        
+        if settings.DEBUG:
+           	logger.debug("DynamicLogDetailViewSet : %s !!" % "retrieve" )
+          
+        #print("== DynamicLogDetailViewSet get_queryset!!")
          
         # Request Method 확인
         method = ""
@@ -1192,7 +255,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         # project_id = self.request.data['project_id']
         model_name = "logdetail_"+project_id
          
-        print("get_queryset model_name :", model_name)
+        if settings.DEBUG:
+            logger.debug("get_queryset model_name : %s !!" % model_name )
          
         LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
         queryset = LogDetail_dynamic.objects.all()
@@ -1216,7 +280,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             start_datetime = dateFromValue + timeFromValue
             end_datetime = dateToValue + timeToValue
             queryset = queryset.filter(fdatetime__range=(start_datetime, end_datetime))
-            #print('Date and Time applied!')
+            
+            if settings.DEBUG:
+                logger.debug('Date and Time applied!')
         
         # Time-taken : Between
         if (ttFromValue is not None) and (ttToValue is not None):
@@ -1229,12 +295,17 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 ttToValue = int(ttToValue) / 1000
                     
             queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
-            #print('Time-taken applied!')
+            
+            if settings.DEBUG:
+                logger.debug('Time-taken applied!')
             
         # conditionValue : Contain
         if conditionValue is not None :
-            #print('conditionValue applied! (conditionValue) : ', conditionValue)
-            #print('searchValue : ', searchValue)
+            
+            if settings.DEBUG:                
+                logger.debug('conditionValue applied! (conditionValue) : %s' % conditionValue)
+                logger.debug('searchValue : %s' % searchValue)
+                
             if conditionValue == 'I':
                 queryset = queryset.filter(fip__icontains=searchValue)
             elif conditionValue == 'R':
@@ -1248,8 +319,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 
         # conditionValue : statistic detailpopup
         if detailconditionValue is not None :
-            #print('conditionValue applied! (conditionValue) : ', conditionValue)
-            #print('searchValue : ', searchValue)
+            
+            if settings.DEBUG:                
+                logger.debug('detailconditionValue applied! (detailconditionValue) : %s' % detailconditionValue)
+                logger.debug('searchValue : %s' % searchValue)
+            
             if detailconditionValue == 'I':
                 queryset = queryset.filter(fip__icontains=detailsearchValue)
             elif detailconditionValue == 'R':
@@ -1281,9 +355,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             project_id = self.request.data['filter']['project_id'] if self.request.data['filter']['project_id'] != '' else None
          
         model_name = "logdetail_"+project_id
-         
-        print("get_serializer_class model_name :", model_name)
-         
+        
+        if settings.DEBUG:
+            logger.debug("get_serializer_class model_name : %s" % model_name)
+                     
         LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()        
                          
         DynamicLogDetailSerializer.Meta.model = LogDetail_dynamic
@@ -1303,8 +378,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     def notice(self, request, pk=None):
         
         try:
-            project_id = request.data['project_id']        
-            print('notice project_id : ', project_id)
+            project_id = request.data['project_id']
+            
+            if settings.DEBUG:
+                logger.debug('notice project_id : %s' % project_id)
+            
             
             logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')
             list_logfile_id = []
@@ -1336,7 +414,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             return Response(response, status = status.HTTP_200_OK)
             
         except Exception as ex:
-            print('Error Occured while processing notice...', ex)
+            logger.error('Error Occured while processing notice : %s' % ex)
                     
             response = {'message': 'notice creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1345,8 +423,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     def start_end(self, request, pk=None):        
        
         try:
-            project_id = request.data['project_id']        
-            print('start_end project_id : ', project_id)
+            project_id = request.data['project_id']
+            
+            if settings.DEBUG:
+    	        logger.debug('start_end project_id : %s' % project_id)
             
             logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id', 'file_name')
             list_logfile_id = []
@@ -1367,7 +447,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             return Response(response, status = status.HTTP_200_OK)
             
         except Exception as ex:
-            print('Error Occured while processing start_end...', ex)
+            logger.error('Error Occured while processing start_end : %s' % ex)
                     
             response = {'message': 'start_end creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1375,21 +455,17 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     # For Statistics
     @action(methods=['post'], detail=False)
     def statistics(self, request, pk=None):
-                
-        print("== DynamicLogDetailViewSet statistics!!")
+        
+        if settings.DEBUG:
+    	    logger.debug("DynamicLogDetailViewSet : %s !!" % "statistics" )                
         
         try:       
-           
             project_id = request.data['project_id']        
-            # print('statistics project_id : ', project_id)
-                        
+
             type = request.data['type']
             N = request.data['N']
             intN = int(N)
             strN = str(N)
-            
-            # print("** statistics : type --> ", type)
-            # print("** statistics : N --> ", N)
             
             queryset = None
                                 
@@ -1399,7 +475,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             else:
                 model_name = "logdetail_"+project_id
                 LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
-                #queryset = self.queryset
                 queryset = LogDetail_dynamic.objects.all()
 
             results = []
@@ -1418,10 +493,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
             totalCnt = queryset.count()
             
-            #type=0. 전체 처리량(건수)  TODO:
+            #type=0. 전체 처리량(건수)
             if type == 0:
-                #cnt = queryset.count()
-                print("type0 : queryset.count() - ", totalCnt)
+                if settings.DEBUG:
+                    logger.debug("type0 : queryset.count() - %s" % totalCnt)
+                    
                 results.append({"result" : 'Total', "result_count" : totalCnt})
             
             #type=1. Status Codes Top N       
@@ -1430,8 +506,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_status.values('fstatus','fstatus_count')
                 
                 for row in rows:
-                    # print("type1 : TOP"+strN+" STATUS - ", row['fstatus'])
-                    # print("type1 : TOP"+strN+" STATUS Count - ", row['fstatus_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type1 : TOP"+strN+" STATUS - %s" % row['fstatus'])
+                        logger.debug("type1 : TOP"+strN+" STATUS Count - %s" % row['fstatus_count'])
                     
                     results.append({"result" : row['fstatus'], "result_count" : row['fstatus_count']})                      
             
@@ -1441,8 +519,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_request.values('frequest','frequest_count')
                 
                 for row in rows:
-                    # print("type2 : TOP"+strN+"REQUEST - ", row['frequest'])
-                    # print("type2 : TOP"+strN+"REQUEST Count - ", row['frequest_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type2 : TOP"+strN+"REQUEST - %s" % row['frequest'])
+                        logger.debug("type2 : TOP"+strN+"REQUEST Count - %s" % row['frequest_count'])
                     
                     results.append({"result" : row['frequest'], "result_count" : row['frequest_count']})   
                         
@@ -1453,8 +533,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 
                 if rows.count() > 0 :
                     for row in rows:
-                        # print("type3 : TOP"+strN+" 404 REQUEST - ", row['frequest'])
-                        # print("type3 : TOP"+strN+" 404 REQUEST Count - ", row['frequest_404_count'])
+                        
+                        if settings.DEBUG:
+                            logger.debug("type3 : TOP"+strN+" 404 REQUEST - %s" % row['frequest'])
+                            logger.debug("type3 : TOP"+strN+" 404 REQUEST Count - %s" % row['frequest_404_count'])
                         
                         results.append({"result" : row['frequest'], "result_count" : row['frequest_404_count']}) 
                 else:
@@ -1466,8 +548,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_timetaken_request.values('frequest','ftime_taken')
                 
                 for row in rows:
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type4 : TOP"+strN+" Timtaken REQUEST - %s" % row['frequest'])
+                        logger.debug("type4 : TOP"+strN+" Timtaken REQUEST Count - %s" % row['ftime_taken'])
                     
                     # 초(second)로 통일
                     duration_sec = round(row['ftime_taken']/1000000, 1) if timetakenUnit == 'D' else row['ftime_taken']
@@ -1479,8 +563,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_visitor.values('fip','fip_count')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" VISITOR - ", row['fip'])
-                    # print("type5 : TOP"+strN+" VISITOR Count - ", row['fip_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type5 : TOP"+strN+" VISITOR - %s" % row['fip'])
+                        logger.debug("type5 : TOP"+strN+" VISITOR Count - %s" % row['fip_count'])
                     
                     results.append({"result" : row['fip'], "result_count" : row['fip_count']})   
             
@@ -1490,8 +576,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_referer.values('freferer','freferer_count')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" freferer - ", row['freferer'])
-                    # print("type5 : TOP"+strN+" freferer Count - ", row['freferer_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type6 : TOP"+strN+" freferer - %s" % row['freferer'])
+                        logger.debug("type6 : TOP"+strN+" freferer Count - %s" % row['freferer_count'])
                     
                     results.append({"result" : row['freferer'], "result_count" : row['freferer_count']}) 
             
@@ -1501,8 +589,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_useragent.values('fuser_agent','fuser_agent_count')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type7 : TOP"+strN+" fuser_agent - %s" % row['fuser_agent'])
+                        logger.debug("type7 : TOP"+strN+" fuser_agent Count - %s" % row['fuser_agent_count'])
                     
                     results.append({"result" : row['fuser_agent'], "result_count" : row['fuser_agent_count']})  
                     
@@ -1512,8 +602,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_byte.values('requestURL','fbyte_sum')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type8 : TOP"+strN+" fuser_agent - %s" % row['fuser_agent'])
+                        logger.debug("type8 : TOP"+strN+" fuser_agent Count - %s" % row['fuser_agent_count'])
                     
                     results.append({"result" : row['requestURL'], "result_count" : row['fbyte_sum']})
                     
@@ -1523,8 +615,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_static.values('fextension','fextension_count')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type9 : TOP"+strN+" fextension - %s" % row['fextension'])
+                        logger.debug("type9 : TOP"+strN+" fextension Count - %s" % row['fextension_count'])
                     
                     results.append({"result" : row['fextension'], "result_count" : row['fextension_count']})  
                     
@@ -1534,8 +628,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_avgbyte.values('requestURL','fbyte_avg')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type10 : TOP"+strN+" requestURL - %s" % row['requestURL'])
+                        logger.debug("type10 : TOP"+strN+" fbyte_avg - %s" % row['fbyte_avg'])
                     
                     results.append({"result" : row['requestURL'], "result_count" : round(row['fbyte_avg'], 1)})
                     
@@ -1545,8 +641,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_avg_timetaken_request.values('requestURL','ftime_taken_avg')
                 
                 for row in rows:
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST - ", row['frequest'])
-                    # print("type4 : TOP"+strN+" Timtaken REQUEST Count - ", row['ftime_taken'])
+                    
+                    if settings.DEBUG:
+                        logger.debug("type11 : TOP"+strN+" requestURL - %s" % row['requestURL'])
+                        logger.debug("type11 : TOP"+strN+" ftime_taken_avg - %s" % row['ftime_taken_avg'])
                     
                     # 초(second)로 통일
                     duration_sec = round(row['ftime_taken_avg']/1000000, 1) if timetakenUnit == 'D' else row['ftime_taken_avg']
@@ -1559,18 +657,22 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 rows = topn_static_filenames.values('frequest','frequest_count')
                 
                 for row in rows:
-                    # print("type5 : TOP"+strN+" fuser_agent - ", row['fuser_agent'])
-                    # print("type5 : TOP"+strN+" fuser_agent Count - ", row['fuser_agent_count'])
+                    if settings.DEBUG:
+                        logger.debug("type12 : TOP"+strN+" frequest - %s" % row['frequest'])
+                        logger.debug("type12 : TOP"+strN+" frequest_count %s " % row['frequest_count'])
                     
                     results.append({"result" : row['frequest'].split(' ')[1], "result_count" : row['frequest_count']})                    
         
-            print("== statistics (type="+str(type)+")걸린 시간 : ", time.time() - start_time)
+            
+            
+            if settings.DEBUG:
+                logger.debug("== statistics (type="+str(type)+") duration(sec) : %s " % (time.time() - start_time))
             
             response = {'message': 'statistics returned', 'resultType': type, 'results': results, 'totalCnt': totalCnt}
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:
-            print('Error Occured while creating statistics...', ex)
+            logger.error('Error Occured while creating statistics : %s' % ex)
                     
             response = {'message': 'statistics creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -1579,16 +681,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     @action(methods=['post'], detail=False)
     def chartdata(self, request, pk=None):
 
-        print("== DynamicLogDetailViewSet chartdata!!")
+        if settings.DEBUG:
+    	    logger.debug("DynamicLogDetailViewSet : %s !!" % "chartdata" )
         
         try:        
             
             project_id = request.data['project_id']        
-            print('**chartdata project_id : ', project_id) 
             
             type = request.data['type']
             kind = request.data['kind']
-            print("** chartdata : type, kind --> ", type, kind)
             
             # 검색 조건 적용
             queryset = self.get_queryset()
@@ -1680,10 +781,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
                                 resultY_500.append(dateStatusCount[xDate][yStatusCode])
                             else:
-                                print('There is no available status code.')
+                                logger.info('There is no available status code.')
                             
-                    print("== 전체 시간 : ", time.time() - start_time)
-                    
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
@@ -1740,9 +839,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         resultX.append(row['x'])
                         #resultY.append(row['y'])
                         resultY.append(round(row['y']/60,1))  # TPS
-                        
-                                        
-                    print("== 전체 시간 : ", time.time() - start_time)                    
                     
                 elif(kind == 2):
                     
@@ -1783,11 +879,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
                                 resultY_500.append(dateStatusCount[xDate][yStatusCode])
                             else:
-                                #print('There is no available status code.')
-                                pass
-                            
-                    print("== 전체 시간 : ", time.time() - start_time)
-                        
+                                logger.info('There is no available status code.')
+                                
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
@@ -1835,15 +928,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 if(kind == 1):               
                     
                     hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
-                    print("== 쿼리 시간 : ", time.time() - start_time)
+
                     rows = hhmmssRequest.values('x','y')
                     
                     for row in rows:
-                        print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                        #print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
                         resultX.append(row['x'])
                         resultY.append(row['y'])    # TPS
-                                        
-                    print("== 전체 시간 : ", time.time() - start_time)
                     
                 elif(kind == 2):
                     
@@ -1884,11 +975,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
                                 resultY_500.append(dateStatusCount[xDate][yStatusCode])
                             else:
-                                #print('There is no available status code.')
-                                pass
-                            
-                    print("== 전체 시간 : ", time.time() - start_time)
-                        
+                                logger.info('There is no available status code.')
+                                                    
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
@@ -1931,14 +1019,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:
-            print('Error Occured while creating chartdata...', ex)
+            logger.error('Error Occured while creating chartdata : %s' % ex)
                     
             response = {'message': 'chartdata creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
              
     def create(self, request, *args, **kwargs):
             
-        print("== DynamicLogDetailViewSet create!!")
+        if settings.DEBUG:
+    	    logger.debug("DynamicLogDetailViewSet : %s !!" % "create" )
 
         start = time.time()
         response = {}
@@ -1950,9 +1039,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             model_name = "logdetail_"+project_id
             
-            print("create model_name :", model_name)
-            
-      
             LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()  
            
             # id=1인 행(null 행) 삭제
@@ -1983,14 +1069,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 
                 LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',')        
                     
-                print("To DB, Total Duration :", time.time() - start)
+                if settings.DEBUG:
+    	            logger.debug("To DB, Total Duration : %s" % (time.time() - start))
                 
                 response = {'message': 'logdetail created successfully.'}
                 
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex: 
-            print('Error Occured while creating logdetail...', ex)
+            logger.error('Error Occured while creating logdetail : %s' % ex)
             
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -2033,16 +1120,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
         except UnicodeDecodeError as ude:
             
-            print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
+            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
             
             try:
                 df_logs_all = pd.read_csv(logfile.name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, na_filter=False)
             except Exception as uex:
-                print('UnicodeDecodeError Occured AGAIN!')
+                logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
             
         except Exception as ex: 
-            print('Error Occured while creating logdetail read_csv#2 whole lines...', ex)            
+            logger.error('Error Occured while creating logdetail read_csv#2 whole lines : %s' % ex)            
             raise ex
         
         file_name = logfile.name
@@ -2061,16 +1148,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
         except UnicodeDecodeError as ude:
             
-            print('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : ', ude)    
+            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)
             
             try:
                 df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
             except Exception as uex:
-                print('UnicodeDecodeError Occured AGAIN!')
+                logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
             
         except Exception as ex: 
-            print('Error Occured while creating logdetail read_csv#1...', ex)            
+            logger.error('Error Occured while creating logdetail read_csv#1  : %s' % ex)
             raise ex                      
                   
         df_logs['log_line'] = df_logs_all
@@ -2181,7 +1268,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         # index 미사용  
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
-        print("Duration to create temporary csv :", time.time() - start)
+        if settings.DEBUG:
+    	    logger.debug("Duration to create temporary csv : %s" % (time.time() - start))
     
     def get_logformat_index(self, log_format, format_kind):
         format_index = {}

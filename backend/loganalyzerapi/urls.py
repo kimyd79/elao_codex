@@ -13,7 +13,6 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()  #  automatically creates the API root view
 router.register(r'logmaster', views.LogMasterViewSet)
 router.register(r'logfile', views.LogFileViewSet)
-router.register(r'logdetail', views.LogDetailViewSet)
 
 # For Ceating Dynamic Logdetail
 router.register(r'logmaster/create_dynamic_logdetail', views.LogMasterViewSet)
@@ -22,18 +21,6 @@ router.register(r'logdetail_dynamic/start_end', views.DynamicLogDetailViewSet, b
 router.register(r'logdetail_dynamic/notice', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/statistics', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/chartdata', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
-
-# For statistics 
-router.register(r'logdetail/statistics', views.LogDetailViewSet)
-
-# For chart
-router.register(r'logdetail/chartdata', views.LogDetailViewSet)
-
-# For Initial Setting
-router.register(r'logdetail/start_end', views.LogDetailViewSet)
-
-# For Notice
-router.register(r'logdetail/notice', views.LogDetailViewSet)
 
 # For logformat
 router.register(r'logformat', views.LogFormatViewSet)
