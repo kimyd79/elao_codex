@@ -15,7 +15,8 @@
             </ui-gnb-menus>
         </template>
         <template v-slot:tail>
-            <lego-button v-on:click="submitRegister" v-if="registerButton">REGISTER</lego-button>
+            <!-- TODO: 승인절차 자동화필요 -->
+            <!--<lego-button v-on:click="submitRegister" v-if="registerButton">REGISTER</lego-button>-->
             <lego-button v-on:click="submitEvent">{{ btnText }}</lego-button>
             <ui-gnb-profile> {{ getUserName }} </ui-gnb-profile>
         </template>

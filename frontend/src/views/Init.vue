@@ -107,7 +107,7 @@
             <div class="popup-buttons">
                 <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
-                <lego-button v-on:click="deleteProjects" main>DelProjects</lego-button>
+                <lego-button v-on:click="deleteProjects" main v-if="creator == 'Leehs' || creator == 'Admin'">DelProjects</lego-button>
                 <lego-button v-on:click="newProject">newProject</lego-button>
             </div>
 
