@@ -74,8 +74,9 @@ export default {
         clickRegister: function () {
             axios.post(serverUrl + '/rest-auth/registration/', this.register)
                 .then((response) => {
-                    //console.log(response);
-                    this.$router.push('/Login');
+                    console.log(response);
+                    this.$alert("Your account has been successfully created.", "Notification", "success");
+                    this.$router.push('/login');
                 })
                 .catch((err) => {
                     console.error(err);
