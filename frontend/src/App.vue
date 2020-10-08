@@ -98,13 +98,13 @@ export default {
     methods: {
         submitEvent: function () {
             if (this.btnText == 'LOGIN') {
-                this.$router.push('/Login');
+                this.$router.push('/login');
             } else {
-                this.$router.push('/Logout');
+                this.$router.push('/logout');
             }
         },
         submitRegister: function () {
-            this.$router.push('/Register');
+            this.$router.push('/register');
         }
     },
     watch: {
