@@ -288,6 +288,8 @@ export default {
             project_id: "getProjectID",
             logFormat: "getLogFormat",
 
+            isSearch: "getToggleSearch",
+
         })
     },
 
@@ -473,6 +475,10 @@ export default {
     watch: {
         valueN() {
             this.$store.dispatch("setToggleSearch");
+        },
+
+        isSearch() {
+            this.allChart();
         }
     }
 };

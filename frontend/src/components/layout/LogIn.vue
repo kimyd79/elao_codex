@@ -15,10 +15,10 @@
         <div class="popup-form">
 
             <ui-form-item :columns=8 label="Username" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="login.username" placeholder="enter username" />            
+                <lego-text-field v-model="login.username" placeholder="Enter username" />
             </ui-form-item>
             <ui-form-item :columns=8 label="Password" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="login.password" v-on:keyup.enter="clickLogin" placeholder="enter password" password/>
+                <lego-text-field v-model="login.password" v-on:keyup.enter="clickLogin" placeholder="Enter password" password />
             </ui-form-item>
 
         </div>
