@@ -56,7 +56,7 @@ export default {
             title: "",
             content: "",
             items: [{
-                result: 'Waiting...',
+                result: '- No Data -',
                 result_count: '...',
                 ratio: ''
             }, ],
@@ -65,7 +65,7 @@ export default {
 
             // Loading Spinner data
             isActive: false,
-            
+
             currentView: null,
 
         }

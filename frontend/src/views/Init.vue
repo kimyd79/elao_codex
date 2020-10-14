@@ -659,13 +659,39 @@ export default {
         selectFile() {
 
             this.file = this.$refs.file.files[0];
-            //console.log('size=' + this.file.size);
-            //console.log('name=' + this.file.name);
 
-            this.fileName = this.file.name
-            this.fileSize = this.file.size
+            // TODO: 수정필요(크기제한 관련)
+            // Check : File Size
+            // 일반파일 : 1GB
+            // 압축파일 : 150MB
+            //            ‘.gz’, ‘.bz2’, ‘.zip’, or ‘.xz’ - Single File 압축만 가능
+            var fileExt = this.file.name.slice(this.file.name.lastIndexOf('.') + 1).toLowerCase();
 
-            this.$store.dispatch("setFileNames", this.fileName);
+            console.log("fileExt : " + fileExt);
+
+            try {
+                if (fileExt == 'gz' || fileExt == 'bz2' || fileExt == 'zip' || fileExt == 'xz') {
+                    if (this.file.size > 150 * 1024 * 1024) {
+                        // 150MB 보다 크다면
+                        this.$alert("Compressed Logfile Size <= 150MB, Use Linesplitter please. ", "Notification", "error");
+                        throw "FileSize Exception";
+                    }
+                } else {
+                    if (this.file.size > 1 * 1024 * 1024 * 1024) {
+                        // 1GB 보다 크다면
+                        this.$alert("Logfile Size <= 1GB, Use Linesplitter please. ", "Notification", "error");
+                        throw "FileSize Exception";
+                    }
+                }
+
+                this.fileName = this.file.name
+                this.fileSize = this.file.size
+
+                this.$store.dispatch("setFileNames", this.fileName);
+
+            } catch (err) {
+                console.error(err);
+            }
 
         },
 

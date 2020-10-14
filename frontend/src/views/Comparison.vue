@@ -241,19 +241,19 @@ export default {
             // for chart reactivess Test
             lChartData1: null,
             lChartData2: null,
-            lOptions: getLineChartOptions('Waiting..'),
+            lOptions: getLineChartOptions('- No Data -'),
 
             mlChartData1: null,
             mlChartData2: null,
-            mlOptions: getMultiLineChartOptions('Waiting..'),
+            mlOptions: getMultiLineChartOptions('- No Data -'),
 
             bChartData1: null,
             bChartData2: null,
-            bOptions: getBarChartOptions('Waiting..'),
+            bOptions: getBarChartOptions('- No Data -'),
 
             sbChartData1: null,
             sbChartData2: null,
-            sbOptions: getStackedBarChartOptions('Waiting..'),
+            sbOptions: getStackedBarChartOptions('- No Data -'),
 
             pChartData1: null,
             pChartDataVisitorTop5_1: null,
@@ -261,7 +261,7 @@ export default {
             pChartData2: null,
             pChartDataVisitorTop5_2: null,
             pChartDataExtension2: null,
-            pOptions: getPieChartOptions('Waiting..'),
+            pOptions: getPieChartOptions('- No Data -'),
 
             logfile_id: '',
             project_id: '',

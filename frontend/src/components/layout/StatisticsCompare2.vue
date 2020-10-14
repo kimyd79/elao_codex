@@ -56,7 +56,7 @@ export default {
             title: "",
             content: "",
             items: [{
-                result: '...',
+                result: '- No Data -',
                 result_count: '....',
             }, ],
 
@@ -64,7 +64,7 @@ export default {
 
             // Loading Spinner data
             isActive: false,
-            
+
             currentView: null,
 
         }

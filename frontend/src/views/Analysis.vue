@@ -194,23 +194,23 @@ export default {
 
             // for chart reactivess Test
             lChartData: null,
-            lOptions: getLineChartOptions('Waiting..'),
+            lOptions: getLineChartOptions('- No Data -'),
 
             mlChartData: null,
-            mlOptions: getMultiLineChartOptions('Waiting..'),
+            mlOptions: getMultiLineChartOptions('- No Data -'),
 
             bChartData: null,
-            bOptions: getBarChartOptions('Waiting..'),
+            bOptions: getBarChartOptions('- No Data -'),
 
             sbChartData: null,
-            sbOptions: getStackedBarChartOptions('Waiting..'),
+            sbOptions: getStackedBarChartOptions('- No Data -'),
 
             pChartData: null,
             pChartDataVisitorTop5: null,
             pChartDataExtension: null,
-            pOptions: getPieChartOptions('Waiting..'),
+            pOptions: getPieChartOptions('- No Data -'),
 
-            logfile_id: '',
+            //logfile_id: '',
 
             // For Loading Spinner
             isActiveLine: false,
