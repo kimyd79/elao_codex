@@ -50,13 +50,6 @@ export default {
                   ]
                 },
 
-                { 
-                  label: 'TODO' ,
-                  menus: [
-                    { label:'LNB - Complex 01', linkto:'/template/LNBComplex01', key:'LNBComplex01', isSelected: false },
-                    { label:'LNB - Complex 02', linkto:'/template/LNBComplex02', key:'LNBComplex02', isSelected: false },                    
-                  ]
-                }                
             ]
         }
     },
