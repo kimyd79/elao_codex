@@ -20,6 +20,7 @@ from django.db.models.functions import Concat, Coalesce, Substr
 from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.http import QueryDict
 
 from postgres_copy import CopyManager
 import copy
@@ -219,6 +220,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         # 조건 적용(GET)
         if method == 'get' :
+
+            orig_query = self.request.META['QUERY_STRING']
+            if orig_query is not None:
+                self.request.GET = QueryDict(orig_query.replace(";","%3B"))
+
             dateFromValue = self.request.query_params.get('dateFromValue', None)
             dateToValue = self.request.query_params.get('dateToValue', None)
             timeFromValue = self.request.query_params.get('timeFromValue', None)
@@ -234,7 +240,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             #statistic detailpopup
             detailconditionValue = self.request.query_params.get('detailconditionValue', None)
-            detailsearchValue = self.request.query_params.get('detailsearchValue', None)
+            detailsearchValue = self.request.GET.get('detailsearchValue', None)
         
         elif method == 'post':
             
@@ -250,7 +256,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             searchValue = self.request.data['filter']['searchValue'] if self.request.data['filter']['searchValue'] != '' else None
             
             project_id = self.request.data['filter']['project_id'] if self.request.data['filter']['project_id'] != '' else None
-        
+                
         # Dynamic Model 처리    
         # project_id = self.request.data['project_id']
         model_name = "logdetail_"+project_id
@@ -322,7 +328,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             if settings.DEBUG:                
                 logger.debug('detailconditionValue applied! (detailconditionValue) : %s' % detailconditionValue)
-                logger.debug('searchValue : %s' % searchValue)
+                logger.debug('detailsearchValue : %s' % detailsearchValue)
             
             if detailconditionValue == 'I':
                 queryset = queryset.filter(fip__icontains=detailsearchValue)
@@ -604,8 +610,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 for row in rows:
                     
                     if settings.DEBUG:
-                        logger.debug("type8 : TOP"+strN+" fuser_agent - %s" % row['fuser_agent'])
-                        logger.debug("type8 : TOP"+strN+" fuser_agent Count - %s" % row['fuser_agent_count'])
+                        logger.debug("type8 : TOP"+strN+" requestURL - %s" % row['requestURL'])
+                        logger.debug("type8 : TOP"+strN+" fbyte_sum - %s" % row['fbyte_sum'])
                     
                     results.append({"result" : row['requestURL'], "result_count" : row['fbyte_sum']})
                     
@@ -1309,7 +1315,3 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             index = index + 1 
             
         return format_index    
-
-        
-    
-    

@@ -44,6 +44,14 @@ const requireAdmin = () => (to, from, next) => {
   }
 };
 
+const checkLoggedin = () => (to, from, next) => {
+  if(store.state.userName == 'Not logged in') {
+    next();
+  } else {
+    VueSimpleAlert.alert("You are already logged in.", "Notification", "error");
+  }
+};
+
 const router = new Router({
   
   routes: [
@@ -98,7 +106,8 @@ const router = new Router({
         {
           path: '/login',
           name: 'login',
-          component: LogIn
+          component: LogIn,
+          beforeEnter: checkLoggedin(),
         },
         {
           path: '/logout',
