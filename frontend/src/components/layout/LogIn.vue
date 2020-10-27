@@ -79,7 +79,7 @@ export default {
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.$alert("Login failed. Check your info", "Notification", "error");
+                    this.$alert("Login failed. Check your account info", "Notification", "error");
                 })
         },
 

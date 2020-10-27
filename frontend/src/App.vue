@@ -99,7 +99,11 @@ export default {
     methods: {
         submitEvent: function () {
             if (this.btnText == 'LOGIN') {
-                this.$router.push('/login');
+                this.$router.push('/login').catch(error => {
+                    if(error.name != "NavigationDuplicated"){
+                        throw error;
+                    }
+                });
             } else {
                 this.$router.push('/logout');
             }

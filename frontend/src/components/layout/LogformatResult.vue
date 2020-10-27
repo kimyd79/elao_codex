@@ -149,6 +149,7 @@ export default {
                 })
                 .catch((err) => {
                     console.error(err);
+                    this.$alert("Add logformat failed. Check for required fields.", "Notification", "error");
                 })
         },
         updateData: function (format) {
@@ -160,6 +161,7 @@ export default {
                 })
                 .catch((err) => {
                     console.error(err);
+                    this.$alert("Update logformat failed. Check for required fields.", "Notification", "error");
                 })
         },
         clickList: function (format_list) {
