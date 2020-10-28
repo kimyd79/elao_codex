@@ -15,17 +15,17 @@
         <table class="page-summary-table">
             <thead>
                 <tr>
-                    <th>format id</th>
-                    <th>format kind</th>
-                    <th>format name</th>
-                    <th>format strings</th>
-                    <th>creator</th>
-                    <th>created</th>
+                    <!--th>format id</th-->
+                    <th style="width: 70px;">format kind</th>
+                    <th style="width: 70px;">format name</th>
+                    <th style="width: 400px;">format strings</th>
+                    <th style="width: 70px;">creator</th>
+                    <th style="width: 70px;">created</th>
                 </tr>
             </thead>
             <tbody id="list">                
                 <tr v-for="(format_list, idx) in format_lists" :key="idx" v-on:click="clickList(format_list)" :class="{'highlight': (format_list.format_id == selected_format_id) }">
-                    <td>{{format_list.format_id}}</td>
+                    <!--td>{{format_list.format_id}}</td-->
                     <td>{{format_list.format_kind}}</td>
                     <td>{{format_list.format_name}}</td>
                     <td>{{format_list.format_strings}}</td>
@@ -258,6 +258,8 @@ export default {
     border-top: 1px solid #eaeaea;
     font-weight: normal;
     background-color: #f7f7f7;
+    position: sticky;
+    top: 0px;
 }
 
 .page-summary-table thead th+th {
@@ -265,7 +267,7 @@ export default {
 }
 
 .page-summary-table tbody td {
-    width: 500px;
+    /*width: 500px;*/
     height: 44px;
     text-align: center;
     border-bottom: 1px solid #eaeaea;

@@ -4,17 +4,22 @@
 
             <ui-container-box :columns=20 horizontal align-center class="page-title">
                 <span class="page-title__label">Project</span>
-                <span class="page-title__sub">
-                    Menu1 > LNB Menu1 > <em>Project</em>
-                </span>
             </ui-container-box>
 
             <ui-container-box :columns=20 horizontal class="page-form-area">
-                    <ProjectSearch></ProjectSearch>
+                <ProjectSearch></ProjectSearch>
             </ui-container-box>
 
             <ui-container-box :columns=20 vertical class="page-summary-area">
-                    <ProjectResult></ProjectResult>
+                <ProjectResult></ProjectResult>
+            </ui-container-box>
+
+            <ui-container-box :columns="20" horizontal>
+                <ui-container-box :columns="10" vertical class="mt20">
+                </ui-container-box>
+                <ui-container-box :columns="3" vertical class="mt20">
+                    <img src="@/assets/ico_footer.png" alt="Samsung SDS" />
+                </ui-container-box>
             </ui-container-box>
 
         </ui-container-box>

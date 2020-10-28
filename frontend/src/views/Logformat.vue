@@ -4,24 +4,29 @@
 
             <ui-container-box :columns=20 horizontal align-center class="page-title">
                 <span class="page-title__label">Logformat</span>
-                <span class="page-title__sub">
-                    Menu1 > LNB Menu1 > <em>Logformat</em>
-                </span>
             </ui-container-box>
 
             <ui-container-box :columns=20 horizontal class="page-form-area">
-                    <LogformatSearch></LogformatSearch>
+                <LogformatSearch></LogformatSearch>
             </ui-container-box>
 
             <ui-container-box :columns=20 vertical class="page-summary-area">
-                    <LogformatResult></LogformatResult>
+                <LogformatResult></LogformatResult>
             </ui-container-box>
 
             <ui-container-box :columns=20 vertical class="page-table-area">
-                    <LogformatDetail></LogformatDetail>
+                <LogformatDetail></LogformatDetail>
+            </ui-container-box>
+            
+            <ui-container-box :columns="20" horizontal>
+                <ui-container-box :columns="10" vertical class="mt20">
+                </ui-container-box>
+                <ui-container-box :columns="3" vertical class="mt20">
+                    <img src="@/assets/ico_footer.png" alt="Samsung SDS" />
+                </ui-container-box>
             </ui-container-box>
 
-        </ui-container-box>
+        </ui-container-box>        
 
 </template>
 

@@ -5,8 +5,8 @@
         <table class="page-summary-table">
             <thead>
                 <tr>
-                    <th>format kind</th>
-                    <th>format string</th>
+                    <th style="width: 70px;">format kind</th>
+                    <th style="width: 70px;">format string</th>
                     <th>format definition</th>
                 </tr>
             </thead>
@@ -105,6 +105,8 @@ export default {
     border-top: 1px solid #eaeaea;
     font-weight: normal;
     background-color: #f7f7f7;
+    position: sticky;
+    top: 0px;
 }
 
 .page-summary-table thead th+th {
