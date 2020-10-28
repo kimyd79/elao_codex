@@ -199,7 +199,7 @@ export default {
 }
 
 .tb_box {
-    max-height: 200px;
+    max-height: 400px;
     overflow-y: auto;
 }
 
@@ -214,6 +214,8 @@ export default {
     border-top: 1px solid #eaeaea;
     font-weight: normal;
     background-color: #f7f7f7;
+    position: sticky;
+    top: 0px;
 }
 
 .page-summary-table thead th+th {
