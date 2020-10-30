@@ -1219,7 +1219,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
             
             # Tomcat, WebtoB의 경우 단위가 ms이므로 *1000 필요 df_logs['ftime_taken']
-            if format_kind == 'apache' or format_kind == 'tomcat' or format_kind == 'webtob':
+            if format_kind == 'tomcat' or format_kind == 'webtob':
                 df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000)
         else:
             df_logs['ftime_taken'] = -1
