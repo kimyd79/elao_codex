@@ -20,6 +20,7 @@
 
     <ui-container-box :columns="20" horizontal>
         <ui-container-box :columns="10" vertical class="mt20">
+            <font size="4">CI-TEC</font>
         </ui-container-box>
         <ui-container-box :columns="3" vertical class="mt20">
             <img src="@/assets/ico_footer.png" alt="Samsung SDS" />

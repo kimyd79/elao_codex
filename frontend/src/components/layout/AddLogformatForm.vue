@@ -1,49 +1,45 @@
 <template>
-    <div class="modal-mask" transition="modal">
-        <div class="modal-wrapper">
-            <ui-container-box :columns=9 vertical class="modal-container">
-                <div class="popup-header">
-                    <div class="popup-header__title">
-                        Add Logformat
-                    </div>
-                    <div class="popup-header__close">
-                        <lego-icon small v-on:click="clickCancle">close</lego-icon>
-                    </div>
+<div class="modal-mask" transition="modal">
+    <div class="modal-wrapper">
+        <ui-container-box :columns=9 vertical class="modal-container">
+            <div class="popup-header">
+                <div class="popup-header__title">
+                    Add Logformat
                 </div>
-
-                <div class="popup-form">
-
-                    <ui-form-item :columns=8
-                        label="format kind" required left-label :label-width=144 :label-padding=16 >
-                        <!--lego-text-field v-model="format.format_kind" placeholder="enter format kind. ex)apache, nginx, IIS..." /-->
-                        <lego-dropdown :items="[{value: 'apache', text: 'apache'}, {value: 'nginx', text: 'nginx'}, {value: 'IIS', text: 'IIS'}]" v-model='format.format_kind'/>
-                    </ui-form-item>
-
-                    <ui-form-item :columns=8
-                        label="format name" required left-label :label-width=144 :label-padding=16 >
-                        <lego-text-field v-model="format.format_name" placeholder="enter format name. ex)common, combined..." />
-                    </ui-form-item>
-
-                    <ui-form-item :columns=8
-                        label="format strings" required left-label :label-width=144 :label-padding=16 >
-                        <lego-text-field v-model="format.format_strings" placeholder="enter log format. ex)%h %l %u %t \%r\ %>s %b" />
-                    </ui-form-item>
-
-                    <ui-form-item :columns=8
-                        label="creator" required left-label :label-width=144 :label-padding=16 >
-                        <lego-text-field disabled v-model="format.creator" />
-                    </ui-form-item>
-
+                <div class="popup-header__close">
+                    <lego-icon small v-on:click="clickCancle">close</lego-icon>
                 </div>
+            </div>
 
-                <div class="popup-buttons">
-                    <lego-button v-on:click="clickCancle">Cancel</lego-button>
-                    <lego-button main v-on:click="clickSave">Save</lego-button>
-                </div>
+            <div class="popup-form">
 
-            </ui-container-box>
-        </div>
+                <ui-form-item :columns=8 label="format kind" required left-label :label-width=144 :label-padding=16>
+                    <!--lego-text-field v-model="format.format_kind" placeholder="enter format kind. ex)apache, nginx, IIS..." /-->
+                    <lego-dropdown :items=conditions v-model='format.format_kind' />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="format name" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field v-model="format.format_name" placeholder="enter format name. ex)common, combined..." />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="format strings" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field v-model="format.format_strings" placeholder="enter log format. ex)%h %l %u %t \%r\ %>s %b" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field disabled v-model="format.creator" />
+                </ui-form-item>
+
+            </div>
+
+            <div class="popup-buttons">
+                <lego-button v-on:click="clickCancle">Cancel</lego-button>
+                <lego-button main v-on:click="clickSave">Save</lego-button>
+            </div>
+
+        </ui-container-box>
     </div>
+</div>
 </template>
 
 <script>
@@ -51,12 +47,17 @@ import EventBus from '../../EventBus';
 
 export default {
     name: 'AddLogformatFrom',
-    data: function() {
-        return {          
-            format : {
-                type : Object,
-                default : function() {
-                    return { format_kind:'', format_name:'', format_strings:'', creator:'' }
+    data: function () {
+        return {
+            format: {
+                type: Object,
+                default: function () {
+                    return {
+                        format_kind: '',
+                        format_name: '',
+                        format_strings: '',
+                        creator: ''
+                    }
                 }
             }
         }
@@ -66,12 +67,48 @@ export default {
         this.format.creator = this.$store.state.userName
     },
 
+    computed: {
+        conditions() {
+            let rtn = [];
+            rtn.push({
+                value: "ALL",
+                text: "ALL"
+            });
+            rtn.push({
+                value: "apache",
+                text: "apache"
+            });
+            rtn.push({
+                value: "tomcat",
+                text: "tomcat"
+            });
+            rtn.push({
+                value: "webtob",
+                text: "webtob"
+            });
+            rtn.push({
+                value: "jeus",
+                text: "jeus(>= ver7)"
+            });
+            rtn.push({
+                value: "IIS",
+                text: "IIS"
+            });
+            rtn.push({
+                value: "nginx",
+                text: "nginx"
+            });
+
+            return rtn;
+        }
+    },
+
     methods: {
-        clickCancle: function() {
+        clickCancle: function () {
             this.$emit('popupClose');
         },
-        
-        clickSave: function() {
+
+        clickSave: function () {
             EventBus.$emit("addFormat", this.format);
         }
     }
@@ -79,46 +116,54 @@ export default {
 </script>
 
 <style scoped>
-
 .modal {
     position: fixed;
     width: 704px;
     left: 50%;
-    margin-left: -20%; /* half of width */
+    margin-left: -20%;
+    /* half of width */
     height: 500px;
     top: 50%;
-    margin-top: -150px; /* half of height */
+    margin-top: -150px;
+    /* half of height */
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
 }
+
 .popup-container {
     padding: 32px;
     border: 1px solid #D0D0D0;
     background-color: white;
 }
+
 .popup-header {
     position: relative;
     display: flex;
     flex-flow: column nowrap;
 }
+
 .popup-header__title {
     font-size: 24px;
     font-weight: bold;
 }
+
 .popup-header__close {
     position: absolute;
     top: 0;
     right: 0;
 }
+
 .popup-header__close:hover {
     cursor: pointer;
 }
+
 .popup-buttons {
     display: flex;
     justify-content: flex-end;
     margin-top: 16px;
 }
+
 .popup-form .ui-form-item {
     margin-top: 32px;
 }

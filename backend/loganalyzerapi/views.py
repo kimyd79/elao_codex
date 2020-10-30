@@ -1073,7 +1073,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 LogDetail_dynamic.objects.model.objects = CopyManager()
                 LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
                 
-                LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',')        
+                LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',', encoding="utf-8")
                     
                 if settings.DEBUG:
     	            logger.debug("To DB, Total Duration : %s" % (time.time() - start))
@@ -1122,6 +1122,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs = None
         df_logs_all = None
         try:
+            
             df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, na_filter=False)
             
         except UnicodeDecodeError as ude:
@@ -1216,6 +1217,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         if (not time_taken_flag) & (log_format.find('%D') != -1):
             df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
+            
+            # Tomcat, WebtoB의 경우 단위가 ms이므로 *1000 필요 df_logs['ftime_taken']
+            if format_kind == 'apache' or format_kind == 'tomcat' or format_kind == 'webtob':
+                df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000)
         else:
             df_logs['ftime_taken'] = -1
         
@@ -1272,6 +1277,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs.dropna(axis=0, inplace=True)
                         
         # index 미사용  
+        #with open(logfile.name+'.csv', mode='w', newline='\r\n') as f:
+        #    df_logs[log_line_header].to_csv(f, index=False, encoding="cp1252")
         df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
        
         if settings.DEBUG:
@@ -1282,7 +1289,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         index = 0
         for tmp in log_format.split(sep=' '):
             
-            if format_kind == 'apache':
+            if format_kind == 'apache' or format_kind == 'tomcat' or format_kind == 'webtob':
                 if tmp.find('Referer') != -1:
                     format_index['Referer'] = index
                 elif tmp.find('User-Agent') != -1:

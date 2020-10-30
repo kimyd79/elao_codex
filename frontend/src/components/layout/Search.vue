@@ -109,7 +109,7 @@ export default {
             });
             rtn.push({
                 value: "S",
-                text: "Satus"
+                text: "Status"
             });
             return rtn;
         }

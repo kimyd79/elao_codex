@@ -4,9 +4,11 @@
         <template v-slot:lead>
             <ui-gnb-title>
                 <template v-slot:title>
-                    <router-link to="/analysis">MW LogAnalyzer</router-link>
+                    <router-link to="/analysis">
+                        Easy Log Analyzer Online -<font size="4"> Web/WAS </font>
+                    </router-link>
                 </template>
-                <template v-slot:sub>CI-TEC</template>
+                <!--<template v-slot:sub>CI-TEC</template>-->
             </ui-gnb-title>
             <ui-gnb-menus :menus="menus">
                 <template v-slot="{ menu }">
@@ -100,7 +102,7 @@ export default {
         submitEvent: function () {
             if (this.btnText == 'LOGIN') {
                 this.$router.push('/login').catch(error => {
-                    if(error.name != "NavigationDuplicated"){
+                    if (error.name != "NavigationDuplicated") {
                         throw error;
                     }
                 });
