@@ -138,7 +138,8 @@ export default {
 
     methods: {
         getDateTimeString(str) {
-            return str >= 10 ? str : "0" + str;
+            //return str >= 10 ? str : "0" + str;
+            return str;
         },
 
         nvl(str, defaultStr) {
@@ -157,15 +158,15 @@ export default {
             for (let i = 0; i < results.length; i++) {
                 dateString =
                     results[i].fyear +
-                    "" +
+                    "/" +
                     this.getDateTimeString(results[i].fmonth) +
-                    "" +
+                    "/" +
                     this.getDateTimeString(results[i].fday);
                 timeString =
                     this.getDateTimeString(results[i].fhour) +
-                    "" +
+                    ":" +
                     this.getDateTimeString(results[i].fminute) +
-                    "" +
+                    ":" +
                     this.getDateTimeString(results[i].fsecond);
 
                 let frequest = results[i].frequest.substring(0, 60)
