@@ -21,10 +21,17 @@ from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.http import QueryDict
-
+import os
 from postgres_copy import CopyManager
 import copy
 import numpy as np
+from zipfile import ZipFile
+import gzip
+import math
+import multiprocessing
+import asyncio
+from multiprocessing import Process, Queue
+from threading import Thread
 
 from dynamic_models.models import ModelSchema, FieldSchema
 from django.apps import apps
@@ -1060,23 +1067,72 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
                 logfile = logfile_model.file_object.file    
                 
-                print("logfile :", logfile)     
+                print("logfile :", logfile)
                 
-                # [병렬처리] Log Parsing : postgresql copy 사용을 위해 csv파일 생성
+                # 파일 추가를 위한 기존정보 체크
                 id_startnum = 0
                 if LogDetail_dynamic.objects.count() > 0:
                     id_startnum = LogDetail_dynamic.objects.all().order_by("-id")[0].id + 1
                 
-                self.parse_log(logfile, logfile_id, id_startnum)
-            
+                # Log Parsing : postgresql copy 사용을 위해 csv파일 생성                
+                # 로그 파일이 크면 분할한다.
+                # 1. 압축파일인지 확인
+                # 2. 압축파일이 풀면 1.5GB 이상인지 확인
+                isCompressed = False
+                limitFileSize = 1.5 * 1024 * 1024 * 1024
+                workFileSize = 0
+                
+                # 1. 압축파일인지 확인(zip, gz)
+                p = re.compile('(.zip|.gz)', re.DOTALL )
+                if len(p.findall(logfile.name)) > 0:    # 압축 파일
+                    isCompressed = True
+                    workFileSize = self.get_original_filesize(logfile.name)
+                else:                                   # 압축 파일 아닌 경우
+                    workFileSize = logfile.size
+                    
+                # 2. 압축파일이 풀면 1.5GB 이상인지 확인
+                workFileCount = 1   # 기본값 = 1
+                resultFiles = []
+                
+                if workFileSize > limitFileSize:                    
+                    # 분할 파일 수를 계산해야 한다.
+                    workFileCount = math.ceil(workFileSize/limitFileSize)
+                    
+                    # 압축 해제한다.
+                    target_filename = self.decompress_file(logfile.name)
+                    
+                    # 전체 라인 카운트(gz, zip 가능)
+                    totalLines = self.get_total_lines(target_filename)
+                    
+                    # Target File Name
+                    #target_filename = logfile.name+"_decompressed"
+                    
+                    # 분할 파일 수로 나누어서 작업을 순차적으로 진행 - 메모리 사용률을 줄이기 위해서
+                    startTime = time.time()
+                                        
+                    unit = int(totalLines/workFileCount)
+
+                    for idx in range(workFileCount):
+                        resultFiles.append(self.parse_log_div(target_filename, logfile_id, id_startnum+idx*unit, unit*idx, unit))
+                                                            
+                    print("## 분할 csv 작업완료 까지 : 총 작업 시간 - ", round((time.time() - startTime),4))   
+                    
+                else:
+                    # 기존로직
+                    #self.parse_log(logfile, logfile_id, id_startnum )
+                    resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None))
+           
                 # postgresql copy 실행                
                 LogDetail_dynamic.objects.model.objects = CopyManager()
                 LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
+                                
+                #LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',', encoding="utf-8")
                 
-                LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',', encoding="utf-8")
+                for filename in resultFiles:
+                    LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
                     
                 if settings.DEBUG:
-    	            logger.debug("To DB, Total Duration : %s" % (time.time() - start))
+                    logger.debug("To DB, Total Duration : %s" % (time.time() - start))
                 
                 response = {'message': 'logdetail created successfully.'}
                 
@@ -1088,8 +1144,206 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    def parse_log(self, logfile, logfile_id, existed_row_size):
+    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows):
     
+        log_lines = []
+        result = []
+        count = 0               
+        start = time.time()
+        
+        # Fileformat 가져온다.(from logfile DB using logfile_id)
+        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'      
+        format_model = LogFile.objects.get(logfile_id=logfile_id)
+        log_format = format_model.file_format
+        
+        # format_kind : apache, nginx, IIS
+        format_kind = format_model.format_kind        
+        format_name = format_model.format_name
+                
+        # 임시 csv 파일생성 for copy to postgresql
+        # For dynamic : logdetail_id -> id
+        log_line_header = ['id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
+                           'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
+                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime','fbyte', 'fextension']
+        
+        # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
+        
+        # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
+        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
+        format_index = self.get_logformat_index(log_format, format_kind)     
+        
+        # X-Forwarded-For 처리 위해 전체라인을 먼저 처리한다.
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.(\t 사용)
+        # 전체 읽을 때에는 escapechar="\\" 불필요하다.
+        df_logs = None
+        df_logs_all = None
+        file_name = logfile_name
+        
+        try:
+            
+            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
+            
+        except UnicodeDecodeError as ude:
+            
+            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
+            
+            try:
+                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
+            except Exception as uex:
+                logger.error('UnicodeDecodeError Occured AGAIN!')
+                raise uex            
+            
+        except Exception as ex: 
+            logger.error('Error Occured while creating logdetail read_csv#2 whole lines : %s' % ex)            
+            raise ex        
+        
+        # X-Forwarded-For 처리부분
+        # 성능 때문에 %h가 없는 경우에만 일단 처리
+        if log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1:
+            repl = lambda m: m.group(0)[:-1:]
+            df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\, )+', repl)            
+            np.savetxt(logfile_name+"_X-Forwarded-For", df_logs_re.values, fmt="%s")
+            file_name = logfile_name+"_X-Forwarded-For"
+                        
+        try:           
+                
+            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+            
+        except UnicodeDecodeError as ude:
+            
+            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)
+            
+            try:
+                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+            except Exception as uex:
+                logger.error('UnicodeDecodeError Occured AGAIN!')
+                raise uex            
+            
+        except Exception as ex: 
+            logger.error('Error Occured while creating logdetail read_csv#1  : %s' % ex)
+            raise ex                      
+                  
+        df_logs['log_line'] = df_logs_all
+        
+        # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
+        #df_logs['log_line'] = df_logs[df_logs.columns[0:]].apply(lambda x: ' '.join(x.astype(str)), axis=1)              
+                
+        # if 'h' in log_format:
+        if log_format.find('h') != -1:
+            df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
+        else:
+            #  %{X-Forwarded-For}i의 맨 앞은 사용자 IP, %h와 같이 사용하지 않을 것임   
+            if log_format.find('X-Forwarded-For') != -1:
+                df_logs['fip'] = df_logs[format_index['X-Forwarded-For']].str.split(',').str[0]            
+            else:
+                df_logs['fip'] = 'NA'
+            
+        # if 'r' in log_format:
+        if log_format.find('r') != -1:
+            df_logs.rename(columns = {format_index['r'] : 'frequest'}, inplace = True)
+        else:
+            df_logs['frequest'] = 'NA'    
+
+        # if 's' in log_format:
+        if log_format.find('s') != -1:
+            df_logs.rename(columns = {format_index['s'] : 'fstatus'}, inplace = True)
+        else:
+            df_logs['fstatus'] = 'NA'
+            
+        # bytes    
+        if log_format.find('b') != -1 or log_format.find('B') != -1:
+            df_logs.rename(columns = {format_index['b'] : 'fbyte'}, inplace = True)
+        else:
+            df_logs['fbyte'] = 0
+
+        if log_format.find('Referer') != -1:
+            df_logs.rename(columns = {format_index['Referer'] : 'freferer'}, inplace = True)
+        else:
+            df_logs['freferer'] = 'NA'
+            
+        if log_format.find('User-Agent') != -1:
+            df_logs.rename(columns = {format_index['User-Agent'] : 'fuser_agent'}, inplace = True)
+        else:
+            df_logs['fuser_agent'] = 'NA'
+
+        time_taken_flag = False    
+        if log_format.find('%T') != -1:
+            df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
+            time_taken_flag = True
+
+        if (not time_taken_flag) & (log_format.find('%D') != -1):
+            df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
+            
+            # Tomcat, WebtoB의 경우 단위가 ms이므로 *1000 필요 df_logs['ftime_taken']
+            if format_kind == 'tomcat' or format_kind == 'webtob':
+                df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000)
+        else:
+            df_logs['ftime_taken'] = -1
+        
+        #'freserve1', 'freserve2', 'freserve3'
+        df_logs['freserve1'] = ''
+        df_logs['freserve2'] = ''
+        df_logs['freserve3'] = ''
+        
+        #'created'
+        datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        df_logs['created'] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
+                
+        #'logfile_id'
+        df_logs['logfile_id'] = logfile_id
+        
+        #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
+        # 시간관련, dummy는 , 때문에
+        time_index = format_index['t']
+        df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
+        series = df_datetime.str.split(' ')
+        df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
+        
+        # 보완로직1 - 결측치 제거 : None있으면 해당 row 제거
+        df_time.dropna(axis=0, inplace=True)
+
+        month_map = {
+            'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
+            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
+        }
+
+        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
+        
+        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
+        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+        
+        # fbyte 처리 : - 를 0으로 처리
+        df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
+        
+        # fextension 처리 : frequest로부터 처리한다.
+        # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
+        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)\s', re.DOTALL )
+        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
+        
+        # Merge : logdetail_id -> id
+        # ID 기존의 개수 + 1 만큼 + 해주어야 한다. 0부터 시작이므로        
+        df_logs = df_logs.rename_axis('id').reset_index()
+        df_logs['id'] = df_logs['id'] + existed_row_size
+        
+        df_logs = pd.concat([df_logs, df_time], axis=1)
+        
+        # 보완로직2 - 결측치 제거 : None있으면 해당 row 제거
+        df_logs.dropna(axis=0, inplace=True)
+                        
+        # index 미사용
+        result_file_name = logfile_name+'_'+str(skiprows)+'.csv'
+        df_logs[log_line_header].to_csv(result_file_name, index=False)
+       
+        if settings.DEBUG:
+    	    logger.debug("Duration to create temporary csv : %s" % (time.time() - start))
+        
+        return result_file_name
+    
+    '''    
+    def parse_log(self, logfile, logfile_id, existed_row_size):
+        
         log_lines = []
         result = []
         count = 0               
@@ -1283,6 +1537,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
        
         if settings.DEBUG:
     	    logger.debug("Duration to create temporary csv : %s" % (time.time() - start))
+    '''
     
     def get_logformat_index(self, log_format, format_kind):
         format_index = {}
@@ -1322,3 +1577,82 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             index = index + 1 
             
         return format_index    
+
+    def get_original_filesize(self, logfile_name):
+        
+        if 'zip' in logfile_name:
+            
+            with ZipFile(logfile_name) as zip_archive:
+                for item in zip_archive.filelist:
+                    print(item)
+                    print("# file_size = ", item.file_size)
+                    
+                #print(f'\nThere are {len(zip_archive.filelist)} ZipInfo objects present in archive')                
+                return item.file_size
+
+        else:   # 'gz'
+            
+            with gzip.open(logfile_name, "rb") as f:
+                #data = f.read()
+                f.seek(0, 2)
+                return f.tell()
+                
+    def decompress_file(self, logfile_name):
+        
+        # 저장할 디렉토리 설정
+        #target_dir = os.path.dirname(logfile_name)+os.path.sep+"decompressed"
+        #original_filename = os.path.basename(logfile_name)
+        result_filename = logfile_name+"_decompressed"
+        
+        #if not(os.path.isdir(target_dir)):
+        #    os.makedirs(os.path.join(target_dir))
+        
+        decompressedFile = ""
+        
+        if 'zip' in logfile_name:
+            with ZipFile(logfile_name, 'r') as zip_ref:
+                zip_ref.extractall(result_filename)
+                # 단일 파일만 지원
+                decompressedFile = result_filename+os.path.sep+zip_ref.filelist[0].filename
+                
+                print("== Here!!")
+        else:                     
+            with gzip.open(logfile_name, 'rb') as s_file, \
+                open(result_filename, 'wb') as d_file:   # 파일명까지 지정해줘여 하는가?
+                
+                while True:
+                    block = s_file.read(65536)
+                    if not block:
+                        break
+                    else:
+                        d_file.write(block)       
+                                
+            decompressedFile = result_filename    
+        
+        # 생성된 파일 경로를 리턴                
+        return decompressedFile
+
+    def get_total_lines(self, file_name):
+        
+        startTime = time.time()
+        
+        processes = multiprocessing.cpu_count()
+        
+        def blocks(files, size=65536):
+            while True:
+                b = files.read(size*(processes))
+                if not b: break
+                yield b
+
+        linecount = 0
+
+        with open(file_name, "r", encoding="utf-8", errors='ignore') as f:
+            linecount = sum(bl.count("\n") for bl in blocks(f))
+            print (linecount)
+        
+        endTime = time.time()
+        
+        print("## 프로세스 수 : ", processes)
+        print("## line count 까지 : 총 작업 시간 - ", round((endTime - startTime),4)) 
+        
+        return linecount
