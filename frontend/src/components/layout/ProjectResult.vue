@@ -72,7 +72,7 @@ export default {
             },
         }
     },
-    mounted() {
+    created() {
         EventBus.$on("searchProject", this.getData);
         EventBus.$on("cancelUpdateProject", () => {
             this.currentView = null;
@@ -85,6 +85,12 @@ export default {
             this.updateData(project);
             this.currentView = null;
         });
+    },
+    beforeDestroy(){
+        EventBus.$off("searchProject");
+        EventBus.$off("cancelUpdateProject");
+        EventBus.$off("updateOK");
+        EventBus.$off("updateProject");
     },
 
     methods: {
