@@ -71,10 +71,6 @@ export default {
         conditions() {
             let rtn = [];
             rtn.push({
-                value: "ALL",
-                text: "ALL"
-            });
-            rtn.push({
                 value: "apache",
                 text: "apache"
             });

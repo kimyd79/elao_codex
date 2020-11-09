@@ -76,7 +76,7 @@ export default {
             },
         }
     },
-    mounted() {
+    created() {
         EventBus.$on("searchFormat", this.getData);
         EventBus.$on("cancel", () => {
             this.currentView = null;
@@ -99,9 +99,17 @@ export default {
         });
 
     },
+    beforeDestroy(){
+        EventBus.$off("searchFormat");
+        EventBus.$off("cancel");
+        EventBus.$off("addFormat");
+        EventBus.$off("updateOK");
+        EventBus.$off("updateFormat");
+        EventBus.$off("deleteFormat");
+    },
 
     methods: {
-        getData: function (format_kind) {
+        getData(format_kind) {
             //axios.get( 'http://127.0.0.1:8000/logformat/?format_kind='+format_kind)
             axios.get(urlStr + '?format_kind=' + format_kind)
                 .then((response) => {
@@ -118,7 +126,7 @@ export default {
                     console.error(err);
                 })
         },
-        getDataOne: function (id) {
+        getDataOne(id) {
             //axios.get( 'http://127.0.0.1:8000/logformat/'+id)
             axios.get(urlStr + id)
                 .then((response) => {
@@ -129,7 +137,7 @@ export default {
                    console.error(err);
                 })
         },
-        deleteData: function (format) {
+        deleteData(format) {
             //axios.delete( 'http://127.0.0.1:8000/logformat/'+format.format_id)
             axios.delete(urlStr + format.format_id)
                 .then((response) => {
@@ -140,7 +148,7 @@ export default {
                     console.error(err);
                 })
         },
-        addData: function (format) {
+        addData(format) {
             //axios.post( 'http://127.0.0.1:8000/logformat/', format)
             axios.post(urlStr, format)
                 .then((response) => {
@@ -152,7 +160,7 @@ export default {
                     this.$alert("Add logformat failed. Check for required fields.", "Notification", "error");
                 })
         },
-        updateData: function (format) {
+        updateData(format) {
             //axios.put('http://127.0.0.1:8000/logformat/'+format.format_id+'/', format)
             axios.put(urlStr + format.format_id + '/', format)
                 .then((response) => {
@@ -164,7 +172,7 @@ export default {
                     this.$alert("Update logformat failed. Check for required fields.", "Notification", "error");
                 })
         },
-        clickList: function (format_list) {
+        clickList(format_list) {
             this.selected_format_id = format_list.format_id;
             this.format.format_id = format_list.format_id;
             this.format.format_kind = format_list.format_kind;
@@ -176,7 +184,7 @@ export default {
             //console.log("click ID : " + format_list.format_id);
 
         },
-        clickDelete: function () {
+        clickDelete() {
             if (this.format.format_id != '') {
                  this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
                     //console.log("OK clicked");
@@ -188,10 +196,10 @@ export default {
                 this.$alert("No Logformat selected", "Confirm Update", "error");
             }
         },
-        clickAdd: function () {
+        clickAdd() {
             this.currentView = 'AddLogformatForm';
         },
-        clickUpdate: function () {
+        clickUpdate() {
             if (this.format.format_id != '') {
                 this.currentView = 'updateLogformatForm';
             } else {

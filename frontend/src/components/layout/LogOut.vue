@@ -72,10 +72,18 @@ export default {
                     this.$router.push('/');
                 })
                 .catch((err) => {
-                    console.error(err);
+                    if (err.response.status == "401"){
+                        //this.$alert(err.response.data.detail + "Authorization Error. Please Login again.", "Unauthorized", "error");
+                        delete axios.defaults.headers.common['Authorization'];
+                        this.$store.dispatch("setUserToken", "");
+                        this.$store.dispatch("setUserName", "Not logged in");
+                        this.$router.push('/');                        
+                    } else {
+                        console.error(err);
+                    }                 
                 })
         }
-    }
+    },
 };
 </script>
 

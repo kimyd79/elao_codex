@@ -178,7 +178,8 @@ export default {
 
     methods: {
         getDateTimeString(str) {
-            return str >= 10 ? str : "0" + str;
+            //return str >= 10 ? str : "0" + str;
+            return str;            
         },
 
         nvl(str, defaultStr) {
@@ -197,15 +198,15 @@ export default {
             for (let i = 0; i < results.length; i++) {
                 dateString =
                     results[i].fyear +
-                    "" +
+                    "/" +
                     this.getDateTimeString(results[i].fmonth) +
-                    "" +
+                    "/" +
                     this.getDateTimeString(results[i].fday);
                 timeString =
                     this.getDateTimeString(results[i].fhour) +
-                    "" +
+                    ":" +
                     this.getDateTimeString(results[i].fminute) +
-                    "" +
+                    ":" +
                     this.getDateTimeString(results[i].fsecond);
 
                 let frequest = results[i].frequest.substring(0, 60)
@@ -294,11 +295,7 @@ export default {
 
             this.getDetailCondition();
 
-            //let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)
             let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
-            //console.log("DetailPopUp detailconditionValue : " + this.detailconditionValue)
-            //console.log("DetailPopUp detailsearchValue : " + this.detailsearchValue)
-            //console.log("DetailPopUp filters : " + filters)
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -319,9 +316,6 @@ export default {
             axios
                 .get(urlstring)
                 .then(res => {
-
-                    //console.log(res.data.count); // 전체건수
-                    //console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
@@ -341,20 +335,13 @@ export default {
             // 1 : 0~9, 2 : 10~19,
             //console.log("offset :" + offset);
 
-            //let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)  
-
             // sec -> ms 단위로 처리한다.(*1000)
             var ttFromValueThreshold = this.threshold * 1000
-            var ttToValueThreshold = 99999 * 1000
-            //let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
+            var ttToValueThreshold =  24*60*60*1000
+            
             let filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '')
-            //let filters = getDetailSearchFilter(ttFromValueThreshold, ttToValueThreshold, this.projectID)
-            //console.log("LongTransactionDetailPopUp ttFromValueThreshold : " + ttFromValueThreshold)
-            //console.log("LongTransactionDetailPopUp ttToValueThreshold : " + ttToValueThreshold)
-            //console.log("LongTransactionDetailPopUp filters : " + filters)
 
             var urlstring =
-                //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
 
             // TODO : Set axiosConfig to set headers

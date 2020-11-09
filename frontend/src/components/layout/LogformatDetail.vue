@@ -42,6 +42,10 @@ export default {
     created() {
         EventBus.$on("searchFormatDetail", this.getData);
     },
+     beforeDestroy(){
+        EventBus.$off("searchFormatDetail");
+    },
+
     methods: {
         getData: function (format_kind) {
             axios.get(urlStr + '?format_kind=' + format_kind)
