@@ -1113,14 +1113,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     unit = int(totalLines/workFileCount)
 
                     for idx in range(workFileCount):
-                        resultFiles.append(self.parse_log_div(target_filename, logfile_id, id_startnum+idx*unit, unit*idx, unit))
+                        resultFiles.append(self.parse_log_div(target_filename, logfile_id, id_startnum+idx*unit, unit*idx, unit, idx))
                                                             
                     print("## 분할 csv 작업완료 까지 : 총 작업 시간 - ", round((time.time() - startTime),4))   
                     
                 else:
                     # 기존로직
                     #self.parse_log(logfile, logfile_id, id_startnum )
-                    resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None))
+                    resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
            
                 # postgresql copy 실행                
                 LogDetail_dynamic.objects.model.objects = CopyManager()
@@ -1144,7 +1144,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows):
+    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
     
         log_lines = []
         result = []
@@ -1203,7 +1203,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             repl = lambda m: m.group(0)[:-1:]
             df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\, )+', repl)            
             np.savetxt(logfile_name+"_X-Forwarded-For", df_logs_re.values, fmt="%s")
-            file_name = logfile_name+"_X-Forwarded-For"
+            
+            # 파일이 나누어서 만들어진다. 대상 파일이 변경됨
+            file_name = logfile_name+"_X-Forwarded-For"            
+            skiprows = None
+            nrows = None
                         
         try:           
                 
@@ -1333,7 +1337,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs.dropna(axis=0, inplace=True)
                         
         # index 미사용
-        result_file_name = logfile_name+'_'+str(skiprows)+'.csv'
+        result_file_name = file_name+'_'+str(file_order)+'.csv'
         df_logs[log_line_header].to_csv(result_file_name, index=False)
        
         if settings.DEBUG:
@@ -1615,7 +1619,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 단일 파일만 지원
                 decompressedFile = result_filename+os.path.sep+zip_ref.filelist[0].filename
                 
-                print("== Here!!")
         else:                     
             with gzip.open(logfile_name, 'rb') as s_file, \
                 open(result_filename, 'wb') as d_file:   # 파일명까지 지정해줘여 하는가?

@@ -2,7 +2,7 @@
 <div id="notice">
     <component :is="currentView" v-on:popupClose="currentView=null"></component>
     <ui-card :columns="10" :height="200">
-        <ui-card-item header>Notice</ui-card-item>
+        <ui-card-item header>Findings</ui-card-item>
         <ui-card-item sub>
 
             <!-- bar-fade-scale, color="#FF6700" -->
@@ -39,14 +39,14 @@ export default {
     components: {
         // export Loading Spinner components
         VueElementLoading,
-        DetailPopup, 
+        DetailPopup,
     },
 
     data() {
         return {
             isActive: false,
             LongTransactionCount: 0,
-            currentView : null,
+            currentView: null,
         }
     },
 
@@ -65,7 +65,7 @@ export default {
         dateToValue: "getToDate",
         timeFromValue: "getFromTime",
         timeToValue: "getToTime",
-        threshold: "getThreshold"        
+        threshold: "getThreshold"
     }),
 
     methods: {
@@ -99,8 +99,8 @@ export default {
             //alert('LongTransactionCount : ' + this.LongTransactionCount)
             //console.log(this.LongTransactionCount +', ' + this.threshold)
             this.$store.state.popupKind = 'LongTransaction';
-            this.$store.state.popupHeader = 'Long Transaction Detail'; 
-            this.$store.state.popupBody = 'threshold : >= ' + this.threshold +'seconds';
+            this.$store.state.popupHeader = 'Long Transaction Detail';
+            this.$store.state.popupBody = 'threshold : >= ' + this.threshold + 'seconds';
             this.$store.state.popupButton = 'Close';
             this.currentView = 'DetailPopup';
         },

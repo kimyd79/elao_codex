@@ -592,6 +592,7 @@ export default {
             };
 
             this.$store.dispatch("setProjectName", this.projectName);
+            this.$store.dispatch("setProjectDescription", this.projectDescription);
 
             let axiosConfig = {
                 headers: {
