@@ -37,7 +37,7 @@ Vue.use(Router)
 
 
 const requireAdmin = () => (to, from, next) => {
-  if(store.state.userName == 'Leehs' || store.state.userName == 'Admin') {
+  if(store.state.userName.toLowerCase() == 'leehs' || store.state.userName.toLowerCase() == 'admin') {
     next();
   } else {
     VueSimpleAlert.alert("Allow only admin to access.", "Notification", "error");
