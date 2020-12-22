@@ -422,7 +422,12 @@ export default {
         getProjects() {
 
             //var url = serverUrl + "/logmaster/?search=" + this.creator
-            var url = serverUrl + "/logmaster/?creator=" + this.creator
+            if (this.creator == 'Leehs' || this.creator == 'Admin') {
+                var url = serverUrl + "/logmaster/?creator="
+            } else {
+                var url = serverUrl + "/logmaster/?creator=" + this.creator
+            }
+            
 
             let axiosConfig = {
                 headers: {
