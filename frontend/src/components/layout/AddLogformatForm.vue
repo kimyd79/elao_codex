@@ -87,8 +87,12 @@ export default {
                 text: "jeus(>= ver7)"
             });
             rtn.push({
-                value: "IIS",
-                text: "IIS"
+                value: "IIS-W3C",
+                text: "IIS-W3C"
+            });
+            rtn.push({
+                value: "IIS-NCSA",
+                text: "IIS-NCSA"
             });
             rtn.push({
                 value: "nginx",

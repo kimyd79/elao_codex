@@ -17,7 +17,7 @@
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="format kind" required left-label :label-width=144 :label-padding=16>
-                    <lego-dropdown :items="[{value: 'apache', text: 'apache'}, {value: 'nginx', text: 'nginx'}, {value: 'IIS', text: 'IIS'}]" v-model='format.format_kind'/>
+                    <lego-dropdown :items="[{value: 'apache', text: 'apache'}, {value: 'nginx', text: 'nginx'}, {value: 'IIS-W3C', text: 'IIS-W3C'}, {value: 'IIS-NCSA', text: 'IIS-NCSA'}]" v-model='format.format_kind'/>
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="format name" required left-label :label-width=144 :label-padding=16>

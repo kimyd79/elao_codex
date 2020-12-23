@@ -1156,7 +1156,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         format_model = LogFile.objects.get(logfile_id=logfile_id)
         log_format = format_model.file_format
         
-        # format_kind : apache, nginx, IIS
+        # format_kind : apache, tomcat, webtob, nginx, IIS-W3C, IIS-NCSA 
         format_kind = format_model.format_kind        
         format_name = format_model.format_name
                 
@@ -1166,7 +1166,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                            'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
                            'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime','fbyte', 'fextension']
         
-        # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
+        # format_kind - Apache, Nginx, IIS를 구분해야 한다.
         
         # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
         # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
@@ -1181,14 +1181,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         try:
             
-            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
+            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\t", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
             
         except UnicodeDecodeError as ude:
             
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
             
             try:
-                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
+                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\t", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
             except Exception as uex:
                 logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -1197,7 +1197,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             logger.error('Error Occured while creating logdetail read_csv#2 whole lines : %s' % ex)            
             raise ex        
         
-        # X-Forwarded-For 처리부분
+        # X-Forwarded-For 처리    
         # 성능 때문에 %h가 없는 경우에만 일단 처리
         if log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1:
             repl = lambda m: m.group(0)[:-1:]
@@ -1210,15 +1210,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             nrows = None
                         
         try:           
-                
-            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+            # IIS-W3C의 경우 Log의 내용 중 시작에 #가 있는 라인은 주석으로 처리한다.
+            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, comment='#', delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
             
         except UnicodeDecodeError as ude:
             
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)
             
             try:
-                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, comment='#', delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
             except Exception as uex:
                 logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -1231,59 +1231,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
         #df_logs['log_line'] = df_logs[df_logs.columns[0:]].apply(lambda x: ' '.join(x.astype(str)), axis=1)              
-                
-        # if 'h' in log_format:
-        if log_format.find('h') != -1:
-            df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
-        else:
-            #  %{X-Forwarded-For}i의 맨 앞은 사용자 IP, %h와 같이 사용하지 않을 것임   
-            if log_format.find('X-Forwarded-For') != -1:
-                df_logs['fip'] = df_logs[format_index['X-Forwarded-For']].str.split(',').str[0]            
-            else:
-                df_logs['fip'] = 'NA'
-            
-        # if 'r' in log_format:
-        if log_format.find('r') != -1:
-            df_logs.rename(columns = {format_index['r'] : 'frequest'}, inplace = True)
-        else:
-            df_logs['frequest'] = 'NA'    
-
-        # if 's' in log_format:
-        if log_format.find('s') != -1:
-            df_logs.rename(columns = {format_index['s'] : 'fstatus'}, inplace = True)
-        else:
-            df_logs['fstatus'] = 'NA'
-            
-        # bytes    
-        if log_format.find('b') != -1 or log_format.find('B') != -1:
-            df_logs.rename(columns = {format_index['b'] : 'fbyte'}, inplace = True)
-        else:
-            df_logs['fbyte'] = 0
-
-        if log_format.find('Referer') != -1:
-            df_logs.rename(columns = {format_index['Referer'] : 'freferer'}, inplace = True)
-        else:
-            df_logs['freferer'] = 'NA'
-            
-        if log_format.find('User-Agent') != -1:
-            df_logs.rename(columns = {format_index['User-Agent'] : 'fuser_agent'}, inplace = True)
-        else:
-            df_logs['fuser_agent'] = 'NA'
-
-        time_taken_flag = False    
-        if log_format.find('%T') != -1:
-            df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
-            time_taken_flag = True
-
-        if (not time_taken_flag) & (log_format.find('%D') != -1):
-            df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
-            
-            # Tomcat, WebtoB의 경우 단위가 ms이므로 *1000 필요 df_logs['ftime_taken']
-            if format_kind == 'tomcat' or format_kind == 'webtob':
-                df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000)
-        else:
-            df_logs['ftime_taken'] = -1
         
+        if format_kind == 'apache' or format_kind == 'tomcat' or format_kind == 'webtob' or format_kind == 'IIS-NCSA':
+            df_logs = self.setColumn(df_logs, format_kind, log_format, format_index)
+        elif format_kind == 'IIS-W3C':
+            df_logs = self.setColumnW3C(df_logs, format_kind, log_format, format_index)
+        elif format_kind == 'nginx':
+            df_logs = self.setColumnNginx(df_logs, format_kind, log_format, format_index)
+
         #'freserve1', 'freserve2', 'freserve3'
         df_logs['freserve1'] = ''
         df_logs['freserve2'] = ''
@@ -1296,27 +1251,41 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         #'logfile_id'
         df_logs['logfile_id'] = logfile_id
         
-        #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
-        # 시간관련, dummy는 , 때문에
-        time_index = format_index['t']
-        df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
-        series = df_datetime.str.split(' ')
-        df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
-        
-        # 보완로직1 - 결측치 제거 : None있으면 해당 row 제거
-        df_time.dropna(axis=0, inplace=True)
+        df_time = pd.DataFrame()
+        if format_kind == 'IIS-W3C':
+            #df_time['fdate'] = df_logs[format_index['date']].str.replace(pat='-', repl= r'', regex=True)
+            #df_time['ftime'] = df_logs[format_index['time']].str.replace(pat=':', repl= r'', regex=True)
+            #df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+                        
+            series = df_logs[format_index['date']].str.split('-') + df_logs[format_index['time']].str.split(':')
+            df_time = pd.DataFrame(series.tolist(), columns=['fyear','fmonth','fday','fhour','fminute','fsecond'])            
+            
+            df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+            df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+            df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+            
+        else:
+            #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
+            # 시간관련, dummy는 , 때문에
+            time_index = format_index['t']
+            df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
+            series = df_datetime.str.split(' ')
+            df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
+            
+            # 보완로직1 - 결측치 제거 : None있으면 해당 row 제거
+            df_time.dropna(axis=0, inplace=True)
 
-        month_map = {
-            'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
-            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
-        }
+            month_map = {
+                'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
+                'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
+            }
 
-        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
-        
-        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
-        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
-        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
-        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+            df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
+            
+            # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
+            df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+            df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+            df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
         
         # fbyte 처리 : - 를 0으로 처리
         df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
@@ -1345,91 +1314,87 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         return result_file_name
     
-    '''    
-    def parse_log(self, logfile, logfile_id, existed_row_size):
-        
-        log_lines = []
-        result = []
-        count = 0               
-        start = time.time()
-        
-        # Fileformat 가져온다.(from logfile DB using logfile_id)
-        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'      
-        format_model = LogFile.objects.get(logfile_id=logfile_id)
-        log_format = format_model.file_format
-        
-        # format_kind : apache, nginx, IIS
-        format_kind = format_model.format_kind        
-        format_name = format_model.format_name
-                
-        # 임시 csv 파일생성 for copy to postgresql
-        # For dynamic : logdetail_id -> id
-        log_line_header = ['id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
-                           'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
-                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime','fbyte', 'fextension']
-        
-        # TODO: format_kind - Apache, Nginx, IIS를 구분해야 한다.
-        
-        # {'h': 0, 't': 3, 'r': 4, 's': 5} 이런 형태
-        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'
-        format_index = self.get_logformat_index(log_format, format_kind)     
-        
-        # X-Forwarded-For 처리 위해 전체라인을 먼저 처리한다.
-        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.(\t 사용)
-        # 전체 읽을 때에는 escapechar="\\" 불필요하다.
-        df_logs = None
-        df_logs_all = None
-        try:
+    def get_logformat_index(self, log_format, format_kind):
+        format_index = {}
+        index = 0
+        for tmp in log_format.split(sep=' '):
             
-            df_logs_all = pd.read_csv(logfile.name, encoding="utf-8", header=None, delimiter="\t", error_bad_lines=False, na_filter=False)
-            
-        except UnicodeDecodeError as ude:
-            
-            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
-            
-            try:
-                df_logs_all = pd.read_csv(logfile.name, encoding="cp1252", header=None, delimiter="\t", error_bad_lines=False, na_filter=False)
-            except Exception as uex:
-                logger.error('UnicodeDecodeError Occured AGAIN!')
-                raise uex            
-            
-        except Exception as ex: 
-            logger.error('Error Occured while creating logdetail read_csv#2 whole lines : %s' % ex)            
-            raise ex
-        
-        file_name = logfile.name
-        
-        # X-Forwarded-For 처리부분
-        # 성능 때문에 %h가 없는 경우에만 일단 처리
-        if log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1:
-            repl = lambda m: m.group(0)[:-1:]
-            df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\, )+', repl)            
-            np.savetxt(logfile.name+"_X-Forwarded-For", df_logs_re.values, fmt="%s")
-            file_name = logfile.name+"_X-Forwarded-For"
+            if format_kind == 'apache' or format_kind == 'tomcat' or format_kind == 'webtob' or format_kind == 'IIS-NCSA':
+                if tmp.find('Referer') != -1:
+                    format_index['Referer'] = index
+                elif tmp.find('User-Agent') != -1:
+                    format_index['User-Agent'] = index
+                elif tmp.find('X-Forwarded-For') != -1:
+                    format_index['X-Forwarded-For'] = index                    
+                elif "%h" in tmp:
+                    format_index['h'] = index
+                elif "%t" in tmp:
+                    format_index['t'] = index
+                    index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
+                elif "%r" in tmp:
+                    format_index['r'] = index
+                elif "%s" in tmp or "%>s" in tmp:
+                    format_index['s'] = index
+                elif "%b" in tmp or "%B" in tmp:
+                    format_index['b'] = index
+                elif "%D" in tmp:   # millisecond
+                    format_index['D'] = index
+                elif "%T" in tmp:   # second
+                    format_index['T'] = index   
                         
-        try:           
+            elif format_kind == 'nginx':
+                if tmp.find('$http_referer') != -1:
+                    format_index['$http_referer'] = index
+                elif tmp.find('$http_user_agent') != -1:
+                    format_index['$http_user_agent'] = index
+                elif tmp.find('$http_x_forwarded_for') != -1:
+                    format_index['$http_x_forwarded_for'] = index                    
+                elif "$remote_addr" in tmp:
+                    format_index['$remote_addr'] = index
+                elif "$time_local" in tmp:
+                    format_index['$time_local'] = index
+                    index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
+                elif "$request" in tmp:
+                    format_index['$request'] = index
+                elif "$status" in tmp:
+                    format_index['$status'] = index
+                elif "$body_bytes_sent" in tmp:
+                    format_index['$body_bytes_sent'] = index
+                elif "$request_time" in tmp:   # millisecond
+                    format_index['$request_time'] = index                
+            
+            elif format_kind == 'IIS-W3C':
+                if tmp.find('cs(Referrer)') != -1:
+                    format_index['cs(Referrer)'] = index
+                elif tmp.find('cs(User-Agent)') != -1:
+                    format_index['cs(User-Agent)'] = index                
+                elif "c-ip" in tmp:
+                    format_index['c-ip'] = index
+                # date, time 처리 필요
+                elif "date" in tmp:
+                    format_index['date'] = index
+                elif "time" in tmp and "time-taken" not in tmp:
+                    format_index['time'] = index
+                # Request 결합 필요
+                elif "cs-method" in tmp:
+                    format_index['cs-method'] = index
+                elif "cs-uri-stem" in tmp:
+                    format_index['cs-uri-stem'] = index
+                elif "cs-uri-query" in tmp:
+                    format_index['cs-uri-query'] = index
+                elif "sc-status" in tmp:
+                    format_index['sc-status'] = index
+                elif "cs-bytes" in tmp:
+                    format_index['cs-bytes'] = index
+                elif "time-taken" in tmp:
+                    format_index['time-taken'] = index
                 
-            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
+            index = index + 1 
             
-        except UnicodeDecodeError as ude:
-            
-            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)
-            
-            try:
-                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, delimiter=" ", escapechar="\\", na_filter=False, quotechar='"')
-            except Exception as uex:
-                logger.error('UnicodeDecodeError Occured AGAIN!')
-                raise uex            
-            
-        except Exception as ex: 
-            logger.error('Error Occured while creating logdetail read_csv#1  : %s' % ex)
-            raise ex                      
-                  
-        df_logs['log_line'] = df_logs_all
+        return format_index    
+
+    def setColumn(self, df_logs, format_kind, log_format, format_index):
         
-        # 읽어들인 Dataframe에서 Merge하기 : 성능향상 목적(File에서 한번 더 읽는 것보다 빠르다.)
-        #df_logs['log_line'] = df_logs[df_logs.columns[0:]].apply(lambda x: ' '.join(x.astype(str)), axis=1)              
-                
         # if 'h' in log_format:
         if log_format.find('h') != -1:
             df_logs.rename(columns = {format_index['h'] : 'fip'}, inplace = True)
@@ -1443,7 +1408,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         # if 'r' in log_format:
         if log_format.find('r') != -1:
             df_logs.rename(columns = {format_index['r'] : 'frequest'}, inplace = True)
-        else:
+        else:           
             df_logs['frequest'] = 'NA'    
 
         # if 's' in log_format:
@@ -1481,107 +1446,100 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000)
         else:
             df_logs['ftime_taken'] = -1
-        
-        #'freserve1', 'freserve2', 'freserve3'
-        df_logs['freserve1'] = ''
-        df_logs['freserve2'] = ''
-        df_logs['freserve3'] = ''
-        
-        #'created'
-        datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
-        df_logs['created'] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
-                
-        #'logfile_id'
-        df_logs['logfile_id'] = logfile_id
-        
-        #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
-        # 시간관련, dummy는 , 때문에
-        time_index = format_index['t']
-        df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
-        series = df_datetime.str.split(' ')
-        df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
-        
-        # 보완로직1 - 결측치 제거 : None있으면 해당 row 제거
-        df_time.dropna(axis=0, inplace=True)
-
-        month_map = {
-            'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
-            'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
-        }
-
-        df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
-        
-        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
-        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
-        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
-        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
-        
-        # fbyte 처리 : - 를 0으로 처리
-        df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
-        
-        # fextension 처리 : frequest로부터 처리한다.
-        # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
-        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)\s', re.DOTALL )
-        df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
-        
-        # Merge : logdetail_id -> id
-        # ID 기존의 개수 + 1 만큼 + 해주어야 한다. 0부터 시작이므로        
-        df_logs = df_logs.rename_axis('id').reset_index()
-        df_logs['id'] = df_logs['id'] + existed_row_size
-        
-        df_logs = pd.concat([df_logs, df_time], axis=1)
-        
-        # 보완로직2 - 결측치 제거 : None있으면 해당 row 제거
-        df_logs.dropna(axis=0, inplace=True)
-                        
-        # index 미사용  
-        #with open(logfile.name+'.csv', mode='w', newline='\r\n') as f:
-        #    df_logs[log_line_header].to_csv(f, index=False, encoding="cp1252")
-        df_logs[log_line_header].to_csv(logfile.name+'.csv', index=False)
-       
-        if settings.DEBUG:
-    	    logger.debug("Duration to create temporary csv : %s" % (time.time() - start))
-    '''
+            
+        return df_logs
     
-    def get_logformat_index(self, log_format, format_kind):
-        format_index = {}
-        index = 0
-        for tmp in log_format.split(sep=' '):
+    def setColumnW3C(self, df_logs, format_kind, log_format, format_index):
+        
+        # if 'c-ip' in log_format:
+        if log_format.find('c-ip') != -1:
+            df_logs.rename(columns = {format_index['c-ip'] : 'fip'}, inplace = True)
+        else:
+            df_logs['fip'] = 'NA'
             
-            if format_kind == 'apache' or format_kind == 'tomcat' or format_kind == 'webtob':
-                if tmp.find('Referer') != -1:
-                    format_index['Referer'] = index
-                elif tmp.find('User-Agent') != -1:
-                    format_index['User-Agent'] = index
-                elif tmp.find('X-Forwarded-For') != -1:
-                    format_index['X-Forwarded-For'] = index                    
-                elif "%h" in tmp:
-                    format_index['h'] = index
-                elif "%t" in tmp:
-                    format_index['t'] = index
-                    index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
-                elif "%r" in tmp:
-                    format_index['r'] = index
-                elif "%s" in tmp or "%>s" in tmp:
-                    format_index['s'] = index
-                elif "%b" in tmp or "%B" in tmp:
-                    format_index['b'] = index
-                elif "%D" in tmp:
-                    format_index['D'] = index
-                elif "%T" in tmp:
-                    format_index['T'] = index   
-                             
-            
-            # TODO : nginx, IIS                    
-            elif format_kind == 'nginx':
-                pass
-            elif format_kind == 'IIS':
-                pass
-                
-            index = index + 1 
-            
-        return format_index    
+        # Request 생성부분
+        # cs-method가 있으면 cs-uri-stem, cs-uri-query 있다고 가정한다.
+        if log_format.find('cs-method') != -1 and log_format.find('cs-uri-stem') != -1 and log_format.find('cs-uri-query') != -1:
+            df_logs['frequest'] = df_logs[format_index['cs-method']]+" "+df_logs[format_index['cs-uri-stem']]+"?"+df_logs[format_index['cs-uri-query']]
+        else:
+            df_logs['frequest'] = 'NA'
 
+        if log_format.find('sc-status') != -1:
+            df_logs.rename(columns = {format_index['sc-status'] : 'fstatus'}, inplace = True)
+        else:
+            df_logs['fstatus'] = 'NA'
+            
+        # bytes    
+        if log_format.find('cs-bytes') != -1:
+            df_logs.rename(columns = {format_index['cs-bytes'] : 'fbyte'}, inplace = True)
+        else:
+            df_logs['fbyte'] = 0
+
+        if log_format.find('cs(Referrer)') != -1:
+            df_logs.rename(columns = {format_index['cs(Referrer)'] : 'freferer'}, inplace = True)
+        else:
+            df_logs['freferer'] = 'NA'
+            
+        if log_format.find('cs(User-Agent)') != -1:
+            df_logs.rename(columns = {format_index['cs(User-Agent)'] : 'fuser_agent'}, inplace = True)
+        else:
+            df_logs['fuser_agent'] = 'NA'
+
+        if log_format.find('time-taken') != -1:
+            df_logs.rename(columns = {format_index['time-taken'] : 'ftime_taken'}, inplace = True)           
+        else:
+            df_logs['ftime_taken'] = -1
+            
+        return df_logs
+    
+    def setColumnNginx(self, df_logs, format_kind, log_format, format_index):
+        
+        # if 'h' in log_format:
+        if log_format.find('$remote_addr') != -1:
+            df_logs.rename(columns = {format_index['$remote_addr'] : 'fip'}, inplace = True)
+        else:
+            #  %{X-Forwarded-For}i의 맨 앞은 사용자 IP, %h와 같이 사용하지 않을 것임   
+            if log_format.find('$http_x_forwarded_for') != -1:
+                df_logs['fip'] = df_logs[format_index['$http_x_forwarded_for']].str.split(',').str[0]            
+            else:
+                df_logs['fip'] = 'NA'
+            
+        # if 'r' in log_format:
+        if log_format.find('$request') != -1:
+            df_logs.rename(columns = {format_index['$request'] : 'frequest'}, inplace = True)
+        else:
+            df_logs['frequest'] = 'NA'    
+
+        # if 's' in log_format:
+        if log_format.find('$status') != -1:
+            df_logs.rename(columns = {format_index['$status'] : 'fstatus'}, inplace = True)
+        else:
+            df_logs['fstatus'] = 'NA'
+            
+        # bytes    
+        if log_format.find('$body_bytes_sent') != -1:
+            df_logs.rename(columns = {format_index['$body_bytes_sent'] : 'fbyte'}, inplace = True)
+        else:
+            df_logs['fbyte'] = 0
+
+        if log_format.find('$http_referer') != -1:
+            df_logs.rename(columns = {format_index['$http_referer'] : 'freferer'}, inplace = True)
+        else:
+            df_logs['freferer'] = 'NA'
+            
+        if log_format.find('$http_user_agent') != -1:
+            df_logs.rename(columns = {format_index['$http_user_agent'] : 'fuser_agent'}, inplace = True)
+        else:
+            df_logs['fuser_agent'] = 'NA'
+       
+        if log_format.find('$request_time') != -1:
+            df_logs.rename(columns = {format_index['$request_time'] : 'ftime_taken'}, inplace = True)            
+        else:
+            df_logs['ftime_taken'] = -1
+            
+        return df_logs
+        
+    
     def get_original_filesize(self, logfile_name):
         
         if 'zip' in logfile_name:
