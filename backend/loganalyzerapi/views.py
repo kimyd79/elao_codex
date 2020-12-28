@@ -1198,9 +1198,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             logger.error('Error Occured while creating logdetail read_csv#2 whole lines : %s' % ex)            
             raise ex        
         
-        # X-Forwarded-For 처리    
-        # 성능 때문에 %h가 없는 경우에만 일단 처리
-        if log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1:
+        # X-Forwarded-For 처리 : apache, nginx   
+        # 성능 때문에 %h가 없는 경우에만 일단 처리(apache)
+        # 성능 때문에 $remote_addr 없는 경우에만 일단 처리(nginx) TODO: 차후 확인필요
+        if (log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1) or (log_format.find('$remote_addr') == -1 and log_format.find('$http_x_forwarded_for') != -1):
             repl = lambda m: m.group(0)[:-1:]
             df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\, )+', repl)            
             np.savetxt(logfile_name+"_X-Forwarded-For", df_logs_re.values, fmt="%s")
