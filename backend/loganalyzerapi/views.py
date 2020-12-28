@@ -300,12 +300,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         # Time-taken : Between
         if (ttFromValue is not None) and (ttToValue is not None):
             # Time Unit 구분 : %T -> ms / 1000, %D (micros) -> ms * 1000            
-            if timeTakenUnit == 'D':
+            if timeTakenUnit == 'D':        # microsecond
                 ttFromValue = int(ttFromValue) * 1000
                 ttToValue   = int(ttToValue) * 1000                 
-            elif timeTakenUnit == 'T':
+            elif timeTakenUnit == 'T':      # second
                 ttFromValue = int(ttFromValue) / 1000
                 ttToValue = int(ttToValue) / 1000
+            # IIS, Nginx : ms 단위이므로 환산이 불필요하다.
                     
             queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
             
@@ -1253,21 +1254,22 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         df_time = pd.DataFrame()
         if format_kind == 'IIS-W3C':
-            #df_time['fdate'] = df_logs[format_index['date']].str.replace(pat='-', repl= r'', regex=True)
-            #df_time['ftime'] = df_logs[format_index['time']].str.replace(pat=':', repl= r'', regex=True)
-            #df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
                         
             series = df_logs[format_index['date']].str.split('-') + df_logs[format_index['time']].str.split(':')
             df_time = pd.DataFrame(series.tolist(), columns=['fyear','fmonth','fday','fhour','fminute','fsecond'])            
             
-            df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
-            df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
-            df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+            #df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+            #df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+            #df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
             
         else:
             #'fhour', #'fminute', #'fsecond', #'fday', #'fmonth', #'fyear'
             # 시간관련, dummy는 , 때문에
-            time_index = format_index['t']
+            if format_kind == 'nginx':
+                time_index = format_index['$time_local']
+            else:
+                time_index = format_index['t']
+            
             df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
             series = df_datetime.str.split(' ')
             df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
@@ -1282,10 +1284,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
             df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
             
-            # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
-            df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
-            df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
-            df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
+        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
+        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
         
         # fbyte 처리 : - 를 0으로 처리
         df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      
@@ -1354,7 +1356,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 elif "$time_local" in tmp:
                     format_index['$time_local'] = index
                     index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
-                elif "$request" in tmp:
+                elif "$request" in tmp and "$request_time" not in tmp:
                     format_index['$request'] = index
                 elif "$status" in tmp:
                     format_index['$status'] = index
@@ -1486,7 +1488,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs['fuser_agent'] = 'NA'
 
         if log_format.find('time-taken') != -1:
-            df_logs.rename(columns = {format_index['time-taken'] : 'ftime_taken'}, inplace = True)           
+            df_logs.rename(columns = {format_index['time-taken'] : 'ftime_taken'}, inplace = True)
+            
+            # millisecond
+            df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000).astype(int)
+                    
         else:
             df_logs['ftime_taken'] = -1
             
@@ -1533,7 +1539,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs['fuser_agent'] = 'NA'
        
         if log_format.find('$request_time') != -1:
-            df_logs.rename(columns = {format_index['$request_time'] : 'ftime_taken'}, inplace = True)            
+            df_logs.rename(columns = {format_index['$request_time'] : 'ftime_taken'}, inplace = True)
+            
+            # millisecond
+            df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000).astype(int)
+                        
         else:
             df_logs['ftime_taken'] = -1
             
