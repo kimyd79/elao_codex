@@ -3,7 +3,8 @@
     <ui-form-box>
         <ui-form-row>
             <ui-form-item :columns=6 label="format kind" align-left>
-                <lego-dropdown :items="conditions" v-model='format_kind' />
+                <!-- <lego-dropdown :items="conditions" v-model='format_kind' /> -->
+                <lego-dropdown :items="items" v-model='format_kind' />
             </ui-form-item>
             <ui-form-item :columns=14 align-right margin-right>
                 <lego-button main v-on:click="getData">Search</lego-button>
@@ -14,7 +15,12 @@
 </template>
 
 <script>
+
 import EventBus from '../../EventBus';
+import axios from 'axios';
+import {
+    serverUrl
+} from "@/common";
 
 export default {
     name: "LogformatSearch",
@@ -22,49 +28,39 @@ export default {
     data: function () {
         return {
             format_kind: '',
-
+            // for format_kind list
+            items: [],
         }
     },
 
-    computed: {
-        conditions() {
-            let rtn = [];
-            rtn.push({
-                value: "ALL",
-                text: "ALL"
-            });
-            rtn.push({
-                value: "apache",
-                text: "apache"
-            });
-            rtn.push({
-                value: "tomcat",
-                text: "tomcat"
-            });
-            rtn.push({
-                value: "webtob",
-                text: "webtob"
-            });
-            rtn.push({
-                value: "jeus",
-                text: "jeus(>= ver7)"
-            });
-            rtn.push({
-                value: "IIS-W3C",
-                text: "IIS-W3C"
-            });
-            rtn.push({
-                value: "IIS-NCSA",
-                text: "IIS-NCSA"
-            });
-            rtn.push({
-                value: "nginx",
-                text: "nginx"
-            });
+    created() {
+        var url = serverUrl + "/logformatstring/formatkind_list/"
 
-            return rtn;
-        }
-    },
+        let axiosConfig = {
+            headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+            }
+        };
+
+        axios.get(url, axiosConfig)
+            .then(res => {
+                //console.log(res);
+                this.items.push({
+                    value: "ALL",
+                    text: "ALL"
+                });
+                for (let i = 0; i < res.data.list_format_kind.length; i++) {
+                    let tmp = (res.data.list_format_kind[i] == "jeus") ? "jeus(>= ver7)" : res.data.list_format_kind[i];
+                    this.items.push({
+                        value: res.data.list_format_kind[i],
+                        text: tmp
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    },        
 
     methods: {
         getData: function () {
