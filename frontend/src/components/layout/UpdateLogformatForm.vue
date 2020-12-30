@@ -17,7 +17,8 @@
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="format kind" required left-label :label-width=144 :label-padding=16>
-                    <lego-dropdown :items="[{value: 'apache', text: 'apache'}, {value: 'nginx', text: 'nginx'}, {value: 'IIS-W3C', text: 'IIS-W3C'}, {value: 'IIS-NCSA', text: 'IIS-NCSA'}]" v-model='format.format_kind'/>
+                    <!-- <lego-dropdown :items="[{value: 'apache', text: 'apache'}, {value: 'nginx', text: 'nginx'}, {value: 'IIS-W3C', text: 'IIS-W3C'}, {value: 'IIS-NCSA', text: 'IIS-NCSA'}]" v-model='format.format_kind'/> -->
+                    <lego-dropdown :items="items" v-model='format.format_kind'/>
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="format name" required left-label :label-width=144 :label-padding=16>
@@ -44,9 +45,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-import EventBus from '../../EventBus';
 
+import EventBus from '../../EventBus';
+import axios from 'axios';
 import {
     serverUrl
 } from "@/common";
@@ -69,6 +70,36 @@ export default {
             }
         }
     },
+    data: function () {
+        return {
+            // for format_kind list
+            items: [],
+        }
+    },
+    created() {
+        var url = serverUrl + "/logformatstring/formatkind_list/"
+
+        let axiosConfig = {
+            headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+            }
+        };
+
+        axios.get(url, axiosConfig)
+            .then(res => {
+                //console.log(res);
+                for (let i = 0; i < res.data.list_format_kind.length; i++) {
+                    let tmp = (res.data.list_format_kind[i] == "jeus") ? "jeus(>= ver7)" : res.data.list_format_kind[i];
+                    this.items.push({
+                        value: res.data.list_format_kind[i],
+                        text: tmp
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    },        
 
     methods: {
         getDataOne: function (id) {

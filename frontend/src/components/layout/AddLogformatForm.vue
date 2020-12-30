@@ -15,7 +15,9 @@
 
                 <ui-form-item :columns=8 label="format kind" required left-label :label-width=144 :label-padding=16>
                     <!--lego-text-field v-model="format.format_kind" placeholder="enter format kind. ex)apache, nginx, IIS..." /-->
-                    <lego-dropdown :items=conditions v-model='format.format_kind' />
+                    <!-- <lego-dropdown :items="conditions" v-model='format.format_kind' /> -->
+                    <lego-dropdown :items="items" v-model='format.format_kind' />
+                    
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="format name" required left-label :label-width=144 :label-padding=16>
@@ -43,6 +45,13 @@
 </template>
 
 <script>
+import axios from "axios";
+import {
+    mapGetters
+} from "vuex";
+import {
+    serverUrl
+} from "@/common";
 import EventBus from '../../EventBus';
 
 export default {
@@ -59,49 +68,38 @@ export default {
                         creator: ''
                     }
                 }
-            }
+            },
+            // for format_kind list
+            items: [],
         }
     },
 
     created() {
         this.format.creator = this.$store.state.userName
-    },
 
-    computed: {
-        conditions() {
-            let rtn = [];
-            rtn.push({
-                value: "apache",
-                text: "apache"
-            });
-            rtn.push({
-                value: "tomcat",
-                text: "tomcat"
-            });
-            rtn.push({
-                value: "webtob",
-                text: "webtob"
-            });
-            rtn.push({
-                value: "jeus",
-                text: "jeus(>= ver7)"
-            });
-            rtn.push({
-                value: "IIS-W3C",
-                text: "IIS-W3C"
-            });
-            rtn.push({
-                value: "IIS-NCSA",
-                text: "IIS-NCSA"
-            });
-            rtn.push({
-                value: "nginx",
-                text: "nginx"
-            });
+        var url = serverUrl + "/logformatstring/formatkind_list/"
 
-            return rtn;
-        }
-    },
+        let axiosConfig = {
+            headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+            }
+        };
+
+        axios.get(url, axiosConfig)
+            .then(res => {
+                //console.log(res);
+                for (let i = 0; i < res.data.list_format_kind.length; i++) {
+                    let tmp = (res.data.list_format_kind[i] == "jeus") ? "jeus(>= ver7)" : res.data.list_format_kind[i];
+                    this.items.push({
+                        value: res.data.list_format_kind[i],
+                        text: tmp
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    },    
 
     methods: {
         clickCancle: function () {
@@ -110,7 +108,7 @@ export default {
 
         clickSave: function () {
             EventBus.$emit("addFormat", this.format);
-        }
+        },
     }
 };
 </script>

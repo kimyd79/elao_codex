@@ -177,7 +177,25 @@ class LogFormatStringViewSet(viewsets.ModelViewSet):
     queryset = LogFormatString.objects.all()
     serializer_class = LogFormatStringSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['format_kind']    
+    filterset_fields = ['format_kind']
+
+    @action(methods=['get'], detail=False)
+    def formatkind_list(self, request, pk=None):
+        try:            
+            formatkinds = LogFormatString.objects.values('format_kind').distinct().order_by('format_kind')
+            list_format_kind = []
+            
+            for formatkind in formatkinds:
+                list_format_kind.append(formatkind['format_kind'])
+            
+            response = {'message': 'list_format_kind returned successfully', 'list_format_kind': list_format_kind}        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing list_format_kind : %s' % ex)
+                    
+            response = {'message': 'list_format_kind creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)    
     
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

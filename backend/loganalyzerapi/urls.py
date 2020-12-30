@@ -25,6 +25,7 @@ router.register(r'logdetail_dynamic/chartdata', views.DynamicLogDetailViewSet, b
 # For logformat
 router.register(r'logformat', views.LogFormatViewSet)
 router.register(r'logformatstring', views.LogFormatStringViewSet)
+router.register(r'logformatstring/formatkind_list', views.LogFormatStringViewSet, basename='logformatstring')
 
 # For user
 router.register(r'user', views.UserViewSet)
