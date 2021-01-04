@@ -124,4 +124,38 @@ class LogFormatString(models.Model):
         ordering = ['created']
 
     def __str__(self): 
-        return self.formatstring_id       
+        return self.formatstring_id
+
+
+class Metrics(models.Model):
+    # PK
+    metric_id = models.UUIDField(verbose_name="mid",primary_key=True, default=uuid.uuid4, editable=False)
+    metric_kind = models.CharField(max_length=10, null=False, blank=False)
+    metric_definition = models.CharField(max_length=500, null=False, blank=False)
+    metric_filter = models.CharField(max_length=500, null=False, blank=False)
+    metric_unit = models.CharField(max_length=10, null=False, blank=False)
+    metric_min = models.IntegerField(default=0)
+    metric_max = models.IntegerField(default=0)
+    creator = models.CharField(max_length=50, null=False, blank=False)
+    created = models.DateTimeField(auto_now=True, verbose_name="date create")
+    
+    class Meta:
+        ordering = ['created']
+
+    def __str__(self): 
+        return self.metric_id 
+
+
+class LogMasterMetric(models.Model):
+    # PK
+    logmastermetric_id = models.UUIDField(verbose_name="lmid",primary_key=True, default=uuid.uuid4, editable=False)
+    project = models.ForeignKey(LogMaster, on_delete=models.CASCADE)
+    metric = models.ForeignKey(Metrics, on_delete=models.CASCADE)
+    creator = models.CharField(max_length=50, null=False, blank=False)
+    created = models.DateTimeField(auto_now=True, verbose_name="date create")
+    
+    class Meta:
+        ordering = ['created']
+
+    def __str__(self): 
+        return self.logmastermetric_id  

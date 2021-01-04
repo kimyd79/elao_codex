@@ -1,43 +1,45 @@
 <template>
-<div class="modal">
-    <ui-container-box :columns=9 vertical class="popup-container">
-        <div class="popup-header">
-            <div class="popup-header__title">
-                Modify Project Information
+<div class="modal-mask" transition="modal">
+    <div class="modal-wrapper">
+        <ui-container-box :columns=9 vertical class="modal-container">
+            <div class="popup-header">
+                <div class="popup-header__title">
+                    Modify Project Information
+                </div>
+                <div class="popup-header__close">
+                    <lego-icon small v-on:click="clickCancle">close</lego-icon>
+                </div>
             </div>
-            <div class="popup-header__close">
-                <lego-icon small v-on:click="clickCancle">close</lego-icon>
+
+            <div class="popup-form">
+                <ui-form-item :columns=8 label="project ID" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field disabled v-model="project.project_id" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="project name" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field v-model="project.project_name" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="project description" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field v-model="project.project_description" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field disabled v-model="project.creator" />
+                </ui-form-item>
+                <ui-form-item :columns=8 label="created" required left-label :label-width=144 :label-padding=16>
+                    <lego-text-field disabled v-model="project.created" />
+                </ui-form-item>
+
             </div>
-        </div>
 
-        <div class="popup-form">
-            <ui-form-item :columns=8 label="project ID" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field disabled v-model="project.project_id" />
-            </ui-form-item>
+            <div class="popup-buttons">
+                <lego-button v-on:click="clickCancle">Cancel</lego-button>
+                <lego-button main v-on:click="clickSave">Save</lego-button>
+            </div>
 
-            <ui-form-item :columns=8 label="project name" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="project.project_name" />
-            </ui-form-item>
-
-            <ui-form-item :columns=8 label="project description" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="project.project_description" />
-            </ui-form-item>
-
-            <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field disabled v-model="project.creator" />
-            </ui-form-item>
-            <ui-form-item :columns=8 label="created" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field disabled v-model="project.created" />
-            </ui-form-item>
-
-        </div>
-
-        <div class="popup-buttons">
-            <lego-button v-on:click="clickCancle">Cancel</lego-button>
-            <lego-button main v-on:click="clickSave">Save</lego-button>
-        </div>
-
-    </ui-container-box>
+        </ui-container-box>
+    </div>
 </div>
 </template>
 
@@ -95,6 +97,33 @@ export default {
     overflow: auto;
     background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: table;
+    transition: opacity .3s ease;
+}
+
+.modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.modal-container {
+    width: 500px;
+    margin: 0px auto;
+    padding: 30px 30px 30px 30px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+    transition: all .3s ease;
 }
 
 .popup-container {

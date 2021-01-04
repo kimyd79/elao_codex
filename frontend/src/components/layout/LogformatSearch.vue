@@ -19,7 +19,8 @@
 import EventBus from '../../EventBus';
 import axios from 'axios';
 import {
-    serverUrl
+    serverUrl,
+    getFormatkindLlist
 } from "@/common";
 
 export default {
@@ -34,32 +35,7 @@ export default {
     },
 
     created() {
-        var url = serverUrl + "/logformatstring/formatkind_list/"
-
-        let axiosConfig = {
-            headers: {
-                //'Authorization': 'Token '+ this.token // For Django
-            }
-        };
-
-        axios.get(url, axiosConfig)
-            .then(res => {
-                //console.log(res);
-                this.items.push({
-                    value: "ALL",
-                    text: "ALL"
-                });
-                for (let i = 0; i < res.data.list_format_kind.length; i++) {
-                    let tmp = (res.data.list_format_kind[i] == "jeus") ? "jeus(>= ver7)" : res.data.list_format_kind[i];
-                    this.items.push({
-                        value: res.data.list_format_kind[i],
-                        text: tmp
-                    });
-                }
-            })
-            .catch(err => {
-                console.error(err);
-            });
+        this.items = getFormatkindLlist();
     },        
 
     methods: {
