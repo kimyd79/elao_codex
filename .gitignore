@@ -27,3 +27,4 @@ frontend/src/debug.log
 .gitignore
 backend/loganalyzerapi/migrations/0001_initial.py
 backend/loganalyzerapi/migrations/0001_initial.py
+frontend/dist.7z
