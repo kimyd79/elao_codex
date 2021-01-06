@@ -786,7 +786,7 @@ export function getMetricsunitLlist() {
 
 export function getProjectLlist(creator) {
 
-    var url = serverUrl + "/logmaster/"
+    // var url = serverUrl + "/logmaster/"
 
     var items = [];
     let axiosConfig = {
@@ -795,7 +795,13 @@ export function getProjectLlist(creator) {
         }
     };
 
-    axios.get(url + '?creator=' + creator, axiosConfig)
+    if (creator == 'Leehs' || creator == 'Admin') {
+        var url = serverUrl + "/logmaster/?creator="
+    } else {
+        var url = serverUrl + "/logmaster/?creator=" + creator
+    }
+
+    axios.get(url, axiosConfig)
         .then(res => {
             for (let i = 0; i < res.data.results.length; i++) {
                 items.push({
