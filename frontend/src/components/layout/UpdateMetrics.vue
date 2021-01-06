@@ -32,13 +32,19 @@
                     <lego-dropdown :items="items_unit" v-model="metric.metric_unit" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric min" required left-label :label-width=144 :label-padding=16>
+                <ui-form-item :columns=8 label="metric min" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'scope'">
                     <lego-text-field v-model="metric.metric_min" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric max" required left-label :label-width=144 :label-padding=16>
+                <ui-form-item :columns=8 label="metric max" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'scope'">
                     <lego-text-field v-model="metric.metric_max" />
                 </ui-form-item>
+
+                <ui-form-item :columns=8 label="metric value" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'threshold'">
+                    <lego-text-field v-model="metric.metric_min" />
+                </ui-form-item>
+
+                
 
                 <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
                     <lego-text-field disabled v-model="metric.creator" />
@@ -115,6 +121,9 @@ export default {
         },
 
         clickSave: function () {
+            if(this.metric.metric_kind == 'threshold') {
+                this.metric.metric_max = this.metric.metric_min;
+            }
             EventBus.$emit("updateMetrics", this.metric);
         }
     }

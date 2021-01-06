@@ -727,8 +727,8 @@ export function getMetricskindLlist() {
 
     var items = [];
     items.push({
-        value: "threshhold",
-        text: "threshhold"
+        value: "threshold",
+        text: "threshold"
     });
     items.push({
         value: "scope",
@@ -752,8 +752,7 @@ export function getMetricsfilterLlist() {
     items.push({
         value: "fextension",
         text: "fextension"
-    });
-        
+    });        
 
     return items;
 }
@@ -777,6 +776,64 @@ export function getMetricsunitLlist() {
         value: "micros",
         text: "micros"
     });
+    items.push({
+        value: "byte",
+        text: "byte"
+    });
+
+    return items;
+}
+
+export function getProjectLlist(creator) {
+
+    var url = serverUrl + "/logmaster/"
+
+    var items = [];
+    let axiosConfig = {
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    axios.get(url + '?creator=' + creator, axiosConfig)
+        .then(res => {
+            for (let i = 0; i < res.data.results.length; i++) {
+                items.push({
+                    value: res.data.results[i].project_id,
+                    text: res.data.results[i].project_name
+                });
+            }             
+        })
+        .catch(err => {
+            console.error(err);
+        });
+
+    return items;
+}
+
+export function getMetricLlist() {
+
+    var url = serverUrl + "/metrics/"
+
+    var items = [];
+    let axiosConfig = {
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    axios.get(url, axiosConfig)
+        .then(res => {
+            for (let i = 0; i < res.data.results.length; i++) {
+                items.push({
+                    value: res.data.results[i].metric_id,
+                    text: res.data.results[i].metric_definition
+                });
+            }             
+        })
+        .catch(err => {
+            console.error(err);
+        });
 
     return items;
 }

@@ -100,7 +100,6 @@ export default {
             this.currentView = null;
         });
         EventBus.$on("addMetrics", (metric) => {
-            console.log(metric);
             this.addData(metric);
             this.currentView = null;
         });
@@ -139,20 +138,22 @@ export default {
                 .then((response) => {
                     //console.log(response);
                     this.getData("");
-                    EventBus.$emit("searchLogmasterMetric", metric.metric_id);
+                    EventBus.$emit("searchLogmasterMetric","");
                 })
                 .catch((err) => {
                     console.error(err);
+                    this.$alert("Delete Metrics failed. Check for required fields.", "Notification", "error");
                 })
         },
         updateData: function (metric) {
             axios.put(urlStr + metric.metric_id + '/', metric)
                 .then((response) => {
                     //console.log(response);
-                    this.getData("");
+                    this.getData(metric.metric_kind);
                 })
                 .catch((err) => {
                     console.error(err);
+                    this.$alert("Update Metrics failed. Check for required fields.", "Notification", "error");
                 })
         },
         addData(metric) {
@@ -163,7 +164,7 @@ export default {
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.$alert("Add Matrics failed. Check for required fields.", "Notification", "error");
+                    this.$alert("Add Metrics failed. Check for required fields.", "Notification", "error");
                 })
         },
         clickList: function (metric_list) {
@@ -173,8 +174,8 @@ export default {
             this.metric.metric_definition = metric_list.metric_definition;
             this.metric.metric_filter = metric_list.metric_filter;
             this.metric.metric_unit = metric_list.metric_unit;
-            this.metric.metric_min = metric_list.metric_max;
-            this.metric.metric_max = metric_list.metric_min;
+            this.metric.metric_min = metric_list.metric_min;
+            this.metric.metric_max = metric_list.metric_max;
             this.metric.creator = metric_list.creator;
             this.metric.created = metric_list.created;
             EventBus.$emit("searchLogmasterMetric", metric_list.metric_id);

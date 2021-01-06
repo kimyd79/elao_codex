@@ -75,7 +75,6 @@ export default {
             this.currentView = null;
         });
         EventBus.$on("addLogmasterMetric", (logmastermetric) => {
-            console.log(logmastermetric);
             this.addData(logmastermetric);
             this.currentView = null;
         });
@@ -90,13 +89,16 @@ export default {
         getData: function (metric) {
             axios.get(urlStr + '?metric=' + metric)
                 .then((response) => {
-                    console.log(response);
+                    // console.log(response);
                     this.logmastermetric_lists = response.data.results;
                     this.selected_logmastermetric_id = '';
                     this.logmastermetric.metric = '';
                     this.logmastermetric.project = '';
                     this.logmastermetric.creator = '';
                     this.logmastermetric.created = '';
+                })
+                .catch((err) => {
+                    console.error(err);
                 });
         },
 
@@ -105,24 +107,25 @@ export default {
                 .then((response) => {
                     //console.log(response);
                     this.getData(logmastermetric.metric);
+                    //this.logmastermetric_lists = null;
                 })
                 .catch((err) => {
-                    console.error(err);
+                    console.error(err);  
+                    this.$alert("Delete LogmasterMetric failed. Check for required fields.", "Notification", "error");                  
                 })
         },
         updateData: function (logmastermetric) {
-            console.log(logmastermetric);
             axios.put(urlStr + logmastermetric.logmastermetric_id + '/', logmastermetric)
                 .then((response) => {
                     //console.log(response);
-                    this.getData("");
+                    this.getData(logmastermetric.metric);
                 })
                 .catch((err) => {
                     console.error(err);
+                    this.$alert("Update LogmasterMetric failed. Check for required fields.", "Notification", "error");
                 })
         },
         addData(logmastermetric) {
-            console.log(logmastermetric);
             axios.post(urlStr, logmastermetric)
                 .then((response) => {
                     //console.log(response);
@@ -130,7 +133,7 @@ export default {
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.$alert("Add LogmasterMatric failed. Check for required fields.", "Notification", "error");
+                    this.$alert("Add LogmasterMetric failed. Check for required fields.", "Notification", "error");
                 })
         },
         clickList: function (logmastermetric_list) {
@@ -140,7 +143,6 @@ export default {
             this.logmastermetric.project = logmastermetric_list.project;
             this.logmastermetric.creator = logmastermetric_list.creator;
             this.logmastermetric.created = logmastermetric_list.created;
-            EventBus.$emit("searchLogmastermetric", logmastermetric_list.logmastermetric_id);
         },
         clickDelete: function () {
             if (this.logmastermetric.logmastermetric_id != '') {
