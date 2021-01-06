@@ -50,7 +50,8 @@ import {
     mapGetters
 } from "vuex";
 import {
-    serverUrl
+    serverUrl,
+    getFormatkindLlist
 } from "@/common";
 import EventBus from '../../EventBus';
 
@@ -75,30 +76,8 @@ export default {
     },
 
     created() {
+        this.items = getFormatkindLlist();
         this.format.creator = this.$store.state.userName
-
-        var url = serverUrl + "/logformatstring/formatkind_list/"
-
-        let axiosConfig = {
-            headers: {
-                //'Authorization': 'Token '+ this.token // For Django
-            }
-        };
-
-        axios.get(url, axiosConfig)
-            .then(res => {
-                //console.log(res);
-                for (let i = 0; i < res.data.list_format_kind.length; i++) {
-                    let tmp = (res.data.list_format_kind[i] == "jeus") ? "jeus(>= ver7)" : res.data.list_format_kind[i];
-                    this.items.push({
-                        value: res.data.list_format_kind[i],
-                        text: tmp
-                    });
-                }
-            })
-            .catch(err => {
-                console.error(err);
-            });
     },    
 
     methods: {

@@ -95,7 +95,7 @@ export default {
 
     methods: {
         getData: function (project_name) {
-            axios.get(urlStr + '?search=' + project_name)
+            axios.get(urlStr + '?project_name=' + project_name)
                 .then((response) => {
                     //console.log(response);
                     this.project_lists = response.data.results;

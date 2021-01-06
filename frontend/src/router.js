@@ -30,6 +30,7 @@ import Register from "./components/layout/Register.vue"
 import LogIn from "./components/layout/LogIn.vue"
 import LogOut from "./components/layout/LogOut.vue"
 import Project from "./views/Project.vue"
+import Metrics from "./views/Metrics.vue"
 import store from "@/vuex/store";
 import VueSimpleAlert from "vue-simple-alert";
 
@@ -118,6 +119,12 @@ const router = new Router({
           path: '/project',
           name: 'project',
           component: Project,
+          beforeEnter: requireAdmin(),
+        },
+        {
+          path: '/metrics',
+          name: 'metrics',
+          component: Metrics,
           beforeEnter: requireAdmin(),
         },
       ]

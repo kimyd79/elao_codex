@@ -6,9 +6,10 @@ from rest_framework.response import Response
 from rest_framework import renderers
 from rest_framework import viewsets, status
 from rest_framework.renderers import JSONRenderer
-from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString
-from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer, DynamicLogDetailSerializer
+from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString, Metrics, LogMasterMetric
+from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer, DynamicLogDetailSerializer, MetricsSerializer, LogMasterMetricSerializer
 import time, uuid, re, csv, io
+
 from datetime import datetime, timezone
 from rest_framework.response import Response
 from django.db import transaction
@@ -58,7 +59,7 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     #filterset_fields = ['project_name', 'uploader']
     #filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['creator']
+    filterset_fields = ['creator', 'project_name']
     # Multiple Search
     # http://127.0.0.1:8000/logmaster/?search=aa,22
     #search_fields = ['project_name', 'project_description', 'creator']
@@ -1646,3 +1647,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         print("## line count 까지 : 총 작업 시간 - ", round((endTime - startTime),4)) 
         
         return linecount
+
+class MetricsViewSet(viewsets.ModelViewSet):
+    queryset = Metrics.objects.all()
+    serializer_class = MetricsSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['metric_kind']
+
+class LogMasterMetricViewSet(viewsets.ModelViewSet):
+    queryset = LogMasterMetric.objects.all()
+    serializer_class = LogMasterMetricSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['metric', 'project']

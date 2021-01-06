@@ -30,6 +30,10 @@ router.register(r'logformatstring/formatkind_list', views.LogFormatStringViewSet
 # For user
 router.register(r'user', views.UserViewSet)
 
+# For Metrics
+router.register(r'metrics', views.MetricsViewSet)
+router.register(r'logmastermetric', views.LogMasterMetricViewSet)
+
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),

@@ -689,3 +689,94 @@ export function getMultiLineChartOptions(title) {
 
     return options;
 }
+
+
+export function getFormatkindLlist() {
+
+    var url = serverUrl + "/logformatstring/formatkind_list/"
+
+    var items = [];
+    let axiosConfig = {
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    axios.get(url, axiosConfig)
+        .then(res => {
+            // items.push({
+            //     value: "ALL",
+            //     text: "ALL"
+            // });
+            for (let i = 0; i < res.data.list_format_kind.length; i++) {
+                let tmp = (res.data.list_format_kind[i] == "jeus") ? "jeus(>= ver7)" : res.data.list_format_kind[i];
+                items.push({
+                    value: res.data.list_format_kind[i],
+                    text: tmp
+                });
+            }             
+        })
+        .catch(err => {
+            console.error(err);
+        });
+
+    return items;
+}
+
+export function getMetricskindLlist() {
+
+    var items = [];
+    items.push({
+        value: "threshhold",
+        text: "threshhold"
+    });
+    items.push({
+        value: "scope",
+        text: "scope"
+    });
+
+    return items;
+}
+
+export function getMetricsfilterLlist() {
+
+    var items = []; 
+    items.push({
+        value: "ftime_taken",
+        text: "ftime_taken"
+    });
+    items.push({
+        value: "fbyte",
+        text: "fbyte"
+    });
+    items.push({
+        value: "fextension",
+        text: "fextension"
+    });
+        
+
+    return items;
+}
+
+export function getMetricsunitLlist() {
+
+    var items = [];
+    items.push({
+        value: "%",
+        text: "%"
+    });
+    items.push({
+        value: "TPS",
+        text: "TPS"
+    });
+    items.push({
+        value: "millis",
+        text: "millis"
+    });
+    items.push({
+        value: "micros",
+        text: "micros"
+    });
+
+    return items;
+}

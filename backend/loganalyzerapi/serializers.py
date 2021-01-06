@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString
+from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString, Metrics, LogMasterMetric
 from django.contrib.auth.models import User
 
 class LogMasterSerializer(serializers.ModelSerializer):
@@ -42,4 +42,17 @@ class DynamicLogDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = None
+        fields = '__all__' 
+
+class MetricsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Metrics
+        fields = '__all__' 
+
+class LogMasterMetricSerializer(serializers.ModelSerializer):
+    # project = LogMasterSerializer(read_only=True)
+    
+    class Meta:
+        model = LogMasterMetric
         fields = '__all__' 

@@ -37,7 +37,8 @@ export default {
                   label: 'Setting' ,
                   menus: [
                     { label:'LogFormat', linkto:'/logformat', key:'logformat', isSelected: false },
-                    { label:'Project', linkto:'/project', key:'project', isSelected: false },                    
+                    { label:'Project', linkto:'/project', key:'project', isSelected: false }, 
+                    { label:'Metrics', linkto:'/metrics', key:'metrics', isSelected: false },                   
                   ]
                 },
                 
