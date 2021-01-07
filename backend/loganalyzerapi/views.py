@@ -1658,4 +1658,4 @@ class LogMasterMetricViewSet(viewsets.ModelViewSet):
     queryset = LogMasterMetric.objects.all()
     serializer_class = LogMasterMetricSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['metric', 'project']
+    filterset_fields = ['metric', 'project', 'creator']

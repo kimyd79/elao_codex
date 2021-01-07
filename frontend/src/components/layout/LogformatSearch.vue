@@ -36,13 +36,14 @@ export default {
 
     created() {
         this.items = getFormatkindLlist();
+        this.items.push({
+        value: "",
+        text: "ALL"
+        });
     },        
 
     methods: {
         getData: function () {
-            if (this.format_kind == 'ALL') {
-                this.format_kind = ''
-            }
             EventBus.$emit("searchFormat", this.format_kind);
             EventBus.$emit("searchFormatDetail", 'Clear');
             //console.log(this.format_kind);

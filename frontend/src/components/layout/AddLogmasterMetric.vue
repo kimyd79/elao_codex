@@ -46,6 +46,7 @@
 <script>
 import axios from "axios";
 import EventBus from '../../EventBus';
+import store from '@/vuex/store';
 import {
     mapGetters
 } from "vuex";
@@ -76,6 +77,7 @@ export default {
 
     created() {
         this.logmastermetric.creator = this.$store.state.userName
+        this.logmastermetric.metric = this.$store.state.metricId
         this.items_project = getProjectLlist(this.$store.state.userName);
         this.items_metric = getMetricLlist();
     },    

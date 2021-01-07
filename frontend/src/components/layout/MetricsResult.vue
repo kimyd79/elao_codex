@@ -48,7 +48,6 @@ import axios from 'axios';
 import EventBus from '../../EventBus';
 import AddMetrics from './AddMetrics';
 import UpdateMetrics from './UpdateMetrics';
-import CommonPopup from './CommonPopup';
 import store from '@/vuex/store';
 import * as types from "@/vuex/mutation_types";
 import {
@@ -66,7 +65,6 @@ export default {
     components: {
         AddMetrics,
         UpdateMetrics,
-        CommonPopup,
     },
     data: function () {
         return {
@@ -91,10 +89,10 @@ export default {
         EventBus.$on("cancelUpdateMetrics", () => {
             this.currentView = null;
         });
-        EventBus.$on("updateOK", (metric) => {
-            this.currentView = null;
-            this.currentView = 'UpdateMetrics';
-        });
+        // EventBus.$on("updateOK", (metric) => {
+        //     this.currentView = null;
+        //     this.currentView = 'UpdateMetrics';
+        // });
         EventBus.$on("updateMetrics", (metric) => {
             this.updateData(metric);
             this.currentView = null;
@@ -107,7 +105,7 @@ export default {
     beforeDestroy(){
         EventBus.$off("searchMetrics");
         EventBus.$off("cancelUpdateMetrics");
-        EventBus.$off("updateOK");
+        // EventBus.$off("updateOK");
         EventBus.$off("updateMetrics");
         EventBus.$off("addMetrics");
     },
@@ -138,7 +136,7 @@ export default {
                 .then((response) => {
                     //console.log(response);
                     this.getData("");
-                    EventBus.$emit("searchLogmasterMetric","");
+                    EventBus.$emit("searchLogmasterMetric","CLEAR");
                 })
                 .catch((err) => {
                     console.error(err);
@@ -178,6 +176,7 @@ export default {
             this.metric.metric_max = metric_list.metric_max;
             this.metric.creator = metric_list.creator;
             this.metric.created = metric_list.created;
+            this.$store.dispatch("setMetricId", metric_list.metric_id);
             EventBus.$emit("searchLogmasterMetric", metric_list.metric_id);
             //console.log(this.metric_name);
             //console.log("click ID : " + metric_list.metric_id);

@@ -34,6 +34,10 @@ export default {
 
     created() {
         this.items = getMetricskindLlist();
+        this.items.push({
+        value: "",
+        text: "ALL"
+        });
     },
 
     // computed: {

@@ -87,11 +87,21 @@ export default {
 
     methods: {
         getData: function (metric) {
-            axios.get(urlStr + '?metric=' + metric)
+            if (metric == 'CLEAR') {
+                this.logmastermetric_lists=null;
+                return 0;
+            }
+            if (this.$store.state.userName == 'Leehs' || this.$store.state.userName == 'Admin') {
+                var url = urlStr + '?metric=' + metric + '&creator='
+            } else {
+                var url =urlStr + '?metric=' + metric + '&creator=' + this.$store.state.userName
+            }
+            axios.get(url)
                 .then((response) => {
                     // console.log(response);
                     this.logmastermetric_lists = response.data.results;
                     this.selected_logmastermetric_id = '';
+                    this.logmastermetric.logmastermetric_id = '';
                     this.logmastermetric.metric = '';
                     this.logmastermetric.project = '';
                     this.logmastermetric.creator = '';
