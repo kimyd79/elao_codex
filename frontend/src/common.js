@@ -4,10 +4,10 @@
 import axios from "axios";
 import * as store from "@/vuex/store";
 
-export var serverUrl = "http://127.0.0.1:8000";
+//export var serverUrl = "http://127.0.0.1:8000";
 //export var serverUrl = "http://172.16.1.109"
 // webport
-//export var serverUrl = "http://182.195.89.147:18080"
+export var serverUrl = "http://182.195.89.147:18080"
 
 //////////////////////////////////////////////////////////////
 // Common Popup
