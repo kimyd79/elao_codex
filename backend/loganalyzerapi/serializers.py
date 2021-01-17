@@ -51,12 +51,6 @@ class MetricsSerializer(serializers.ModelSerializer):
         fields = '__all__' 
 
 class LogMasterMetricSerializer(serializers.ModelSerializer):
-    # project = LogMasterSerializer(read_only=True)
-
-    # project = LogMasterSerializer(read_only=False)
-    # project_name = serializers.RelatedField(source='logmaster.name', read_only=True)
-    # project_name = serializers.ReadOnlyField(source='logmaster.project_name')
-    # project_name = LogMasterSerializer(many=True,read_only=False)
     project_name = serializers.CharField(source='project.project_name', read_only=True)
     metric_kind = serializers.CharField(source='metric.metric_kind', read_only=True)
     metric_definition = serializers.CharField(source='metric.metric_definition', read_only=True)
@@ -70,13 +64,3 @@ class LogMasterMetricSerializer(serializers.ModelSerializer):
         model = LogMasterMetric
         # fields = '__all__' 
         fields = ['logmastermetric_id', 'metric', 'project', 'project_name', 'creator', 'created','metric_kind', 'metric_definition', 'metric_filter', 'metric_unit', 'metric_min', 'metric_max'] 
-
-
-# class LogMasterMetricJoinSerializer(serializers.ModelSerializer):
-#     project = LogMasterSerializer(read_only=True)
-#     # project_name = serializers.ReadOnlyField(source='logmaster.project_name')
-    
-#     class Meta:
-#         model = LogMasterMetric
-#         fields = '__all__' 
-#         # fields = ['logmastermetric_id', 'metric', 'project', 'project_name', 'creator', 'created']  
