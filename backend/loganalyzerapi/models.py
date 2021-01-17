@@ -155,6 +155,7 @@ class LogMasterMetric(models.Model):
     created = models.DateTimeField(auto_now=True, verbose_name="date create")
     
     class Meta:
+        unique_together = ('project', 'metric')
         ordering = ['created']
 
     def __str__(self): 

@@ -59,7 +59,7 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch, byteFrom, byteTo){
     
     var filters="";
 
@@ -70,6 +70,12 @@ export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condit
     }
     if ( detailsearch != '') {
         filters = filters + "&detailsearchValue="+detailsearch
+    }
+    if ( byteFrom != '') {
+        filters = filters + "&byteFromValue="+byteFrom
+    }
+    if ( byteTo != '') {
+        filters = filters + "&byteToValue="+byteTo
     }
 
     return filters;
@@ -742,17 +748,17 @@ export function getMetricsfilterLlist() {
 
     var items = []; 
     items.push({
-        value: "ftime_taken",
-        text: "ftime_taken"
+        value: "ftime_taken_request",
+        text: "ftime_taken(request)"
+    });
+    items.push({
+        value: "ftime_taken_staticfile",
+        text: "ftime_taken(static file)"
     });
     items.push({
         value: "fbyte",
         text: "fbyte"
     });
-    items.push({
-        value: "fextension",
-        text: "fextension"
-    });        
 
     return items;
 }
@@ -760,14 +766,6 @@ export function getMetricsfilterLlist() {
 export function getMetricsunitLlist() {
 
     var items = [];
-    items.push({
-        value: "%",
-        text: "%"
-    });
-    items.push({
-        value: "TPS",
-        text: "TPS"
-    });
     items.push({
         value: "millis",
         text: "millis"
@@ -779,6 +777,14 @@ export function getMetricsunitLlist() {
     items.push({
         value: "byte",
         text: "byte"
+    });
+    items.push({
+        value: "%",
+        text: "%"
+    });
+    items.push({
+        value: "TPS",
+        text: "TPS"
     });
 
     return items;

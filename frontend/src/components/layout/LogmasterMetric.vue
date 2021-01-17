@@ -13,7 +13,7 @@
                 <tr>
                     <th>logmastermetric id</th>
                     <th>metric id</th>
-                    <th>project id</th>
+                    <th>project name</th>
                     <th>logmastermetric creator</th> 
                 </tr>
             </thead>
@@ -21,7 +21,7 @@
                 <tr v-for="(logmastermetric_list, idx) in logmastermetric_lists" :key="idx" v-on:click="clickList(logmastermetric_list)" :class="{'highlight': (logmastermetric_list.logmastermetric_id == selected_logmastermetric_id) }">
                     <td>{{logmastermetric_list.logmastermetric_id}}</td>
                     <td>{{logmastermetric_list.metric}}</td>
-                    <td>{{logmastermetric_list.project}}</td>
+                    <td>{{logmastermetric_list.project_name}}</td>
                     <td>{{logmastermetric_list.creator}}</td>
                 </tr>
             </tbody>
@@ -68,6 +68,7 @@ export default {
             },
         }
     },
+
     created() {
         EventBus.$on("searchLogmasterMetric", this.getData);
         EventBus.$on("updateLogmasterMetric", (logmastermetric) => {
@@ -98,7 +99,6 @@ export default {
             }
             axios.get(url)
                 .then((response) => {
-                    // console.log(response);
                     this.logmastermetric_lists = response.data.results;
                     this.selected_logmastermetric_id = '';
                     this.logmastermetric.logmastermetric_id = '';

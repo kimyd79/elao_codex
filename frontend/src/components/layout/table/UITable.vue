@@ -278,7 +278,7 @@ export default {
             }
             if (selectedCount == 0){
                  item.isSelected == true ? item.isSelected = false : item.isSelected = true
-                 this.$store.dispatch("setToggleSearch");
+                //  this.$store.dispatch("setToggleSearch");
             }else if (selectedCount == 1 && item.isSelected == true){                
                 item.isSelected == true ? item.isSelected = false : item.isSelected = true
             }else {

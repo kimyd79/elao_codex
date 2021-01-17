@@ -1,19 +1,17 @@
 <template>
-<div id="notice">
-    <component :is="currentView" v-on:popupClose="currentView=null"></component>
-    <ui-card :columns="10" :height="200">
+<div id="notice" >
+    <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
+    <ui-card :columns="10" :height="200" :padding="9" >
         <ui-card-item header>Findings</ui-card-item>
-        <ui-card-item sub>
-
+        <ui-card-item sub class="card_box">
             <!-- bar-fade-scale, color="#FF6700" -->
             <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
-            <span style="color:red" v-on:click="getLongTransactionDetail()">
-
-                [CHECK] Long Transaction time [>= {{ this.threshold }} seconds] : {{ this.LongTransactionCount }}
-                <!--[CHECK] Long Transaction time [>= 3 seconds] : {{ this.LongTransactionCount }}-->
-
+            <span style="color:red" v-for="(finding, idx) in findingListResult" :key="idx" v-on:click="getMetricDetailSearch(idx, finding)"> 
+                {{idx+1}}] {{finding.description}} : {{finding.result}}<br>
             </span>
-
+            <!-- <span style="color:red" v-on:click="getLongTransactionDetail()">
+                [CHECK] Long Transaction time [>= {{ this.threshold }} seconds] : {{ this.LongTransactionCount }}
+            </span> -->
         </ui-card-item>
         <ui-card-item body></ui-card-item>
 
@@ -44,14 +42,27 @@ export default {
 
     data() {
         return {
+            // Loading Spinner data
             isActive: false,
             LongTransactionCount: 0,
             currentView: null,
+            findingList: [],
+            findingListResult: [],
+            finding: [{
+                description: '',
+                result: '',
+                metric_kind: '',
+                metric_filter: '',
+                metric_unit: '',
+                metric_min: '',
+                metric_max: '',
+            }],
         }
     },
 
     created() {
-        this.getNotice()
+        this.getMetrics()
+        //this.getNotice()
     },
 
     computed: mapGetters({
@@ -73,26 +84,24 @@ export default {
 
             let postData = {
                 project_id: this.projectID,
-                threshold: this.threshold
+                threshold: this.threshold,
             };
 
             // Start Loading Spinner
-            this.isLoading = true;
+            this.isActive = true;
             axios
-                //.post(serverUrl + "/logdetail/notice/", postData)
                 .post(serverUrl + "/logdetail_dynamic/notice/", postData)
                 .then(res => {
                     //console.log(res);
-
-                    this.LongTransactionCount = res.data.tiemtakenResult
+                    this.LongTransactionCount = res.data.timetakenResult
 
                     // Stop Loading Spinner
-                    this.isLoading = false;
+                    this.isActive = false;
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
-                    this.isLoading = false;
+                    this.isActive = false;
                 });
         },
         getLongTransactionDetail: function () {
@@ -104,9 +113,101 @@ export default {
             this.$store.state.popupButton = 'Close';
             this.currentView = 'DetailPopup';
         },
+        getMetricList: function () {
+            // console.log('getMetricList start: ');
+            axios.get( serverUrl + '/logmastermetric/?project=' + this.projectID)
+                .then((response) => {
+                    console.log('getMetricList result: ', response);
+                    this.findingList = response.data.results;
+                    return response.data.results;
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        },
+
+        async getMetricDetail(metrics) {
+            
+            // console.log('getMetricDetail input : ', metrics);
+            let items = []
+            let descriptionString = ''
+
+            for (let i = 0; i < metrics.length; i++) {
+                let postData = {
+                    project_id: this.projectID,
+                    metric_kind: metrics[i].metric_kind,
+                    metric_filter: metrics[i].metric_filter,
+                    metric_unit: metrics[i].metric_unit,
+                    metric_min: metrics[i].metric_min,
+                    metric_max: metrics[i].metric_max,
+                };
+
+                await axios
+                    .post(serverUrl + "/logdetail_dynamic/findings/", postData)
+                    .then(res => {
+                        // console.log('getMetricDetail result : [',i ,']', res);
+                        if (metrics[i].metric_kind == 'threshold') {
+                            descriptionString = "["+metrics[i].metric_kind+"] "+metrics[i].metric_definition+" ["+metrics[i].metric_filter+" <= "+metrics[i].metric_min+" "+metrics[i].metric_unit+"]"
+                        } else {
+                            descriptionString = "["+metrics[i].metric_kind+"] "+metrics[i].metric_definition+" ["+metrics[i].metric_min+" <= "+metrics[i].metric_filter+" <= "+metrics[i].metric_max+" "+metrics[i].metric_unit+"]"
+                        }
+
+                        items.push({
+                            description: descriptionString,                            
+                            result: res.data.findingsResult,
+                            metric_kind: metrics[i].metric_kind,
+                            metric_filter: metrics[i].metric_filter,
+                            metric_unit: metrics[i].metric_unit,
+                            metric_min: metrics[i].metric_min,
+                            metric_max: metrics[i].metric_max,
+                        });
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            }
+
+            this.findingListResult = items;
+            console.log('this.findingListResult final: ', this.findingListResult);
+        },
+
+        async getMetrics() {   
+            // Start Loading Spinner
+            this.isActive = true;         
+
+            try {
+                let res = await axios.get( serverUrl + '/logmastermetric/?project=' + this.projectID)
+                console.log('await getMetricList() result : ', res.data.results);
+                this.findingList = res.data.results;
+                this.getMetricDetail(res.data.results);
+
+                // Stop Loading Spinner
+                this.isActive = false;
+            } catch (err) {
+                console.error(err);
+                // Stop Loading Spinner
+                this.isActive = false;
+            } 
+        },
+
+        // getMetricDetailSearch(idx, metric_kind,metric_filter, metric_unit, metric_min, metric_max) {
+        getMetricDetailSearch(idx, finding) {
+            console.log('Findings idx : ', idx, ', ', finding)
+            this.finding = finding
+            this.$store.state.popupKind = 'FindingsDetail';
+            this.$store.state.popupHeader = 'Finding Detail';
+            this.$store.state.popupBody = finding.description;
+            this.$store.state.popupButton = 'Close';
+            this.currentView = 'DetailPopup';
+        },
     }
 };
 </script>
 
 <style scoped>
+.card_box {
+    max-height: 300px;
+    overflow-y: auto;
+}
 </style>
