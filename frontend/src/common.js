@@ -4,11 +4,11 @@
 import axios from "axios";
 import * as store from "@/vuex/store";
 
-//export var serverUrl = "http://127.0.0.1:8000";
+//TODO: y축 Scale 맞추기
+export var serverUrl = "http://127.0.0.1:8000";
 //export var serverUrl = "http://172.16.1.109"
 // webport
-export var serverUrl = "http://182.195.89.147:18080"
-
+//export var serverUrl = "http://182.195.89.147:18080"    
 //////////////////////////////////////////////////////////////
 // Common Popup
 //////////////////////////////////////////////////////////////
@@ -596,7 +596,11 @@ export function getLineChartOptions(title) {
                 scaleLabel: {
                     display: true,
                     labelString: 'tps'
-                }
+                },
+                //ticks: {
+                //    suggestedMin: 100,
+                //    suggestedMax: 100
+                //}
             }]
         },
 
@@ -671,6 +675,10 @@ export function getMultiLineChartOptions(title) {
                     scaleLabel: {
                         display: true,
                         labelString: 'Request(count)'
+                    },
+                    ticks: {
+                        suggestedMin: 100,
+                        suggestedMax: 100
                     }
                 },{
                     type: 'linear',
@@ -680,6 +688,10 @@ export function getMultiLineChartOptions(title) {
                     scaleLabel: {
                         display: true,
                         labelString: 'Duration(s)'
+                    },
+                    ticks: {
+                        suggestedMin: 100,
+                        suggestedMax: 100
                     }
             }]
         },
