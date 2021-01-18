@@ -114,20 +114,24 @@
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="12"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1 || this.logFormat.indexOf('$http_referer')!=-1"></statistics>
+            <!-- For Ingress Nginx -->
+            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1 || this.logFormat.indexOf('$http_user_agent')!=-1"></statistics>
+            <!-- For Ingress Nginx -->
+            <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
         </ui-container-box>
 
     </ui-container-box>
@@ -243,6 +247,8 @@ export default {
     created() {
         //this.logfile_id = this.$store.state.logFileID
         //this.project_id = this.$store.state.projectID
+        // 초기깂 로딩
+        this.$store.dispatch("setToggleSearch");
     },
 
     mounted() {
