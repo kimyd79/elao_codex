@@ -1232,14 +1232,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         
         try:           
             # IIS-W3C의 경우 Log의 내용 중 시작에 #가 있는 라인은 주석으로 처리한다.
-            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, comment='#', delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+            # Delimiter로 공백이 여러개 있을 수 있으므로 \s+ 사용한다. 
+            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, comment='#', delimiter="\s+", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
             
         except UnicodeDecodeError as ude:
             
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)
             
             try:
-                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, comment='#', delimiter=" ", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+                df_logs = pd.read_csv(file_name, encoding="cp1252", error_bad_lines=False, header=None, comment='#', delimiter="\s+", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
             except Exception as uex:
                 logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -1376,7 +1377,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 elif "$time_local" in tmp:
                     format_index['$time_local'] = index
                     index = index + 1 # 하나 더 세야 한다.(apache 시간의 경우 [24/Dec/2019:13:54:26 +0900] 이런 형식이기 때문에)
-                elif "$request" in tmp and "$request_time" not in tmp:
+                elif "$request" in tmp and "$request_" not in tmp:
                     format_index['$request'] = index
                 elif "$status" in tmp:
                     format_index['$status'] = index
@@ -1562,7 +1563,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs.rename(columns = {format_index['$request_time'] : 'ftime_taken'}, inplace = True)
             
             # millisecond
-            df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000).astype(int)
+            #df_logs['ftime_taken'].mul(1000).fillna(0).apply(np.int64)
+            # 잘못 파싱되어 문자열 들어간 경우
+            df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000).astype(int)
                         
         else:
             df_logs['ftime_taken'] = -1

@@ -33,7 +33,7 @@ class LogFile(models.Model):
     project = models.ForeignKey(LogMaster, on_delete=models.CASCADE)    
     file_name = models.CharField(max_length=100, blank=True, default='')    
     file_object = models.FileField(upload_to=upload_directory_path)
-    file_format = models.CharField(max_length=200, null=False, blank=False)
+    file_format = models.CharField(max_length=400, null=False, blank=False)
     
     format_kind = models.CharField(max_length=50, null=True, blank=False)
     format_name = models.CharField(max_length=50, null=True, blank=False)
