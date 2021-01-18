@@ -93,7 +93,9 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
     // type=9. Static files (count) Top N
     // type=10. Requests URI (Average Bytes) Top N
     // type=11. Requests Average Time-taken (s/㎲)  Top N
-    // type=12. Static file Names (count) Top N
+    // type=12. Static file Names (count) Top N    
+    // type=13. Nginx Ingress : Domain Top N - Referer에서 Domain만
+    // type=14. Nginx Ingress : $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) Top N
 
     var content = "";
 
@@ -133,6 +135,12 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
             break;
         case 12:
             content = "Static file Names (count)";
+            break;
+        case 13:
+            content = "Domains (count, K8S Ingress)";
+            break;
+        case 14:
+            content = "Upstream Info (count, K8S Ingress)";
             break;
         default:
     };
