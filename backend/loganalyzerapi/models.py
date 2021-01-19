@@ -82,9 +82,9 @@ class LogDetail(models.Model):
     fextension = models.CharField(max_length=10, null=True, blank=True)
     
     # Reservation Fields
-    freserve1 = models.CharField(max_length=200, null=True, blank=True)
-    freserve2 = models.CharField(max_length=200, null=True, blank=True)
-    freserve3 = models.CharField(max_length=200, null=True, blank=True)
+    freserve1 = models.CharField(max_length=500, null=True, blank=True)
+    freserve2 = models.CharField(max_length=500, null=True, blank=True)
+    freserve3 = models.CharField(max_length=500, null=True, blank=True)
     
     created = models.DateTimeField(auto_now=True, verbose_name="date create")   
     
