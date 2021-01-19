@@ -137,10 +137,10 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
             content = "Static file Names (count)";
             break;
         case 13:
-            content = "Domains (count, K8S Ingress)";
+            content = "Upstream Info (count, K8S Ingress)";
             break;
         case 14:
-            content = "Upstream Info (count, K8S Ingress)";
+            content = "Domains (count, K8S Ingress)";            
             break;
         default:
     };
@@ -400,9 +400,9 @@ var bgColors = function (data) {
     var results = [];
 
     for (var i = 0; i < count; i++) {
-        var randomR = Math.floor((Math.random() * 100) + 100);
-        var randomG = Math.floor((Math.random() * 120) + 100);
-        var randomB = Math.floor((Math.random() * 150) + 100);
+        var randomR = Math.floor((Math.random() * 100) + 155);
+        var randomG = Math.floor((Math.random() * 100) + 155);
+        var randomB = Math.floor((Math.random() * 100) + 155);
 
         var graphBackground = "rgb(" +
             randomR + ", " +
@@ -577,7 +577,7 @@ export function getLineChartTemplate(x, y, label) {
     return chartData;
 }
 
-export function getLineChartOptions(title) {
+export function getLineChartOptions(title, y_scale) {
 
     var options = {
         responsive: true,
@@ -605,10 +605,10 @@ export function getLineChartOptions(title) {
                     display: true,
                     labelString: 'tps'
                 },
-                //ticks: {
-                //    suggestedMin: 100,
-                //    suggestedMax: 100
-                //}
+                ticks: { 
+                    suggestedMin: y_scale,
+                    suggestedMax: y_scale
+                }
             }]
         },
 
@@ -651,7 +651,7 @@ export function getMultiLineChartTemplate(x, y1, label1, y2, label2) {
     return chartData;
 }
 
-export function getMultiLineChartOptions(title) {
+export function getMultiLineChartOptions(title, y_scale) {
 
     var options = {
         responsive: true,
@@ -685,8 +685,8 @@ export function getMultiLineChartOptions(title) {
                         labelString: 'Request(count)'
                     },
                     ticks: {
-                        suggestedMin: 100,
-                        suggestedMax: 100
+                        suggestedMin: y_scale,
+                        suggestedMax: y_scale
                     }
                 },{
                     type: 'linear',
@@ -698,8 +698,8 @@ export function getMultiLineChartOptions(title) {
                         labelString: 'Duration(s)'
                     },
                     ticks: {
-                        suggestedMin: 100,
-                        suggestedMax: 100
+                        suggestedMin: y_scale,
+                        suggestedMax: y_scale
                     }
             }]
         },

@@ -72,6 +72,7 @@ export default {
 
     created() {
         //console.log(this.statisticsRow, this.statisticsKind)
+        this.getStatistics();
     },
 
     computed: mapGetters({

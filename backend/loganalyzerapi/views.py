@@ -683,7 +683,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     duration_sec = round(row['ftime_taken_avg']/1000000, 1) if timetakenUnit == 'D' else row['ftime_taken_avg']
                     results.append({"result" : row['requestURL'], "result_count" : duration_sec, "timetakenUnit" : 'T'})
                     
-            #type=9. Static filenames Top N               
+            #type=12. Static filenames Top N               
             elif type == 12:
                 
                 topn_static_filenames = queryset.filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css']).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]
@@ -694,9 +694,34 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         logger.debug("type12 : TOP"+strN+" frequest - %s" % row['frequest'])
                         logger.debug("type12 : TOP"+strN+" frequest_count %s " % row['frequest_count'])
                     
-                    results.append({"result" : row['frequest'].split(' ')[1], "result_count" : row['frequest_count']})                    
+                    results.append({"result" : row['frequest'].split(' ')[1], "result_count" : row['frequest_count']})        
+                    
+            # type=13. Nginx Ingress : $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) Top N
+            elif type == 13:
+                topn_ingress = queryset.values('freserve1').annotate(freserve1_count=Count('freserve1')).order_by('-freserve1_count')[0:intN]
+                rows = topn_ingress.values('freserve1','freserve1_count')
+                
+                for row in rows:
+                    
+                    if settings.DEBUG:
+                        logger.debug("type13 : TOP"+strN+" freserve1($proxy_upstream_name/$upstream_addr) - %s" % row['freserve1'])
+                        logger.debug("type13 : TOP"+strN+" freserve1($proxy_upstream_name/$upstream_addr) Count - %s" % row['freserve1_count'])
+                    
+                    results.append({"result" : row['freserve1'], "result_count" : row['freserve1_count']})                                
         
-            
+            # type=14. Nginx Ingress : Domain Top N - Referer에서 Domain만
+            elif type == 14:
+                
+                topn_referer_domain = queryset.values('freserve2').annotate(freserve2_count=Count('freserve2')).order_by('-freserve2_count')[0:intN]
+                rows = topn_referer_domain.values('freserve2','freserve2_count')
+                
+                for row in rows:
+                    
+                    if settings.DEBUG:
+                        logger.debug("type14 : TOP"+strN+" freserve2(Domain) - %s" % row['freserve2'])
+                        logger.debug("type14 : TOP"+strN+" freserve2(Domain) Count - %s" % row['freserve2_count'])
+                    
+                    results.append({"result" : row['freserve2'], "result_count" : row['freserve2_count']})              
             
             if settings.DEBUG:
                 logger.debug("== statistics (type="+str(type)+") duration(sec) : %s " % (time.time() - start_time))
@@ -826,6 +851,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         time_unit = 1 
                     elif file_format.find('%D') != -1:
                         time_unit = 2
+                    elif file_format.find('$request_time') != -1:
+                        time_unit = 2
+                    elif file_format.find('time-taken') != -1:
+                        time_unit = 2
                     
                     resultY_time_unit = time_unit
                                         
@@ -924,6 +953,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         time_unit = 1 
                     elif file_format.find('%D') != -1:
                         time_unit = 2
+                    elif file_format.find('$request_time') != -1:
+                        time_unit = 2
+                    elif file_format.find('time-taken') != -1:
+                        time_unit = 2
                     
                     resultY_time_unit = time_unit
                                         
@@ -1019,6 +1052,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     if file_format.find('%T') != -1:
                         time_unit = 1 
                     elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    elif file_format.find('$request_time') != -1:
+                        time_unit = 2
+                    elif file_format.find('time-taken') != -1:
                         time_unit = 2
                     
                     resultY_time_unit = time_unit
@@ -1261,10 +1298,19 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         elif format_kind == 'nginx':
             df_logs = self.setColumnNginx(df_logs, format_kind, log_format, format_index)
 
-        #'freserve1', 'freserve2', 'freserve3'
+        #'freserve1', 'freserve2', 'freserve3'        
         df_logs['freserve1'] = ''
         df_logs['freserve2'] = ''
         df_logs['freserve3'] = ''
+        
+        # freserve1 : Nginx Ingress Controller의 upstream 정보 용도로 사용 - df_logs['proxy_upstream_name'], df_logs['upstream_addr']
+        # TODO: 값이 없는 경우의 처리는?
+        if format_kind == 'nginx':
+            df_logs['freserve1'] = df_logs['proxy_upstream_name'] + '/' + df_logs['upstream_addr']
+            
+            # TODO: Domain 추출 - 패턴 : "http:// ~ /"            
+            p = re.compile('http://[a-zA-Z0-9.\-_]+/', re.DOTALL )
+            df_logs['freserve2']  = df_logs['freferer'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else '-')
         
         #'created'
         datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
@@ -1384,11 +1430,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 elif "$body_bytes_sent" in tmp:
                     format_index['$body_bytes_sent'] = index
                 elif "$request_time" in tmp:   # millisecond
-                    format_index['$request_time'] = index                
+                    format_index['$request_time'] = index
+                # Ingress Nginx
+                elif "$proxy_upstream_name" in tmp:   
+                    format_index['$proxy_upstream_name'] = index
+                elif "$upstream_addr" in tmp:   
+                    format_index['$upstream_addr'] = index                  
             
             elif format_kind == 'IIS-W3C':
-                if tmp.find('cs(Referrer)') != -1:
-                    format_index['cs(Referrer)'] = index
+                if tmp.find('cs(Referer)') != -1:
+                    format_index['cs(Referer)'] = index
                 elif tmp.find('cs(User-Agent)') != -1:
                     format_index['cs(User-Agent)'] = index                
                 elif "c-ip" in tmp:
@@ -1566,6 +1617,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             #df_logs['ftime_taken'].mul(1000).fillna(0).apply(np.int64)
             # 잘못 파싱되어 문자열 들어간 경우
             df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000).astype(int)
+        
+        # Ingress Nginx    
+        if log_format.find('$proxy_upstream_name') != -1:
+            df_logs.rename(columns = {format_index['$proxy_upstream_name'] : 'proxy_upstream_name'}, inplace = True)
+            
+        if log_format.find('$upstream_addr') != -1:
+            df_logs.rename(columns = {format_index['$upstream_addr'] : 'upstream_addr'}, inplace = True)
                         
         else:
             df_logs['ftime_taken'] = -1

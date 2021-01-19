@@ -262,13 +262,19 @@ export default {
     },
 
     created() {
-        // TODO : 인증에 대해 처리한다.  
-
+      
         // Initial Value Setting
-        this.projectName = this.$store.state.projectName
-        this.projectDescription = this.$store.state.projectDescription
-        this.fileName = this.$store.state.fileNames
-        this.fileFormat = this.$store.state.logFormat
+            this.projectName = this.$store.state.projectName
+            this.projectDescription = this.$store.state.projectDescription
+            this.fileName = this.$store.state.fileNames
+            this.fileFormat = this.$store.state.logFormat
+
+        // Current Info 값이 없을 경우 Click "Next" to create a project or load an existing one. 나타낸다.
+        if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){
+      
+            this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';           
+
+        }
 
         // File format 가져오기
         var url = serverUrl + "/logformat"
@@ -351,6 +357,9 @@ export default {
                 this.projectDescription = ""
                 this.fileName = ""
                 this.fileFormat = ""
+                
+                this.radioValue = "1"
+                this.isPrevShow = false
 
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
@@ -358,6 +367,10 @@ export default {
                         this.tabs[0].isSelected = true
                         break;
                     }
+                }
+
+                if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                    this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';
                 }
                 //this.isNewProject = false
 
@@ -474,7 +487,7 @@ export default {
                 this.isPrevShow = true
             }
 
-            if (this.tabs[1].isSelected) { // Step1 : logmaster    
+            if (this.tabs[1].isSelected) { // Step1 : logmaster
 
                 if (this.radioValue == 1) { // New인 경우 새로운 정보로 저장한다.
 
@@ -565,6 +578,11 @@ export default {
             if (dir == 1) { // Forward
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
+
+                        if (i-1 == 0 && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                            this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';
+                        }
+
                         if (i - 1 >= 0) {
                             this.tabs[i].isSelected = false
                             this.tabs[i - 1].isSelected = true
@@ -576,6 +594,12 @@ export default {
             } else { // Backward
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
+
+                        if ( i + 1 == 1 ) {
+                            this.projectName = "";
+                            this.projectDescription = "";
+                        }
+
                         if (i + 1 < this.tabs.length) {
                             this.tabs[i].isSelected = false
                             this.tabs[i + 1].isSelected = true

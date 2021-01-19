@@ -237,7 +237,7 @@ export default {
     },
     data() {
         return {
-            timeCondition: "2",
+            timeCondition: "1",
 
             // for chart reactivess Test
             lChartData1: null,
@@ -294,6 +294,9 @@ export default {
         // TODO: Check! mapGetter로 가능?
         this.logfile_id = this.$store.state.logFileID
         this.project_id = this.$store.state.projectID
+
+        this.search1Chart();
+        this.search2Chart();
     },
     computed: {
         ...mapGetters({

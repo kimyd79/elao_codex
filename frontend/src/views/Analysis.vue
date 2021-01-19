@@ -39,6 +39,8 @@
                 <lego-button @click="pieChartData(5)" main small>Visitor IP(5)</lego-button>
 
                 <lego-button @click="pieChartData(9)" main small>Static Files</lego-button>
+                <lego-button @click="pieChartData(13)" main small>Upstream Info</lego-button>
+                <lego-button @click="pieChartData(14)" main small>Domains</lego-button>
                 <lego-button @click="allChart()" small>ALL</lego-button>
             </ui-form-item>
         </ui-form-row>
@@ -74,6 +76,11 @@
                 <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
             </div>
 
+            <div class="vld-parent">
+                <vue-element-loading :active="isActivePieUpstream" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                <chart-pie :chart-data="pChartDataUpstream" :options="pOptions"></chart-pie>
+            </div>
+
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
@@ -95,6 +102,11 @@
                 <chart-pie :chart-data="pChartDataExtension" :options="pOptions"></chart-pie>
             </div>
 
+            <div class="vld-parent">
+                <vue-element-loading :active="isActivePieDomain" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                <chart-pie :chart-data="pChartDataDomain" :options="pOptions"></chart-pie>
+            </div>
+
         </ui-container-box>
 
     </ui-container-box>
@@ -114,24 +126,24 @@
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
+            <!-- For Ingress Nginx -->
+            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="12"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1 || this.logFormat.indexOf('$http_referer')!=-1"></statistics>
-            <!-- For Ingress Nginx -->
-            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1 || this.logFormat.indexOf('$http_referer')!=-1"></statistics>            
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
+            <!-- For Ingress Nginx -->
+            <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1 || this.logFormat.indexOf('$http_user_agent')!=-1"></statistics>
-            <!-- For Ingress Nginx -->
-            <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1 || this.logFormat.indexOf('$http_user_agent')!=-1"></statistics>            
         </ui-container-box>
 
     </ui-container-box>
@@ -213,6 +225,8 @@ export default {
             pChartData: null,
             pChartDataVisitorTop5: null,
             pChartDataExtension: null,
+            pChartDataUpstream: null,
+            pChartDataDomain: null,
             pOptions: getPieChartOptions('- No Data -'),
 
             //logfile_id: '',
@@ -225,6 +239,9 @@ export default {
             isActivePie: false,
             isActivePie5: false,
             isActivePieExtension: false,
+            
+            isActivePieUpstream: false,
+            isActivePieDomain: false,
 
             // For Statistics N
             valueN: 5,
@@ -310,8 +327,9 @@ export default {
             this.stackedbarChartData();
             this.pieChartData(5);
             this.pieChartData(1);
-            this.pieChartData(9)
-
+            this.pieChartData(9);
+            this.pieChartData(13);
+            this.pieChartData(14);
         },
 
         resetZoom(chart) {
@@ -358,6 +376,10 @@ export default {
                 this.isActivePie5 = true
             } else if (type == 9) {
                 this.isActivePieExtension = true
+            } else if (type == 13) {
+                this.isActivePieUpstream = true
+            } else if (type == 14) {
+                this.isActivePieDomain = true
             }
 
             let filter = this.getFilter()
@@ -383,6 +405,14 @@ export default {
 
                     //Stop Loading Spinner
                     //this.isActivePieExtension = false
+                } else if (type == 13) {
+                    this.pChartDataUpstream = getPieChartTemplate(res.x, res.y)
+                    this.pOptions = getPieChartOptions("Upstream Info");
+                    
+                } else if (type == 14) {
+                    this.pChartDataDomain = getPieChartTemplate(res.x, res.y)
+                    this.pOptions = getPieChartOptions("Domains");
+                    
                 }
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch                
@@ -394,6 +424,10 @@ export default {
                     this.isActivePie5 = false;
                 } else if (type == 9) {
                     this.isActivePieExtension = false;
+                } else if (type == 13) {
+                    this.isActivePieUpstream = false;
+                } else if (type == 14) {
+                    this.isActivePieDomain = false;
                 }
             }
 

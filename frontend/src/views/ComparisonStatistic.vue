@@ -128,6 +128,7 @@ export default {
 
         this.logfile_id = this.$store.state.logFileID
         this.project_id = this.$store.state.projectID
+
     },
     computed: {
         listN1() {

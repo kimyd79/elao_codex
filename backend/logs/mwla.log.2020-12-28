@@ -1,0 +1,483 @@
+[DEBUG][28/Dec/2020 10:42:49,559][32280|22576][loganalyzerapi.views|create|1043] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 10:42:55,372][32280|22576][loganalyzerapi.views|parse_log_div|1314] Duration to create temporary csv : 5.625205039978027
+[ERROR][28/Dec/2020 10:42:55,478][32280|22576][loganalyzerapi.views|create|1142] Error Occured while creating logdetail : invalid input syntax for type integer: "0.0"
+
+[DEBUG][28/Dec/2020 11:04:57,912][32280|8244][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 11:04:57,914][32280|8244][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_43bc3e24-78e6-4898-a7f9-afed0da3a29a !!
+[DEBUG][28/Dec/2020 11:04:57,993][32280|8244][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 11:04:57,995][32280|8244][loganalyzerapi.views|get_queryset|337] detailconditionValue applied! (detailconditionValue) : R
+[DEBUG][28/Dec/2020 11:04:57,996][32280|8244][loganalyzerapi.views|get_queryset|338] detailsearchValue : PUT /restservice/asset HTTP/1.1
+[DEBUG][28/Dec/2020 11:04:59,233][32280|8244][loganalyzerapi.views|get_serializer_class|373] get_serializer_class model_name : logdetail_43bc3e24-78e6-4898-a7f9-afed0da3a29a
+[DEBUG][28/Dec/2020 12:11:25,182][21936|17568][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 12:11:25,567][21936|17568][loganalyzerapi.views|parse_log_div|1315] Duration to create temporary csv : 0.1860039234161377
+[ERROR][28/Dec/2020 12:11:25,687][21936|17568][loganalyzerapi.views|create|1143] Error Occured while creating logdetail : invalid input syntax for type integer: "0.0"
+
+[DEBUG][28/Dec/2020 12:12:18,199][3824|32828][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 12:12:51,178][3824|32828][loganalyzerapi.views|parse_log_div|1315] Duration to create temporary csv : 32.78949522972107
+[ERROR][28/Dec/2020 12:12:51,289][3824|32828][loganalyzerapi.views|create|1143] Error Occured while creating logdetail : invalid input syntax for type integer: "0.0"
+
+[DEBUG][28/Dec/2020 12:12:57,480][3824|32828][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 12:51:48,493][26612|26012][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 12:51:59,264][26612|26012][loganalyzerapi.views|parse_log_div|1315] Duration to create temporary csv : 10.572875022888184
+[DEBUG][28/Dec/2020 12:51:59,393][26612|26012][loganalyzerapi.views|create|1136] To DB, Total Duration : 10.898890733718872
+[DEBUG][28/Dec/2020 12:51:59,446][26612|26012][loganalyzerapi.views|start_end|443] start_end project_id : df038a4c-c0f8-4874-82d3-8efe138064cd
+[DEBUG][28/Dec/2020 12:52:04,224][26612|26012][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:04,241][26612|7420][loganalyzerapi.views|notice|398] notice project_id : df038a4c-c0f8-4874-82d3-8efe138064cd
+[DEBUG][28/Dec/2020 12:52:04,452][26612|26012][loganalyzerapi.views|statistics|513] type0 : queryset.count() - 224
+[DEBUG][28/Dec/2020 12:52:04,453][26612|26012][loganalyzerapi.views|statistics|683] == statistics (type=0) duration(sec) : 0.02100348472595215 
+[DEBUG][28/Dec/2020 12:52:08,601][26612|7420][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:08,604][26612|26012][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:08,615][26612|7420][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:08,619][26612|8592][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:08,622][26612|24324][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:08,622][26612|26012][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:08,624][26612|7420][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:08,626][26612|8592][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:08,629][26612|24552][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:08,630][26612|24324][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:08,632][26612|26012][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:08,650][26612|33692][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:08,650][26612|8592][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:08,651][26612|24552][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:08,651][26612|24324][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:08,656][26612|33692][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:08,658][26612|24552][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:08,661][26612|33692][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:08,980][26612|7420][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09, 10][26612|7420][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09, 25][26612|7420][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09, 62][26612|26012][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09, 80][26612|26012][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09, 96][26612|26012][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,148][26612|7420][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,165][26612|33692][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,171][26612|7420][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 114
+[DEBUG][28/Dec/2020 12:52:09,190][26612|33692][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,202][26612|8592][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,203][26612|7420][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,208][26612|24324][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,213][26612|33692][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,217][26612|24552][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,217][26612|8592][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,218][26612|7420][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 108
+[DEBUG][28/Dec/2020 12:52:09,219][26612|24324][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,224][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 502
+[DEBUG][28/Dec/2020 12:52:09,224][26612|24552][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,227][26612|8592][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,246][26612|7420][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,246][26612|24324][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,247][26612|33692][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - -
+[DEBUG][28/Dec/2020 12:52:09,247][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 114
+[DEBUG][28/Dec/2020 12:52:09,248][26612|24552][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,251][26612|7420][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 2
+[DEBUG][28/Dec/2020 12:52:09,259][26612|33692][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 222
+[DEBUG][28/Dec/2020 12:52:09,276][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 304
+[DEBUG][28/Dec/2020 12:52:09,287][26612|8592][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,290][26612|7420][loganalyzerapi.views|statistics|683] == statistics (type=2) duration(sec) : 0.2209925651550293 
+[DEBUG][28/Dec/2020 12:52:09,290][26612|24324][loganalyzerapi.views|statistics|582] type5 : TOP5 VISITOR - 172.16.1.110
+[DEBUG][28/Dec/2020 12:52:09,303][26612|33692][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - ico
+[DEBUG][28/Dec/2020 12:52:09,304][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 106
+[DEBUG][28/Dec/2020 12:52:09,308][26612|8592][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 56316
+[DEBUG][28/Dec/2020 12:52:09,310][26612|24552][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 502
+[DEBUG][28/Dec/2020 12:52:09,310][26612|24324][loganalyzerapi.views|statistics|583] type5 : TOP5 VISITOR Count - 224
+[DEBUG][28/Dec/2020 12:52:09,310][26612|33692][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 2
+[DEBUG][28/Dec/2020 12:52:09,311][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 200
+[DEBUG][28/Dec/2020 12:52:09,312][26612|8592][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,315][26612|7420][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:09,316][26612|24552][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 114
+[DEBUG][28/Dec/2020 12:52:09,316][26612|24324][loganalyzerapi.views|statistics|683] == statistics (type=5) duration(sec) : 0.06298637390136719 
+[DEBUG][28/Dec/2020 12:52:09,317][26612|33692][loganalyzerapi.views|statistics|683] == statistics (type=9) duration(sec) : 0.09498763084411621 
+[DEBUG][28/Dec/2020 12:52:09,317][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 12:52:09,318][26612|8592][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 792
+[DEBUG][28/Dec/2020 12:52:09,333][26612|7420][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:09,334][26612|24552][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 304
+[DEBUG][28/Dec/2020 12:52:09,338][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 404
+[DEBUG][28/Dec/2020 12:52:09,339][26612|8592][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,340][26612|7420][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:09,344][26612|24324][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:09,344][26612|24552][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 106
+[DEBUG][28/Dec/2020 12:52:09,347][26612|33692][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:09,347][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 12:52:09,348][26612|8592][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 360
+[DEBUG][28/Dec/2020 12:52:09,351][26612|24324][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:09,366][26612|24552][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 200
+[DEBUG][28/Dec/2020 12:52:09,367][26612|33692][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:09,368][26612|26012][loganalyzerapi.views|statistics|683] == statistics (type=1) duration(sec) : 0.22800111770629883 
+[DEBUG][28/Dec/2020 12:52:09,369][26612|8592][loganalyzerapi.views|statistics|683] == statistics (type=8) duration(sec) : 0.12001562118530273 
+[DEBUG][28/Dec/2020 12:52:09,369][26612|24324][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:09,370][26612|24552][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 12:52:09,371][26612|33692][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:09,377][26612|24552][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 404
+[DEBUG][28/Dec/2020 12:52:09,383][26612|26012][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:09,384][26612|24552][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 12:52:09,387][26612|8592][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 12:52:09,404][26612|26012][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:09,404][26612|24552][loganalyzerapi.views|statistics|683] == statistics (type=1) duration(sec) : 0.12200593948364258 
+[DEBUG][28/Dec/2020 12:52:09,405][26612|8592][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:09,406][26612|26012][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:09,408][26612|8592][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:09,416][26612|24552][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:09,432][26612|24552][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:09,433][26612|24552][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:09,708][26612|7420][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,713][26612|7420][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,750][26612|24324][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,751][26612|7420][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,766][26612|24324][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,812][26612|24324][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,884][26612|26012][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,906][26612|7420][loganalyzerapi.views|statistics|675] type12 : TOP5 frequest - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,911][26612|26012][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,912][26612|24324][loganalyzerapi.views|statistics|582] type5 : TOP5 VISITOR - 172.16.1.110
+[DEBUG][28/Dec/2020 12:52:09,912][26612|7420][loganalyzerapi.views|statistics|676] type12 : TOP5 frequest_count 2 
+[DEBUG][28/Dec/2020 12:52:09,920][26612|26012][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,928][26612|24552][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,930][26612|24324][loganalyzerapi.views|statistics|583] type5 : TOP5 VISITOR Count - 224
+[DEBUG][28/Dec/2020 12:52:09,942][26612|33692][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,943][26612|7420][loganalyzerapi.views|statistics|683] == statistics (type=12) duration(sec) : 0.14500141143798828 
+[DEBUG][28/Dec/2020 12:52:09,957][26612|8592][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:09,960][26612|24552][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,963][26612|24324][loganalyzerapi.views|statistics|683] == statistics (type=5) duration(sec) : 0.14701104164123535 
+[DEBUG][28/Dec/2020 12:52:09,965][26612|33692][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,971][26612|8592][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:09,973][26612|24552][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,986][26612|26012][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:09,990][26612|33692][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,994][26612|7420][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 12:52:09,995][26612|8592][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:09,998][26612|24324][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 12:52:10,  1][26612|26012][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 494.0
+[DEBUG][28/Dec/2020 12:52:10, 10][26612|7420][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:10, 36][26612|24324][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:10, 58][26612|24552][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - -
+[DEBUG][28/Dec/2020 12:52:10, 61][26612|26012][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:10, 62][26612|33692][loganalyzerapi.views|statistics|552] type3 : TOP5 404 REQUEST - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:10, 62][26612|7420][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:10, 63][26612|24324][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:10, 63][26612|24552][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 222
+[DEBUG][28/Dec/2020 12:52:10, 64][26612|26012][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 180.0
+[DEBUG][28/Dec/2020 12:52:10, 64][26612|33692][loganalyzerapi.views|statistics|553] type3 : TOP5 404 REQUEST Count - 2
+[DEBUG][28/Dec/2020 12:52:10, 84][26612|24552][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - ico
+[DEBUG][28/Dec/2020 12:52:10, 85][26612|26012][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 12:52:10, 86][26612|33692][loganalyzerapi.views|statistics|683] == statistics (type=3) duration(sec) : 0.08199930191040039 
+[DEBUG][28/Dec/2020 12:52:10, 86][26612|24552][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 2
+[DEBUG][28/Dec/2020 12:52:10, 87][26612|26012][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 7.333333333333333
+[DEBUG][28/Dec/2020 12:52:10, 89][26612|24552][loganalyzerapi.views|statistics|683] == statistics (type=9) duration(sec) : 0.09002232551574707 
+[DEBUG][28/Dec/2020 12:52:10, 90][26612|26012][loganalyzerapi.views|statistics|683] == statistics (type=10) duration(sec) : 0.1324470043182373 
+[DEBUG][28/Dec/2020 12:52:10,302][26612|7420][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:10,304][26612|7420][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:10,306][26612|7420][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:10,314][26612|24324][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:10,322][26612|24324][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 12:52:10,328][26612|24324][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 12:52:35,153][26612|24324][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 12:52:35,158][26612|33692][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:35,161][26612|24552][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:35,164][26612|7420][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 12:52:35,165][26612|24324][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:35,168][26612|26012][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 12:52:35,171][26612|8592][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 12:52:35,178][26612|33692][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:35,179][26612|24552][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:35,180][26612|7420][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:35,181][26612|24324][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:35,181][26612|26012][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:35,182][26612|8592][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 12:52:35,183][26612|33692][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:35,183][26612|24552][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:35,184][26612|7420][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:35,188][26612|26012][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:35,188][26612|8592][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 12:52:35,724][26612|8592][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:35,727][26612|33692][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:35,730][26612|24324][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 12:52:35,732][26612|24552][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:13,110][26612|8592][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:13,112][26612|8592][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:13,114][26612|24552][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:13,120][26612|33692][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:23,863][26612|24324][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:23,865][26612|33692][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:23,868][26612|24324][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:23,873][26612|24552][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:23,877][26612|26012][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:23,902][26612|7420][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:23,903][26612|8592][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - -
+[DEBUG][28/Dec/2020 13:19:23,928][26612|33692][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 502
+[DEBUG][28/Dec/2020 13:19:29,660][26612|26012][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:29,660][26612|24324][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:29,661][26612|26012][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:29,662][26612|24324][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:29,663][26612|24324][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:29,684][26612|8592][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 222
+[DEBUG][28/Dec/2020 13:19:29,685][26612|33692][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 114
+[DEBUG][28/Dec/2020 13:19:29,689][26612|7420][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:29,690][26612|8592][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - ico
+[DEBUG][28/Dec/2020 13:19:29,694][26612|33692][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 304
+[DEBUG][28/Dec/2020 13:19:29,698][26612|7420][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:29,700][26612|24552][loganalyzerapi.views|statistics|582] type5 : TOP5 VISITOR - 172.16.1.110
+[DEBUG][28/Dec/2020 13:19:29,722][26612|8592][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 2
+[DEBUG][28/Dec/2020 13:19:29,725][26612|33692][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 106
+[DEBUG][28/Dec/2020 13:19:29,733][26612|24552][loganalyzerapi.views|statistics|583] type5 : TOP5 VISITOR Count - 224
+[DEBUG][28/Dec/2020 13:19:29,758][26612|8592][loganalyzerapi.views|statistics|683] == statistics (type=9) duration(sec) : 16.639804124832153 
+[DEBUG][28/Dec/2020 13:19:29,770][26612|33692][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 404
+[DEBUG][28/Dec/2020 13:19:29,771][26612|24552][loganalyzerapi.views|statistics|683] == statistics (type=5) duration(sec) : 0.10500383377075195 
+[DEBUG][28/Dec/2020 13:19:29,785][26612|33692][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:19:29,794][26612|33692][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 200
+[DEBUG][28/Dec/2020 13:19:29,808][26612|33692][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:19:29,814][26612|33692][loganalyzerapi.views|statistics|683] == statistics (type=1) duration(sec) : 5.929584741592407 
+[DEBUG][28/Dec/2020 13:19:29,823][26612|26012][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:29,840][26612|26012][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:29,851][26612|26012][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:29,919][26612|24324][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:29,924][26612|7420][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:29,932][26612|24324][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:29,935][26612|7420][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:29,937][26612|24324][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:29,939][26612|7420][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:29,942][26612|8592][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:29,966][26612|8592][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:29,973][26612|8592][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:29,976][26612|24552][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:29,977][26612|24324][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:29,993][26612|24552][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:29,996][26612|24324][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 114
+[DEBUG][28/Dec/2020 13:19:30,  1][26612|24552][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:30,  5][26612|24324][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30, 26][26612|24324][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 108
+[DEBUG][28/Dec/2020 13:19:30, 33][26612|33692][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:30, 36][26612|24324][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30, 38][26612|33692][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:30, 41][26612|24324][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 2
+[DEBUG][28/Dec/2020 13:19:30, 60][26612|33692][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:30, 61][26612|24324][loganalyzerapi.views|statistics|683] == statistics (type=2) duration(sec) : 0.11598682403564453 
+[DEBUG][28/Dec/2020 13:19:30, 76][26612|26012][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30, 86][26612|26012][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30, 90][26612|24324][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:30, 92][26612|26012][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30, 95][26612|24324][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:30,136][26612|24324][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:30,150][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 502
+[DEBUG][28/Dec/2020 13:19:30,156][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 114
+[DEBUG][28/Dec/2020 13:19:30,162][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 304
+[DEBUG][28/Dec/2020 13:19:30,184][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 106
+[DEBUG][28/Dec/2020 13:19:30,193][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 404
+[DEBUG][28/Dec/2020 13:19:30,223][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:19:30,234][26612|26012][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 200
+[DEBUG][28/Dec/2020 13:19:30,247][26612|26012][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:19:30,261][26612|26012][loganalyzerapi.views|statistics|683] == statistics (type=1) duration(sec) : 0.16400551795959473 
+[DEBUG][28/Dec/2020 13:19:30,272][26612|7420][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30,309][26612|7420][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30,328][26612|7420][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30,351][26612|26012][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:19:30,358][26612|8592][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30,405][26612|26012][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:19:30,413][26612|8592][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30,430][26612|33692][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30,438][26612|26012][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:19:30,439][26612|7420][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,447][26612|8592][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30,467][26612|33692][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30,496][26612|7420][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 56316
+[DEBUG][28/Dec/2020 13:19:30,500][26612|24552][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30,506][26612|24324][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30,506][26612|33692][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30,522][26612|7420][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,523][26612|24552][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30,523][26612|24324][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30,532][26612|7420][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 792
+[DEBUG][28/Dec/2020 13:19:30,533][26612|8592][loganalyzerapi.views|statistics|675] type12 : TOP5 frequest - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,535][26612|24552][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30,538][26612|24324][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30,553][26612|7420][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,554][26612|8592][loganalyzerapi.views|statistics|676] type12 : TOP5 frequest_count 2 
+[DEBUG][28/Dec/2020 13:19:30,559][26612|33692][loganalyzerapi.views|statistics|552] type3 : TOP5 404 REQUEST - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,565][26612|7420][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 360
+[DEBUG][28/Dec/2020 13:19:30,570][26612|8592][loganalyzerapi.views|statistics|683] == statistics (type=12) duration(sec) : 0.06800317764282227 
+[DEBUG][28/Dec/2020 13:19:30,588][26612|33692][loganalyzerapi.views|statistics|553] type3 : TOP5 404 REQUEST Count - 2
+[DEBUG][28/Dec/2020 13:19:30,597][26612|24552][loganalyzerapi.views|statistics|582] type5 : TOP5 VISITOR - 172.16.1.110
+[DEBUG][28/Dec/2020 13:19:30,598][26612|7420][loganalyzerapi.views|statistics|683] == statistics (type=8) duration(sec) : 0.24399256706237793 
+[DEBUG][28/Dec/2020 13:19:30,599][26612|24324][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,604][26612|33692][loganalyzerapi.views|statistics|683] == statistics (type=3) duration(sec) : 0.07999205589294434 
+[DEBUG][28/Dec/2020 13:19:30,619][26612|24552][loganalyzerapi.views|statistics|583] type5 : TOP5 VISITOR Count - 224
+[DEBUG][28/Dec/2020 13:19:30,630][26612|24324][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 494.0
+[DEBUG][28/Dec/2020 13:19:30,653][26612|24552][loganalyzerapi.views|statistics|683] == statistics (type=5) duration(sec) : 0.09599733352661133 
+[DEBUG][28/Dec/2020 13:19:30,662][26612|24324][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,677][26612|26012][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:19:30,679][26612|24324][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 180.0
+[DEBUG][28/Dec/2020 13:19:30,680][26612|26012][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:19:30,681][26612|24324][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 13:19:30,682][26612|26012][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:19:30,682][26612|24324][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 7.333333333333333
+[DEBUG][28/Dec/2020 13:19:30,685][26612|24324][loganalyzerapi.views|statistics|683] == statistics (type=10) duration(sec) : 0.1260056495666504 
+[DEBUG][28/Dec/2020 13:19:30,708][26612|26012][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - -
+[DEBUG][28/Dec/2020 13:19:30,710][26612|26012][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 222
+[DEBUG][28/Dec/2020 13:19:30,711][26612|26012][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - ico
+[DEBUG][28/Dec/2020 13:19:30,712][26612|26012][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 2
+[DEBUG][28/Dec/2020 13:19:30,713][26612|26012][loganalyzerapi.views|statistics|683] == statistics (type=9) duration(sec) : 0.029993772506713867 
+[DEBUG][28/Dec/2020 13:21:54,712][26612|26012][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:21:54,714][26612|26012][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd !!
+[DEBUG][28/Dec/2020 13:21:54,899][26612|26012][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:21:54,900][26612|26012][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : R
+[DEBUG][28/Dec/2020 13:21:54,900][26612|26012][loganalyzerapi.views|get_queryset|339] detailsearchValue : GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:21:54,911][26612|26012][loganalyzerapi.views|get_serializer_class|374] get_serializer_class model_name : logdetail_df038a4c-c0f8-4874-82d3-8efe138064cd
+[DEBUG][28/Dec/2020 13:48:28,478][7964|29820][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 13:48:28,786][7964|29820][loganalyzerapi.views|parse_log_div|1316] Duration to create temporary csv : 0.17000174522399902
+[DEBUG][28/Dec/2020 13:48:28,854][7964|29820][loganalyzerapi.views|create|1136] To DB, Total Duration : 0.37454819679260254
+[DEBUG][28/Dec/2020 13:48:28,880][7964|29820][loganalyzerapi.views|start_end|443] start_end project_id : 7c3c475c-0a2d-442a-92c9-bdd1506d1bcd
+[DEBUG][28/Dec/2020 13:50:12,771][7964|29820][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 13:50:12,910][7964|29820][loganalyzerapi.views|start_end|443] start_end project_id : 7c3c475c-0a2d-442a-92c9-bdd1506d1bcd
+[DEBUG][28/Dec/2020 13:50:18,226][7964|29820][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:18,235][7964|27932][loganalyzerapi.views|notice|398] notice project_id : 7c3c475c-0a2d-442a-92c9-bdd1506d1bcd
+[DEBUG][28/Dec/2020 13:50:18,355][7964|29820][loganalyzerapi.views|statistics|513] type0 : queryset.count() - 224
+[DEBUG][28/Dec/2020 13:50:18,360][7964|29820][loganalyzerapi.views|statistics|683] == statistics (type=0) duration(sec) : 0.016000747680664062 
+[DEBUG][28/Dec/2020 13:50:21,903][7964|29820][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 13:50:21,906][7964|27932][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 13:50:21,907][7964|29820][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:21,919][7964|27932][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:21,919][7964|29820][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:21,921][7964|27932][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:21,927][7964|2624][loganalyzerapi.views|chartdata|699] DynamicLogDetailViewSet : chartdata !!
+[DEBUG][28/Dec/2020 13:50:21,930][7964|2624][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:21,932][7964|2624][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:21,935][7964|29036][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:21,938][7964|29036][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:21,939][7964|29036][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:21,945][7964|3996][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:21,961][7964|3996][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:21,963][7964|3996][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:21,970][7964|33720][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:21,971][7964|33720][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:21,972][7964|33720][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22, 63][7964|29820][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22, 66][7964|29820][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22, 66][7964|29820][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22, 79][7964|27932][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22, 88][7964|27932][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22, 93][7964|29820][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22, 94][7964|2624][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22, 98][7964|27932][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22, 99][7964|29820][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22, 99][7964|2624][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,103][7964|29036][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,119][7964|29820][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,133][7964|33720][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,133][7964|2624][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,134][7964|3996][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,143][7964|29036][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,149][7964|27932][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,149][7964|33720][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,152][7964|3996][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,158][7964|29036][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,159][7964|27932][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,159][7964|33720][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,160][7964|3996][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,164][7964|27932][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,177][7964|29036][loganalyzerapi.views|statistics|582] type5 : TOP5 VISITOR - 172.16.1.110
+[DEBUG][28/Dec/2020 13:50:22,189][7964|2624][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,198][7964|33720][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - -
+[DEBUG][28/Dec/2020 13:50:22,205][7964|3996][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 502
+[DEBUG][28/Dec/2020 13:50:22,206][7964|29036][loganalyzerapi.views|statistics|583] type5 : TOP5 VISITOR Count - 224
+[DEBUG][28/Dec/2020 13:50:22,207][7964|2624][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,207][7964|33720][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 222
+[DEBUG][28/Dec/2020 13:50:22,208][7964|3996][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 114
+[DEBUG][28/Dec/2020 13:50:22,210][7964|3996][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 304
+[DEBUG][28/Dec/2020 13:50:22,209][7964|2624][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,209][7964|33720][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - ico
+[DEBUG][28/Dec/2020 13:50:22,208][7964|29036][loganalyzerapi.views|statistics|683] == statistics (type=5) duration(sec) : 0.04699587821960449 
+[DEBUG][28/Dec/2020 13:50:22,211][7964|3996][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 106
+[DEBUG][28/Dec/2020 13:50:22,213][7964|33720][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 2
+[DEBUG][28/Dec/2020 13:50:22,215][7964|3996][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 404
+[DEBUG][28/Dec/2020 13:50:22,215][7964|33720][loganalyzerapi.views|statistics|683] == statistics (type=9) duration(sec) : 0.03799843788146973 
+[DEBUG][28/Dec/2020 13:50:22,217][7964|3996][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:50:22,222][7964|29036][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,224][7964|3996][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 200
+[DEBUG][28/Dec/2020 13:50:22,226][7964|29036][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,240][7964|3996][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:50:22,244][7964|33720][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,244][7964|29036][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,245][7964|3996][loganalyzerapi.views|statistics|683] == statistics (type=1) duration(sec) : 0.06300044059753418 
+[DEBUG][28/Dec/2020 13:50:22,246][7964|33720][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,250][7964|33720][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,259][7964|3996][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,263][7964|29820][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,271][7964|3996][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,271][7964|29820][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,272][7964|3996][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,273][7964|29820][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,293][7964|29820][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,302][7964|29820][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 114
+[DEBUG][28/Dec/2020 13:50:22,303][7964|29820][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,304][7964|29820][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 108
+[DEBUG][28/Dec/2020 13:50:22,305][7964|29820][loganalyzerapi.views|statistics|538] type2 : TOP5REQUEST - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,306][7964|29820][loganalyzerapi.views|statistics|539] type2 : TOP5REQUEST Count - 2
+[DEBUG][28/Dec/2020 13:50:22,306][7964|29820][loganalyzerapi.views|statistics|683] == statistics (type=2) duration(sec) : 0.030004501342773438 
+[DEBUG][28/Dec/2020 13:50:22,313][7964|29820][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,317][7964|29820][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,317][7964|29820][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,324][7964|27932][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,337][7964|27932][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,338][7964|27932][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,353][7964|2624][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,360][7964|27932][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 502
+[DEBUG][28/Dec/2020 13:50:22,369][7964|2624][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,370][7964|27932][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 114
+[DEBUG][28/Dec/2020 13:50:22,371][7964|27932][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 304
+[DEBUG][28/Dec/2020 13:50:22,371][7964|2624][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,372][7964|27932][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 106
+[DEBUG][28/Dec/2020 13:50:22,378][7964|27932][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 404
+[DEBUG][28/Dec/2020 13:50:22,381][7964|27932][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:50:22,387][7964|29036][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,393][7964|2624][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,394][7964|27932][loganalyzerapi.views|statistics|525] type1 : TOP5 STATUS - 200
+[DEBUG][28/Dec/2020 13:50:22,394][7964|29036][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,395][7964|2624][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 56316
+[DEBUG][28/Dec/2020 13:50:22,398][7964|27932][loganalyzerapi.views|statistics|526] type1 : TOP5 STATUS Count - 2
+[DEBUG][28/Dec/2020 13:50:22,399][7964|29036][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,404][7964|2624][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,406][7964|27932][loganalyzerapi.views|statistics|683] == statistics (type=1) duration(sec) : 0.06300210952758789 
+[DEBUG][28/Dec/2020 13:50:22,408][7964|33720][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,409][7964|3996][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,412][7964|2624][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 792
+[DEBUG][28/Dec/2020 13:50:22,425][7964|29036][loganalyzerapi.views|statistics|675] type12 : TOP5 frequest - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,428][7964|33720][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,429][7964|3996][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,432][7964|27932][loganalyzerapi.views|statistics|474] DynamicLogDetailViewSet : statistics !!
+[DEBUG][28/Dec/2020 13:50:22,432][7964|2624][loganalyzerapi.views|statistics|621] type8 : TOP5 requestURL - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,436][7964|29036][loganalyzerapi.views|statistics|676] type12 : TOP5 frequest_count 2 
+[DEBUG][28/Dec/2020 13:50:22,436][7964|33720][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,437][7964|3996][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,438][7964|27932][loganalyzerapi.views|get_queryset|203] DynamicLogDetailViewSet : retrieve !!
+[DEBUG][28/Dec/2020 13:50:22,440][7964|2624][loganalyzerapi.views|statistics|622] type8 : TOP5 fbyte_sum - 360
+[DEBUG][28/Dec/2020 13:50:22,442][7964|29820][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,442][7964|29036][loganalyzerapi.views|statistics|683] == statistics (type=12) duration(sec) : 0.032998085021972656 
+[DEBUG][28/Dec/2020 13:50:22,463][7964|27932][loganalyzerapi.views|get_queryset|272] get_queryset model_name : logdetail_7c3c475c-0a2d-442a-92c9-bdd1506d1bcd !!
+[DEBUG][28/Dec/2020 13:50:22,463][7964|33720][loganalyzerapi.views|statistics|582] type5 : TOP5 VISITOR - 172.16.1.110
+[DEBUG][28/Dec/2020 13:50:22,464][7964|2624][loganalyzerapi.views|statistics|683] == statistics (type=8) duration(sec) : 0.09099912643432617 
+[DEBUG][28/Dec/2020 13:50:22,466][7964|29820][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,467][7964|3996][loganalyzerapi.views|statistics|552] type3 : TOP5 404 REQUEST - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,470][7964|33720][loganalyzerapi.views|statistics|583] type5 : TOP5 VISITOR Count - 224
+[DEBUG][28/Dec/2020 13:50:22,472][7964|29820][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,473][7964|3996][loganalyzerapi.views|statistics|553] type3 : TOP5 404 REQUEST Count - 2
+[DEBUG][28/Dec/2020 13:50:22,473][7964|33720][loganalyzerapi.views|statistics|683] == statistics (type=5) duration(sec) : 0.03099513053894043 
+[DEBUG][28/Dec/2020 13:50:22,491][7964|29820][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET /testapp/index.jsp HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,492][7964|3996][loganalyzerapi.views|statistics|683] == statistics (type=3) duration(sec) : 0.04738926887512207 
+[DEBUG][28/Dec/2020 13:50:22,493][7964|29820][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 494.0
+[DEBUG][28/Dec/2020 13:50:22,495][7964|29820][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET /favicon.ico HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,497][7964|29820][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 180.0
+[DEBUG][28/Dec/2020 13:50:22,498][7964|29820][loganalyzerapi.views|statistics|647] type10 : TOP5 requestURL - GET / HTTP/1.1
+[DEBUG][28/Dec/2020 13:50:22,498][7964|29820][loganalyzerapi.views|statistics|648] type10 : TOP5 fbyte_avg - 7.333333333333333
+[DEBUG][28/Dec/2020 13:50:22,499][7964|29820][loganalyzerapi.views|statistics|683] == statistics (type=10) duration(sec) : 0.024033784866333008 
+[DEBUG][28/Dec/2020 13:50:22,586][7964|27932][loganalyzerapi.views|get_queryset|298] Date and Time applied!
+[DEBUG][28/Dec/2020 13:50:22,587][7964|27932][loganalyzerapi.views|get_queryset|338] detailconditionValue applied! (detailconditionValue) : 
+[DEBUG][28/Dec/2020 13:50:22,587][7964|27932][loganalyzerapi.views|get_queryset|339] detailsearchValue : 
+[DEBUG][28/Dec/2020 13:50:22,602][7964|27932][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - -
+[DEBUG][28/Dec/2020 13:50:22,603][7964|27932][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 222
+[DEBUG][28/Dec/2020 13:50:22,604][7964|27932][loganalyzerapi.views|statistics|634] type9 : TOP5 fextension - ico
+[DEBUG][28/Dec/2020 13:50:22,605][7964|27932][loganalyzerapi.views|statistics|635] type9 : TOP5 fextension Count - 2
+[DEBUG][28/Dec/2020 13:50:22,605][7964|27932][loganalyzerapi.views|statistics|683] == statistics (type=9) duration(sec) : 0.0159759521484375 
+[DEBUG][28/Dec/2020 13:52:26,240][7964|27932][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 13:54:35, 24][29168|28728][loganalyzerapi.views|create|1044] DynamicLogDetailViewSet : create !!
+[DEBUG][28/Dec/2020 13:55:08,706][29168|28728][loganalyzerapi.views|parse_log_div|1316] Duration to create temporary csv : 33.48180866241455
+[DEBUG][28/Dec/2020 13:55:08,832][29168|28728][loganalyzerapi.views|create|1136] To DB, Total Duration : 33.80680251121521
+[DEBUG][28/Dec/2020 13:55:08,878][29168|28728][loganalyzerapi.views|start_end|443] start_end project_id : e19ed02a-c15b-46bd-aeef-afebc28affdf
