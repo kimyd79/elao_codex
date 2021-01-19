@@ -1,12 +1,12 @@
 <script>
 
-import { Pie, mixins } from 'vue-chartjs'
+import { Pie, Doughnut, mixins } from 'vue-chartjs'
 const { reactiveProp } = mixins
 
 export default {
   name: 'ChartPie',
   
-  extends: Pie,
+  extends: Doughnut , // Pie 가능
   mixins: [reactiveProp],
   props: ['chartData', 'options'],
   

@@ -440,10 +440,14 @@ export function getPieChartOptions(title) {
     var options = {
         responsive: true,
         maintainAspectRatio: false,
+        cutoutPercentage: 35,
 
         title: {
             display: true,
-            text: title
+            text: title,
+            fontStyle: 'bold',
+            fontColor: 'rgb(85,60,165)',
+            fontSize: 18,
         },
     }
 
@@ -540,7 +544,11 @@ export function getStackedBarChartOptions(title) {
 
         title: {
             display: true,
-            text: title
+            text: title,
+            fontStyle: 'bold',
+            fontColor: 'rgb(85,60,165)',
+            fontSize: 18,
+            padding: 20,
         },
 
         scales: {
@@ -590,7 +598,11 @@ export function getLineChartOptions(title, y_scale) {
         maintainAspectRatio: false,
         title: {
             display: true,
-            text: title
+            text: title,
+            fontStyle: 'bold',
+            fontColor: 'rgb(85,60,165)',
+            fontSize: 18,
+            padding: 20,
         },
 
         scales: {
@@ -665,7 +677,11 @@ export function getMultiLineChartOptions(title, y_scale) {
 
         title: {
             display: true,
-            text: title
+            text: title,
+            fontStyle: 'bold',
+            fontColor: 'rgb(85,60,165)',
+            fontSize: 18,
+            padding: 20,
         },
 
         scales:{

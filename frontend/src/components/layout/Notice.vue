@@ -129,7 +129,8 @@ export default {
             let descriptionString = ''
 
 
-             // Start Loading Spinner
+            // Start Loading Spinner
+            // TODO: 로직 수정해야 함..아래 문제 생김(Loading Bar 관련)
             this.isActive = true; 
 
             for (let i = 0; i < metrics.length; i++) {
@@ -160,8 +161,7 @@ export default {
                             metric_unit: metrics[i].metric_unit,
                             metric_min: metrics[i].metric_min,
                             metric_max: metrics[i].metric_max,
-                        });
-                         this.isActive = false;  
+                        });                         
                     })
                     .catch(err => {
                         console.error(err);
@@ -170,6 +170,9 @@ export default {
 
             this.findingListResult = items;
             console.log('this.findingListResult final: ', this.findingListResult);
+
+            //setTimeout("Temp", 1000);
+            this.isActive = false;
         },
 
         async getMetrics() {                    

@@ -7,9 +7,9 @@
             <table class="page-summary-table">
                 <thead>
                     <tr>
-                        <th rowspan="2" style="width: 60px;">{{ this.title }}</th>
-                        <th rowspan="2" style="width: 580px;">{{ this.content }}</th>
-                        <th rowspan="2" style="width: 100px;">Result {{ this.timetakenUnit }}</th>
+                        <th rowspan="2" style="width: 60px; color: rgb(85,60,165)">{{ this.title }}</th>
+                        <th rowspan="2" style="width: 580px; color: rgb(85,60,165)">{{ this.content }}</th>
+                        <th rowspan="2" style="width: 100px; color: rgb(85,60,165)">Result {{ this.timetakenUnit }}</th>
                     </tr>
                 </thead>
                 <tbody>
