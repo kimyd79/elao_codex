@@ -3,15 +3,11 @@
     <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
     <ui-card :columns="10" :height="200" :padding="9" >
         <ui-card-item header>Findings</ui-card-item>
-        <ui-card-item sub class="card_box">
-            <!-- bar-fade-scale, color="#FF6700" -->
-            <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+        <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+        <ui-card-item sub class="card_box">                        
             <span style="color:red" v-for="(finding, idx) in findingListResult" :key="idx" v-on:click="getMetricDetailSearch(idx, finding)"> 
-                {{idx+1}}] {{finding.description}} : {{finding.result}}<br>
-            </span>
-            <!-- <span style="color:red" v-on:click="getLongTransactionDetail()">
-                [CHECK] Long Transaction time [>= {{ this.threshold }} seconds] : {{ this.LongTransactionCount }}
-            </span> -->
+                [{{idx+1}}] {{finding.description}} : {{finding.result}}<br>
+            </span>           
         </ui-card-item>
         <ui-card-item body></ui-card-item>
 
@@ -132,6 +128,10 @@ export default {
             let items = []
             let descriptionString = ''
 
+
+             // Start Loading Spinner
+            this.isActive = true; 
+
             for (let i = 0; i < metrics.length; i++) {
                 let postData = {
                     project_id: this.projectID,
@@ -161,7 +161,7 @@ export default {
                             metric_min: metrics[i].metric_min,
                             metric_max: metrics[i].metric_max,
                         });
-
+                         this.isActive = false;  
                     })
                     .catch(err => {
                         console.error(err);
@@ -172,22 +172,20 @@ export default {
             console.log('this.findingListResult final: ', this.findingListResult);
         },
 
-        async getMetrics() {   
-            // Start Loading Spinner
-            this.isActive = true;         
-
+        async getMetrics() {                    
+            
             try {
                 let res = await axios.get( serverUrl + '/logmastermetric/?project=' + this.projectID)
                 console.log('await getMetricList() result : ', res.data.results);
                 this.findingList = res.data.results;
                 this.getMetricDetail(res.data.results);
-
+                
                 // Stop Loading Spinner
-                this.isActive = false;
+                // this.isActive = false;
             } catch (err) {
                 console.error(err);
                 // Stop Loading Spinner
-                this.isActive = false;
+                // this.isActive = false;
             } 
         },
 

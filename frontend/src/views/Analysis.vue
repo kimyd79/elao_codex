@@ -76,7 +76,7 @@
                 <chart-pie :chart-data="pChartDataVisitorTop5" :options="pOptions"></chart-pie>
             </div>
 
-            <div class="vld-parent">
+            <div class="vld-parent" v-if="this.logFormat.indexOf('$proxy_upstream_name')!=-1">
                 <vue-element-loading :active="isActivePieUpstream" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                 <chart-pie :chart-data="pChartDataUpstream" :options="pOptions"></chart-pie>
             </div>
@@ -102,7 +102,7 @@
                 <chart-pie :chart-data="pChartDataExtension" :options="pOptions"></chart-pie>
             </div>
 
-            <div class="vld-parent">
+            <div class="vld-parent" v-if="this.logFormat.indexOf('$http_referer')!=-1" >
                 <vue-element-loading :active="isActivePieDomain" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                 <chart-pie :chart-data="pChartDataDomain" :options="pOptions"></chart-pie>
             </div>
@@ -127,7 +127,7 @@
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
             <!-- For Ingress Nginx -->
-            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat.indexOf('$proxy_upstream_name')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>

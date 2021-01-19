@@ -383,7 +383,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         # Findings detailpopup Staticfiles
         # response byte size : Between 
-        if (byteFromValue is not None) and (byteToValue is not None):
+        # TODO: POST로 요청이 들어오면 "" 초기값 그대로 가지고 있음. 아래의 로직은 오류 발생함.(모든 차트와 통계값)
+        # 원본 : if (byteFromValue is not None) and (byteToValue is not None):
+        # 아래는 임시 수정이므로 전체 확인하여 처리요망
+        if (byteFromValue is not None and byteFromValue != "" ) and (byteToValue is not None and byteToValue != ""):
             byteFromValue = int(byteFromValue)
             byteToValue   = int(byteToValue)
             queryset = queryset.filter(fbyte__range=(byteFromValue, byteToValue))
