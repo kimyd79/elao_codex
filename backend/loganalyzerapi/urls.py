@@ -21,6 +21,7 @@ router.register(r'logdetail_dynamic/start_end', views.DynamicLogDetailViewSet, b
 router.register(r'logdetail_dynamic/notice', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/statistics', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/chartdata', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
+router.register(r'logdetail_dynamic/findings', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 
 # For logformat
 router.register(r'logformat', views.LogFormatViewSet)

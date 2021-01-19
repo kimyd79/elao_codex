@@ -33,6 +33,8 @@ export default {
     getPopupReturn: state => state.PopupReturn,
     getPopupKind: state => state.PopupKind,
     getPopupFormatId: state => state.PopupFormatId,
-    getPopupFormatKind: state => state.PopupFormatKind
+    getPopupFormatKind: state => state.PopupFormatKind,
+    
+    getMetricId: state => state.MetricId
 
 }

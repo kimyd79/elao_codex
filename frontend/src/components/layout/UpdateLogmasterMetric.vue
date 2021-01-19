@@ -17,11 +17,17 @@
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="metric" required left-label :label-width=144 :label-padding=16>
-                    <lego-text-field v-model="logmastermetric.metric" />
+                    <lego-dropdown :items="items_metric" v-model="logmastermetric.metric" /> 
+                </ui-form-item>
+                <ui-form-item :columns=8 label=" " left-label :label-width=144 :label-padding=16>
+                    <lego-text-field disabled v-model="logmastermetric.metric" />               
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="project" required left-label :label-width=144 :label-padding=16>
-                    <lego-text-field v-model="logmastermetric.project" />
+                    <lego-dropdown :items="items_project" v-model="logmastermetric.project" />                     
+                </ui-form-item>
+                <ui-form-item :columns=8 label=" " left-label :label-width=144 :label-padding=16>
+                    <lego-text-field disabled v-model="logmastermetric.project" />               
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
@@ -49,7 +55,9 @@ import axios from 'axios';
 import EventBus from '../../EventBus';
 
 import {
-    serverUrl
+    serverUrl,
+    getProjectLlist,
+    getMetricLlist
 } from "@/common";
 
 var urlStr = serverUrl + "/metrics/";
@@ -70,6 +78,17 @@ export default {
             }
         }
     },
+    data: function () {
+        return {
+            items_project: [],
+            items_metric: []
+        }
+    },    
+
+    created() {
+        this.items_project = getProjectLlist(this.$store.state.userName);
+        this.items_metric = getMetricLlist();
+    },  
 
     methods: {
         clickCancle: function () {

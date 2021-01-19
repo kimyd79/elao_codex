@@ -6,10 +6,10 @@
                     label="metrics kind" required left-label :label-width=144 :label-padding=16 >
                     <lego-text-field v-model="metric_kind" placeholder="enter metric kind" />
                 </ui-form-item> -->
-                <ui-form-item :columns=6 label="metrics kind">
+                <ui-form-item :columns=6 label="metrics kind" align-left>
                       <lego-dropdown :items="items" v-model="metric_kind" />
                 </ui-form-item>
-                <ui-form-item :columns=12 align-right margin-right>
+                <ui-form-item :columns=14 align-right margin-right>
                     <lego-button main v-on:click="getData">Search</lego-button>
                 </ui-form-item>
             </ui-form-row>
@@ -34,6 +34,10 @@ export default {
 
     created() {
         this.items = getMetricskindLlist();
+        this.items.push({
+        value: "",
+        text: "ALL"
+        });
     },
 
     // computed: {

@@ -56,6 +56,9 @@ const state = {
     popupKind: '', 
     popupFormatId: '',
     popupFormatKind: '', 
+
+    //metric info
+    metricId: ''
 }
 
 // mutation
@@ -97,7 +100,8 @@ const mutations = {
     [types.SET_POPUPFORMATID] (state, value) { state.popupFormatId = value },
     [types.SET_POPUPFORMATKIND] (state, value) { state.popupFormatKind = value },
 
-
+    // metric info
+    [types.SET_METRICID] (state, value) { state.metricId = value }
 
 }
 

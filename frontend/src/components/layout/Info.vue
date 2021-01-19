@@ -1,8 +1,8 @@
 <template>
 <div id="info">
-    <ui-card :columns="10" :height="200">
+    <ui-card :columns="10" :height="200" :padding="9">
         <ui-card-item header>Information</ui-card-item>
-        <ui-card-item sub>
+        <ui-card-item sub class="card_box" >
             <span style="color:gray">
                 Project Name (Total Log Lines) : {{ this.projectName }} ({{ totalLogLines }} lines)
                 <br>
@@ -88,4 +88,8 @@ export default {
 </script>
 
 <style scoped>
+.card_box {
+    max-height: 300px;
+    overflow-y: auto;
+}
 </style>

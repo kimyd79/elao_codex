@@ -13,7 +13,7 @@
                 <tr>
                     <th>logmastermetric id</th>
                     <th>metric id</th>
-                    <th>project id</th>
+                    <th>project name</th>
                     <th>logmastermetric creator</th> 
                 </tr>
             </thead>
@@ -21,7 +21,7 @@
                 <tr v-for="(logmastermetric_list, idx) in logmastermetric_lists" :key="idx" v-on:click="clickList(logmastermetric_list)" :class="{'highlight': (logmastermetric_list.logmastermetric_id == selected_logmastermetric_id) }">
                     <td>{{logmastermetric_list.logmastermetric_id}}</td>
                     <td>{{logmastermetric_list.metric}}</td>
-                    <td>{{logmastermetric_list.project}}</td>
+                    <td>{{logmastermetric_list.project_name}}</td>
                     <td>{{logmastermetric_list.creator}}</td>
                 </tr>
             </tbody>
@@ -68,6 +68,7 @@ export default {
             },
         }
     },
+
     created() {
         EventBus.$on("searchLogmasterMetric", this.getData);
         EventBus.$on("updateLogmasterMetric", (logmastermetric) => {
@@ -75,7 +76,6 @@ export default {
             this.currentView = null;
         });
         EventBus.$on("addLogmasterMetric", (logmastermetric) => {
-            console.log(logmastermetric);
             this.addData(logmastermetric);
             this.currentView = null;
         });
@@ -88,15 +88,27 @@ export default {
 
     methods: {
         getData: function (metric) {
-            axios.get(urlStr + '?metric=' + metric)
+            if (metric == 'CLEAR') {
+                this.logmastermetric_lists=null;
+                return 0;
+            }
+            if (this.$store.state.userName == 'Leehs' || this.$store.state.userName == 'Admin') {
+                var url = urlStr + '?metric=' + metric + '&creator='
+            } else {
+                var url =urlStr + '?metric=' + metric + '&creator=' + this.$store.state.userName
+            }
+            axios.get(url)
                 .then((response) => {
-                    console.log(response);
                     this.logmastermetric_lists = response.data.results;
                     this.selected_logmastermetric_id = '';
+                    this.logmastermetric.logmastermetric_id = '';
                     this.logmastermetric.metric = '';
                     this.logmastermetric.project = '';
                     this.logmastermetric.creator = '';
                     this.logmastermetric.created = '';
+                })
+                .catch((err) => {
+                    console.error(err);
                 });
         },
 
@@ -105,24 +117,25 @@ export default {
                 .then((response) => {
                     //console.log(response);
                     this.getData(logmastermetric.metric);
+                    //this.logmastermetric_lists = null;
                 })
                 .catch((err) => {
-                    console.error(err);
+                    console.error(err);  
+                    this.$alert("Delete LogmasterMetric failed. Check for required fields.", "Notification", "error");                  
                 })
         },
         updateData: function (logmastermetric) {
-            console.log(logmastermetric);
             axios.put(urlStr + logmastermetric.logmastermetric_id + '/', logmastermetric)
                 .then((response) => {
                     //console.log(response);
-                    this.getData("");
+                    this.getData(logmastermetric.metric);
                 })
                 .catch((err) => {
                     console.error(err);
+                    this.$alert("Update LogmasterMetric failed. Check for required fields.", "Notification", "error");
                 })
         },
         addData(logmastermetric) {
-            console.log(logmastermetric);
             axios.post(urlStr, logmastermetric)
                 .then((response) => {
                     //console.log(response);
@@ -130,7 +143,7 @@ export default {
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.$alert("Add LogmasterMatric failed. Check for required fields.", "Notification", "error");
+                    this.$alert("Add LogmasterMetric failed. Check for required fields.", "Notification", "error");
                 })
         },
         clickList: function (logmastermetric_list) {
@@ -140,7 +153,6 @@ export default {
             this.logmastermetric.project = logmastermetric_list.project;
             this.logmastermetric.creator = logmastermetric_list.creator;
             this.logmastermetric.created = logmastermetric_list.created;
-            EventBus.$emit("searchLogmastermetric", logmastermetric_list.logmastermetric_id);
         },
         clickDelete: function () {
             if (this.logmastermetric.logmastermetric_id != '') {

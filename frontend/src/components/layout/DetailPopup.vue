@@ -4,7 +4,7 @@
         <ui-container-box :columns=21 vertical class="modal-container">
             <div class="popup-header">
                 <div class="popup-header__title">
-                    {{ this.$store.state.popupHeader }}
+                    {{ this.$store.state.popupHeader }} 
                 </div>
                 <div class="popup-header__close">
                     <lego-icon small v-on:click="clickClose">close</lego-icon>
@@ -64,7 +64,21 @@ export default {
                 }
             }
         },
-        popupState: ''
+        popupState: '',
+        finding: {
+            type: Object,
+            default: function () {
+                return {
+                    description: '',
+                    result: '',
+                    metric_kind: '',
+                    metric_filter: '',
+                    metric_unit: '',
+                    metric_min: '',
+                    metric_max: '',
+                }
+            }
+        }
     },
     data: function () {
         return {
@@ -295,7 +309,7 @@ export default {
 
             this.getDetailCondition();
 
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue)
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue, '', '')
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -339,7 +353,7 @@ export default {
             var ttFromValueThreshold = this.threshold * 1000
             var ttToValueThreshold =  24*60*60*1000
             
-            let filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '')
+            let filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '', '', '')
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -374,6 +388,112 @@ export default {
                 });
         },
 
+        getFindingLogDetails() {
+
+            let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
+
+            let ttFromValueThreshold = 0
+            let ttToValueThreshold = 0
+            let byteFromValueThreshold = 0
+            let byteToValueThreshold = 0
+            let filters = ''
+
+            // #CASE1 : TimeTaken threshold or scope 건수
+            // microseconds -> ms 단위로 처리한다.(/1000)
+            if (this.finding.metric_filter == 'ftime_taken_request'){
+                if (this.finding.metric_kind == 'threshold'){
+                    if (this.finding.metric_unit == 'micros'){
+                        ttFromValueThreshold = this.finding.metric_min / 1000
+                        ttToValueThreshold =  24*60*60*1000
+                    } else {
+                        ttFromValueThreshold = this.finding.metric_min
+                        ttToValueThreshold =  24*60*60*1000
+                    }               
+                } else if (this.finding.metric_kind == 'scope'){
+                    if (this.finding.metric_unit == 'micros'){
+                        ttFromValueThreshold = this.finding.metric_min / 1000
+                        ttToValueThreshold =  this.finding.metric_max / 1000
+                    } else {
+                        ttFromValueThreshold = this.finding.metric_min
+                        ttToValueThreshold =  this.finding.metric_max
+                    }
+                }
+                filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '', '', '')
+            } else if (this.finding.metric_filter == 'ftime_taken_staticfile'){    
+                if (this.finding.metric_kind == 'threshold'){
+                    if (this.finding.metric_unit == 'micros'){
+                        ttFromValueThreshold = this.finding.metric_min / 1000
+                        ttToValueThreshold =  24*60*60*1000
+                    } else {
+                        ttFromValueThreshold = this.finding.metric_min
+                        ttToValueThreshold =  24*60*60*1000
+                    }               
+                } else if (this.finding.metric_kind == 'scope'){
+                    if (this.finding.metric_unit == 'micros'){
+                        ttFromValueThreshold = this.finding.metric_min / 1000
+                        ttToValueThreshold =  this.finding.metric_max / 1000
+                    } else {
+                        ttFromValueThreshold = this.finding.metric_min
+                        ttToValueThreshold =  this.finding.metric_max
+                    }
+                }
+                filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, 'D', '', '', '')
+            } else if (this.finding.metric_filter == 'fbyte'){ 
+                if (this.finding.metric_kind == 'threshold'){   
+                    if (this.finding.metric_unit == 'byte'){
+                        byteFromValueThreshold = this.finding.metric_min
+                        byteToValueThreshold =  1024*1024*1024*1024
+                    } else {
+                        byteFromValueThreshold = ''
+                        byteToValueThreshold =  ''
+                    }               
+                } else if (this.finding.metric_kind == 'scope'){
+                    if (this.finding.metric_unit == 'byte'){
+                        byteFromValueThreshold = this.finding.metric_min
+                        byteToValueThreshold =  this.finding.metric_max
+                    } else {
+                        byteFromValueThreshold = ''
+                        byteToValueThreshold =  ''
+                    }   
+                }
+                filters = getDetailSearchFilter('', '', '', '', '', '', '', '', this.projectID, 'D', '', byteFromValueThreshold, byteToValueThreshold)      
+            }
+
+            var urlstring =
+                serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
+
+            // TODO : Set axiosConfig to set headers
+            //let axiosConfig = {
+            //  headers: {
+            //    'Authorization': 'Token '+ this.token // For Django
+            //  }
+            //};
+
+            // TODO : Set GET parametes, ex) /logdetail/?limit=10&offset=20
+
+            // Start Loading Spinner
+            this.isActive = true
+
+            axios
+                .get(urlstring)
+                .then(res => {
+
+                    //console.log(res.data.count); // 전체건수
+                    //console.log(res);
+                    this.pagingInfo.totalItems = res.data.count;
+                    this.setItemList(res.data.results);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                });
+        },
+
+
+
         pageChange(page) {
             //console.log(page);
             this.pagingInfo.currentPage = page;
@@ -381,6 +501,8 @@ export default {
                 this.getStatisticsLogDetails();
             } else if (this.$store.state.popupKind == 'LongTransaction') {
                 this.getLongTransactionLogDetails();
+            } else if (this.$store.state.popupKind == 'FindingsDetail') {
+                this.getFindingLogDetails();
             }
         },
 
@@ -396,6 +518,8 @@ export default {
             this.getStatisticsLogDetails();
         } else if (this.$store.state.popupKind == 'LongTransaction') {
             this.getLongTransactionLogDetails();
+        } else if (this.$store.state.popupKind == 'FindingsDetail') {
+            this.getFindingLogDetails();
         }
     },
 
@@ -405,6 +529,8 @@ export default {
                 this.getStatisticsLogDetails();
             } else if (this.$store.state.popupKind == 'LongTransaction') {
                 this.getLongTransactionLogDetails();
+            } else if (this.$store.state.popupKind == 'FindingsDetail') {
+                this.getFindingLogDetails();
             }
         }
     }

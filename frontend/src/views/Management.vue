@@ -1,6 +1,6 @@
 <template>
   <div>
-      <ui-gnb style="position: fixed; width: 100%; z-index:999;">
+      <ui-gnb style="position: absolute; width: 100%; z-index:999;">
           <template v-slot:lead>
               <ui-gnb-menus :menus="menus">
                 <template v-slot="{ menu }" >

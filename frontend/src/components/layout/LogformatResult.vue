@@ -251,7 +251,7 @@ export default {
 }
 
 .tb_box {
-    max-height: 200px;
+    max-height: 220px;
     overflow-y: auto;
 }
 

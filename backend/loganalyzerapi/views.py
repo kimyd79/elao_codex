@@ -244,6 +244,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         detailconditionValue = ""
         detailsearchValue = ""
 
+        #findings detailpopup
+        byteFromValue = ""
+        byteToValue = ""
+
         # 조건 적용(GET)
         if method == 'get' :
 
@@ -267,6 +271,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             #statistic detailpopup
             detailconditionValue = self.request.query_params.get('detailconditionValue', None)
             detailsearchValue = self.request.GET.get('detailsearchValue', None)
+
+            #findings detailpopup
+            byteFromValue = self.request.query_params.get('byteFromValue', None)
+            byteToValue = self.request.GET.get('byteToValue', None)
         
         elif method == 'post':
             
@@ -368,7 +376,20 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             elif detailconditionValue == 'S':
                 queryset = queryset.filter(fstatus__icontains=detailsearchValue)
             elif detailconditionValue == 'F':
-                queryset = queryset.filter(fextension__icontains=detailsearchValue) 
+                queryset = queryset.filter(fextension__icontains=detailsearchValue)
+            #Findings detailpopup Staticfiles 
+            elif detailconditionValue == 'D':
+                queryset = queryset.filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css'])
+
+        # Findings detailpopup Staticfiles
+        # response byte size : Between 
+        if (byteFromValue is not None) and (byteToValue is not None):
+            byteFromValue = int(byteFromValue)
+            byteToValue   = int(byteToValue)
+            queryset = queryset.filter(fbyte__range=(byteFromValue, byteToValue))
+
+            if settings.DEBUG:
+               logger.debug('byte between applied!')
         
         return queryset           
 
@@ -406,7 +427,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             return 'T'
         else:
             return None
-        
+
     @action(methods=['post'], detail=False)
     def notice(self, request, pk=None):
         
@@ -439,11 +460,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 model_name = "logdetail_"+project_id
                 LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
             
-                tiemtakenResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(ftime_taken__gt=threshold).count()
+                timetakenResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(ftime_taken__gt=threshold).count()
             else:
-                tiemtakenResult = "N/A"
+                timetakenResult = "N/A"
             
-            response = {'message': 'notice returned successfully', 'tiemtakenResult': tiemtakenResult}        
+            response = {'message': 'notice returned successfully', 'timetakenResult': timetakenResult}        
             return Response(response, status = status.HTTP_200_OK)
             
         except Exception as ex:
@@ -451,7 +472,112 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     
             response = {'message': 'notice creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
-     
+
+    @action(methods=['post'], detail=False)
+    def findings(self, request, pk=None):
+        
+        try:
+            project_id = request.data['project_id']
+            metric_kind = request.data['metric_kind']
+            metric_filter = request.data['metric_filter']
+            metric_unit =  request.data['metric_unit']
+            metric_min = int(request.data['metric_min'])
+            metric_max = int(request.data['metric_max'])
+            
+            if settings.DEBUG:
+                logger.debug('notice project_id : %s' % project_id)            
+            
+            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')
+            list_logfile_id = []
+         
+            for logfile in logfiles:
+                list_logfile_id.append(str(logfile['logfile_id']))
+                timetakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))
+
+            #CASE1 : TimeTaken threshold or scope 건수(%T : seconds, %D : microseconds)
+            if metric_filter == 'ftime_taken_request':
+                if metric_kind == 'threshold':
+                    threshold = int(request.data['metric_min'])
+                    if timetakenUnit is not None:
+                        threshold = threshold/1000 if timetakenUnit == 'T' else threshold*1000   
+
+                        model_name = "logdetail_"+project_id
+                        LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+                    
+                        findingsResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(ftime_taken__gt=threshold).count()
+                    else:
+                        findingsResult = "N/A"
+
+                elif metric_kind == 'scope': 
+                    if timetakenUnit is not None:
+                        if timetakenUnit == 'D':        # microsecond
+                            ttFromValue = int(request.data['metric_min']) * 1000
+                            ttToValue   = int(request.data['metric_max']) * 1000                 
+                        elif timetakenUnit == 'T':      # second
+                            ttFromValue = int(request.data['metric_min']) / 1000
+                            ttToValue = int(request.data['metric_max']) / 1000
+
+                        model_name = "logdetail_"+project_id
+                        LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+                    
+                        findingsResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(ftime_taken__range=(ttFromValue, ttToValue)).count()
+                    else:
+                        findingsResult = "N/A"   
+
+            #CASE2 : static file 처리시간 지연, TimeTaken 입력값 범위 건수(%T : seconds, %D : microseconds)
+            if metric_filter == 'ftime_taken_staticfile':
+                if metric_kind == 'threshold':
+                    threshold = int(request.data['metric_min'])
+                    if timetakenUnit is not None:
+                        threshold = threshold/1000 if timetakenUnit == 'T' else threshold*1000   
+
+                        model_name = "logdetail_"+project_id
+                        LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+                    
+                        findingsResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css']).filter(ftime_taken__gt=threshold).count()
+                    else:
+                        findingsResult = "N/A"
+
+                elif metric_kind == 'scope': 
+                    if timetakenUnit is not None:
+                        if timetakenUnit == 'D':        # microsecond
+                            ttFromValue = int(request.data['metric_min']) * 1000
+                            ttToValue   = int(request.data['metric_max']) * 1000                 
+                        elif timetakenUnit == 'T':      # second
+                            ttFromValue = int(request.data['metric_min']) / 1000
+                            ttToValue = int(request.data['metric_max']) / 1000
+
+                        model_name = "logdetail_"+project_id
+                        LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+                    
+                        findingsResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css']).filter(ftime_taken__range=(ttFromValue, ttToValue)).count()
+                    else:
+                        findingsResult = "N/A"
+
+            #CASE3 : static file 크기 입력값 이상 or 범위 건수
+            if metric_filter == 'fbyte':
+                if metric_kind == 'threshold':
+                    threshold = int(request.data['metric_min'])
+                    model_name = "logdetail_"+project_id
+                    LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+                    findingsResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css']).filter(fbyte__gt=threshold).count()
+                    
+                elif metric_kind == 'scope': 
+                    ttFromValue = int(request.data['metric_min'])
+                    ttToValue   = int(request.data['metric_max'])                 
+                    model_name = "logdetail_"+project_id
+                    LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+                    findingsResult = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css']).filter(fbyte__range=(ttFromValue, ttToValue)).count()
+           
+            response = {'message': 'notice returned successfully', 'findingsResult': findingsResult}        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing findings : %s' % ex)
+                    
+            response = {'message': 'findings creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @action(methods=['post'], detail=False)
     def start_end(self, request, pk=None):        
        
@@ -1719,4 +1845,4 @@ class LogMasterMetricViewSet(viewsets.ModelViewSet):
     queryset = LogMasterMetric.objects.all()
     serializer_class = LogMasterMetricSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['metric', 'project']
+    filterset_fields = ['metric', 'project', 'creator']

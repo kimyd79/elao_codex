@@ -125,7 +125,7 @@ const router = new Router({
           path: '/metrics',
           name: 'metrics',
           component: Metrics,
-          beforeEnter: requireAdmin(),
+          // beforeEnter: requireAdmin(),
         },
       ]
     },    

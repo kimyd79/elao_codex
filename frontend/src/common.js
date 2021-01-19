@@ -59,7 +59,7 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch, byteFrom, byteTo){
     
     var filters="";
 
@@ -70,6 +70,12 @@ export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condit
     }
     if ( detailsearch != '') {
         filters = filters + "&detailsearchValue="+detailsearch
+    }
+    if ( byteFrom != '') {
+        filters = filters + "&byteFromValue="+byteFrom
+    }
+    if ( byteTo != '') {
+        filters = filters + "&byteToValue="+byteTo
     }
 
     return filters;
@@ -747,8 +753,8 @@ export function getMetricskindLlist() {
 
     var items = [];
     items.push({
-        value: "threshhold",
-        text: "threshhold"
+        value: "threshold",
+        text: "threshold"
     });
     items.push({
         value: "scope",
@@ -762,18 +768,17 @@ export function getMetricsfilterLlist() {
 
     var items = []; 
     items.push({
-        value: "ftime_taken",
-        text: "ftime_taken"
+        value: "ftime_taken_request",
+        text: "ftime_taken(request)"
+    });
+    items.push({
+        value: "ftime_taken_staticfile",
+        text: "ftime_taken(static file)"
     });
     items.push({
         value: "fbyte",
         text: "fbyte"
     });
-    items.push({
-        value: "fextension",
-        text: "fextension"
-    });
-        
 
     return items;
 }
@@ -782,14 +787,6 @@ export function getMetricsunitLlist() {
 
     var items = [];
     items.push({
-        value: "%",
-        text: "%"
-    });
-    items.push({
-        value: "TPS",
-        text: "TPS"
-    });
-    items.push({
         value: "millis",
         text: "millis"
     });
@@ -797,6 +794,78 @@ export function getMetricsunitLlist() {
         value: "micros",
         text: "micros"
     });
+    items.push({
+        value: "byte",
+        text: "byte"
+    });
+    items.push({
+        value: "%",
+        text: "%"
+    });
+    items.push({
+        value: "TPS",
+        text: "TPS"
+    });
+
+    return items;
+}
+
+export function getProjectLlist(creator) {
+
+    // var url = serverUrl + "/logmaster/"
+
+    var items = [];
+    let axiosConfig = {
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    if (creator == 'Leehs' || creator == 'Admin') {
+        var url = serverUrl + "/logmaster/?creator="
+    } else {
+        var url = serverUrl + "/logmaster/?creator=" + creator
+    }
+
+    axios.get(url, axiosConfig)
+        .then(res => {
+            for (let i = 0; i < res.data.results.length; i++) {
+                items.push({
+                    value: res.data.results[i].project_id,
+                    text: res.data.results[i].project_name
+                });
+            }             
+        })
+        .catch(err => {
+            console.error(err);
+        });
+
+    return items;
+}
+
+export function getMetricLlist() {
+
+    var url = serverUrl + "/metrics/"
+
+    var items = [];
+    let axiosConfig = {
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    axios.get(url, axiosConfig)
+        .then(res => {
+            for (let i = 0; i < res.data.results.length; i++) {
+                items.push({
+                    value: res.data.results[i].metric_id,
+                    text: res.data.results[i].metric_definition
+                });
+            }             
+        })
+        .catch(err => {
+            console.error(err);
+        });
 
     return items;
 }

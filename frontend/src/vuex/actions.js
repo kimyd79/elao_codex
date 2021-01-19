@@ -36,4 +36,6 @@ export default {
     setPopupKind({commit}, value) { commit(types.SET_POPUPKIND, value) },
     setPopupFormatId({commit}, value) { commit(types.SET_POPUPFORMATID, value) },
     setPopupFormatKind({commit}, value) { commit(types.SET_POPUPFORMATKIND, value) },
+
+    setMetricId({commit}, value) { commit(types.SET_METRICID, value) }
 }
