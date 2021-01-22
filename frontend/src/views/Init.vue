@@ -107,7 +107,7 @@
             <div class="popup-buttons">
                 <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
-                <lego-button v-on:click="deleteProjects" main v-if="creator == 'Leehs' || creator == 'Admin'">DelProjects</lego-button>
+                <lego-button v-on:click="deleteProjects" main v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'">DelProjects</lego-button>
                 <lego-button v-on:click="newProject">newProject</lego-button>
             </div>
 
@@ -383,37 +383,41 @@ export default {
         // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
         deleteProjects(projectID) {
 
-            let projectIDList = []
+            this.$confirm("Will you delete ALL projects? This button is only for Admin.", "Are you sure?", "warning").then(() => {
+                let projectIDList = []
 
-            // Get Projects
+                // Get Projects
 
-            let axiosConfig = {
-                headers: {
-                    //'Authorization': 'Token '+ this.token // For Django
-                }
-            };
-
-            axios.get(serverUrl + "/logmaster/", axiosConfig)
-                .then(res => {
-                    //console.log(res)
-
-                    for (let i = 0; i < res.data.results.length; i++) {
-
-                        projectIDList.push(res.data.results[i].project_id);
-
-                        axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
-                            .then(res => {
-                                //console.log(res.data)
-                            })
-                            .catch(err => {
-                                console.error(err);
-                            })
+                let axiosConfig = {
+                    headers: {
+                        //'Authorization': 'Token '+ this.token // For Django
                     }
+                };
 
-                })
-                .catch(err => {
-                    console.error(err);
-                })
+                axios.get(serverUrl + "/logmaster/", axiosConfig)
+                    .then(res => {
+                        //console.log(res)
+
+                        for (let i = 0; i < res.data.results.length; i++) {
+
+                            projectIDList.push(res.data.results[i].project_id);
+
+                            axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
+                                .then(res => {
+                                    //console.log(res.data)
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                })
+                        }
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            }).catch(() => {
+                //console.log("Cancel clicked");
+            });
         },
 
         setItemList(results) {
