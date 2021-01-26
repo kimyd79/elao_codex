@@ -224,7 +224,7 @@ export default {
                     this.getDateTimeString(results[i].fsecond);
 
                 let frequest = results[i].frequest.substring(0, 60)
-                let referrer = this.nvl(results[i].referrer, "N/A").substring(0, 10)
+                let freferrer = this.nvl(results[i].freferer, "N/A").substring(0, 10)
                 let fuser_agent = this.nvl(results[i].fuser_agent, "N/A").substring(0, 10)
 
                 this.items.push({
@@ -233,7 +233,7 @@ export default {
                     ip: results[i].fip,
 
                     request: frequest,
-                    referrer: referrer,
+                    referrer: freferrer,
                     useragent: fuser_agent,
                     status: results[i].fstatus,
                     timetaken: results[i].ftime_taken,
@@ -391,73 +391,43 @@ export default {
         getFindingLogDetails() {
 
             let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
-
-            let ttFromValueThreshold = 0
-            let ttToValueThreshold = 0
-            let byteFromValueThreshold = 0
-            let byteToValueThreshold = 0
+            let ttFromValueThreshold = ''
+            let ttToValueThreshold = ''
+            let byteFromValueThreshold = ''
+            let byteToValueThreshold = ''
+            let staticValue = ''
             let filters = ''
 
-            // #CASE1 : TimeTaken threshold or scope 건수
-            // microseconds -> ms 단위로 처리한다.(/1000)
-            if (this.finding.metric_filter == 'ftime_taken_request'){
-                if (this.finding.metric_kind == 'threshold'){
-                    if (this.finding.metric_unit == 'micros'){
-                        ttFromValueThreshold = this.finding.metric_min / 1000
-                        ttToValueThreshold =  24*60*60*1000
-                    } else {
-                        ttFromValueThreshold = this.finding.metric_min
-                        ttToValueThreshold =  24*60*60*1000
-                    }               
-                } else if (this.finding.metric_kind == 'scope'){
-                    if (this.finding.metric_unit == 'micros'){
-                        ttFromValueThreshold = this.finding.metric_min / 1000
-                        ttToValueThreshold =  this.finding.metric_max / 1000
-                    } else {
-                        ttFromValueThreshold = this.finding.metric_min
-                        ttToValueThreshold =  this.finding.metric_max
-                    }
-                }
-                filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '', '', '')
-            } else if (this.finding.metric_filter == 'ftime_taken_staticfile'){    
-                if (this.finding.metric_kind == 'threshold'){
-                    if (this.finding.metric_unit == 'micros'){
-                        ttFromValueThreshold = this.finding.metric_min / 1000
-                        ttToValueThreshold =  24*60*60*1000
-                    } else {
-                        ttFromValueThreshold = this.finding.metric_min
-                        ttToValueThreshold =  24*60*60*1000
-                    }               
-                } else if (this.finding.metric_kind == 'scope'){
-                    if (this.finding.metric_unit == 'micros'){
-                        ttFromValueThreshold = this.finding.metric_min / 1000
-                        ttToValueThreshold =  this.finding.metric_max / 1000
-                    } else {
-                        ttFromValueThreshold = this.finding.metric_min
-                        ttToValueThreshold =  this.finding.metric_max
-                    }
-                }
-                filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, 'D', '', '', '')
-            } else if (this.finding.metric_filter == 'fbyte'){ 
-                if (this.finding.metric_kind == 'threshold'){   
-                    if (this.finding.metric_unit == 'byte'){
-                        byteFromValueThreshold = this.finding.metric_min
-                        byteToValueThreshold =  1024*1024*1024*1024
-                    } else {
-                        byteFromValueThreshold = ''
-                        byteToValueThreshold =  ''
-                    }               
-                } else if (this.finding.metric_kind == 'scope'){
-                    if (this.finding.metric_unit == 'byte'){
-                        byteFromValueThreshold = this.finding.metric_min
-                        byteToValueThreshold =  this.finding.metric_max
-                    } else {
-                        byteFromValueThreshold = ''
-                        byteToValueThreshold =  ''
-                    }   
-                }
-                filters = getDetailSearchFilter('', '', '', '', '', '', '', '', this.projectID, 'D', '', byteFromValueThreshold, byteToValueThreshold)      
+            if (this.finding.metric_static == 'Y'){
+                staticValue = 'D'
             }
+            // timetaken 값은 microseconds -> ms 단위로 처리한다.(/1000)
+            // logdetail_dynamic ftime_taken, fbyte between 조회
+            if (this.finding.metric_kind == 'threshold'){
+                if (this.finding.metric_unit == 'micros'){
+                    ttFromValueThreshold = this.finding.metric_min / 1000
+                    ttToValueThreshold = 24*60*60*1000 
+                } else if (this.finding.metric_unit == 'millis'){
+                    ttFromValueThreshold = this.finding.metric_min
+                    ttToValueThreshold = 24*60*60*1000
+                } else if (this.finding.metric_unit == 'byte'){
+                    byteFromValueThreshold = this.finding.metric_min
+                    byteToValueThreshold = 1024*1024*1024*1024
+                } 
+            } else if (this.finding.metric_kind == 'scope'){
+                if (this.finding.metric_unit == 'micros'){
+                    ttFromValueThreshold = this.finding.metric_min / 1000
+                    ttToValueThreshold =  this.finding.metric_max / 1000
+                } else if (this.finding.metric_unit == 'millis'){
+                    ttFromValueThreshold = this.finding.metric_min
+                    ttToValueThreshold = this.finding.metric_max
+                } else if (this.finding.metric_unit == 'byte'){
+                    byteFromValueThreshold = this.finding.metric_min
+                    byteToValueThreshold = this.finding.metric_max
+                } 
+            }
+
+            filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, staticValue, '', byteFromValueThreshold, byteToValueThreshold)
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;

@@ -784,12 +784,8 @@ export function getMetricsfilterLlist() {
 
     var items = []; 
     items.push({
-        value: "ftime_taken_request",
-        text: "ftime_taken(request)"
-    });
-    items.push({
-        value: "ftime_taken_staticfile",
-        text: "ftime_taken(static file)"
+        value: "ftime_taken",
+        text: "ftime_taken"
     });
     items.push({
         value: "fbyte",
@@ -814,14 +810,14 @@ export function getMetricsunitLlist() {
         value: "byte",
         text: "byte"
     });
-    items.push({
-        value: "%",
-        text: "%"
-    });
-    items.push({
-        value: "TPS",
-        text: "TPS"
-    });
+    // items.push({
+    //     value: "%",
+    //     text: "%"
+    // });
+    // items.push({
+    //     value: "TPS",
+    //     text: "TPS"
+    // });
 
     return items;
 }

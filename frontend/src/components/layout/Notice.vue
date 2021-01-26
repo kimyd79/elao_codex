@@ -52,13 +52,13 @@ export default {
                 metric_unit: '',
                 metric_min: '',
                 metric_max: '',
+                metric_static: '',
             }],
         }
     },
 
     created() {
         this.getMetrics()
-        //this.getNotice()
     },
 
     computed: mapGetters({
@@ -76,125 +76,55 @@ export default {
     }),
 
     methods: {
-        getNotice() {
 
-            let postData = {
-                project_id: this.projectID,
-                threshold: this.threshold,
-            };
-
-            // Start Loading Spinner
-            this.isActive = true;
-            axios
-                .post(serverUrl + "/logdetail_dynamic/notice/", postData)
-                .then(res => {
-                    //console.log(res);
-                    this.LongTransactionCount = res.data.timetakenResult
-
-                    // Stop Loading Spinner
-                    this.isActive = false;
-                })
-                .catch(err => {
-                    console.error(err);
-                    // Stop Loading Spinner
-                    this.isActive = false;
-                });
-        },
-        getLongTransactionDetail: function () {
-            //alert('LongTransactionCount : ' + this.LongTransactionCount)
-            //console.log(this.LongTransactionCount +', ' + this.threshold)
-            this.$store.state.popupKind = 'LongTransaction';
-            this.$store.state.popupHeader = 'Long Transaction Detail';
-            this.$store.state.popupBody = 'threshold : >= ' + this.threshold + 'seconds';
-            this.$store.state.popupButton = 'Close';
-            this.currentView = 'DetailPopup';
-        },
-        getMetricList: function () {
-            // console.log('getMetricList start: ');
-            axios.get( serverUrl + '/logmastermetric/?project=' + this.projectID)
-                .then((response) => {
-                    console.log('getMetricList result: ', response);
-                    this.findingList = response.data.results;
-                    return response.data.results;
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        },
-
-        async getMetricDetail(metrics) {
+        async getMetrics() {                    
             
-            // console.log('getMetricDetail input : ', metrics);
             let items = []
             let descriptionString = ''
-
 
             // Start Loading Spinner
             // TODO: 로직 수정해야 함..아래 문제 생김(Loading Bar 관련)
             this.isActive = true; 
 
-            for (let i = 0; i < metrics.length; i++) {
-                let postData = {
-                    project_id: this.projectID,
-                    metric_kind: metrics[i].metric_kind,
-                    metric_filter: metrics[i].metric_filter,
-                    metric_unit: metrics[i].metric_unit,
-                    metric_min: metrics[i].metric_min,
-                    metric_max: metrics[i].metric_max,
-                };
+            let postData = {
+                project_id: this.projectID,
+            };
 
-                await axios
-                    .post(serverUrl + "/logdetail_dynamic/findings/", postData)
-                    .then(res => {
-                        // console.log('getMetricDetail result : [',i ,']', res);
-                        if (metrics[i].metric_kind == 'threshold') {
-                            descriptionString = "["+metrics[i].metric_kind+"] "+metrics[i].metric_definition+" ["+metrics[i].metric_filter+" <= "+metrics[i].metric_min+" "+metrics[i].metric_unit+"]"
+            await axios
+                .post(serverUrl + "/logdetail_dynamic/findings/", postData)
+                .then(res => {
+
+                    for (let i = 0; i < res.data.findingsResult.length; i++) {
+                        if (res.data.findingsResult[i].metric_kind == 'threshold') {
+                            descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_min+" "+res.data.findingsResult[i].metric_unit+"]"
                         } else {
-                            descriptionString = "["+metrics[i].metric_kind+"] "+metrics[i].metric_definition+" ["+metrics[i].metric_min+" <= "+metrics[i].metric_filter+" <= "+metrics[i].metric_max+" "+metrics[i].metric_unit+"]"
+                            descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_min+" <= "+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_max+" "+res.data.findingsResult[i].metric_unit+"]"
                         }
 
                         items.push({
                             description: descriptionString,                            
-                            result: res.data.findingsResult,
-                            metric_kind: metrics[i].metric_kind,
-                            metric_filter: metrics[i].metric_filter,
-                            metric_unit: metrics[i].metric_unit,
-                            metric_min: metrics[i].metric_min,
-                            metric_max: metrics[i].metric_max,
-                        });                         
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-            }
+                            result: res.data.findingsResult[i].result,
+                            metric_kind: res.data.findingsResult[i].metric_kind,
+                            metric_filter: res.data.findingsResult[i].metric_filter,
+                            metric_unit: res.data.findingsResult[i].metric_unit,
+                            metric_min: res.data.findingsResult[i].metric_min,
+                            metric_max: res.data.findingsResult[i].metric_max,
+                            metric_static: res.data.findingsResult[i].metric_static,
+                        }); 
+                    };                                            
+                })
+                .catch(err => {
+                    console.error(err);
+                });
 
             this.findingListResult = items;
-            console.log('this.findingListResult final: ', this.findingListResult);
 
             //setTimeout("Temp", 1000);
             this.isActive = false;
+    
         },
 
-        async getMetrics() {                    
-            
-            try {
-                let res = await axios.get( serverUrl + '/logmastermetric/?project=' + this.projectID)
-                console.log('await getMetricList() result : ', res.data.results);
-                this.findingList = res.data.results;
-                this.getMetricDetail(res.data.results);
-                
-                // Stop Loading Spinner
-                // this.isActive = false;
-            } catch (err) {
-                console.error(err);
-                // Stop Loading Spinner
-                // this.isActive = false;
-            } 
-        },
-
-        // getMetricDetailSearch(idx, metric_kind,metric_filter, metric_unit, metric_min, metric_max) {
         getMetricDetailSearch(idx, finding) {
-            console.log('Findings idx : ', idx, ', ', finding)
             this.finding = finding
             this.$store.state.popupKind = 'FindingsDetail';
             this.$store.state.popupHeader = 'Finding Detail';

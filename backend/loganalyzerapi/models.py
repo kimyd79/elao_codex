@@ -136,6 +136,7 @@ class Metrics(models.Model):
     metric_unit = models.CharField(max_length=10, null=False, blank=False)
     metric_min = models.IntegerField(default=0)
     metric_max = models.IntegerField(default=0)
+    metric_static = models.CharField(max_length=1, null=False, blank=False)
     creator = models.CharField(max_length=50, null=False, blank=False)
     created = models.DateTimeField(auto_now=True, verbose_name="date create")
     

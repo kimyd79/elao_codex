@@ -44,7 +44,9 @@
                     <lego-text-field v-model="metric.metric_min" />
                 </ui-form-item>
 
-                
+                <ui-form-item :columns=8 label="metric static" required left-label :label-width=144 :label-padding=16>
+                    <lego-dropdown :items="conditions" v-model="metric.metric_static" />
+                </ui-form-item>
 
                 <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
                     <lego-text-field disabled v-model="metric.creator" />
@@ -112,6 +114,22 @@ export default {
         this.items_filter = getMetricsfilterLlist();
         this.items_unit = getMetricsunitLlist();
     },
+
+    computed: {
+
+        conditions() {
+            let rtn = [];
+            rtn.push({
+                value: "Y",
+                text: "Y"
+            });
+            rtn.push({
+                value: "N",
+                text: "N"
+            });
+            return rtn;
+        }
+    },  
 
     methods: {
         clickCancle: function () {

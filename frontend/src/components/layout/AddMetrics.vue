@@ -29,16 +29,20 @@
                     <lego-dropdown :items="items_unit" v-model="metric.metric_unit" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric min" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'scope'">
+                <ui-form-item :columns=8 label="metric min" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind == 'scope'">
                     <lego-text-field v-model="metric.metric_min" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric max" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'scope'">
+                <ui-form-item :columns=8 label="metric max" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind == 'scope'">
                     <lego-text-field v-model="metric.metric_max" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric value" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'threshold'">
+                <ui-form-item :columns=8 label="metric value" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind == 'threshold'">
                     <lego-text-field v-model="metric.metric_min" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="metric static" required left-label :label-width=144 :label-padding=16>
+                    <lego-dropdown :items="conditions" v-model="metric.metric_static" />
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="creator" required left-label :label-width=144 :label-padding=16>
@@ -84,6 +88,7 @@ export default {
                         metric_unit: '',
                         metric_min: '',
                         metric_max: '',
+                        metric_static: '',
                         creator: '',
                     }
                 }
@@ -99,7 +104,23 @@ export default {
         this.items_filter = getMetricsfilterLlist();
         this.items_unit = getMetricsunitLlist();
         this.metric.creator = this.$store.state.userName
-    },    
+    },  
+
+    computed: {
+
+        conditions() {
+            let rtn = [];
+            rtn.push({
+                value: "Y",
+                text: "Y"
+            });
+            rtn.push({
+                value: "N",
+                text: "N"
+            });
+            return rtn;
+        }
+    },  
 
     methods: {
         clickCancle: function () {
