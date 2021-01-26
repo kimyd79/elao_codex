@@ -383,37 +383,42 @@ export default {
         // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
         deleteProjects(projectID) {
 
-            let projectIDList = []
+            this.$confirm("Do you want to DELETE all project?", "Are you sure?", "question").then(() => {
 
-            // Get Projects
+                let projectIDList = []
 
-            let axiosConfig = {
-                headers: {
-                    //'Authorization': 'Token '+ this.token // For Django
-                }
-            };
+                // Get Projects
 
-            axios.get(serverUrl + "/logmaster/", axiosConfig)
-                .then(res => {
-                    //console.log(res)
-
-                    for (let i = 0; i < res.data.results.length; i++) {
-
-                        projectIDList.push(res.data.results[i].project_id);
-
-                        axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
-                            .then(res => {
-                                //console.log(res.data)
-                            })
-                            .catch(err => {
-                                console.error(err);
-                            })
+                let axiosConfig = {
+                    headers: {
+                        //'Authorization': 'Token '+ this.token // For Django
                     }
+                };
 
-                })
-                .catch(err => {
-                    console.error(err);
-                })
+                axios.get(serverUrl + "/logmaster/", axiosConfig)
+                    .then(res => {
+                        //console.log(res)
+
+                        for (let i = 0; i < res.data.results.length; i++) {
+
+                            projectIDList.push(res.data.results[i].project_id);
+
+                            axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
+                                .then(res => {
+                                    //console.log(res.data)
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                })
+                        }
+
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    })
+            }).catch(() => {
+                //console.log("Cancel clicked");
+            });
         },
 
         setItemList(results) {
@@ -917,8 +922,8 @@ export default {
     },
     watch: {
         async isRowChecked() {
-            //console.log("Is isRowChecked?")
-            //console.log("this.isNewProject : " + this.isNewProject)
+            // console.log("Is isRowChecked?")
+            // console.log("this.isNewProject : " + this.isNewProject)
 
             if (this.isNewProject == false) {
 
