@@ -11,18 +11,18 @@
         <table class="page-summary-table">
             <thead>
                 <tr>
-                    <th>logmastermetric id</th>
-                    <th>metric id</th>
+                    <th>metric name</th>
                     <th>project name</th>
                     <th>logmastermetric creator</th> 
+                    <th>logmastermetric created</th> 
                 </tr>
             </thead>
             <tbody>
                 <tr v-for="(logmastermetric_list, idx) in logmastermetric_lists" :key="idx" v-on:click="clickList(logmastermetric_list)" :class="{'highlight': (logmastermetric_list.logmastermetric_id == selected_logmastermetric_id) }">
-                    <td>{{logmastermetric_list.logmastermetric_id}}</td>
-                    <td>{{logmastermetric_list.metric}}</td>
+                    <td>{{logmastermetric_list.metric_definition}}</td>
                     <td>{{logmastermetric_list.project_name}}</td>
                     <td>{{logmastermetric_list.creator}}</td>
+                    <td>{{logmastermetric_list.created}}</td>
                 </tr>
             </tbody>
         </table>

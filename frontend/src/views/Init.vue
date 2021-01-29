@@ -921,8 +921,8 @@ export default {
     },
     watch: {
         async isRowChecked() {
-            //console.log("Is isRowChecked?")
-            //console.log("this.isNewProject : " + this.isNewProject)
+            // console.log("Is isRowChecked?")
+            // console.log("this.isNewProject : " + this.isNewProject)
 
             if (this.isNewProject == false) {
 

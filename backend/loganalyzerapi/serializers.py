@@ -56,11 +56,13 @@ class LogMasterMetricSerializer(serializers.ModelSerializer):
     metric_definition = serializers.CharField(source='metric.metric_definition', read_only=True)
     metric_filter = serializers.CharField(source='metric.metric_filter', read_only=True)
     metric_unit = serializers.CharField(source='metric.metric_unit', read_only=True)
-    metric_min = serializers.CharField(source='metric.metric_min', read_only=True)
-    metric_max = serializers.CharField(source='metric.metric_max', read_only=True)
+    metric_min = serializers.IntegerField(source='metric.metric_min', read_only=True)
+    metric_max = serializers.IntegerField(source='metric.metric_max', read_only=True)
+    metric_static = serializers.CharField(source='metric.metric_static', read_only=True)
+
 
     
     class Meta:
         model = LogMasterMetric
         # fields = '__all__' 
-        fields = ['logmastermetric_id', 'metric', 'project', 'project_name', 'creator', 'created','metric_kind', 'metric_definition', 'metric_filter', 'metric_unit', 'metric_min', 'metric_max'] 
+        fields = ['logmastermetric_id', 'metric', 'project', 'project_name', 'creator', 'created','metric_kind', 'metric_definition', 'metric_filter', 'metric_unit', 'metric_min', 'metric_max', 'metric_static'] 

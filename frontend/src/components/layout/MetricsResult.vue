@@ -14,26 +14,26 @@
         <table class="page-summary-table">
             <thead>
                 <tr>
-                    <th>metric id</th>
                     <th>metric kind</th>
                     <th>metric definition</th>
                     <th>metric filter</th>
                     <th>metric unit</th>
                     <th>metric min</th>
                     <th>metric max</th>
+                    <th>metric static</th>
                     <th>creator</th>
                     <th>created</th>
                 </tr>
             </thead>
             <tbody id="list">
             <tr v-for="(metric_list, idx) in metric_lists" :key="idx" v-on:click="clickList(metric_list)" :class="{'highlight': (metric_list.metric_id == selected_metric_id) }">
-                    <td>{{metric_list.metric_id}}</td>
                     <td>{{metric_list.metric_kind}}</td>
                     <td>{{metric_list.metric_definition}}</td>
                     <td>{{metric_list.metric_filter}}</td>
                     <td>{{metric_list.metric_unit}}</td>
                     <td>{{metric_list.metric_min}}</td>
                     <td>{{metric_list.metric_max}}</td>
+                    <td>{{metric_list.metric_static}}</td>
                     <td>{{metric_list.creator}}</td>
                     <td>{{metric_list.created}}</td>
                 </tr>
@@ -79,6 +79,7 @@ export default {
                 metric_unit: '',
                 metric_min: '',
                 metric_max: '',
+                metric_static: '',
                 creator: '',
                 created: ''
             },
@@ -124,6 +125,7 @@ export default {
                     this.metric.metric_unit = '';
                     this.metric.metric_min = '';
                     this.metric.metric_max = '';
+                    this.metric.metric_static = '';
                     this.metric.creator = '';
                     this.metric.created = '';
                 })
@@ -147,7 +149,7 @@ export default {
             axios.put(urlStr + metric.metric_id + '/', metric)
                 .then((response) => {
                     //console.log(response);
-                    this.getData(metric.metric_kind);
+                    this.getData("");
                 })
                 .catch((err) => {
                     console.error(err);
@@ -174,6 +176,7 @@ export default {
             this.metric.metric_unit = metric_list.metric_unit;
             this.metric.metric_min = metric_list.metric_min;
             this.metric.metric_max = metric_list.metric_max;
+            this.metric.metric_static = metric_list.metric_static;
             this.metric.creator = metric_list.creator;
             this.metric.created = metric_list.created;
             this.$store.dispatch("setMetricId", metric_list.metric_id);

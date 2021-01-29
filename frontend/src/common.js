@@ -5,10 +5,10 @@ import axios from "axios";
 import * as store from "@/vuex/store";
 
 //TODO: y축 Scale 맞추기
-export var serverUrl = "http://127.0.0.1:8000";
+//export var serverUrl = "http://127.0.0.1:8000";
 //export var serverUrl = "http://172.16.1.109"
 // webport
-//export var serverUrl = "http://182.195.89.147:18080"    
+export var serverUrl = "http://182.195.89.147:18080"    
 //////////////////////////////////////////////////////////////
 // Common Popup
 //////////////////////////////////////////////////////////////
@@ -784,12 +784,8 @@ export function getMetricsfilterLlist() {
 
     var items = []; 
     items.push({
-        value: "ftime_taken_request",
-        text: "ftime_taken(request)"
-    });
-    items.push({
-        value: "ftime_taken_staticfile",
-        text: "ftime_taken(static file)"
+        value: "ftime_taken",
+        text: "ftime_taken"
     });
     items.push({
         value: "fbyte",
@@ -814,14 +810,14 @@ export function getMetricsunitLlist() {
         value: "byte",
         text: "byte"
     });
-    items.push({
-        value: "%",
-        text: "%"
-    });
-    items.push({
-        value: "TPS",
-        text: "TPS"
-    });
+    // items.push({
+    //     value: "%",
+    //     text: "%"
+    // });
+    // items.push({
+    //     value: "TPS",
+    //     text: "TPS"
+    // });
 
     return items;
 }

@@ -278,25 +278,19 @@ export default {
             }
             if (selectedCount == 0){
                  item.isSelected == true ? item.isSelected = false : item.isSelected = true
-                 this.$store.dispatch("setToggleSearch");
+
+                 // log detail table에서는 setToggleSearch 호출하지 않음. 불필요한 background 조회 발생.
+                 if( item.viewname != 'detail'){
+                    this.$store.dispatch("setToggleSearch");
+                 }
             }else if (selectedCount == 1 && item.isSelected == true){                
                 item.isSelected == true ? item.isSelected = false : item.isSelected = true
             }else {
                 item.isSelected = false
             }
-
-            //console.log('item : ', item)
-
-            // TODO : project_id 등 설정 필요 - vuex 사용
-            //console.log('item : ', item.projectID)
-            //console.log('item : ', item.projectName)
-            //console.log('item : ', item.projectDescription)
-            //console.log('item : ', item.logline)            
-            //console.log('item.viewname : ', item.viewname) 
+            
             // log detail table에서만 Popup 생성
             if( item.viewname == 'detail'){
-                //this.$alert(item.logline, "Access Log", "info");
-                //this.$store.state.popupLog = item.logline;
                 this.logLine = item.logline;
                 this.currentView = 'CommonPopup';
             }else {              

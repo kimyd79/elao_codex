@@ -170,7 +170,7 @@ export default {
                     this.getDateTimeString(results[i].fsecond);
 
                 let frequest = results[i].frequest.substring(0, 60)
-                let referrer = this.nvl(results[i].referrer, "N/A").substring(0, 10)
+                let freferrer = this.nvl(results[i].freferer, "N/A").substring(0, 10)
                 let fuser_agent = this.nvl(results[i].fuser_agent, "N/A").substring(0, 10)
 
                 this.items.push({
@@ -179,7 +179,7 @@ export default {
                     ip: results[i].fip,
 
                     request: frequest,
-                    referrer: referrer,
+                    referrer: freferrer,
                     useragent: fuser_agent,
                     status: results[i].fstatus,
                     timetaken: results[i].ftime_taken,
