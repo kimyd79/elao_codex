@@ -383,7 +383,8 @@ export default {
         // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
         deleteProjects(projectID) {
 
-            this.$confirm("Will you delete ALL projects? This button is only for Admin.", "Are you sure?", "warning").then(() => {
+            this.$confirm("Do you want to DELETE all project?", "Are you sure?", "question").then(() => {
+
                 let projectIDList = []
 
                 // Get Projects
