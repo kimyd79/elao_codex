@@ -107,7 +107,7 @@
             <div class="popup-buttons">
                 <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
-                <lego-button v-on:click="deleteProjects" main v-if="creator == 'Leehs' || creator == 'Admin'">DelProjects</lego-button>
+                <lego-button v-on:click="deleteProjects" main v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'">DelProjects</lego-button>
                 <lego-button v-on:click="newProject">newProject</lego-button>
             </div>
 
@@ -383,7 +383,7 @@ export default {
         // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
         deleteProjects(projectID) {
 
-            this.$confirm("Do you want to DELETE all project?", "Are you sure?", "question").then(() => {
+            this.$confirm("Do you want to DELETE all project?", "Are you sure?", "warning").then(() => {
 
                 let projectIDList = []
 
