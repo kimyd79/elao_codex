@@ -50,6 +50,15 @@ const checkLoggedin = () => (to, from, next) => {
     next();
   } else {
     VueSimpleAlert.alert("You are already logged in.", "Notification", "error");
+    next('/initialization');
+  }
+};
+
+const checkHome = () => (to, from, next) => {
+  if(store.state.userName == 'Not logged in') {
+    next('/login');
+  } else {
+    next('/initialization');
   }
 };
 
@@ -60,6 +69,7 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: Home,
+      beforeEnter: checkHome(),
     },
 
     // LogAnalyzer

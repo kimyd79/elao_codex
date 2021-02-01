@@ -115,6 +115,8 @@ export default {
             for (let i = 0; i < results.length; i++) {
 
                 var ratio = ""
+                var result_count = ""
+                
                 if (resultType != '4' && resultType != '8' && resultType != '10' && resultType != '11') {
 
                     //let percentile = (results[i].result_count / totalCnt).toFixed(4) * 100;
@@ -129,9 +131,12 @@ export default {
                     ratio = "(" + percentile + "%)";
                 }
 
+                // 숫자 3자리(천단위) 마다 "," 표시
+                result_count = results[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
                 this.items.push({
                     result: results[i].result,
-                    result_count: results[i].result_count,
+                    result_count: result_count,
                     ratio: ratio
                 })
 

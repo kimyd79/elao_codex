@@ -517,7 +517,8 @@ export default {
                     } else {
                         // Step3으로 이동 :한번 더 이동시킨다.
                         this.tabChange(2);
-                        this.buttonName = "OK"
+                        // this.buttonName = "OK"
+                        this.buttonName = "Analysis"
                         this.isNewFileAdded = false;
 
                         //선택한 project의 file 정보를 가져온다.
@@ -535,7 +536,8 @@ export default {
 
                 try {
                     await this.createLogfile(serverUrl)
-                    this.buttonName = "OK"
+                    // this.buttonName = "OK"
+                    this.buttonName = "Analysis"
                     this.isNewFileAdded = true;
                     isNext = true;
 
@@ -905,7 +907,13 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Get Logdetail Data completed..!!", "Notification", "success");
+                    // this.$alert("Get Logdetail Data completed..!!", "Notification", "success");
+                    this.$alert("Get Logdetail Data completed..!!", "Notification", "success").then(() => {
+                        this.$router.push('/analysis');
+                    }).catch(() => {
+                        //console.log("Cancel clicked");
+                    });
+                    
 
                 })
                 .catch(err => {
