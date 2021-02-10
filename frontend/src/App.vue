@@ -20,8 +20,10 @@
         <template v-slot:tail>
             <!-- TODO: 승인절차 자동화필요 -->
             <!--<lego-button v-on:click="submitRegister" v-if="registerButton">REGISTER</lego-button>-->
-            <lego-button v-on:click="manualClick">MANUAL</lego-button>
-            <lego-button v-on:click="submitEvent">{{ btnText }}</lego-button>
+            <lego-button v-on:click="viewCtus" small>Contact Us</lego-button>
+            <lego-button v-on:click="viewInfo" small>Info</lego-button>
+            <lego-button v-on:click="viewManual" small>MANUAL</lego-button>
+            <lego-button v-on:click="submitEvent" small>{{ btnText }}</lego-button>
             <ui-gnb-profile> {{ getUserName }} </ui-gnb-profile>
         </template>
     </ui-gnb>
@@ -33,15 +35,20 @@
 
 <script>
 import CommonPopup from '@/components/layout/CommonPopup';
+import PopupInfo from '@/components/layout/PopupInfo';
+import PopupManual from '@/components/layout/PopupManual';
 import store from './vuex/store'
 import * as types from "@/vuex/mutation_types";
+
 import {
     mapGetters
 } from 'vuex'
 
 export default {
     components: {
-        CommonPopup
+        CommonPopup,
+        PopupInfo,
+        PopupManual,
     },
     store,
     data() {
@@ -121,12 +128,23 @@ export default {
         submitRegister: function () {
             this.$router.push('/register');
         },
-        manualClick: function () {
-            this.$store.dispatch("setPopupHeader", 'Manual');
+        
+        viewManual: function () {
+            this.currentView = 'PopupManual';
+        },
+
+        viewCtus: function () {
+            this.$store.dispatch("setPopupHeader", 'Contact US');
             this.$store.dispatch("setPopupButton", 'Close');
-            this.logLine = "manual";
+            this.logLine = `<p> #1 이희석 * HP : +82-10-6252-9654 / E-mail : hs9654.lee@samsung.com</p>
+                            <p> #2 김영도 * HP : +82-10-9816-7972 / E-mail : youngdo7.kim@samsung.com</p>`;
             this.currentView = 'CommonPopup';
-        }
+        },
+
+        viewInfo: function () {            
+            this.currentView = 'PopupInfo';
+        },
+
     },
     watch: {
         '$route'(to, from) {

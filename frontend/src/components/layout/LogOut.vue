@@ -77,7 +77,7 @@ export default {
                         delete axios.defaults.headers.common['Authorization'];
                         this.$store.dispatch("setUserToken", "");
                         this.$store.dispatch("setUserName", "Not logged in");
-                        this.$router.push('/');                        
+                        this.$router.push('/');
                     } else {
                         console.error(err);
                     }                 

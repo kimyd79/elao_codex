@@ -15,19 +15,19 @@
         <div class="popup-form">
 
             <ui-form-item :columns=8 label="Username" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="register.username" placeholder="enter username" />
+                <lego-text-field v-model="register.username" placeholder="Enter username" />
             </ui-form-item>
 
             <ui-form-item :columns=8 label="Password" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="register.password1" placeholder="enter password" password/>
+                <lego-text-field v-model="register.password1" placeholder="Enter password" password/>
             </ui-form-item>
 
             <ui-form-item :columns=8 label="Confirm Password" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="register.password2" placeholder="confirm password" password/>
+                <lego-text-field v-model="register.password2" placeholder="Confirm password" password/>
             </ui-form-item>
 
-            <ui-form-item :columns=8 label="email" required left-label :label-width=144 :label-padding=16>
-                <lego-text-field v-model="register.email" v-on:keyup.enter="clickRegister" placeholder="enter email" />
+            <ui-form-item :columns=8 label="E-mail" required left-label :label-width=144 :label-padding=16>
+                <lego-text-field v-model="register.email" v-on:keyup.enter="clickRegister" placeholder="Enter e-mail" />
             </ui-form-item>
 
         </div>
@@ -74,14 +74,16 @@ export default {
         clickRegister: function () {
             axios.post(serverUrl + '/rest-auth/registration/', this.register)
                 .then((response) => {
-                    axios.post(serverUrl + '/user/active/', this.register)
-                        .then((response) => {
-                            this.$alert("Your account has been successfully created. Administrator approval required for LogIn.", "Notification", "success");
-                            this.$router.push('/');
-                        })
-                        .catch((err) => {
-                            console.error(err);
-                        })
+                    // axios.post(serverUrl + '/user/active/', this.register)
+                    //     .then((response) => {
+                    //         this.$alert("Your account has been successfully created. Administrator approval required for LogIn.", "Notification", "success");
+                    //         this.$router.push('/');
+                    //     })
+                    //     .catch((err) => {
+                    //         console.error(err);
+                    //     })
+                    this.$alert("Your account has been successfully created. You are able to login NOW.", "Notification", "success");
+                    this.$router.push('/');
                 })
                 .catch((err) => {
                     if (err.response.status == "400"){

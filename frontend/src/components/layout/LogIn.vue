@@ -24,6 +24,7 @@
         </div>
 
         <div class="popup-buttons">
+            <lego-button v-on:click="clickRegister">Register</lego-button>
             <lego-button v-on:click="clickCancle">Cancel</lego-button>
             <lego-button main v-on:click="clickLogin">LogIn</lego-button>
         </div>
@@ -62,6 +63,10 @@ export default {
     methods: {
         clickCancle: function () {
             this.$router.push('/');
+        },
+
+        clickRegister: function () {
+            this.$router.push('/register');
         },
 
         clickLogin: function () {
