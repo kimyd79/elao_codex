@@ -1,7 +1,7 @@
 <template>
 <div id="gridtable">
     <!-- This page is GridTable - {{ isSearch }} -->
-    <ui-container-box :columns="20" vertical title="Details" class="mb50">
+    <ui-container-box :columns="20" vertical class="mb50">
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-container-box :columns="20" vertical>
             <ui-table header-divider no-action :columns="columns" :items="items" class="mt20"></ui-table>

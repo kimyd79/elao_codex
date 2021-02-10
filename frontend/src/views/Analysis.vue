@@ -16,7 +16,7 @@
 
     <!-- Charts 영역 -->
     <ui-container-box :columns="20" vertical align-left class="page-title">
-        <span class="page-title__label">Charts</span>
+        <span class="page-title__2label">Charts</span>
 
         <ui-form-row>
             <ui-form-item :columns="12" label="Timeline" align-left required-left>
@@ -531,4 +531,6 @@ export default {
     padding: 80px 80px;
     background-color: white;
 }
+
+
 </style>

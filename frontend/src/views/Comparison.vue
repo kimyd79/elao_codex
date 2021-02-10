@@ -14,9 +14,9 @@
         <search-compare2></search-compare2>
     </ui-container-box>
 
-    <ui-container-box :columns="20" vertical align-left class="page-form-area">
+    <ui-container-box :columns="20" vertical align-left class="page-form-area_no_border_top">
 
-        <span class="page-title__label">Charts</span>
+        <span class="page-title__2label">Charts</span>
 
         <ui-form-row>
             <ui-form-item :columns="12" label="Timeline" align-left required-left>
@@ -646,4 +646,5 @@ export default {
     padding: 80px 80px;
     background-color: white;
 }
+
 </style>

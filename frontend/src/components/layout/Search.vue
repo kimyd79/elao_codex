@@ -1,8 +1,10 @@
 <template>
 <div id="search">
-    <ui-container-box :columns="20" vertical title="Search">
+    <ui-container-box :columns="20" vertical>
+
         <!-- class="mb50" -->
         <ui-form-box>
+            <span class="page-title__2label">Search</span>
             <ui-form-row>
                 <ui-form-item :columns="12" label="Date/Time" required-left>
 
@@ -155,4 +157,5 @@ export default {
 </script>
 
 <style scoped>
+
 </style>

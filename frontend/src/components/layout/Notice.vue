@@ -1,8 +1,9 @@
 <template>
 <div id="notice" >
-    <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
-    <ui-card :columns="10" :height="200" :padding="9" >
+    
+    <ui-card :columns="10" :height="170" :padding="4" >
         <ui-card-item header>Findings</ui-card-item>
+        <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-card-item sub class="card_box">                        
             <span style="color:red" v-for="(finding, idx) in findingListResult" :key="idx" v-on:click="getMetricDetailSearch(idx, finding)"> 

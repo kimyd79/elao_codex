@@ -15,7 +15,7 @@ export default {
     display: flex;
     flex-flow: column nowrap;
 
-    padding: 32px 0;
+    padding: 0 0;
     background: white;
 }
 </style>

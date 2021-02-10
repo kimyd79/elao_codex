@@ -1,7 +1,8 @@
 <template>
 <div id="search">
-    <ui-container-box :columns="10" vertical title="Search-1">
+    <ui-container-box :columns="10" vertical>
         <ui-form-box>
+            <span class="page-title__2label">Search-1</span>
             <ui-form-row>
                 <ui-form-item :columns="8" label="Date/Time" required-left>
 

@@ -268,7 +268,7 @@ em {
 
 .page-title {
     margin-top: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 0px;
     padding-bottom: 16px;
     border-bottom: 1px solid #cccccc;
 }
@@ -280,6 +280,22 @@ em {
 
 .page-form-area {
     padding: 16px 0;
+    border-bottom: 1px solid #cccccc;
+}
+
+.page-form-area_no_border_top {
+    margin-top: 16px;
+    margin-bottom: 0px;
+}
+
+.page-form-area_no_border_bottom {
+    margin-top: 0px;
+    margin-bottom: 16px;
+}
+
+.page-form-area2 {
+    margin-top: 0px;
+    margin-bottom: 16px;
     border-bottom: 1px solid #cccccc;
 }
 
@@ -337,5 +353,10 @@ em {
     justify-content: flex-end;
     margin-right: 5px;
     //margin-top: 16px;
+}
+
+.page-title__2label {
+    font-size: 24px;
+    font-weight: bold;
 }
 </style>

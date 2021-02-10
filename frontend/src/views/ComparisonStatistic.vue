@@ -16,8 +16,8 @@
 
     <ui-container-box :columns="20" horizontal align-left class="page-title">
 
-        <ui-container-box :columns="10" vertical class="mt20">
-            <span class="page-title__label">Statistics - Top {{ valueN1 == 0 ? "" : valueN1 }}</span>
+        <ui-container-box :columns="10" vertical >
+            <span class="page-title__2label">Statistics - Top {{ valueN1 == 0 ? "" : valueN1 }}</span>
             <ui-form-row>
                 <ui-form-item :columns="10" label="Select N" align-left required-left>
                     <lego-dropdown :items="listN1" v-model="valueN1" width="100px" />
@@ -25,8 +25,8 @@
             </ui-form-row>
         </ui-container-box>
 
-        <ui-container-box :columns="10" vertical class="mt20">
-            <span class="page-title__label">Statistics - Top {{ valueN2 == 0 ? "" : valueN2 }}</span>
+        <ui-container-box :columns="10" vertical >
+            <span class="page-title__2label">Statistics - Top {{ valueN2 == 0 ? "" : valueN2 }}</span>
             <ui-form-row>
                 <ui-form-item :columns="10" label="Select N" align-left required-left>
                     <lego-dropdown :items="listN2" v-model="valueN2" width="100px" />
@@ -38,7 +38,7 @@
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
 
-        <ui-container-box :columns="10" vertical class="mt20">
+        <ui-container-box :columns="10" vertical>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="2"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="5"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare1>
@@ -53,7 +53,7 @@
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1"></statistics-compare1>
         </ui-container-box>
 
-        <ui-container-box :columns="10" vertical class="mt20">
+        <ui-container-box :columns="10" vertical>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="2"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="5"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare2>
@@ -234,4 +234,5 @@ export default {
     padding: 80px 80px;
     background-color: white;
 }
+
 </style>

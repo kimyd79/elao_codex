@@ -57,4 +57,5 @@ export default {
     padding: 80px 80px;
     background-color: white;
 }
+
 </style>
