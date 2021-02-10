@@ -84,17 +84,19 @@ export default {
                         })
                 })
                 .catch((err) => {
-                    let errMsg = ''
+                    if (err.response.status == "400"){
+                        let errMsg = ''
 
-                    // TODO: vue-simple-alert message 줄바꿈 방법 확인 필요.
-                    // 우선 error 가 여러개일 경우 마지막 한개만 표시됨.  
-                    for (var prop in err.response.data) {
-                        // console.log(prop, err.response.data[prop]); 
-                        errMsg = err.response.data[prop]
-                    }                
-                    
-                    this.$alert(errMsg, "Notification", "error");
-                    console.error(err);
+                        // TODO: vue-simple-alert message 줄바꿈 방법 확인 필요.
+                        // 우선 error 가 여러개일 경우 마지막 한개만 표시됨.  
+                        for (var prop in err.response.data) {
+                            // console.log(prop, err.response.data[prop]); 
+                            errMsg = err.response.data[prop]
+                        }
+                        this.$alert(errMsg, "Notification", "error");
+                    } else {
+                        console.error(err);
+                    }  
                 })
         },
     }
