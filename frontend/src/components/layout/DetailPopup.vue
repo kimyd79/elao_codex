@@ -236,7 +236,8 @@ export default {
                     referrer: freferrer,
                     useragent: fuser_agent,
                     status: results[i].fstatus,
-                    timetaken: results[i].ftime_taken,
+                    // 숫자 3자리(천단위) 마다 "," 표시
+                    timetaken: results[i].ftime_taken.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),                    
                     isSelected: false,
                     logline: results[i].log_line,
                     viewname: 'detail'

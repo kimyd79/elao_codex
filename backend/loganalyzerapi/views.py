@@ -203,6 +203,24 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]   
 
+    @action(methods=['post'], detail=False)
+    def active(self, request, pk=None):
+        try:    
+            username = request.data['username']       
+            user = User.objects.get(username=username)
+
+            user.is_active = False
+            user.save()
+           
+            response = {'message': 'is_active is set to false successfully', 'username': user.username}        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing is_active : %s' % ex)
+                    
+            response = {'message': 'is_active setting failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)    
+
 # Dynamic Model
 class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     
@@ -518,7 +536,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     findingsResult = queryset.count()
                 
                 tmp = list(metricDetail)
-                tmp[0]['result'] = findingsResult             
+                # 숫자 3자리(천단위) 마다 "," 표시
+                tmp[0]['result'] = format(findingsResult, ',')             
                 findingsResultList.append(tmp[0])
  
             response = {'message': 'findings returned successfully', 'findingsResult': findingsResultList}        

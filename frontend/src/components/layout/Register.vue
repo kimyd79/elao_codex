@@ -63,7 +63,7 @@ export default {
                         email: ''
                     }
                 }
-            }
+            },
         }
     },
     methods: {
@@ -74,11 +74,26 @@ export default {
         clickRegister: function () {
             axios.post(serverUrl + '/rest-auth/registration/', this.register)
                 .then((response) => {
-                    console.log(response);
-                    this.$alert("Your account has been successfully created.", "Notification", "success");
-                    this.$router.push('/login');
+                    axios.post(serverUrl + '/user/active/', this.register)
+                        .then((response) => {
+                            this.$alert("Your account has been successfully created.", "Notification", "success");
+                            this.$router.push('/');
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        })
                 })
                 .catch((err) => {
+                    let errMsg = ''
+
+                    // TODO: vue-simple-alert message 줄바꿈 방법 확인 필요.
+                    // 우선 error 가 여러개일 경우 마지막 한개만 표시됨.  
+                    for (var prop in err.response.data) {
+                        // console.log(prop, err.response.data[prop]); 
+                        errMsg = err.response.data[prop]
+                    }                
+                    
+                    this.$alert(errMsg, "Notification", "error");
                     console.error(err);
                 })
         },

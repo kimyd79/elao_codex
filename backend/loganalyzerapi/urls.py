@@ -30,6 +30,7 @@ router.register(r'logformatstring/formatkind_list', views.LogFormatStringViewSet
 
 # For user
 router.register(r'user', views.UserViewSet)
+router.register(r'user/active', views.UserViewSet)
 
 # For Metrics
 router.register(r'metrics', views.MetricsViewSet)
