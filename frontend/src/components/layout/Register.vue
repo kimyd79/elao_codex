@@ -76,7 +76,7 @@ export default {
                 .then((response) => {
                     axios.post(serverUrl + '/user/active/', this.register)
                         .then((response) => {
-                            this.$alert("Your account has been successfully created.", "Notification", "success");
+                            this.$alert("Your account has been successfully created. Administrator approval required for LogIn.", "Notification", "success");
                             this.$router.push('/');
                         })
                         .catch((err) => {

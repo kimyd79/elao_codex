@@ -292,6 +292,7 @@ export default {
             // log detail table에서만 Popup 생성
             if( item.viewname == 'detail'){
                 this.logLine = item.logline;
+                this.$store.dispatch("setPopupHeader", 'Log Detail');
                 this.currentView = 'CommonPopup';
             }else {              
                 this.$store.dispatch("setProjectName", item.projectName);

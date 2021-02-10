@@ -27,13 +27,13 @@ export default {
     getUserToken: state => state.userToken ,
     getUserName: state => state.userName ,
       
-    getPopupHeader: state => state.PopupHeader,
-    getPopupBody: state => state.PopupBody,
-    getPopupButton: state => state.PopupButton,
-    getPopupReturn: state => state.PopupReturn,
-    getPopupKind: state => state.PopupKind,
-    getPopupFormatId: state => state.PopupFormatId,
-    getPopupFormatKind: state => state.PopupFormatKind,
+    getPopupHeader: state => state.popupHeader,
+    getPopupBody: state => state.popupBody,
+    getPopupButton: state => state.popupButton,
+    getPopupReturn: state => state.popupReturn,
+    getPopupKind: state => state.popupKind,
+    getPopupFormatId: state => state.popupFormatId,
+    getPopupFormatKind: state => state.popupFormatKind,
     
     getMetricId: state => state.MetricId
 

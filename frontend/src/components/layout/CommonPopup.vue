@@ -4,7 +4,7 @@
         <ui-container-box :columns=12 vertical class="modal-container">
             <div class="popup-header">
                 <div class="popup-header__title">
-                    Log Detail
+                    {{ getPopupHeader }}
                 </div>
                 <div class="popup-header__close">
                     <lego-icon small v-on:click="clickClose">close</lego-icon>
@@ -43,6 +43,8 @@ export default {
     },
 
     computed: {
+        ...mapGetters(['getPopupHeader']),
+
         buttonClose: function () {
             if (this.$store.state.popupButton == 'Close') return true;
             else return false;

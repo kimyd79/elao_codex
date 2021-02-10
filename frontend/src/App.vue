@@ -1,5 +1,6 @@
 <template>
 <div id="app">
+    <component :is="currentView" v-on:popupClose="currentView=null" :logLine="logLine" ></component>
     <ui-gnb style="width: 100%; z-index:900;">
         <template v-slot:lead>
             <ui-gnb-title>
@@ -19,6 +20,7 @@
         <template v-slot:tail>
             <!-- TODO: 승인절차 자동화필요 -->
             <!--<lego-button v-on:click="submitRegister" v-if="registerButton">REGISTER</lego-button>-->
+            <lego-button v-on:click="manualClick">MANUAL</lego-button>
             <lego-button v-on:click="submitEvent">{{ btnText }}</lego-button>
             <ui-gnb-profile> {{ getUserName }} </ui-gnb-profile>
         </template>
@@ -30,6 +32,7 @@
 </template>
 
 <script>
+import CommonPopup from '@/components/layout/CommonPopup';
 import store from './vuex/store'
 import * as types from "@/vuex/mutation_types";
 import {
@@ -37,9 +40,14 @@ import {
 } from 'vuex'
 
 export default {
+    components: {
+        CommonPopup
+    },
     store,
     data() {
         return {
+            currentView: null,
+            logLine: '',
             menus: [
                 //{ label:'Component Set', linkto:'/sets', key:'componentset', isSelected: false },
                 //{ label:'Template', linkto:'/template', key:'template', isSelected: false },
@@ -112,6 +120,12 @@ export default {
         },
         submitRegister: function () {
             this.$router.push('/register');
+        },
+        manualClick: function () {
+            this.$store.dispatch("setPopupHeader", 'Manual');
+            this.$store.dispatch("setPopupButton", 'Close');
+            this.logLine = "manual";
+            this.currentView = 'CommonPopup';
         }
     },
     watch: {
