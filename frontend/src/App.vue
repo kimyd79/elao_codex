@@ -136,8 +136,8 @@ export default {
         viewCtus: function () {
             this.$store.dispatch("setPopupHeader", 'Contact US');
             this.$store.dispatch("setPopupButton", 'Close');
-            this.logLine = `<p> #1 이희석 * HP : +82-10-6252-9654 / E-mail : hs9654.lee@samsung.com</p>
-                            <p> #2 김영도 * HP : +82-10-9816-7972 / E-mail : youngdo7.kim@samsung.com</p>`;
+            this.logLine = `<p> ☞ 이희석 프로 * HP : +82-10-6252-9654 / E-mail : hs9654.lee@samsung.com</p>
+                            <p> ☞ 김영도 프로 * HP : +82-10-9816-7972 / E-mail : youngdo7.kim@samsung.com</p>`;
             this.currentView = 'CommonPopup';
         },
 

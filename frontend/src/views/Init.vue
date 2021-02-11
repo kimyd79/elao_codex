@@ -54,14 +54,19 @@
                         {{ fileSize }} bytes
                     </ui-form-item>
 
+                    <!-- 추가 -->
+                    <component :is="currentView" v-on:popupClose="currentView=null" :format="format"></component>
+
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                        <lego-dropdown :items="items" v-model="fileFormat" width="650px" />
+                        <lego-dropdown :items="items" v-model="fileFormat" width="600px" />&nbsp;&nbsp;
+                        <lego-button v-on:click="addLogFormat">Add</lego-button>
                     </ui-form-item>
 
                     <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16>
 
                         <lego-radio v-model="dataRangeValue" value="1">ALL</lego-radio>
-                        <lego-radio v-model="dataRangeValue" value="2">Select Range</lego-radio>
+                        <!-- TODO: Date Range 구현필요 -->
+                        <lego-radio v-model="dataRangeValue" value="2" :disabled="true" >Select Range</lego-radio>
 
                     </ui-form-item>
 
@@ -132,6 +137,8 @@ import {
 //Popup
 import CommonPopup from '@/components/layout/CommonPopup';
 
+import AddLogformatForm from '@/components/layout/AddLogformatForm';
+
 // Spinner
 import VueElementLoading from 'vue-element-loading'
 
@@ -158,6 +165,8 @@ export default {
         VueElementLoading,
 
         DatePicker,
+
+        AddLogformatForm
     },
     data() {
         return {
@@ -167,7 +176,6 @@ export default {
 
             projectName: "",
             projectDescription: "",
-            //creator: "Leehs", // TODO : 인증처리 후 사용자 ID입력
             creator: this.$store.state.userName,
             projectID: "",
 
@@ -264,16 +272,22 @@ export default {
     created() {
       
         // Initial Value Setting
-            this.projectName = this.$store.state.projectName
-            this.projectDescription = this.$store.state.projectDescription
-            this.fileName = this.$store.state.fileNames
-            this.fileFormat = this.$store.state.logFormat
+        this.projectName = this.$store.state.projectName
+        this.projectDescription = this.$store.state.projectDescription
+        this.fileName = this.$store.state.fileNames
+        this.fileFormat = this.$store.state.logFormat
 
         // Current Info 값이 없을 경우 Click "Next" to create a project or load an existing one. 나타낸다.
-        if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){
+        // if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){
       
-            this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';           
+        //     this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.'; 
+                                  
+        // }
 
+        // 처음 입력시 Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
+        if (this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){
+            this.tabs[0].isSelected = false;
+            this.tabs[1].isSelected = true;
         }
 
         // File format 가져오기
@@ -311,6 +325,17 @@ export default {
     },
 
     methods: {
+
+        // 로그 포맷을 추가한다.
+        addLogFormat() {
+            
+            // TODO: 바로 추가할 수 있도록 수정할 것
+            //this.currentView = 'AddLogformatForm';
+
+            // 임시 : 로그포맷 입력 화면으로 돌아간다.
+             this.$router.push('/logformat');
+
+        },
 
         popupOK() {
             this.currentView = null
@@ -369,9 +394,17 @@ export default {
                     }
                 }
 
-                if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
-                    this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';
+                // 
+                // if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                //     this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';
+                // }
+
+                // Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
+                if (this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                    this.tabs[0].isSelected = false;
+                    this.tabs[1].isSelected = true;
                 }
+
                 //this.isNewProject = false
 
             }).catch(() => {
