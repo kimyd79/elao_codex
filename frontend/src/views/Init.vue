@@ -58,8 +58,11 @@
                     <component :is="currentView" v-on:popupClose="currentView=null" :format="format"></component>
 
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                        <lego-dropdown :items="items" v-model="fileFormat" width="600px" />&nbsp;&nbsp;
-                        <lego-button v-on:click="addLogFormat">Add</lego-button>
+                        <lego-dropdown :items="items" v-model="fileFormat" width="640px" />&nbsp;&nbsp;
+                        
+                        <!-- TODO: 진행할 부분 
+                        <lego-button v-on:click="addLogFormat">Add</lego-button>-->
+
                     </ui-form-item>
 
                     <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16>

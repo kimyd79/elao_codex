@@ -1,7 +1,7 @@
 <template>
 <div class="modal-mask" transition="modal">
     <div class="modal-wrapper">
-        <ui-container-box :columns=18 vertical class="modal-container">
+        <ui-container-box :columns=12 vertical class="modal-container">
             
             <div class="popup-header">
                 <div class="popup-header__title">
@@ -13,28 +13,37 @@
             </div>
 
             <div class="popup-body"> <!-- add_scroll -->
-                Version : 
+                Version : 1.0.0
                 <br><br>
-                Log Formats : 
-                <br><br>
+                <!--Log Formats : Apache Httpd Server, OHS, IIS(W3C, NCSA), Nginx, Webtob
+                              Tomcat, Jeus7/8 -->
+                <div class="table-summary" >
+                    <div class="table-summary-title">Support Log Format</div>
+                    <div class="table-summary-item" >
+                        <div>WebServer</div>
+                        <div>WAS</div>
+                    </div>
+                    <div class="table-summary-item" >
+                        <div>Apache Httpd Server, OHS, IIS(W3C, NCSA), Nginx, Webtob</div>
+                        <div>Tomcat, Jeus7/8</div>
+                    </div>
+                    
+                </div>
+                <br>                
                 <div class="table-summary">
                     <div class="table-summary-title">Summary</div>
                     <div class="table-summary-item">
-                        <div>Female: 0</div>
-                        <div>Male: 9</div>
+                        <div>Statistics</div>
+                        <div>16</div>
                     </div>
                     <div class="table-summary-item">
-                        <div>Y: 4</div>
-                        <div>N: 5</div>
+                        <div>Charts</div>
+                        <div>8</div>
                     </div>
                     <div class="table-summary-item">
-                        <div>Min: 3</div>
-                        <div>Max: 18</div>
-                    </div>
-                    <div class="table-summary-item">
-                        <div>Sum: 4,120,000,000</div>
-                        <div>Avg: 5,600,000</div>
-                    </div>
+                        <div>Metrics</div>
+                        <div>4</div>
+                    </div>                    
                 </div>
             </div>
 

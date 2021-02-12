@@ -1,7 +1,7 @@
 <template>
 <div class="modal-mask" transition="modal">
     <div class="modal-wrapper">
-        <ui-container-box :columns=18 vertical class="modal-container">
+        <ui-container-box :columns=14 vertical class="modal-container">
             
             <div class="popup-header">
                 <div class="popup-header__title">
@@ -13,13 +13,29 @@
             </div>
 
             <div class="popup-body add_scroll">
-                    <img src="@/assets/logo.png" /><br>
-                    <img src="@/assets/logo.png" /><br>
-                    <img src="@/assets/logo.png" /><br>
-                    <img src="@/assets/logo.png" /><br>
-                    <img src="@/assets/logo.png" /><br>
-                    <img src="@/assets/logo.png" /><br>
-                </span>
+                <img src="@/assets/manual0.png" /><br>
+                <img src="@/assets/manual1.png" /><br>
+                <img src="@/assets/manual2.png" /><br>
+                <img src="@/assets/manual3.png" /><br>
+                <img src="@/assets/manual4.png" /><br>
+                <img src="@/assets/manual5.png" /><br>
+                <img src="@/assets/manual6.png" /><br>
+                <img src="@/assets/manual7.png" /><br>
+                <img src="@/assets/manual8.png" /><br>
+                <img src="@/assets/manual9.png" /><br>
+                <img src="@/assets/manual10.png" /><br>
+                <img src="@/assets/manual11.png" /><br>
+                <img src="@/assets/manual12.png" /><br>
+                <img src="@/assets/manual13.png" /><br>
+                <img src="@/assets/manual14.png" /><br>
+                <img src="@/assets/manual15.png" /><br>
+                <img src="@/assets/manual16.png" /><br>
+                <img src="@/assets/manual17.png" /><br>
+                <img src="@/assets/manual18.png" /><br>
+                <img src="@/assets/manual19.png" /><br>
+                <img src="@/assets/manual20.png" /><br>
+                <img src="@/assets/manual21.png" /><br>
+                <img src="@/assets/manual22.png" /><br>
             </div>
 
             <div class="popup-buttons">

@@ -5,10 +5,10 @@ import axios from "axios";
 import * as store from "@/vuex/store";
 
 //TODO: y축 Scale 맞추기
-//export var serverUrl = "http://127.0.0.1:8000";
+export var serverUrl = "http://127.0.0.1:8000";
 //export var serverUrl = "http://172.16.1.109"
 // webport
-export var serverUrl = "http://182.195.89.147:18080"    
+//export var serverUrl = "http://182.195.89.147:18080"    
 //////////////////////////////////////////////////////////////
 // Common Popup
 //////////////////////////////////////////////////////////////
@@ -591,7 +591,7 @@ export function getLineChartTemplate(x, y, label) {
     return chartData;
 }
 
-export function getLineChartOptions(title, y_scale) {
+export function getLineChartOptions(title){ //, y_scale) {
 
     var options = {
         responsive: true,
@@ -623,10 +623,10 @@ export function getLineChartOptions(title, y_scale) {
                     display: true,
                     labelString: 'tps'
                 },
-                ticks: { 
-                    suggestedMin: y_scale,
-                    suggestedMax: y_scale
-                }
+                // ticks: { 
+                //     suggestedMin: y_scale,
+                //     suggestedMax: y_scale
+                // }
             }]
         },
 
@@ -669,7 +669,7 @@ export function getMultiLineChartTemplate(x, y1, label1, y2, label2) {
     return chartData;
 }
 
-export function getMultiLineChartOptions(title, y_scale) {
+export function getMultiLineChartOptions(title) { //, y_scale) {
 
     var options = {
         responsive: true,
@@ -706,10 +706,10 @@ export function getMultiLineChartOptions(title, y_scale) {
                         display: true,
                         labelString: 'Request(count)'
                     },
-                    ticks: {
-                        suggestedMin: y_scale,
-                        suggestedMax: y_scale
-                    }
+                    // ticks: {
+                    //     suggestedMin: y_scale,
+                    //     suggestedMax: y_scale
+                    // }
                 },{
                     type: 'linear',
                     display: true,
@@ -719,10 +719,10 @@ export function getMultiLineChartOptions(title, y_scale) {
                         display: true,
                         labelString: 'Duration(s)'
                     },
-                    ticks: {
-                        suggestedMin: y_scale,
-                        suggestedMax: y_scale
-                    }
+                    // ticks: {
+                    //     suggestedMin: y_scale,
+                    //     suggestedMax: y_scale
+                    // }
             }]
         },
 
