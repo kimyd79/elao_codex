@@ -60,6 +60,7 @@ export default {
     },
     data: function () {
         return {
+            creator: this.$store.state.userName,
             currentView: null,
             selected_project_id: null,
             project_lists: [],
@@ -95,7 +96,13 @@ export default {
 
     methods: {
         getData: function (project_name) {
-            axios.get(urlStr + '?project_name=' + project_name)
+            if (this.creator == 'Leehs' || this.creator == 'Admin') {
+                var url = urlStr + '?project_name=' + project_name
+            } else {
+                var url = urlStr + '?project_name=' + project_name + '&creator=' + this.creator
+            }
+
+            axios.get(url)
                 .then((response) => {
                     //console.log(response);
                     this.project_lists = response.data.results;

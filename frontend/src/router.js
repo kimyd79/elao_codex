@@ -129,7 +129,7 @@ const router = new Router({
           path: '/project',
           name: 'project',
           component: Project,
-          beforeEnter: requireAdmin(),
+          // beforeEnter: requireAdmin(),
         },
         {
           path: '/metrics',
