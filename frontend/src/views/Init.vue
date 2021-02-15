@@ -54,14 +54,14 @@
                         {{ fileSize }} bytes
                     </ui-form-item>
 
-                    <!-- 추가 -->
+                    <!-- addLogFormat popup 추가 -->
                     <component :is="currentView" v-on:popupClose="currentView=null" :format="format"></component>
 
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                        <lego-dropdown :items="items" v-model="fileFormat" width="640px" />&nbsp;&nbsp;
+                        <lego-dropdown :items="items" v-model="fileFormat" width="590px" />&nbsp;&nbsp;
                         
-                        <!-- TODO: 진행할 부분 
-                        <lego-button v-on:click="addLogFormat">Add</lego-button>-->
+                        <!-- TODO: 진행할 부분 -->
+                        <lego-button v-on:click="addLogFormat">Add</lego-button>
 
                     </ui-form-item>
 
@@ -131,6 +131,7 @@ import Init from '@/components/layout/Init'
 import Notice from '@/components/layout/Notice'
 import Search from '@/components/layout/Search'
 import Statistics from '@/components/layout/Statistics'
+import EventBus from '../EventBus';
 
 import * as types from "@/vuex/mutation_types";
 import {
@@ -269,10 +270,23 @@ export default {
             // Popup view
             currentView: null,
             needToAdditionalFile: false,
+
+            // for addLogformat 
+            format: {
+                format_kind: '',
+                format_name: '',
+                format_strings: '',
+                creator: ''
+            },
         }
     },
 
     created() {
+        // Add LogFormat
+        EventBus.$on("addFormat", (format) => {
+            this.addData(format);
+            this.currentView = null;
+        });
       
         // Initial Value Setting
         this.projectName = this.$store.state.projectName
@@ -294,30 +308,35 @@ export default {
         }
 
         // File format 가져오기
-        var url = serverUrl + "/logformat"
+        this.getLogformatList();  
+        // var url = serverUrl + "/logformat"
 
-        let axiosConfig = {
-            headers: {
-                //'Authorization': 'Token '+ this.token // For Django
-            }
-        };
+        // let axiosConfig = {
+        //     headers: {
+        //         //'Authorization': 'Token '+ this.token // For Django
+        //     }
+        // };
 
-        axios.get(url, axiosConfig)
-            .then(res => {
+        // axios.get(url, axiosConfig)
+        //     .then(res => {
 
-                for (let i = 0; i < res.data.results.length; i++) {
-                    let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
-                    this.items.push({
-                        value: tmp + '/' + res.data.results[i].format_strings,
-                        text: tmp + ' => ' + res.data.results[i].format_strings
-                    });
-                }
+        //         for (let i = 0; i < res.data.results.length; i++) {
+        //             let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
+        //             this.items.push({
+        //                 value: tmp + '/' + res.data.results[i].format_strings,
+        //                 text: tmp + ' => ' + res.data.results[i].format_strings
+        //             });
+        //         }
 
-            })
-            .catch(err => {
-                console.error(err);
-            })
+        //     })
+        //     .catch(err => {
+        //         console.error(err);
+        //     })
 
+    },
+
+    beforeDestroy(){
+        EventBus.$off("addFormat");
     },
 
     computed: {
@@ -333,11 +352,50 @@ export default {
         addLogFormat() {
             
             // TODO: 바로 추가할 수 있도록 수정할 것
-            //this.currentView = 'AddLogformatForm';
+            this.currentView = 'AddLogformatForm';
 
             // 임시 : 로그포맷 입력 화면으로 돌아간다.
-             this.$router.push('/logformat');
+            // this.$router.push('/logformat');
 
+        },
+        addData(format) {
+            var url = serverUrl + "/logformat/"
+            axios.post(url, format)
+                .then((response) => {
+                    this.$alert("Add File Format completed..!!", "Notification", "success");
+                    this.getLogformatList();                    
+                })
+                .catch((err) => {
+                    console.error(err);
+                    this.$alert("Add logformat failed. Check for required fields.", "Notification", "error");
+                })
+        },
+
+        // File Format List 가져오기
+        getLogformatList(){
+            var url = serverUrl + "/logformat"
+
+            let axiosConfig = {
+                headers: {
+                    //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+            axios.get(url, axiosConfig)
+                .then(res => {
+
+                    for (let i = 0; i < res.data.results.length; i++) {
+                        let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
+                        this.items.push({
+                            value: tmp + '/' + res.data.results[i].format_strings,
+                            text: tmp + ' => ' + res.data.results[i].format_strings
+                        });
+                    }
+
+                })
+                .catch(err => {
+                    console.error(err);
+                })
         },
 
         popupOK() {
