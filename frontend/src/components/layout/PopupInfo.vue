@@ -34,15 +34,15 @@
                     <div class="table-summary-title">Summary</div>
                     <div class="table-summary-item">
                         <div>Statistics</div>
-                        <div>16</div>
+                        <div style="color:blue"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545211" onclick="window.open(this.href,'_blank'); return false;">16</a></div>
                     </div>
                     <div class="table-summary-item">
                         <div>Charts</div>
-                        <div>8</div>
+                        <div style="color:blue"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545228" onclick="window.open(this.href,'_blank'); return false;">8</a></div>
                     </div>
                     <div class="table-summary-item">
                         <div>Metrics</div>
-                        <div>4</div>
+                        <div style="color:blue"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545515" onclick="window.open(this.href,'_blank'); return false;">4</a></div>
                     </div>                    
                 </div>
             </div>

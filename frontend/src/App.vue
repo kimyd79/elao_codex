@@ -20,7 +20,7 @@
         <template v-slot:tail>
             <!-- TODO: 승인절차 자동화필요 -->
             <!--<lego-button v-on:click="submitRegister" v-if="registerButton">REGISTER</lego-button>-->
-            <lego-button v-on:click="viewCtus" small>Contact Us</lego-button>
+            <lego-button v-on:click="viewCtus" small>Q & A</lego-button>
             <lego-button v-on:click="viewInfo" small>Info</lego-button>
             <lego-button v-on:click="viewManual" small>MANUAL</lego-button>
             <lego-button v-on:click="submitEvent" small>{{ btnText }}</lego-button>
@@ -137,7 +137,8 @@ export default {
             this.$store.dispatch("setPopupHeader", 'Contact US');
             this.$store.dispatch("setPopupButton", 'Close');
             this.logLine = `<p> ☞ 이희석 프로 * HP : +82-10-6252-9654 / E-mail : hs9654.lee@samsung.com</p>
-                            <p> ☞ 김영도 프로 * HP : +82-10-9816-7972 / E-mail : youngdo7.kim@samsung.com</p>`;
+                            <p> ☞ 김영도 프로 * HP : +82-10-9816-7972 / E-mail : youngdo7.kim@samsung.com</p><br>
+                            <p> ※ Q & A Page : <a href="http://devops.sdsdev.co.kr/confluence/pages/resumedraft.action?draftId=230551289&draftShareId=446045c8-4520-4111-ae18-7cfb334fe0fd&" onclick="window.open(this.href,'_blank'); return false;">Go (Click)</a></p>`;
             this.currentView = 'CommonPopup';
         },
 
