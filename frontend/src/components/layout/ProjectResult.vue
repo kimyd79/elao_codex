@@ -96,7 +96,7 @@ export default {
 
     methods: {
         getData: function (project_name) {
-            if (this.creator == 'Leehs' || this.creator == 'Admin') {
+            if (this.creator.toLowerCase() == 'leehs' || this.creator.toLowerCase() == 'admin') {
                 var url = urlStr + '?project_name=' + project_name
             } else {
                 var url = urlStr + '?project_name=' + project_name + '&creator=' + this.creator
