@@ -97,9 +97,9 @@ export default {
     methods: {
         getData: function (project_name) {
             if (this.creator.toLowerCase() == 'leehs' || this.creator.toLowerCase() == 'admin') {
-                var url = urlStr + '?project_name=' + project_name
+                var url = urlStr + '?search=' + project_name
             } else {
-                var url = urlStr + '?project_name=' + project_name + '&creator=' + this.creator
+                var url = urlStr + '?search=' + project_name + '&creator=' + this.creator
             }
 
             axios.get(url)

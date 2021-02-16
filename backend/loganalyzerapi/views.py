@@ -58,8 +58,9 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     
     #filterset_fields = ['project_name', 'uploader']
     #filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['creator', 'project_name']
+    search_fields = ['project_name']
     # Multiple Search
     # http://127.0.0.1:8000/logmaster/?search=aa,22
     #search_fields = ['project_name', 'project_description', 'creator']
@@ -387,6 +388,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(fip__icontains=detailsearchValue)
             elif detailconditionValue == 'R':
                 queryset = queryset.filter(frequest__icontains=detailsearchValue)
+            # 404 Requests URI (count)
+            elif detailconditionValue == 'NFR':
+                queryset = queryset.filter(fstatus__icontains='404')
+                queryset = queryset.filter(frequest__icontains=detailsearchValue)
             elif detailconditionValue == 'E':
                 queryset = queryset.filter(freferer__icontains=detailsearchValue)
             elif detailconditionValue == 'U':
@@ -395,7 +400,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(fstatus__icontains=detailsearchValue)
             elif detailconditionValue == 'F':
                 queryset = queryset.filter(fextension__icontains=detailsearchValue)
-            #Findings detailpopup Staticfiles 
+            # Findings detailpopup Staticfiles 
             elif detailconditionValue == 'D':
                 queryset = queryset.exclude(fextension='-')
                 # queryset = queryset.filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css'])

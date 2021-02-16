@@ -259,7 +259,7 @@ export default {
                     break;
                 case 3:
                     this.$store.state.popupHeader = "404 Requests URI (count)"
-                    this.$store.state.detailcondition = "R"
+                    this.$store.state.detailcondition = "NFR"
                     break;
                 case 4:
                     this.$store.state.popupHeader = "Requests Time-taken (s/㎲)"
