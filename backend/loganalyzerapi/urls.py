@@ -16,12 +16,14 @@ router.register(r'logfile', views.LogFileViewSet)
 
 # For Ceating Dynamic Logdetail
 router.register(r'logmaster/create_dynamic_logdetail', views.LogMasterViewSet)
+router.register(r'logmaster/delete_dynamic_logdetail', views.LogMasterViewSet)
 router.register(r'logdetail_dynamic', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/start_end', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/notice', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/statistics', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/chartdata', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/findings', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
+
 
 # For logformat
 router.register(r'logformat', views.LogFormatViewSet)
@@ -38,9 +40,9 @@ router.register(r'logmastermetric', views.LogMasterMetricViewSet)
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
-    path('', include(router.urls)),
-    path('rest-auth/', include('rest_auth.urls')),
-    path('rest-auth/registration/', include('rest_auth.registration.urls'))
+    path('mwla/', include(router.urls)),
+    path('mwla/rest-auth/', include('rest_auth.urls')),
+    path('mwla/rest-auth/registration/', include('rest_auth.registration.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
 
 

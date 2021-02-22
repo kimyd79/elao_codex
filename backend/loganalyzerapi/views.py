@@ -150,7 +150,43 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             print('Error Occured while creating Dynamic LogDetail...', ex)
                     
             response = {'message': 'Dynamic LogDetail creation failed.'}            
-            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)    
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)  
+        
+    # Project 삭제시 detail 테이블도 삭제 : Logfile은 cascading 삭제
+    # http://127.0.0.1:8000/logmaster/delete_dynamic_logdetail
+    @action(methods=['post'], detail=False)
+    def delete_dynamic_logdetail(self, request, pk=None):
+
+        try:
+            
+            project_id = request.data['project_id']
+            
+            print('delete_logdetail project_id : %s' % project_id)            
+            
+            # Table Name : "loganalyzerapi_logdetail_"+ this.project.project_id.replace("-","_");
+            # Ex : loganalyzerapi_logdetail_1218aca3_e9b4_4fea_be5d_38fb58421496
+            
+            if settings.DEBUG:
+    	        logger.debug('delete_logdetail project_id : %s' % project_id)
+                                   
+            model_name = "logdetail_"+project_id
+
+            # 삭제한다. 존재하는지 확인, 없으면 그냥 리턴
+            try:
+                ModelSchema.objects.get(name=model_name).delete()
+                
+            except Exception as ex:
+                # detail이 존재하지 않을 경우 
+                logger.error('There is no model named : '+model_name+' - %s' % ex)
+            
+            response = {'message': 'delete_logdetail returned successfully', 'result': 'true'}
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while deleting model_name : %s' % ex)
+                    
+            response = {'message': 'delete_logdetail deletion failed.', 'result': 'false'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)         
 
   
 class LogFileViewSet(viewsets.ModelViewSet):
@@ -471,7 +507,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 timeValue = metric_time
 
         return timeValue
-
+        
+        
 
     @action(methods=['post'], detail=False)
     def findings(self, request, pk=None):
@@ -1304,6 +1341,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
     def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
     
         log_lines = []

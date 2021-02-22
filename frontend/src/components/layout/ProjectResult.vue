@@ -117,15 +117,17 @@ export default {
                     console.error(err);
                 })
         },
-        deleteData: function (project) {
-            axios.delete(urlStr + project.project_id)
-                .then((response) => {
-                    //console.log(response);
-                    this.getData("");
-                })
-                .catch((err) => {
-                    console.error(err);
-                })
+        deleteData: async function (project) {
+
+            return await axios.delete(urlStr + project.project_id)
+                    .then((response) => {                        
+                        this.getData("");
+                        return true;
+                    })
+                    .catch((err) => {
+                        console.error(err);
+                        throw err;
+                    })
         },
         updateData: function (project) {
             axios.put(urlStr + project.project_id + '/', project)
@@ -147,14 +149,40 @@ export default {
             //console.log(this.project_name);
             //console.log("click ID : " + project_list.project_id);
 
-        },
+        },        
         clickDelete: function () {
             if (this.project.project_id != '') {
+
+                let project_id = this.project.project_id;
+
                 this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                    //console.log("OK clicked");
-                    this.deleteData(this.project);
-                }).catch(() => {
-                    //console.log("Cancel clicked");
+                
+                    try {
+                        let res = this.deleteData(this.project);                        
+                        console.log("== project_id : " + project_id);
+
+                        if(res){                        
+                            
+                            // axios : POST
+                            let postData = {
+                                project_id: project_id,                            
+                            };
+
+                            axios.post(urlStr + "delete_dynamic_logdetail/", postData)
+                                .then(res => {
+                                    
+                                    console.log("result : "+res);
+
+                                })
+                                .catch(err => {
+                                    console.error(err);                            
+                                    //throw err
+                                })
+
+                        }                        
+                    } catch (err) {
+                        console.error(err);
+                    }
                 });
             } else {
                 this.$alert("No Project selected", "Confirm Delete", "error");
