@@ -617,16 +617,20 @@ export function getLineChartOptions(title){ //, y_scale) {
                 // ticks: {
                 //     maxRotation: 0
                 // }
+                ticks: {    // YYYYMMDDHHmmss
+                    min: '20200701000000',
+                    max: '20200701220000'
+               }
             }],
             yAxes: [{
                 scaleLabel: {
                     display: true,
                     labelString: 'tps'
                 },
-                // ticks: { 
-                //     suggestedMin: y_scale,
-                //     suggestedMax: y_scale
-                // }
+                ticks: { 
+                     suggestedMin: 0,
+                     suggestedMax: 50
+                }
             }]
         },
 

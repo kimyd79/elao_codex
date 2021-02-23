@@ -4,7 +4,7 @@
         <ui-card-item header>Information</ui-card-item>
         <ui-card-item sub class="card_box" >
             <span style="color:gray">
-                Project Name (Total Log Lines) : {{ this.projectName }} ({{ totalLogLines }} lines)
+                Project Name (Total Log Lines) : {{ this.projectName }} ({{ totalLogLines.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} lines)
                 <br>
                 Logfile Name : {{ this.fileNames }}
                 <br>
@@ -77,10 +77,10 @@ export default {
         logFileID: "getLogFileID",
         projectID: "getProjectID",
 
-        dateFromValue: "getFromDate",
-        dateToValue: "getToDate",
-        timeFromValue: "getFromTime",
-        timeToValue: "getToTime",
+        dateFromValue: "getGlobalFromDate",
+        dateToValue: "getGlobalToDate",
+        timeFromValue: "getGlobalFromTime",
+        timeToValue: "getGlobalToTime",
 
     }),
 

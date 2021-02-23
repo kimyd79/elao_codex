@@ -68,14 +68,14 @@ export default {
     created() {
         // Initial Value Setting
 
-        this.dateFromValue = this.$store.state.fromDate
-        this.dateToValue = this.$store.state.toDate
-        this.timeFromValue = this.$store.state.fromTime
-        this.timeToValue = this.$store.state.toTime
-        this.conditionValue = this.$store.state.condition
-        this.searchValue = this.$store.state.searchKeyword
-        this.ttFromValue = this.$store.state.fromTimeTaken
-        this.ttToValue = this.$store.state.toTimeTaken
+        this.dateFromValue = this.$store.state.fromDate2
+        this.dateToValue = this.$store.state.toDate2
+        this.timeFromValue = this.$store.state.fromTime2
+        this.timeToValue = this.$store.state.toTime2
+        this.conditionValue = this.$store.state.condition2
+        this.searchValue = this.$store.state.searchKeyword2
+        this.ttFromValue = this.$store.state.fromTimeTaken2
+        this.ttToValue = this.$store.state.toTimeTaken2
 
     },
     computed: {
@@ -119,15 +119,15 @@ export default {
 
         // mapAction
         setSerachCondition() {
-            this.$store.dispatch("setFromDate", this.dateFromValue);
-            this.$store.dispatch("setToDate", this.dateToValue);
-            this.$store.dispatch("setFromTime", this.timeFromValue);
-            this.$store.dispatch("setToTime", this.timeToValue);
+            this.$store.dispatch("setFromDate2", this.dateFromValue);
+            this.$store.dispatch("setToDate2", this.dateToValue);
+            this.$store.dispatch("setFromTime2", this.timeFromValue);
+            this.$store.dispatch("setToTime2", this.timeToValue);
 
-            this.$store.dispatch("setCondition", this.conditionValue);
-            this.$store.dispatch("setSearchKeyword", this.searchValue);
-            this.$store.dispatch("setFromTimeTaken", this.ttFromValue);
-            this.$store.dispatch("setToTimeTaken", this.ttToValue);
+            this.$store.dispatch("setCondition2", this.conditionValue);
+            this.$store.dispatch("setSearchKeyword2", this.searchValue);
+            this.$store.dispatch("setFromTimeTaken2", this.ttFromValue);
+            this.$store.dispatch("setToTimeTaken2", this.ttToValue);
 
             this.$store.dispatch("setToggleSearch2");
         },

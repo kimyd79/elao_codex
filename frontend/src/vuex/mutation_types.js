@@ -5,6 +5,13 @@ export const SET_LOGFORMAT      = "SET_LOGFORMAT"
 export const SET_PROJECTID      = "SET_PROJECTID"
 export const SET_LOGFILEID      = "SET_LOGFILEID"
 
+// global time, date
+export const SET_GLOBAL_FROMDATE       = "SET_GLOBAL_FROMDATE"
+export const SET_GLOBAL_TODATE         = "SET_GLOBAL_TODATE"
+export const SET_GLOBAL_FROMTIME       = "SET_GLOBAL_FROMTIME"
+export const SET_GLOBAL_TOTIME         = "SET_GLOBAL_TOTIME"
+
+// search 1
 export const SET_FROMDATE       = "SET_FROMDATE"
 export const SET_TODATE         = "SET_TODATE"
 export const SET_FROMTIME       = "SET_FROMTIME"
@@ -13,6 +20,17 @@ export const SET_FROMTIMETAKEN  = "SET_FROMTIMETAKEN"
 export const SET_TOTIMETAKEN    = "SET_TOTIMETAKEN"
 export const SET_CONDITION      = "SET_CONDITION"
 export const SET_SEARCHKEYWORD  = "SET_SEARCHKEYWORD"
+
+// search 2
+export const SET_FROMDATE2       = "SET_FROMDATE2"
+export const SET_TODATE2         = "SET_TODATE2"
+export const SET_FROMTIME2       = "SET_FROMTIME2"
+export const SET_TOTIME2         = "SET_TOTIME2"
+export const SET_FROMTIMETAKEN2  = "SET_FROMTIMETAKEN2"
+export const SET_TOTIMETAKEN2    = "SET_TOTIMETAKEN2"
+export const SET_CONDITION2      = "SET_CONDITION2"
+export const SET_SEARCHKEYWORD2  = "SET_SEARCHKEYWORD2"
+
 //statistic detailpopup
 export const SET_DETAILCONDITION      = "SET_DETAILCONDITION"
 export const SET_DETAILSEARCHKEYWORD  = "SET_DETAILSEARCHKEYWORD"

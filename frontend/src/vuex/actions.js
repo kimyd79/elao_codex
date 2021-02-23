@@ -9,6 +9,11 @@ export default {
     setProjectID({commit}, value) { commit(types.SET_PROJECTID, value) },
     setLogFileID({commit}, value) { commit(types.SET_LOGFILEID, value) },
 
+    setGlobalFromDate({commit}, value) { commit(types.SET_GLOBAL_FROMDATE, value) },
+    setGlobalToDate({commit}, value) { commit(types.SET_GLOBAL_TODATE, value) },
+    setGlobalFromTime({commit}, value) { commit(types.SET_GLOBAL_FROMTIME, value) },
+    setGlobalToTime({commit}, value) { commit(types.SET_GLOBAL_TOTIME, value) },
+
     setFromDate({commit}, value) { commit(types.SET_FROMDATE, value) },
     setToDate({commit}, value) { commit(types.SET_TODATE, value) },
     setFromTime({commit}, value) { commit(types.SET_FROMTIME, value) },
@@ -17,6 +22,16 @@ export default {
     setToTimeTaken({commit}, value) { commit(types.SET_TOTIMETAKEN, value) },
     setCondition({commit}, value) { commit(types.SET_CONDITION, value) },
     setSearchKeyword({commit}, value) { commit(types.SET_SEARCHKEYWORD, value) },
+
+    setFromDate2({commit}, value) { commit(types.SET_FROMDATE2, value) },
+    setToDate2({commit}, value) { commit(types.SET_TODATE2, value) },
+    setFromTime2({commit}, value) { commit(types.SET_FROMTIME2, value) },
+    setToTime2({commit}, value) { commit(types.SET_TOTIME2, value) },
+    setFromTimeTaken2({commit}, value) { commit(types.SET_FROMTIMETAKEN2, value) },
+    setToTimeTaken2({commit}, value) { commit(types.SET_TOTIMETAKEN2, value) },
+    setCondition2({commit}, value) { commit(types.SET_CONDITION2, value) },
+    setSearchKeyword2({commit}, value) { commit(types.SET_SEARCHKEYWORD2, value) },
+
     //statistic detailpopup
     setDetailCondition({commit}, value) { commit(types.SET_DETAILCONDITION, value) },
     setDetailSearchKeyword({commit}, value) { commit(types.SET_DETAILSEARCHKEYWORD, value) },

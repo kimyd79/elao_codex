@@ -73,6 +73,7 @@ export default {
             },
         }
     },
+
     created() {
         EventBus.$on("searchProject", this.getData);
         EventBus.$on("cancelUpdateProject", () => {
@@ -158,7 +159,8 @@ export default {
                 this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
                 
                     try {
-                        let res = this.deleteData(this.project);                        
+                        let res = this.deleteData(this.project);
+                        
                         console.log("== project_id : " + project_id);
 
                         if(res){                        

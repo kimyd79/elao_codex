@@ -78,16 +78,17 @@ export default {
     computed: mapGetters({
         isSearch2: "getToggleSearch2",
 
-        dateFromValue: "getFromDate",
-        dateToValue: "getToDate",
-        timeFromValue: "getFromTime",
-        timeToValue: "getToTime",
+        dateFromValue: "getFromDate2",
+        dateToValue: "getToDate2",
+        timeFromValue: "getFromTime2",
+        timeToValue: "getToTime2",
 
-        conditionValue: "getCondition",
-        searchValue: "getSearchKeyword",
+        conditionValue: "getCondition2",
+        searchValue: "getSearchKeyword2",
 
-        ttFromValue: "getFromTimeTaken",
-        ttToValue: "getToTimeTaken",
+        ttFromValue: "getFromTimeTaken2",
+        ttToValue: "getToTimeTaken2",
+        
         project_id: "getProjectID",
 
     }),
@@ -134,7 +135,7 @@ export default {
 
                 this.items.push({
                     result: results[i].result,
-                    result_count: results[i].result_count,
+                    result_count: results[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     ratio: ratio
                 })
 

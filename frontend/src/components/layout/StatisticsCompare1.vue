@@ -88,6 +88,7 @@ export default {
 
         ttFromValue: "getFromTimeTaken",
         ttToValue: "getToTimeTaken",
+
         project_id: "getProjectID",
 
     }),
@@ -134,7 +135,7 @@ export default {
 
                 this.items.push({
                     result: results[i].result,
-                    result_count: results[i].result_count,
+                    result_count: results[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     ratio: ratio
                 })
 

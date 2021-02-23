@@ -100,13 +100,11 @@
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
                         {{ fileFormat }}
                     </ui-form-item>
-
-                    <!--
-                <ui-form-item :columns=11 
-                    label="Data range" required-left left-label :label-width=144 :label-padding=16 >
-                    {{ this.dateFromValue }} {{timeFromValue}} ~ {{ dateToValue }} {{timeToValue}}
-                </ui-form-item>
-                -->
+                    <!-- TODO: 필요시
+                    <ui-form-item :columns=11 label="Data range" required-left left-label :label-width=144 :label-padding=16 >
+                        {{ this.dateFromValue }}/{{this.timeFromValue}} ~ {{ this.dateToValue }}/{{this.timeToValue}}
+                    </ui-form-item> 
+                    -->
 
                     <!-- STEP3 end -->
                 </span>
@@ -901,10 +899,26 @@ export default {
                 .then(res => {
                     //console.log(res)
 
+                    this.$store.dispatch("setGlobalFromDate", res.data.start_date);
+                    this.$store.dispatch("setGlobalToDate", res.data.end_date);
+                    this.$store.dispatch("setGlobalFromTime", res.data.start_time);
+                    this.$store.dispatch("setGlobalToTime", res.data.end_time);
+
                     this.$store.dispatch("setFromDate", res.data.start_date);
                     this.$store.dispatch("setToDate", res.data.end_date);
                     this.$store.dispatch("setFromTime", res.data.start_time);
                     this.$store.dispatch("setToTime", res.data.end_time);
+
+                    this.$store.dispatch("setFromDate2", res.data.start_date);
+                    this.$store.dispatch("setToDate2", res.data.end_date);
+                    this.$store.dispatch("setFromTime2", res.data.start_time);
+                    this.$store.dispatch("setToTime2", res.data.end_time);
+
+                    // For Tab3
+                    this.setFromDate = res.data.start_date;
+                    this.setFromTime = res.data.end_date;
+                    this.setToDate = res.data.start_time;
+                    this.setToTime = res.data.end_time;
 
                     // Stop Loading Spinner
                     this.isActive = false
@@ -986,10 +1000,20 @@ export default {
                 .then(res => {
                     //console.log(res)
 
+                    this.$store.dispatch("setGlobalFromDate", res.data.start_date);
+                    this.$store.dispatch("setGlobalToDate", res.data.end_date);
+                    this.$store.dispatch("setGlobalFromTime", res.data.start_time);
+                    this.$store.dispatch("setGlobalToTime", res.data.end_time);
+
                     this.$store.dispatch("setFromDate", res.data.start_date);
                     this.$store.dispatch("setFromTime", res.data.start_time);
                     this.$store.dispatch("setToDate", res.data.end_date);
                     this.$store.dispatch("setToTime", res.data.end_time);
+
+                    this.$store.dispatch("setFromDate2", res.data.start_date);
+                    this.$store.dispatch("setToDate2", res.data.end_date);
+                    this.$store.dispatch("setFromTime2", res.data.start_time);
+                    this.$store.dispatch("setToTime2", res.data.end_time);
 
                     var file_list = ""
                     res.data.file_names.forEach(file => file_list = file_list + file + ", ")

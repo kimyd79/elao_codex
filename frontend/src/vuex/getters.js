@@ -7,6 +7,11 @@ export default {
     getProjectID: state => state.projectID,
     getLogFileID: state => state.logFileID,
 
+    getGlobalFromDate: state => state.global_fromDate ,
+    getGlobalToDate: state => state.global_toDate ,
+    getGlobalFromTime: state => state.global_fromTime ,
+    getGlobalToTime: state => state.global_toTime ,
+
     getFromDate: state => state.fromDate ,
     getToDate: state => state.toDate ,
     getFromTime: state => state.fromTime ,
@@ -15,6 +20,16 @@ export default {
     getToTimeTaken: state => state.toTimeTaken ,
     getCondition: state => state.condition ,
     getSearchKeyword: state => state.searchKeyword ,
+
+    getFromDate2: state => state.fromDate2 ,
+    getToDate2: state => state.toDate2 ,
+    getFromTime2: state => state.fromTime2 ,
+    getToTime2: state => state.toTime2 ,
+    getFromTimeTaken2: state => state.fromTimeTaken2 ,
+    getToTimeTaken2: state => state.toTimeTaken2 ,
+    getCondition2: state => state.condition2 ,
+    getSearchKeyword2: state => state.searchKeyword2 ,
+
     // statistic detailpopup
     getDetailCondition: state => state.detailcondition ,
     getDetailSearchKeyword: state => state.detailsearchKeyword ,   

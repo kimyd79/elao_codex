@@ -22,6 +22,12 @@ const state = {
     projectID: '',
     logFileID: '',
 
+    // Global Date, Time (immutable)
+    global_fromDate: '',
+    global_toDate: '',
+    global_fromTime: '',
+    global_toTime: '',
+    
     // search info   
     fromDate: '',
     toDate: '',
@@ -31,6 +37,17 @@ const state = {
     toTimeTaken: '',
     condition: '',
     searchKeyword: '',
+
+    // search info2   
+    fromDate2: '',
+    toDate2: '',
+    fromTime2: '',
+    toTime2: '',
+    fromTimeTaken2: '',
+    toTimeTaken2: '',
+    condition2: '',
+    searchKeyword2: '',
+
     // statistic detailpopup
     detailcondition: '',
     detailsearchKeyword: '',
@@ -72,6 +89,12 @@ const mutations = {
     [types.SET_PROJECTID] (state, value) { state.projectID = value },
     [types.SET_LOGFILEID] (state, value) { state.logFileID = value },
 
+    // global time, date
+    [types.SET_GLOBAL_FROMDATE] (state, value) { state.global_fromDate = value },
+    [types.SET_GLOBAL_TODATE] (state, value) { state.global_toDate = value },
+    [types.SET_GLOBAL_FROMTIME] (state, value) { state.global_fromTime = value },
+    [types.SET_GLOBAL_TOTIME] (state, value) { state.global_toTime = value },
+
     // search info
     [types.SET_FROMDATE] (state, value) { state.fromDate = value },
     [types.SET_TODATE] (state, value) { state.toDate = value },
@@ -81,6 +104,16 @@ const mutations = {
     [types.SET_TOTIMETAKEN] (state, value) { state.toTimeTaken = value },
     [types.SET_CONDITION] (state, value) { state.condition = value },
     [types.SET_SEARCHKEYWORD] (state, value) { state.searchKeyword = value },
+
+    // search info 2
+    [types.SET_FROMDATE2] (state, value) { state.fromDate2 = value },
+    [types.SET_TODATE2] (state, value) { state.toDate2 = value },
+    [types.SET_FROMTIME2] (state, value) { state.fromTime2 = value },
+    [types.SET_TOTIME2] (state, value) { state.toTime2 = value },
+    [types.SET_FROMTIMETAKEN2] (state, value) { state.fromTimeTaken2 = value },
+    [types.SET_TOTIMETAKEN2] (state, value) { state.toTimeTaken2 = value },
+    [types.SET_CONDITION2] (state, value) { state.condition2 = value },
+    [types.SET_SEARCHKEYWORD2] (state, value) { state.searchKeyword2 = value },
 
     [types.TOGGLE_SEARCH] (state) { state.toggleSearch == 1 ? state.toggleSearch = 0 : state.toggleSearch = 1 },
     
