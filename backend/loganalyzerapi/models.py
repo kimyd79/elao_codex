@@ -75,7 +75,7 @@ class LogDetail(models.Model):
     freferer = models.CharField(max_length=500, null=True, blank=True)
     fuser_agent = models.CharField(max_length=500, null=True, blank=True)
     fstatus = models.CharField(max_length=10, null=True, blank=True)
-    ftime_taken = models.IntegerField(default=0)
+    ftime_taken = models.BigIntegerField(default=0)
     
     # Add Filters
     fbyte = models.IntegerField(default=0)

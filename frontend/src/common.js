@@ -536,7 +536,7 @@ export function getStackedBarChartTemplate(x, y200, y300, y400, y500) {
     return chartData;
 }
 
-export function getStackedBarChartOptions(title) {
+export function getStackedBarChartOptions(title, x_min, x_max, y_max_request) { 
 
     var options = {
         responsive: true,
@@ -556,12 +556,19 @@ export function getStackedBarChartOptions(title) {
                 type: 'time',
                 time: zoomTimeOption,
                 stacked: true,
+                // X axis scale : 
+                ticks: {    // YYYYMMDDHHmmss
+                    min: x_min,
+                    max: x_max
+                }
             }],
             yAxes: [{
                 stacked: true,
                 ticks: {
-                    beginAtZero: true
-                }
+                    //beginAtZero: true,
+                    suggestedMin: 0,
+                    suggestedMax: y_max_request
+                }                
             }]
         },
 
@@ -591,8 +598,9 @@ export function getLineChartTemplate(x, y, label) {
     return chartData;
 }
 
-export function getLineChartOptions(title){ //, y_scale) {
+export function getLineChartOptions(title, x_min, x_max, y_max_tps){
 
+    var test;
     var options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -614,12 +622,10 @@ export function getLineChartOptions(title){ //, y_scale) {
                     display: true,
                     labelString: 'Date'
                 },
-                // ticks: {
-                //     maxRotation: 0
-                // }
+                // X axis scale : 
                 ticks: {    // YYYYMMDDHHmmss
-                    min: '20200701000000',
-                    max: '20200701220000'
+                    min: x_min,
+                    max: x_max
                }
             }],
             yAxes: [{
@@ -629,7 +635,9 @@ export function getLineChartOptions(title){ //, y_scale) {
                 },
                 ticks: { 
                      suggestedMin: 0,
-                     suggestedMax: 50
+                     suggestedMax: y_max_tps
+                     //min: 0,
+                     //max: ''
                 }
             }]
         },
@@ -673,7 +681,7 @@ export function getMultiLineChartTemplate(x, y1, label1, y2, label2) {
     return chartData;
 }
 
-export function getMultiLineChartOptions(title) { //, y_scale) {
+export function getMultiLineChartOptions(title, x_min, x_max, y_max_request, y_max_duration) { 
 
     var options = {
         responsive: true,
@@ -697,9 +705,10 @@ export function getMultiLineChartOptions(title) { //, y_scale) {
                     display: true,
                     labelString: 'Date/Time'
                 },
-                // ticks: {
-                //     maxRotation: 0
-                // }
+                ticks: {    // YYYYMMDDHHmmss
+                    min: x_min,
+                    max: x_max
+               }
             }]
             ,yAxes:[{
                     type: 'linear',
@@ -710,10 +719,12 @@ export function getMultiLineChartOptions(title) { //, y_scale) {
                         display: true,
                         labelString: 'Request(count)'
                     },
-                    // ticks: {
-                    //     suggestedMin: y_scale,
-                    //     suggestedMax: y_scale
-                    // }
+                    ticks: { 
+                        suggestedMin: 0,
+                        suggestedMax: y_max_request
+                        //min: 0,
+                        //max: ''
+                   }
                 },{
                     type: 'linear',
                     display: true,
@@ -723,10 +734,12 @@ export function getMultiLineChartOptions(title) { //, y_scale) {
                         display: true,
                         labelString: 'Duration(s)'
                     },
-                    // ticks: {
-                    //     suggestedMin: y_scale,
-                    //     suggestedMax: y_scale
-                    // }
+                    ticks: { 
+                        suggestedMin: 0,
+                        suggestedMax: y_max_duration
+                        //min: 0,
+                        //max: ''
+                   }
             }]
         },
 

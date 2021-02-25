@@ -22,11 +22,23 @@ const state = {
     projectID: '',
     logFileID: '',
 
-    // Global Date, Time (immutable)
+    // Global Date, Time (immutable) -Global  Scale X 
     global_fromDate: '',
     global_toDate: '',
     global_fromTime: '',
     global_toTime: '',
+
+    // Global Scale Y
+    global_Y_tps: '',
+    global_Y_request: '',
+    global_Y_duration: '',
+    global_Y_request_sbar: '',
+
+    // Global Scale Y2
+    global_Y_tps2: '',
+    global_Y_request2: '',
+    global_Y_duration2: '',
+    global_Y_request_sbar2: '',   
     
     // search info   
     fromDate: '',
@@ -52,7 +64,6 @@ const state = {
     detailcondition: '',
     detailsearchKeyword: '',
     threshold: 3,
-
 
     // check
     toggleSearch: '0',  //  0 or 1 변경사항 확인용
@@ -94,6 +105,18 @@ const mutations = {
     [types.SET_GLOBAL_TODATE] (state, value) { state.global_toDate = value },
     [types.SET_GLOBAL_FROMTIME] (state, value) { state.global_fromTime = value },
     [types.SET_GLOBAL_TOTIME] (state, value) { state.global_toTime = value },
+
+    // global Y
+    [types.SET_GLOBAL_Y_TPS] (state, value) { state.global_Y_tps = value },
+    [types.SET_GLOBAL_Y_REQUEST] (state, value) { state.global_Y_request = value },
+    [types.SET_GLOBAL_Y_DURATION] (state, value) { state.global_Y_duration = value },
+    [types.SET_GLOBAL_Y_REQUEST_SBAR] (state, value) { state.global_Y_request = value },
+
+    // global Y2
+    [types.SET_GLOBAL_Y_TPS2] (state, value) { state.global_Y_tps2 = value },
+    [types.SET_GLOBAL_Y_REQUEST2] (state, value) { state.global_Y_request2 = value },
+    [types.SET_GLOBAL_Y_DURATION2] (state, value) { state.global_Y_duration2 = value },
+    [types.SET_GLOBAL_Y_REQUEST_SBAR2] (state, value) { state.global_Y_request2 = value },
 
     // search info
     [types.SET_FROMDATE] (state, value) { state.fromDate = value },

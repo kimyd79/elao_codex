@@ -11,6 +11,18 @@ export const SET_GLOBAL_TODATE         = "SET_GLOBAL_TODATE"
 export const SET_GLOBAL_FROMTIME       = "SET_GLOBAL_FROMTIME"
 export const SET_GLOBAL_TOTIME         = "SET_GLOBAL_TOTIME"
 
+// global Y
+export const SET_GLOBAL_Y_TPS          = "SET_GLOBAL_Y_TPS"
+export const SET_GLOBAL_Y_REQUEST      = "SET_GLOBAL_Y_REQUEST"
+export const SET_GLOBAL_Y_DURATION     = "SET_GLOBAL_Y_DURATION"
+export const SET_GLOBAL_Y_REQUEST_SBAR      = "SET_GLOBAL_Y_REQUEST_SBAR"
+
+// global Y2
+export const SET_GLOBAL_Y_TPS2         = "SET_GLOBAL_Y_TPS2"
+export const SET_GLOBAL_Y_REQUEST2      = "SET_GLOBAL_Y_REQUEST2"
+export const SET_GLOBAL_Y_DURATION2     = "SET_GLOBAL_Y_DURATION2"
+export const SET_GLOBAL_Y_REQUEST_SBAR2      = "SET_GLOBAL_Y_REQUEST_SBAR2"
+
 // search 1
 export const SET_FROMDATE       = "SET_FROMDATE"
 export const SET_TODATE         = "SET_TODATE"

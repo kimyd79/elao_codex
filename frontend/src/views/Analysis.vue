@@ -314,6 +314,11 @@ export default {
 
             isSearch: "getToggleSearch",
 
+            x_min_date: "getGlobalFromDate",            
+            x_min_time: "getGlobalFromTime",
+            x_max_date: "getGlobalToDate",
+            x_max_time: "getGlobalToTime",
+
         })
     },
 
@@ -461,7 +466,7 @@ export default {
             try {
                 let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
                 this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
-                this.sbOptions = getStackedBarChartOptions('Http Status Code');
+                this.sbOptions = getStackedBarChartOptions('Http Status Code', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch
             } finally {
@@ -481,8 +486,8 @@ export default {
             try {
                 let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
                 this.lChartData = getLineChartTemplate(res.x, res.y, "TPS")
-
-                this.lOptions = getLineChartOptions('Transaction Per Second');
+               
+                this.lOptions = getLineChartOptions('Transaction Per Second', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch
             } finally {
@@ -502,7 +507,7 @@ export default {
             try {
                 let res = await getLineChartData(3, this.timeCondition, this.project_id, filter);
                 this.mlChartData = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, 'Time-Taken');
-                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken');
+                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch
             } finally {

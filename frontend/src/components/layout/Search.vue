@@ -119,10 +119,11 @@ export default {
     methods: {
         initialize() {
 
-            // this.dateFromValue = "";
-            // this.dateToValue = "";
-            // this.timeFromValue = "";
-            // this.timeToValue = "";
+            this.dateFromValue = this.$store.state.global_fromDate;
+            this.dateToValue = this.$store.state.global_toDate;
+            this.timeFromValue = this.$store.state.global_fromTime;
+            this.timeToValue = this.$store.state.global_toTime;
+                        
             this.conditionValue = "";
             this.searchValue = "";
             this.ttFromValue = "";

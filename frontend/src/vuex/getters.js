@@ -12,6 +12,16 @@ export default {
     getGlobalFromTime: state => state.global_fromTime ,
     getGlobalToTime: state => state.global_toTime ,
 
+    getGlobalYTps: state => state.global_Y_tps ,
+    getGlobalYRequest: state => state.global_Y_request ,
+    getGlobalYDuration: state => state.global_Y_duration ,
+    getGlobalYRequestSBar: state => state.global_Y_request_sbar ,
+
+    getGlobalYTps2: state => state.global_Y_tps2 ,
+    getGlobalYRequest2: state => state.global_Y_request2 ,
+    getGlobalYDuration2: state => state.global_Y_duration2 ,
+    getGlobalYRequestSBar2: state => state.global_Y_request_sbar2 ,
+
     getFromDate: state => state.fromDate ,
     getToDate: state => state.toDate ,
     getFromTime: state => state.fromTime ,

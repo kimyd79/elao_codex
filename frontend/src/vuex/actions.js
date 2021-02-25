@@ -14,6 +14,16 @@ export default {
     setGlobalFromTime({commit}, value) { commit(types.SET_GLOBAL_FROMTIME, value) },
     setGlobalToTime({commit}, value) { commit(types.SET_GLOBAL_TOTIME, value) },
 
+    setGlobalYTps({commit}, value) { commit(types.SET_GLOBAL_Y_TPS, value) },
+    setGlobalYRequest({commit}, value) { commit(types.SET_GLOBAL_Y_REQUEST, value) },
+    setGlobalYDuration({commit}, value) { commit(types.SET_GLOBAL_Y_DURATION, value) },
+    setGlobalYRequestSBar({commit}, value) { commit(types.SET_GLOBAL_Y_REQUEST_SBAR, value) },
+
+    setGlobalYTps2({commit}, value) { commit(types.SET_GLOBAL_Y_TPS2, value) },
+    setGlobalYRequest2({commit}, value) { commit(types.SET_GLOBAL_Y_REQUEST2, value) },
+    setGlobalYDuration2({commit}, value) { commit(types.SET_GLOBAL_Y_DURATION2, value) },
+    setGlobalYRequestSBar2({commit}, value) { commit(types.SET_GLOBAL_Y_REQUEST_SBAR2, value) },
+
     setFromDate({commit}, value) { commit(types.SET_FROMDATE, value) },
     setToDate({commit}, value) { commit(types.SET_TODATE, value) },
     setFromTime({commit}, value) { commit(types.SET_FROMTIME, value) },

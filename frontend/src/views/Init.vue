@@ -429,29 +429,30 @@ export default {
                 //do something...
                 //("OK clicked")
 
-                this.isNewProject = true
+                this.isNewProject = true;
                 // 로그인 풀림 방지
-                let userToken = this.$store.state.userToken
-                let userName = this.$store.state.userName
-                localStorage.removeItem("vuex")
-                this.$store.reset()
-                this.$store.dispatch("setUserToken", userToken)
-                this.$store.dispatch("setUserName", userName)
-                this.projectName = ""
-                this.projectDescription = ""
-                this.fileName = ""
-                this.fileFormat = ""
+                let userToken = this.$store.state.userToken;
+                let userName = this.$store.state.userName;
+                localStorage.removeItem("vuex");
+                this.$store.reset();
+                this.$store.dispatch("setUserToken", userToken);
+                this.$store.dispatch("setUserName", userName);
+                this.projectName = "";
+                this.projectDescription = "";
+                this.fileName = "";
+                this.fileFormat = "";
                 
-                this.radioValue = "1"
-                this.isPrevShow = false
+                this.radioValue = "1";
+                this.isPrevShow = false;
 
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
-                        this.tabs[i].isSelected = false
-                        this.tabs[0].isSelected = true
+                        this.tabs[i].isSelected = false;
+                        this.tabs[0].isSelected = true;
                         break;
                     }
                 }
+                this.buttonName = "Next";
 
                 // 
                 // if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
@@ -1061,6 +1062,7 @@ export default {
                 await this.getLogfile(this.projectID)
             } else {
                 this.isNewProject = false
+
             }
         }
     }

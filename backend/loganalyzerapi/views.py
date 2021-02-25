@@ -121,7 +121,7 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             fstatus = FieldSchema.objects.create(model_schema=logdetail_schema, name='fstatus', data_type='character', max_length=10, null=True)
             
             # ftime_taken = models.IntegerField(default=0)
-            ftime_taken = FieldSchema.objects.create(model_schema=logdetail_schema, name='ftime_taken', data_type='integer', null=True)
+            ftime_taken = FieldSchema.objects.create(model_schema=logdetail_schema, name='ftime_taken', data_type='float', null=True)
             
             fbyte = FieldSchema.objects.create(model_schema=logdetail_schema, name='fbyte', data_type='integer', null=True)
             fextension = FieldSchema.objects.create(model_schema=logdetail_schema, name='fextension', data_type='character', max_length=10, null=True)
@@ -968,18 +968,31 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
                         
                     for xDate in resultX:
-                        for yStatusCode in resultStatusCode:
+                        for yStatusCode in ['2', '3', '4', '5']:
                             
-                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                            else:
-                                logger.info('There is no available status code.')
+                            if yStatusCode == '2':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_200.append(0)
+                            
+                            if yStatusCode == '3':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_300.append(0)
+                            
+                            if yStatusCode == '4':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_400.append(0)
+                                    
+                            if yStatusCode == '5':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_500.append(0)
                             
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -1070,18 +1083,31 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
                         
                     for xDate in resultX:
-                        for yStatusCode in resultStatusCode:
+                        for yStatusCode in ['2', '3', '4', '5']:
                             
-                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                            else:
-                                logger.info('There is no available status code.')
+                            if yStatusCode == '2':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_200.append(0)
+                            
+                            if yStatusCode == '3':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_300.append(0)
+                            
+                            if yStatusCode == '4':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_400.append(0)
+                                    
+                            if yStatusCode == '5':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_500.append(0)
                                 
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -1170,18 +1196,31 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
                         
                     for xDate in resultX:
-                        for yStatusCode in resultStatusCode:
+                        for yStatusCode in ['2', '3', '4', '5']:
                             
-                            if yStatusCode == '2' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '3' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '4' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                            elif yStatusCode == '5' and yStatusCode in dateStatusCount[xDate] :
-                                resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                            else:
-                                logger.info('There is no available status code.')
+                            if yStatusCode == '2':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_200.append(0)
+                            
+                            if yStatusCode == '3':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_300.append(0)
+                            
+                            if yStatusCode == '4':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_400.append(0)
+                                    
+                            if yStatusCode == '5':
+                                if yStatusCode in dateStatusCount[xDate]:
+                                    resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                                else:
+                                    resultY_500.append(0)
                                                     
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고

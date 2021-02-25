@@ -314,9 +314,37 @@ export default {
             ttFromValue: "getFromTimeTaken",
             ttToValue: "getToTimeTaken",
 
+            dateFromValue2: "getFromDate2",
+            dateToValue2: "getToDate2",
+            timeFromValue2: "getFromTime2",
+            timeToValue2: "getToTime2",
+
+            conditionValue2: "getCondition2",
+            searchValue2: "getSearchKeyword2",
+
+            ttFromValue2: "getFromTimeTaken2",
+            ttToValue2: "getToTimeTaken2",
+
             //logfile_id: "getLogFileID",
             //project_id: "getProjectID",
             logFormat: "getLogFormat",
+
+            x_min_date: "getGlobalFromDate",            
+            x_min_time: "getGlobalFromTime",
+            x_max_date: "getGlobalToDate",
+            x_max_time: "getGlobalToTime",
+
+            // global scale Y
+            global_Y_tps: "getGlobalYTps",
+            global_Y_request: "getGlobalYRequest",            
+            global_Y_duration: "getGlobalYDuration",
+            global_Y_request_sbar: "getGlobalYRequestSBar",
+
+            // global scale Y2
+            global_Y_tps: "getGlobalYTps2",
+            global_Y_request: "getGlobalYRequest2",            
+            global_Y_duration: "getGlobalYDuration2",
+            global_Y_request_sbar: "getGlobalYRequestSBar2",
         }),
     },
     methods: {
@@ -340,7 +368,7 @@ export default {
             comp._data._chart.resetZoom()
         },
 
-        getFilter() {
+        getFilter1() {
 
             let filter = {
                 dateFromValue: this.dateFromValue,
@@ -353,6 +381,25 @@ export default {
 
                 ttFromValue: this.ttFromValue,
                 ttToValue: this.ttToValue,
+                project_id: this.project_id,
+            }
+
+            return filter
+        },
+
+        getFilter2() {
+
+            let filter = {
+                dateFromValue: this.dateFromValue2,
+                dateToValue: this.dateToValue2,
+                timeFromValue: this.timeFromValue2,
+                timeToValue: this.timeToValue2,
+
+                conditionValue: this.conditionValue2,
+                searchValue: this.searchValue2,
+
+                ttFromValue: this.ttFromValue2,
+                ttToValue: this.ttToValue2,
                 project_id: this.project_id,
             }
 
@@ -415,7 +462,7 @@ export default {
 
             }
 
-            let filter = this.getFilter()
+            let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
 
             try {
                 let res = await getChartDataFromStatistics(type, this.project_id, filter, 5)
@@ -504,7 +551,7 @@ export default {
                 this.isActiveBar2 = true
             }
 
-            let filter = this.getFilter()
+            let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
 
             try {
                 let res = await getChartDataFromStatistics(1, this.project_id, filter, 5)
@@ -536,18 +583,67 @@ export default {
                 this.isActiveStackedBar2 = true
             }
 
-            let filter = this.getFilter()
+            let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
 
             try {
                 let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
+
+                // Global Scale : 200, 300, 400, 500을 모두 더해주어야 한다.                
+                //console.log(res)
+
+                //var sumsbarY = new Array;
+//
+                //let scale_y_global = this.$store.state.global_Y_request_sbar;
+                //let scale_y_global2 = this.$store.state.global_Y_request_sbar2;
+                //let scale_y_local = 0;
+                //
+                //for (let i = 0 ; i < res.sbarX.length ; i++){
+                //    sumsbarY.push(res.sbarY_200[i] + res.sbarY_300[i] + res.sbarY_400[i] + res.sbarY_500[i]);
+                //}
+
+                //let currentMax = Math.max.apply(null, sumsbarY);               
+//
+                //console.log("currentMax  : "+currentMax)
+                //console.log("scale_y_global  : "+ scale_y_global)
+                //console.log("scale_y_global2  : "+ scale_y_global2)
+//
+                //// Initialization
+                //if (scale_y_global == "" || scale_y_global == "undefined" || scale_y_global == null )//{               
+                //    this.$store.state.global_Y_request_sbar = currentMax;
+                //}
+//
+                //if (scale_y_global2 == "" || scale_y_global2 == "undefined" || scale_y_global2 == null )//{               
+                //    this.$store.state.global_Y_request_sbar2 = currentMax;
+                //}
+//
+                //// Update global scale
+                //scale_y_local = currentMax;
+                //if (searchArea == 1) {                        
+                //    this.$store.state.global_Y_request_sbar = currentMax;
+                //    scale_y_global = currentMax;
+                //    
+                //} else if (searchArea == 2) {
+                //    
+                //    this.$store.state.global_Y_request_sbar2 = currentMax;
+                //    scale_y_global2 = currentMax;                    
+                //}
+//
+                //if (scale_y_global < scale_y_global2) {
+                //    scale_y_local = scale_y_global2;                    
+                //} else {
+                //    scale_y_local = scale_y_global;                    
+                //}
+                //
+                //console.log("scale_y_local  : "+scale_y_local)
+
                 if (searchArea == 1) {
-                    this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
-                    //this.isActiveStackedBar1 = false
+                    this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)                    
                 } else {
-                    this.sbChartData2 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
-                    //this.isActiveStackedBar2 = false
+                    this.sbChartData2 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)                    
                 }
-                this.sbOptions = getStackedBarChartOptions('Http Status Code');
+
+                //console.log("scale_y_local  : "+scale_y_local)
+                this.sbOptions = getStackedBarChartOptions('Http Status Code', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time); //TODO:, scale_y_local);
             } catch (err) {
 
                 console.error(err); // TypeError: failed to fatch
@@ -571,16 +667,59 @@ export default {
             }
 
             try {
-                let filter = this.getFilter()
+                let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
                 let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
+
+                //let scale_y_global = this.$store.state.global_Y_tps;
+                //let scale_y_global2 = this.$store.state.global_Y_tps2;
+                //let scale_y_local = 0;
+//
+                //let currentMax = Math.max.apply(null, res.y);
+//
+                //console.log("currentMax  : "+currentMax)
+                //console.log("scale_y_global  : "+ scale_y_global)
+                //console.log("scale_y_global2  : "+ scale_y_global2)
+//
+                //// Initialization
+                //if (scale_y_global == "" || scale_y_global == "undefined" || scale_y_global == null )//{               
+                //    this.$store.state.global_Y_tps = currentMax;
+                //}
+//
+                //if (scale_y_global2 == "" || scale_y_global2 == "undefined" || scale_y_global2 == null )//{               
+                //    this.$store.state.global_Y_tps2 = currentMax;
+                //}
+//
+                //// Update global scale
+                //scale_y_local = currentMax;
+                //if (searchArea == 1) {                        
+                //    this.$store.state.global_Y_tps = currentMax;
+                //    scale_y_global = currentMax;
+                //    
+                //} else if (searchArea == 2) {
+                //    
+                //    this.$store.state.global_Y_tps2 = currentMax;
+                //    scale_y_global2 = currentMax;                    
+                //}
+//
+                //if (scale_y_global < scale_y_global2) {
+                //    scale_y_local = scale_y_global2;                    
+                //} else {
+                //    scale_y_local = scale_y_global;                    
+                //}
+                //
+                //console.log("scale_y_local  : "+scale_y_local)
+
+
                 if (searchArea == 1) {
+                    
                     this.lChartData1 = getLineChartTemplate(res.x, res.y, "TPS")
-                    //this.isActiveLine1 = false
+                    
                 } else {
+                    
                     this.lChartData2 = getLineChartTemplate(res.x, res.y, "TPS")
-                    //this.isActiveLine2 = false
+                    
                 }
-                this.lOptions = getLineChartOptions('Transaction Per Second');
+                this.lOptions = getLineChartOptions('Transaction Per Second', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);    // TODO: scale_y_local
             } catch (err) {
 
                 console.error(err); // TypeError: failed to fatch               
@@ -603,8 +742,38 @@ export default {
             }
 
             try {
-                let filter = this.getFilter()
+                let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
+                
                 let res = await getLineChartData(3, this.timeCondition, this.project_id, filter)
+
+                //console.log(res.y)
+                //console.log(res.yt)
+
+                // Global Scale 
+                //let scale_y_request = this.$store.state.global_Y_request;                
+
+                //if (scale_y_request == "" || scale_y_request == "undefined" || scale_y_request == null ){
+                //    this.$store.state.global_Y_request = Math.max.apply(null, res.y);
+
+                //} else {
+
+                //    if (scale_y_request < Math.max.apply(null, res.y)){
+                //        this.$store.state.global_Y_request = Math.max.apply(null, res.y);
+                //    }                    
+                //}
+
+                //let scale_y_duration = this.$store.state.global_Y_duration;
+
+                //if (scale_y_duration == "" || scale_y_duration == "undefined" || scale_y_duration == null ){
+                //    this.$store.state.global_Y_duration = Math.max.apply(null, res.yt);
+
+                //} else {
+
+                //    if (scale_y_duration < Math.max.apply(null, res.yt)){
+                //        this.$store.state.global_Y_duration = Math.max.apply(null, res.yt);
+                //    }                    
+                //}
+                
                 if (searchArea == 1) {
                     this.mlChartData1 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
                     //this.isActiveMultiLine1 = false
@@ -612,7 +781,9 @@ export default {
                     this.mlChartData2 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
                     //this.isActiveMultiLine2 = false
                 }
-                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken');
+                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
+                // TODO:, this.$store.state.global_Y_request, this.$store.state.global_Y_duration);
+
             } catch (err) {
 
                 console.error(err); // TypeError: failed to fatch
