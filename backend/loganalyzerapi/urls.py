@@ -23,6 +23,7 @@ router.register(r'logdetail_dynamic/notice', views.DynamicLogDetailViewSet, base
 router.register(r'logdetail_dynamic/statistics', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/chartdata', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 router.register(r'logdetail_dynamic/findings', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
+router.register(r'logdetail_dynamic/get_before_after_detail', views.DynamicLogDetailViewSet, basename='logdetail_dynamic')
 
 
 # For logformat

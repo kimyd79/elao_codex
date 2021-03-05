@@ -90,6 +90,12 @@ export default {
                     isSelected: false
                 },
                 {
+                    label: 'Lookup',
+                    linkto: '/lookup',
+                    key: 'lookup',
+                    isSelected: false
+                },
+                {
                     label: 'Management',
                     linkto: '/management',
                     key: 'management',

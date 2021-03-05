@@ -198,6 +198,8 @@ export default {
 
             // 1 : 0~9, 2 : 10~19,
             //console.log("offset :" + offset);
+            //console.log("this.pagingInfo.rowsPerPage :" + this.pagingInfo.rowsPerPage);
+            //console.log("this.pagingInfo.currentPage :" + this.pagingInfo.currentPage);
 
             let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)
             //console.log("filters : " + filters)

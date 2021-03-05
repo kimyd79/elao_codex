@@ -1,7 +1,7 @@
 <template>
 <div id="notice" >
     
-    <ui-card :columns="10" :height="170" :padding="4" >
+    <ui-card :columns="10" :height="160" :padding="2" >
         <ui-card-item header>Findings</ui-card-item>
         <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />

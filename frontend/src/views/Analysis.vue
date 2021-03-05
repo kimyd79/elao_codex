@@ -465,6 +465,8 @@ export default {
 
             try {
                 let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
+
+                console.log(res);
                 this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
                 this.sbOptions = getStackedBarChartOptions('Http Status Code', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {

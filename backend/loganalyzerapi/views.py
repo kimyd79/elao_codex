@@ -354,7 +354,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             logger.debug("get_queryset model_name : %s !!" % model_name )
          
         LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
-        queryset = LogDetail_dynamic.objects.all()
+        
+        # Default : orderby id(PK)
+        #queryset = LogDetail_dynamic.objects.all()
+        queryset = LogDetail_dynamic.objects.order_by('id')
         
         timeTakenUnit = ""            
         # 관련 project만 가져온다. : multifile 처리
@@ -411,7 +414,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             elif conditionValue == 'U':
                 queryset = queryset.filter(fuser_agent__icontains=searchValue)
             elif conditionValue == 'S':
-                queryset = queryset.filter(fstatus__icontains=searchValue)      
+                queryset = queryset.filter(fstatus__icontains=searchValue)    
+        
+        # String 검색
+        if conditionValue is None and searchValue is not None:
+            
+            if settings.DEBUG:                
+                logger.debug('searchValue applied! (String Search) : %s' % searchValue)                
+            
+            queryset = queryset.filter(log_line__icontains=searchValue)        
                 
         # conditionValue : statistic detailpopup
         if detailconditionValue is not None :
@@ -507,7 +518,49 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 timeValue = metric_time
 
         return timeValue
-        
+           
+    @action(methods=['post'], detail=False)
+    def get_before_after_detail(self, request, pk=None):        
+       
+        try:
+            project_id = request.data['project_id']
+            before = int(request.data['before'])
+            after = int(request.data['after'])
+            logs = request.data['logs']
+            results = []
+            
+            if settings.DEBUG:
+    	        logger.debug('get_before_after_detail project_id : %s' % project_id)
+            
+            model_name = "logdetail_"+project_id
+            LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+            
+            for log in logs['results']:
+                
+                #if settings.DEBUG:
+        	    #    logger.debug("log : ", log)
+                                  
+                rows = LogDetail_dynamic.objects.filter(id__range=(log['id']-before, log['id']+after)).order_by('id')
+                
+                cnt = rows.values('id','log_line').count()
+                for row in rows.values('id','log_line'):
+                    
+                    #if settings.DEBUG:
+                    #    logger.debug("row['id'] : ", row['id'])
+                    #    logger.debug("row['log_line'] : ", row['log_line'])
+                    
+                    cnt = cnt - 1
+                    results.append({'id' : row['id'], 'log_line' : row['log_line'], 'is_main' : "true" if log['id'] == row['id'] else "false", 'is_last': "true" if cnt == 0 else "false"})
+            
+            response = {'message': 'get_before_after_detail returned successfully', 'results': results, 'count': len(results) }        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing get_before_after_detail : %s' % ex)
+                    
+            response = {'message': 'get_before_after_detail creation failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+      
         
 
     @action(methods=['post'], detail=False)
@@ -945,9 +998,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
                     rows = hhRequest.values('f_date', 'f_status', 'status_count')
                     
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    statusCount = {}
-                    
+                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}                   
                     resultStatusCode = []
                                                 
                     for row in rows:
@@ -963,7 +1014,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         if row['f_status'] not in resultStatusCode:
                             resultStatusCode.append(row['f_status']) 
                             
-                        # 전체 Map 구하기                    
+                        # 전체 Map 구하기     
+                        statusCount = {}               
                         statusCount[row['f_status']] = row['status_count']
                         dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
                         
@@ -1060,8 +1112,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
                     rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
                     
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    statusCount = {}
+                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}                    
                     
                     resultStatusCode = []
                                                 
@@ -1078,7 +1129,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         if row['f_status'] not in resultStatusCode:
                             resultStatusCode.append(row['f_status']) 
                             
-                        # 전체 Map 구하기                    
+                        # 전체 Map 구하기
+                        statusCount = {}
                         statusCount[row['f_status']] = row['status_count']
                         dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
                         
@@ -1174,8 +1226,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     rows = hhmmssRequest.values('f_date', 'f_status', 'status_count')
                     
                     dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    statusCount = {}
-                    
                     resultStatusCode = []
                                                 
                     for row in rows:
@@ -1191,7 +1241,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         if row['f_status'] not in resultStatusCode:
                             resultStatusCode.append(row['f_status']) 
                             
-                        # 전체 Map 구하기                    
+                        # 전체 Map 구하기
+                        statusCount = {}
                         statusCount[row['f_status']] = row['status_count']
                         dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
                         

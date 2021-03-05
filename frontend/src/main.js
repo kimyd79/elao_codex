@@ -6,20 +6,20 @@ import LegoComponent from 'lego-component'
 import './styles/common.scss'
 import Layouts from './components/layout'
 
-import VueSimpleAlert from "vue-simple-alert";
+import VueSimpleAlert from "vue-simple-alert"
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 Vue.use(LegoComponent);
 Vue.use(Layouts);
 Vue.use(VueSimpleAlert, { reverseButtons: true });
 
 // Below codes come alert for leaving this site.
-window.addEventListener('beforeunload', function (e) { 
+//window.addEventListener('beforeunload', function (e) { 
   
-  e.preventDefault(); 
-  e.returnValue = ''; 
-}); 
+//  e.preventDefault(); 
+//  e.returnValue = ''; 
+//}); 
 
 new Vue({
   router,

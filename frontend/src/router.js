@@ -24,6 +24,7 @@ import Analysis from "./views/Analysis.vue"
 import Comparison from "./views/Comparison.vue"
 import ComparisonStatistic from "./views/ComparisonStatistic.vue"
 import Detail from "./views/Detail.vue"
+import Lookup from "./views/Lookup.vue"
 import Management from "./views/Management.vue"
 import Logformat from "./views/Logformat.vue"
 import Register from "./components/layout/Register.vue"
@@ -97,6 +98,11 @@ const router = new Router({
       path: '/comparison_statistic',
       name: 'comparison_statistic',
       component: ComparisonStatistic,
+    },
+    {
+      path: '/lookup',
+      name: 'lookup',
+      component: Lookup,
     },
     {
       path: '/management',
