@@ -15,7 +15,7 @@
 
             <ui-tab box :tabs="tabs" v-on:tabChange="tabChange" />
 
-            <vue-element-loading :active="isActive" spinner="spinner" text="500MB 기준 약 100초 소요됩니다." :is-full-screen="false" color="#553ca5" />
+            <vue-element-loading :active="isActive" spinner="spinner" text="It takes about 100 seconds based on 500MB." :is-full-screen="false" color="#553ca5" />
 
             <div class="popup-form">
 
@@ -51,7 +51,7 @@
                     </ui-form-item>
 
                     <ui-form-item :columns=11 label="File Size" required-left left-label :label-width=144 :label-padding=16>
-                        {{ fileSize }} bytes
+                        {{ fileSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} bytes
                     </ui-form-item>
 
                     <!-- addLogFormat popup 추가 -->
@@ -383,11 +383,21 @@ export default {
                 .then(res => {
 
                     for (let i = 0; i < res.data.results.length; i++) {
-                        let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
+                        
+                        let result = res.data.results[i];
+                        let tmp = result.format_kind + '/' + result.format_name;
+                        
                         this.items.push({
-                            value: tmp + '/' + res.data.results[i].format_strings,
-                            text: tmp + ' => ' + res.data.results[i].format_strings
+                            value: tmp + '/' + result.format_strings,
+                            text: '▶ ' +tmp + ' → ' + result.format_strings.substr(0,130)+(result.format_strings.length > 130 ? " ..." : "" ),
                         });
+
+                        //let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
+                        //this.items.push({
+                        //    value: tmp + '/' + res.data.results[i].format_strings,
+                        //    text: tmp + ' => ' + res.data.results[i].format_strings
+                        //    });
+
                     }
 
                 })
@@ -628,6 +638,7 @@ export default {
             } else if (this.tabs[2].isSelected) { // Step2 : this.projectID
 
                 try {
+                    this.fileSize = 0;
                     await this.createLogfile(serverUrl)
                     // this.buttonName = "OK"
                     this.buttonName = "Analysis"
@@ -838,6 +849,12 @@ export default {
 
             let splitedFormat = this.fileFormat.split("/")
 
+            //console.log("this.fileFormat : "+this.fileFormat)
+            //console.log("splitedFormat : "+splitedFormat)
+            //console.log("splitedFormat[0] : "+splitedFormat[0])
+            //console.log("splitedFormat[1] : "+splitedFormat[1])
+            //console.log("splitedFormat[2] : "+splitedFormat[2])
+
             formData.append('format_kind', splitedFormat[0]);
             formData.append('format_name', splitedFormat[1]);
             formData.append('file_format', splitedFormat[2]);
@@ -905,15 +922,16 @@ export default {
                     this.$store.dispatch("setGlobalFromTime", res.data.start_time);
                     this.$store.dispatch("setGlobalToTime", res.data.end_time);
 
+                    
                     this.$store.dispatch("setFromDate", res.data.start_date);
-                    this.$store.dispatch("setToDate", res.data.end_date);
+                    this.$store.dispatch("setToDate", res.data.limit_end_date);
                     this.$store.dispatch("setFromTime", res.data.start_time);
-                    this.$store.dispatch("setToTime", res.data.end_time);
+                    this.$store.dispatch("setToTime", res.data.limit_end_time);
 
                     this.$store.dispatch("setFromDate2", res.data.start_date);
-                    this.$store.dispatch("setToDate2", res.data.end_date);
+                    this.$store.dispatch("setToDate2", res.data.limit_end_date);
                     this.$store.dispatch("setFromTime2", res.data.start_time);
-                    this.$store.dispatch("setToTime2", res.data.end_time);
+                    this.$store.dispatch("setToTime2", res.data.limit_end_time);
 
                     // For Tab3
                     this.setFromDate = res.data.start_date;
@@ -1000,21 +1018,21 @@ export default {
             return axios.post(url, postData)
                 .then(res => {
                     //console.log(res)
-
+                    
                     this.$store.dispatch("setGlobalFromDate", res.data.start_date);
                     this.$store.dispatch("setGlobalToDate", res.data.end_date);
                     this.$store.dispatch("setGlobalFromTime", res.data.start_time);
                     this.$store.dispatch("setGlobalToTime", res.data.end_time);
-
+                    
                     this.$store.dispatch("setFromDate", res.data.start_date);
+                    this.$store.dispatch("setToDate", res.data.limit_end_date);
                     this.$store.dispatch("setFromTime", res.data.start_time);
-                    this.$store.dispatch("setToDate", res.data.end_date);
-                    this.$store.dispatch("setToTime", res.data.end_time);
+                    this.$store.dispatch("setToTime", res.data.limit_end_time);
 
                     this.$store.dispatch("setFromDate2", res.data.start_date);
-                    this.$store.dispatch("setToDate2", res.data.end_date);
+                    this.$store.dispatch("setToDate2", res.data.limit_end_date);
                     this.$store.dispatch("setFromTime2", res.data.start_time);
-                    this.$store.dispatch("setToTime2", res.data.end_time);
+                    this.$store.dispatch("setToTime2", res.data.limit_end_time);                   
 
                     var file_list = ""
                     res.data.file_names.forEach(file => file_list = file_list + file + ", ")

@@ -357,7 +357,7 @@ export default {
             var ttFromValueThreshold = this.threshold * 1000
             var ttToValueThreshold =  24*60*60*1000
             
-            let filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '', '', '')
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '', '', '')
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -431,7 +431,10 @@ export default {
                 } 
             }
 
-            filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, staticValue, '', byteFromValueThreshold, byteToValueThreshold)
+            // 왜 기간, 조건이 빠져있는가?
+            //filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, staticValue, '', byteFromValueThreshold, byteToValueThreshold)
+
+            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, staticValue, '', byteFromValueThreshold, byteToValueThreshold)
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;

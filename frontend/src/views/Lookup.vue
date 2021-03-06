@@ -110,15 +110,16 @@ export default {
 
     data() {
         return {
-
-            searchValue: "",
+            
             dateFromValue: '',
             dateToValue: "",
             timeFromValue: "",
             timeToValue: "",
-            beforeLines: "",
-            afterLines: "",
             projectID: "",
+            searchValue: "",
+
+            beforeLines: "",
+            afterLines: "",            
 
             resultLogs: [],            
             scrollLimit: 30,
@@ -137,11 +138,9 @@ export default {
         this.dateToValue = this.$store.state.toDate
         this.timeFromValue = this.$store.state.fromTime
         this.timeToValue = this.$store.state.toTime
-
         this.searchValue = this.$store.state.searchKeyword
         this.projectID = this.$store.state.projectID
     },
-
     methods: {
         initialize() {
 
@@ -166,16 +165,19 @@ export default {
         },
 
         // mapAction
-        setSerachCondition() {
+        setSearchCondition() {
             this.$store.dispatch("setFromDate", this.dateFromValue);
             this.$store.dispatch("setToDate", this.dateToValue);
             this.$store.dispatch("setFromTime", this.timeFromValue);
             this.$store.dispatch("setToTime", this.timeToValue);
-        },
 
+            this.$store.dispatch("setToggleSearch1");
+        },
+        
         async search($state) {
             
-            //console.log("this.searchValue : "+this.searchValue);
+            //console.log("this.searchValue : "+this.searchValue);            
+            this.setSearchCondition();
 
             this.queries = [];
             if (this.searchValue != ""){
@@ -219,6 +221,8 @@ export default {
                     console.error(err);                   
                 });           
             
+            this.totalCount = tempResult.count;
+
             //console.table(tempResult);
 
             // Step2 : Before / After 값 존재여부 확인 
@@ -267,15 +271,19 @@ export default {
             //console.table(tempResult);
 
             if (tempResult.results.length) {
-                this.totalCount = tempResult.count;
+                
                 this.resultLogs.push(...tempResult.results);
+
                 $state.loaded();
                 
             } else {                
 
                 this.resultLogs.push(...tempResult.results);
+
                 $state.complete();
             }
+
+            
             
         }
 

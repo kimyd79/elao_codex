@@ -4,13 +4,13 @@
         <ui-card-item header>Information</ui-card-item>
         <ui-card-item sub class="card_box" >
             <span style="color:gray">
-                Project Name (Total Log Lines) : {{ this.projectName }} ({{ totalLogLines.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} lines)
+                <span style="color:#553ca5"><b>Project Name (Total Log Lines)</b></span> : {{ this.projectName }} ({{ totalLogLines.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} lines)
                 <br>
-                Logfile Name : {{ this.fileNames }}
+                <span style="color:#553ca5"><b>Logfile Name</b></span> : {{ this.fileNames }}
                 <br>
-                LogFormat : {{ this.logFormat }}
+                <span style="color:#553ca5"><b>LogFormat</b></span> : {{ this.logFormat }}
                 <br>
-                Period(Date/Time) : {{ this.dateFromValue }}/{{ this.timeFromValue }} ~ {{ this.dateToValue }}/{{ this.timeToValue }}
+                <span style="color:#553ca5"><b>Period(Date/Time)</b></span> : {{ this.dateFromValue }}/{{ this.timeFromValue }} ~ {{ this.dateToValue }}/{{ this.timeToValue }}
             </span>
         </ui-card-item>
         <ui-card-item body></ui-card-item>

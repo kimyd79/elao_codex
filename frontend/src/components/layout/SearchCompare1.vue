@@ -120,7 +120,7 @@ export default {
         },
 
         // mapAction
-        setSerachCondition() {
+        setSearchCondition() {
             this.$store.dispatch("setFromDate", this.dateFromValue);
             this.$store.dispatch("setToDate", this.dateToValue);
             this.$store.dispatch("setFromTime", this.timeFromValue);
@@ -138,7 +138,7 @@ export default {
             // TODO : Validation Check
 
             // Set Global Variable
-            this.setSerachCondition()
+            this.setSearchCondition();
         }
     },
 

@@ -2,7 +2,7 @@
 <div id="notice" >
     
     <ui-card :columns="10" :height="160" :padding="2" >
-        <ui-card-item header>Findings</ui-card-item>
+        <ui-card-item header>Findings2</ui-card-item>
         <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-card-item sub class="card_box">                        
@@ -23,9 +23,10 @@ import {
     mapGetters
 } from "vuex";
 import VueElementLoading from 'vue-element-loading'
-import DetailPopup from './DetailPopup';
+import DetailPopup2 from './DetailPopup2';
 import {
-    serverUrl
+    serverUrl,
+    getSearchFilter
 } from "@/common";
 
 export default {
@@ -34,7 +35,7 @@ export default {
     components: {
         // export Loading Spinner components
         VueElementLoading,
-        DetailPopup,
+        DetailPopup2,
     },
 
     data() {
@@ -69,22 +70,19 @@ export default {
         logfileID: "getLogFileID",
         projectID: "getProjectID",
 
-        dateFromValue: "getFromDate",
-        dateToValue: "getToDate",
-        timeFromValue: "getFromTime",
-        timeToValue: "getToTime",
-        threshold: "getThreshold",
+        dateFromValue: "getFromDate2",
+        dateToValue: "getToDate2",
+        timeFromValue: "getFromTime2",
+        timeToValue: "getToTime2",
+        conditionValue: "getCondition2",
+        searchValue: "getSearchKeyword2",
 
-        conditionValue: "getCondition",
-        searchValue: "getSearchKeyword",
-
-        ttFromValue: "getFromTimeTaken",
-        ttToValue: "getToTimeTaken",
+        ttFromValue: "getFromTimeTaken2",
+        ttToValue: "getToTimeTaken2",
 
         threshold: "getThreshold",
 
-        isSearch: "getToggleSearch",
-        isSearch1: "getToggleSearch1",
+        isSearch: "getToggleSearch2",
     }),
 
     methods: {
@@ -109,6 +107,7 @@ export default {
             return filter
         },
 
+
         async getMetrics() {                    
             
             let items = []
@@ -120,10 +119,12 @@ export default {
 
             let postData = {
                 project_id: this.projectID,
-                
+
+                // TODO: Filter 로직 필요, 현재 전체에 대해서 결과를 가져온다.
                 filter: this.getFilter(),
             };
 
+            
             await axios
                 .post(serverUrl + "/logdetail_dynamic/findings/", postData)
                 .then(res => {
@@ -164,17 +165,12 @@ export default {
             this.$store.state.popupHeader = 'Finding Detail';
             this.$store.state.popupBody = finding.description;
             this.$store.state.popupButton = 'Close';
-            this.currentView = 'DetailPopup';
+            this.currentView = 'DetailPopup2';
         },
-        
     },
     watch: {
         
         isSearch() {
-            this.getMetrics();
-        },
-
-        isSearch1() {
             this.getMetrics();
         }
     }

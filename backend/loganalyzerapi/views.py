@@ -570,6 +570,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             project_id = request.data['project_id']
             timetakenUnit = ""
             findingsResultList = []
+            
+            # 검색 조건 적용 TODO: 검증
+            queryset = self.get_queryset()
 
             if settings.DEBUG:
                 logger.debug('findings project_id : %s' % project_id)            
@@ -599,10 +602,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 metric_max = metricDetail[0]['metric_max']   
                 metric_static = metricDetail[0]['metric_static']   
 
-                model_name = "logdetail_"+project_id
-                LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()   
-
-                queryset = LogDetail_dynamic.objects.all()
+                #model_name = "logdetail_"+project_id
+                #LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()   
+                #queryset = LogDetail_dynamic.objects.all()
+                
                 queryset = queryset.filter(logfile_id__in=list_logfile_id)
 
                 # Static file 조회 여부('js', 'html','ico','jpg','png','bmp','otf','css')
@@ -664,12 +667,23 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             model_name = "logdetail_"+project_id
             LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
-            tempset = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
+            
+            # All Period            
+            tempset = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')            
             
             firstRow = tempset.first()
             lastRow = tempset.last()
             
-            response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime, 'file_names': list_file_name}        
+            # Limit 30% of Total for default loading : TODO: Setting
+            #limitRows = int(tempset.count() * 1)
+            #lastLimitedRow = LogDetail_dynamic.objects.filter(logfile_id__in=list_logfile_id, id=limitRows).get()
+            # 없을 경우 오류처리 필요, 우선 동일하게
+            
+            #response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime, 'limit_end_date': lastLimitedRow.fdate, 'limit_end_time': lastLimitedRow.ftime, 'file_names': list_file_name}        
+            
+            # 우선 동일하게
+            response = {'message': 'start_end returned successfully', 'start_date': firstRow.fdate, 'start_time': firstRow.ftime, 'end_date': lastRow.fdate, 'end_time': lastRow.ftime, 'limit_end_date': lastRow.fdate, 'limit_end_time': lastRow.ftime, 'file_names': list_file_name}
+            
             return Response(response, status = status.HTTP_200_OK)
             
         except Exception as ex:

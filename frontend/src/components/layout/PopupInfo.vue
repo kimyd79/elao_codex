@@ -13,7 +13,7 @@
             </div>
 
             <div class="popup-body"> <!-- add_scroll -->
-                Version : 1.0.0
+                <span style="color:#553ca5"><b>Version</b></span> : 1.0.0b (2021.03.01)
                 <br><br>
                 <!--Log Formats : Apache Httpd Server, OHS, IIS(W3C, NCSA), Nginx, Webtob
                               Tomcat, Jeus7/8 -->
@@ -34,15 +34,18 @@
                     <div class="table-summary-title">Summary</div>
                     <div class="table-summary-item">
                         <div>Statistics</div>
-                        <div style="color:blue"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545211" onclick="window.open(this.href,'_blank'); return false;">16</a></div>
+                        <div style="color:#553ca5"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545211" onclick="window.open(this.href,'_blank'); return false;"><b>16</b></a></div>
+                        <div>&nbsp;</div>
                     </div>
                     <div class="table-summary-item">
                         <div>Charts</div>
-                        <div style="color:blue"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545228" onclick="window.open(this.href,'_blank'); return false;">8</a></div>
+                        <div style="color:#553ca5"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545228" onclick="window.open(this.href,'_blank'); return false;"><b>8</b></a></div>
+                        <div>&nbsp;</div>
                     </div>
                     <div class="table-summary-item">
                         <div>Metrics</div>
-                        <div style="color:blue"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545515" onclick="window.open(this.href,'_blank'); return false;">4</a></div>
+                        <div style="color:#553ca5"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545515" onclick="window.open(this.href,'_blank'); return false;"><b>7</b></a></div>
+                        <div>(14 in preparation)</div>
                     </div>                    
                 </div>
             </div>

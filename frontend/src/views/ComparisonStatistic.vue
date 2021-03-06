@@ -5,8 +5,9 @@
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
-        <info></info>
+        <!-- <info></info> -->
         <notice></notice>
+        <notice2></notice2>
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal align-center class="page-form-area">
@@ -85,6 +86,7 @@
 import Info from "@/components/layout/Info";
 import Init from "@/components/layout/Init";
 import Notice from "@/components/layout/Notice";
+import Notice2 from "@/components/layout/Notice2";
 import Search from "@/components/layout/Search";
 import SearchCompare1 from "@/components/layout/SearchCompare1";
 import SearchCompare2 from "@/components/layout/SearchCompare2";
@@ -105,6 +107,7 @@ export default {
     components: {
         Info,
         Notice,
+        Notice2,
         SearchCompare1,
         SearchCompare2,
         StatisticsCompare1,
