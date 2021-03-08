@@ -38,6 +38,7 @@
                 <img src="@/assets/manual22.png" /><br>
                 <img src="@/assets/manual23.png" /><br>
                 <img src="@/assets/manual24.png" /><br>
+                <img src="@/assets/manual25.png" /><br>
             </div>
 
             <div class="popup-buttons">
