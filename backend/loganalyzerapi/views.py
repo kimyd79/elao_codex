@@ -572,7 +572,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             findingsResultList = []
             
             # 검색 조건 적용 TODO: 검증
-            queryset = self.get_queryset()
+            queryset_tmp = self.get_queryset()
 
             if settings.DEBUG:
                 logger.debug('findings project_id : %s' % project_id)            
@@ -602,11 +602,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 metric_max = metricDetail[0]['metric_max']   
                 metric_static = metricDetail[0]['metric_static']   
 
-                #model_name = "logdetail_"+project_id
-                #LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()   
-                #queryset = LogDetail_dynamic.objects.all()
+                # model_name = "logdetail_"+project_id
+                # LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()   
+                # queryset = LogDetail_dynamic.objects.all()
                 
-                queryset = queryset.filter(logfile_id__in=list_logfile_id)
+                queryset = queryset_tmp.filter(logfile_id__in=list_logfile_id)
 
                 # Static file 조회 여부('js', 'html','ico','jpg','png','bmp','otf','css')
                 if metric_static == 'Y':
