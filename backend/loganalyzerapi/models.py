@@ -92,7 +92,7 @@ class LogDetail(models.Model):
     objects = CopyManager()
     
     def __str__(self):
-        return self.project_id
+        return str(self.project_id)
 
     class Meta:
         ordering = ['created']
@@ -110,7 +110,7 @@ class LogFormat(models.Model):
         ordering = ['created']
 
     def __str__(self): 
-        return self.format_id   
+        return str(self.format_id   )
 
 class LogFormatString(models.Model):
     # PK
@@ -124,7 +124,7 @@ class LogFormatString(models.Model):
         ordering = ['created']
 
     def __str__(self): 
-        return self.formatstring_id
+        return str(self.formatstring_id)
 
 
 class Metrics(models.Model):
@@ -144,7 +144,7 @@ class Metrics(models.Model):
         ordering = ['created']
 
     def __str__(self): 
-        return self.metric_id 
+        return str(self.metric_id)
 
 
 class LogMasterMetric(models.Model):
@@ -160,4 +160,4 @@ class LogMasterMetric(models.Model):
         ordering = ['created']
 
     def __str__(self): 
-        return self.logmastermetric_id  
+        return str(self.logmastermetric_id)

@@ -195,7 +195,7 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             #'class': 'logging.FileHandler',
             'class': 'logging.handlers.TimedRotatingFileHandler',            
             'filename': os.path.join(BASE_DIR, 'logs', 'mwla.log'),   
@@ -204,7 +204,7 @@ LOGGING = {
             'backupCount': '30',
         },
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
@@ -213,7 +213,7 @@ LOGGING = {
     'loggers': {
         'loganalyzerapi': {
             'handlers': ['console', 'file'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
     }

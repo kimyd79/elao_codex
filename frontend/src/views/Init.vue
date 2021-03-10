@@ -563,7 +563,7 @@ export default {
                     //console.log(res)
                     this.setItemList(res.data.results);
 
-                    this.isActive = false
+                    this.isActive = false                    
                     this.$alert("Get project data completed..!!", "Notification", "success");
 
                 })
@@ -654,16 +654,31 @@ export default {
 
                 // TODO : Multi-File 및 기존 project에 File Add시 처리
 
+                var processing_time = 0;
                 try {
                     // CASE1 : File을 새로 추가한 경우            
                     if (this.isNewFileAdded) {
 
-                        await this.createLogdetail(serverUrl);
+                        processing_time = await this.createLogdetail(serverUrl);
 
                     }
 
                     // CASE2 : 기존 File을 이용하는 경우                    
-                    await this.getLogDetail(this.projectID)
+                    //await this.getStartEnd(this.projectID)
+
+                    // TODO: 임시로직
+                    var resultMsg = "Get Logdetail Data completed..!! ";
+                    if ( processing_time != 0){
+                        resultMsg = resultMsg + processing_time  + " : secs"
+                    }
+
+                    this.$alert(resultMsg, "Notification", "success").then(() => {
+
+                        this.getStartEnd(this.projectID);                        
+
+                    }).catch(() => {
+                        console.log("getStartEnd Error");
+                    });
 
                     isNext = true;
                 } catch (err) {
@@ -915,7 +930,7 @@ export default {
             this.isActive = true
             return axios.post(url + "/logdetail_dynamic/", postData, axiosConfig)
                 .then(res => {
-                    //console.log(res)
+                //console.log(res)
 
                     this.$store.dispatch("setGlobalFromDate", res.data.start_date);
                     this.$store.dispatch("setGlobalToDate", res.data.end_date);
@@ -942,7 +957,10 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Create Logdetail Data completed..!!", "Notification", "success");
+                    // Check -> 뒤에 start_end에서 출력하도록 한다.
+                     //this.$alert("Create Logdetail Data completed..!! "+ res.data.processing_time + " : secs", "Notification", "success");
+
+                    return res.data.processing_time;
 
                 })
                 .catch(err => {
@@ -1001,7 +1019,7 @@ export default {
                 })
         },
 
-        getLogDetail(projectID) {
+        getStartEnd(projectID) {
 
             //console.log("getLogDetail projectID : " + projectID)
 
@@ -1010,7 +1028,8 @@ export default {
             //var url = serverUrl + "/logdetail/start_end/"
 
             let postData = {
-                project_id: projectID
+                project_id: projectID,
+                creator : this.creator
             };
 
             this.isActive = true
@@ -1036,21 +1055,22 @@ export default {
 
                     var file_list = ""
                     res.data.file_names.forEach(file => file_list = file_list + file + ", ")
+                    
+                    this.fileName = file_list;
+                    this.$store.dispatch("setFileNames", this.fileName);
 
-                    //("file_list - " + file_list)
-
-                    this.fileName = file_list
-                    this.$store.dispatch("setFileNames", file_list);
                     // Stop Loading Spinner
                     this.isActive = false
 
                     // this.$alert("Get Logdetail Data completed..!!", "Notification", "success");
-                    this.$alert("Get Logdetail Data completed..!!", "Notification", "success").then(() => {
-                        this.$router.push('/analysis');
-                    }).catch(() => {
+                    //this.$alert("Get Logdetail Data completed..!!", "Notification", "success").then(() => {
+                    //    this.$router.push('/analysis');
+                    //}).catch(() => {
                         //console.log("Cancel clicked");
-                    });
+                    //});
                     
+                    // TODO: 임시로직
+                    this.$router.push('/analysis');
 
                 })
                 .catch(err => {
@@ -1134,5 +1154,20 @@ export default {
 
 .popup-form .ui-form-item {
     margin-top: 32px;
+}
+
+
+.swal2-content {
+    z-index: 1;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    color: #545454;
+    font-size: 1.125em;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    word-wrap: break-word;
+    white-space: pre;
 }
 </style>

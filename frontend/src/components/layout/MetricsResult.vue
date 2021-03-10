@@ -112,10 +112,20 @@ export default {
     },
 
     methods: {
-        getData: function (metric_kind) {
-            axios.get(urlStr + '?metric_kind=' + metric_kind)
+        getData: function (metric_kind) {           
+
+
+            var url = "";
+
+            if (this.$store.state.userName == 'Leehs' || this.$store.state.userName == 'Admin') {
+                url = urlStr + '?metric_kind=' + metric_kind + '&creator='
+            } else {
+                url = urlStr + '?metric_kind=' + metric_kind + '&creator=' + this.$store.state.userName
+            }
+
+            axios.get(url)
                 .then((response) => {
-                    //console.log(response);
+                    console.log(response);
                     this.metric_lists = response.data.results;
                     this.selected_metric_id = '';
                     this.metric.metric_id = '';

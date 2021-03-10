@@ -28,7 +28,8 @@
                 </div>
             </template>
         </div>
-        <div v-if="!noAction" class="ui-tab-action">
+        <!-- < > button --> 
+        <!-- <div v-if="!noAction" class="ui-tab-action">
             <div class="ui-tab-action-item">
                 <div class="ui-tab-action-forward">
                     <lego-icon small type="picto" v-on:click="tabForward">collapse_menu</lego-icon>
@@ -42,7 +43,7 @@
             <div v-if="removable" class="ui-tab-action-item">
                 <lego-icon small type="picto">add</lego-icon>
             </div>
-        </div>
+        </div> -->
     </div>
 
 </template>

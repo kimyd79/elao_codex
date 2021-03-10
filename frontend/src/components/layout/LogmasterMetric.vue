@@ -136,6 +136,11 @@ export default {
                 })
         },
         addData(logmastermetric) {
+
+            // TODO: Check
+            console.log("logmastermetric : "+logmastermetric);
+            console.table(logmastermetric);
+
             axios.post(urlStr, logmastermetric)
                 .then((response) => {
                     //console.log(response);

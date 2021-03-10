@@ -144,7 +144,7 @@ export default {
             this.$store.dispatch("setPopupButton", 'Close');
             this.logLine = `<p> ☞ 이희석 프로 * HP : +82-10-6252-9654 / E-mail : hs9654.lee@samsung.com</p>
                             <p> ☞ 김영도 프로 * HP : +82-10-9816-7972 / E-mail : youngdo7.kim@samsung.com</p><br>
-                            <p> ※ Q & A Page : <a href="http://devops.sdsdev.co.kr/confluence/pages/resumedraft.action?draftId=230551289&draftShareId=446045c8-4520-4111-ae18-7cfb334fe0fd&" onclick="window.open(this.href,'_blank'); return false;">Go (Click)</a></p>`;
+                            <p> ※ Q & A Page : <a href="https://devops.sdsdev.co.kr/confluence/pages/resumedraft.action?draftId=230551289&draftShareId=446045c8-4520-4111-ae18-7cfb334fe0fd&" onclick="window.open(this.href,'_blank'); return false;">Go (Click)</a></p>`;
             this.currentView = 'CommonPopup';
         },
 

@@ -6,7 +6,7 @@
             <span style="color:gray">
                 <span style="color:#553ca5"><b>Project Name (Total Log Lines)</b></span> : {{ this.projectName }} ({{ totalLogLines.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} lines)
                 <br>
-                <span style="color:#553ca5"><b>Logfile Name</b></span> : {{ this.fileNames }}
+                <span style="color:#553ca5"><b>Logfile Name</b></span> : {{ this.fileNames.slice(0,-1) }}
                 <br>
                 <span style="color:#553ca5"><b>LogFormat</b></span> : {{ this.logFormat }}
                 <br>

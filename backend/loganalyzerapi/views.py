@@ -647,12 +647,51 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'findings creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    def setDefaultMetrics(self, project_id, creator):
+        
+        try:
+            
+            # 이미 한 작업이면 디폴트 설정없이 리턴한다.
+            if LogMasterMetric.objects.filter(project_id=project_id, creator=creator).count() != 0:
+                return
+            
+            # 처음에는 전체 Metric 항목을 사용자에게 복사 - creator만 변경하여 추가
+            # admin을 시스템 공통으로 해야 한다.(기준 Metric)
+            # TODO: Logic 추가 - metric.metric_definition이 존재하는 것은 제외
+            exist_metric_definitions = []
+            for metric in Metrics.objects.filter(creator=creator):
+                exist_metric_definitions.append(metric.metric_definition)
+                
+            
+            admins = ['admin', 'Admin', 'Leehs'] 
+            for metric in Metrics.objects.filter(creator__in=admins):
+                #print(metric)
+                
+                if creator not in admins and metric.metric_definition not in exist_metric_definitions:                    
+                    
+                    new_metric = Metrics.objects.create(metric_kind=metric.metric_kind, metric_definition=metric.metric_definition, metric_filter=metric.metric_filter,
+                    metric_unit=metric.metric_unit, metric_min=metric.metric_min,
+                    metric_max=metric.metric_max, metric_static=metric.metric_static, creator=creator)
+                    
+                    new_metric.save()   # commit
+            
+            # Metrics 전체 가져와서 추가하기
+            for metric in Metrics.objects.filter(creator=creator):
+                logmastermetric = LogMasterMetric.objects.create(project_id=project_id, metric_id=metric.metric_id,  creator=creator)
+
+                logmastermetric.save()
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing setDefaultMetrics : %s' % ex)
+            raise
+        
 
     @action(methods=['post'], detail=False)
     def start_end(self, request, pk=None):        
        
         try:
             project_id = request.data['project_id']
+            creator = request.data['creator']
             
             if settings.DEBUG:
     	        logger.debug('start_end project_id : %s' % project_id)
@@ -673,6 +712,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             firstRow = tempset.first()
             lastRow = tempset.last()
+            
+            # TODO: Metric을 기본 설정한다.
+            self.setDefaultMetrics(project_id, creator)
             
             # Limit 30% of Total for default loading : TODO: Setting
             #limitRows = int(tempset.count() * 1)
@@ -1433,9 +1475,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
                     
                 if settings.DEBUG:
-                    logger.debug("To DB, Total Duration : %s" % (time.time() - start))
+                    logger.debug("To DB, Total Duration : %s sec" % (time.time() - start))
                 
-                response = {'message': 'logdetail created successfully.'}
+                response = {'message': 'logdetail created successfully.', 'processing_time': round(time.time() - start, 3) }
                 
             return Response(response, status = status.HTTP_200_OK)
         
@@ -1958,7 +2000,7 @@ class MetricsViewSet(viewsets.ModelViewSet):
     queryset = Metrics.objects.all()
     serializer_class = MetricsSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['metric_kind']
+    filterset_fields = ['metric_kind', 'creator']
 
 class LogMasterMetricViewSet(viewsets.ModelViewSet):
     queryset = LogMasterMetric.objects.all()

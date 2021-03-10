@@ -35,7 +35,7 @@
             </ui-form-item>
             <ui-form-item :columns="8" align-right margin-right>
                 <lego-button v-on:click="initialize">Initialize</lego-button>
-                <lego-button v-on:click="clear">Clear</lego-button>
+                <lego-button v-on:click="clear">Result Clear</lego-button>
                 <lego-button v-on:click="search" main>Search</lego-button>
             </ui-form-item>
         </ui-form-row>
@@ -47,7 +47,7 @@
         
         <div class="page-content card_box">
             <span v-for="(log, idx) in resultLogs" :key="idx">
-                <span v-bind:style= " log.is_main == 'true' ? 'color:blue' : 'color:black' " > 
+                <span v-bind:style= " log.is_main == 'true' ? 'color:#553ca5' : 'color:black' " > 
                     [{{idx+1}}] <!--[{{log.id}}]--> <text-highlight :queries="queries"> {{ log.log_line }} </text-highlight>
                 </span>
                 <br>

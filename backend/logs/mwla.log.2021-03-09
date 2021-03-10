@@ -1,0 +1,24 @@
+[ERROR][09/Mar/2021 19:24:09,931][42548|48112][loganalyzerapi.views|parse_log_div|1490] UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : 'utf-8' codec can't decode byte 0xfd in position 239039: invalid start byte
+[ERROR][09/Mar/2021 19:24:13, 71][42548|48112][loganalyzerapi.views|parse_log_div|1522] UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : 'utf-8' codec can't decode byte 0xfd in position 239039: invalid start byte
+[ERROR][09/Mar/2021 20:15:29,736][40192|43984][loganalyzerapi.views|parse_log_div|1490] UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : 'utf-8' codec can't decode byte 0xfd in position 239039: invalid start byte
+[ERROR][09/Mar/2021 20:15:32,927][40192|43984][loganalyzerapi.views|parse_log_div|1522] UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : 'utf-8' codec can't decode byte 0xfd in position 239039: invalid start byte
+[ERROR][09/Mar/2021 22:29:06,275][45068|31868][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,279][45068|50012][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,283][45068|22276][loganalyzerapi.views|findings|645] Error Occured while processing findings : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,288][45068|43084][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,308][45068|31868][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,316][45068|50012][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,325][45068|22276][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,329][45068|43084][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,335][45068|31868][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,357][45068|50012][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,365][45068|22276][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,384][45068|43084][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,390][45068|31868][loganalyzerapi.views|chartdata|1336] Error Occured while creating chartdata : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,394][45068|50012][loganalyzerapi.views|chartdata|1336] Error Occured while creating chartdata : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,423][45068|22276][loganalyzerapi.views|chartdata|1336] Error Occured while creating chartdata : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,430][45068|43084][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,453][45068|31868][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,485][45068|22276][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,490][45068|50012][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
+[ERROR][09/Mar/2021 22:29:06,518][45068|43084][loganalyzerapi.views|statistics|940] Error Occured while creating statistics : 'dateFromValue'
