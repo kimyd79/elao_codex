@@ -702,6 +702,7 @@ export default {
         tabChange(dir) {
 
             if (dir == 1) { // Forward
+                this.buttonName = "Next"
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
 
@@ -718,6 +719,9 @@ export default {
 
                 }
             } else { // Backward
+                if (this.tabs[3].isSelected) {
+                    this.buttonName = "Analysis"
+                }
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
 
@@ -732,10 +736,8 @@ export default {
                             break;
                         }
                     }
-
                 }
             }
-
         },
 
         createLogmaster(url) {
