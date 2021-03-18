@@ -45,6 +45,10 @@ export default {
     getDetailSearchKeyword: state => state.detailsearchKeyword ,   
     getThreshold: state => state.threshold ,
 
+    // statistic detailpopup
+    getDetailCondition2: state => state.detailcondition2 ,
+    getDetailSearchKeyword2: state => state.detailsearchKeyword2 ,   
+
     getToggleSearch: state => state.toggleSearch ,
     getToggleSearch1: state => state.toggleSearch1 ,
     getToggleSearch2: state => state.toggleSearch2 ,

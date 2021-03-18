@@ -74,8 +74,8 @@ export default {
                     metric_kind: '',
                     metric_filter: '',
                     metric_unit: '',
-                    metric_min: '',
-                    metric_max: '',
+                    metric_value1: '',
+                    metric_value2: '',
                 }
             }
         }
@@ -297,6 +297,14 @@ export default {
                     this.$store.state.popupHeader = "Static file Names (count)"
                     this.$store.state.detailcondition = "R"
                     break;
+                case 13:
+                    this.$store.state.popupHeader = "Upstream Info (count, K8S Ingress)";
+                    this.$store.state.detailcondition = "V1"
+                    break;
+                case 14:
+                    this.$store.state.popupHeader = "Domains (count, K8S Ingress)";    
+                    this.$store.state.detailcondition = "V2"        
+                    break;
                 default:
             }
         },
@@ -310,7 +318,7 @@ export default {
 
             this.getDetailCondition();
 
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue, '', '')
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue, '', '', '')
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -346,50 +354,33 @@ export default {
                 });
         },
 
-        getLongTransactionLogDetails() {
+        getFindingDetailCondition() {
 
-            let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
-
-            // 1 : 0~9, 2 : 10~19,
-            //console.log("offset :" + offset);
-
-            // sec -> ms 단위로 처리한다.(*1000)
-            var ttFromValueThreshold = this.threshold * 1000
-            var ttToValueThreshold =  24*60*60*1000
-            
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, '', '', '', '')
-
-            var urlstring =
-                serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
-
-            // TODO : Set axiosConfig to set headers
-            //let axiosConfig = {
-            //  headers: {
-            //    'Authorization': 'Token '+ this.token // For Django
-            //  }
-            //};
-
-            // TODO : Set GET parametes, ex) /logdetail/?limit=10&offset=20
-
-            // Start Loading Spinner
-            this.isActive = true
-
-            axios
-                .get(urlstring)
-                .then(res => {
-
-                    //console.log(res.data.count); // 전체건수
-                    //console.log(res);
-                    this.pagingInfo.totalItems = res.data.count;
-                    this.setItemList(res.data.results);
-                    // Stop Loading Spinner
-                    this.isActive = false
-                })
-                .catch(err => {
-                    console.error(err);
-                    // Stop Loading Spinner
-                    this.isActive = false
-                });
+            if (this.$store.state.detailcondition == 'fstatus') {
+                //this.$store.state.popupHeader = "HTTP Status Codes (count)"
+                this.$store.state.detailcondition = "S"
+            } else if (this.$store.state.detailcondition == 'frequest') {    
+                // this.$store.state.popupHeader = "Requests URI (count)"
+                this.$store.state.detailcondition = "R"
+            } else if (this.$store.state.detailcondition == 'fip') {
+                // this.$store.state.popupHeader = "Visitors (count)"
+                this.$store.state.detailcondition = "I"
+            } else if (this.$store.state.detailcondition == 'freferer') {
+                // this.$store.state.popupHeader = "Referers (count)"
+                this.$store.state.detailcondition = "E"
+            } else if (this.$store.state.detailcondition == 'fuser_agent') {
+                // this.$store.state.popupHeader = "User Agent (count)"
+                this.$store.state.detailcondition = "U"
+            } else if (this.$store.state.detailcondition == 'fextension') {
+                // this.$store.state.popupHeader = "Static files (count)"
+                this.$store.state.detailcondition = "F"
+            } else if (this.$store.state.detailcondition == 'freserve1') {
+                // this.$store.state.popupHeader = "Upstream Info (count, K8S Ingress)";
+                this.$store.state.detailcondition = "V1"
+            } else if (this.$store.state.detailcondition == 'freserve2') {
+                // this.$store.state.popupHeader = "Domains (count, K8S Ingress)";    
+                this.$store.state.detailcondition = "V2"        
+            }
         },
 
         getFindingLogDetails() {
@@ -402,39 +393,38 @@ export default {
             let staticValue = ''
             let filters = ''
 
+            this.getFindingDetailCondition();
+
             if (this.finding.metric_static == 'Y'){
-                staticValue = 'D'
+                staticValue = 'T'
             }
             // timetaken 값은 microseconds -> ms 단위로 처리한다.(/1000)
             // logdetail_dynamic ftime_taken, fbyte between 조회
             if (this.finding.metric_kind == 'threshold'){
                 if (this.finding.metric_unit == 'micros'){
-                    ttFromValueThreshold = this.finding.metric_min / 1000
+                    ttFromValueThreshold = this.finding.metric_value1 / 1000
                     ttToValueThreshold = 24*60*60*1000 
                 } else if (this.finding.metric_unit == 'millis'){
-                    ttFromValueThreshold = this.finding.metric_min
+                    ttFromValueThreshold = this.finding.metric_value1
                     ttToValueThreshold = 24*60*60*1000
                 } else if (this.finding.metric_unit == 'byte'){
-                    byteFromValueThreshold = this.finding.metric_min
+                    byteFromValueThreshold = this.finding.metric_value1
                     byteToValueThreshold = 1024*1024*1024*1024
                 } 
             } else if (this.finding.metric_kind == 'scope'){
                 if (this.finding.metric_unit == 'micros'){
-                    ttFromValueThreshold = this.finding.metric_min / 1000
-                    ttToValueThreshold =  this.finding.metric_max / 1000
+                    ttFromValueThreshold = this.finding.metric_value1 / 1000
+                    ttToValueThreshold =  this.finding.metric_value2 / 1000
                 } else if (this.finding.metric_unit == 'millis'){
-                    ttFromValueThreshold = this.finding.metric_min
-                    ttToValueThreshold = this.finding.metric_max
+                    ttFromValueThreshold = this.finding.metric_value1
+                    ttToValueThreshold = this.finding.metric_value2
                 } else if (this.finding.metric_unit == 'byte'){
-                    byteFromValueThreshold = this.finding.metric_min
-                    byteToValueThreshold = this.finding.metric_max
+                    byteFromValueThreshold = this.finding.metric_value1
+                    byteToValueThreshold = this.finding.metric_value2
                 } 
             }
 
-            // 왜 기간, 조건이 빠져있는가?
-            //filters = getDetailSearchFilter('', '', '', '', '', '', ttFromValueThreshold, ttToValueThreshold, this.projectID, staticValue, '', byteFromValueThreshold, byteToValueThreshold)
-
-            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, staticValue, '', byteFromValueThreshold, byteToValueThreshold)
+            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue)
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -455,8 +445,6 @@ export default {
                 .get(urlstring)
                 .then(res => {
 
-                    //console.log(res.data.count); // 전체건수
-                    //console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
@@ -476,8 +464,6 @@ export default {
             this.pagingInfo.currentPage = page;
             if (this.$store.state.popupKind == 'Statistics') {
                 this.getStatisticsLogDetails();
-            } else if (this.$store.state.popupKind == 'LongTransaction') {
-                this.getLongTransactionLogDetails();
             } else if (this.$store.state.popupKind == 'FindingsDetail') {
                 this.getFindingLogDetails();
             }
@@ -493,8 +479,6 @@ export default {
     created() {
         if (this.$store.state.popupKind == 'Statistics') {
             this.getStatisticsLogDetails();
-        } else if (this.$store.state.popupKind == 'LongTransaction') {
-            this.getLongTransactionLogDetails();
         } else if (this.$store.state.popupKind == 'FindingsDetail') {
             this.getFindingLogDetails();
         }
@@ -504,8 +488,6 @@ export default {
         isSearch() {
             if (this.$store.state.popupKind == 'Statistics') {
                 this.getStatisticsLogDetails();
-            } else if (this.$store.state.popupKind == 'LongTransaction') {
-                this.getLongTransactionLogDetails();
             } else if (this.$store.state.popupKind == 'FindingsDetail') {
                 this.getFindingLogDetails();
             }

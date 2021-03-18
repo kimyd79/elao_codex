@@ -6,8 +6,11 @@
         <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-card-item sub class="card_box">                        
-            <span style="color:#553ca5" v-for="(finding, idx) in findingListResult" :key="idx" v-on:click="getMetricDetailSearch(idx, finding)"> 
-                [{{idx+1}}] {{finding.description}} : {{finding.result}}<br>
+            <span style="color:#553ca5" v-for="(finding, idx) in findingListResult" :key="idx"> 
+                <b>[{{idx+1}}] {{finding.description}}</b><br>
+                <span style="color:#553ca5" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
+                    > {{result.result}} : {{result.result_value}} <br>
+                </span>    
             </span>           
         </ui-card-item>
         <ui-card-item body></ui-card-item>
@@ -47,12 +50,12 @@ export default {
             findingListResult: [],
             finding: [{
                 description: '',
-                result: '',
+                results: [],
                 metric_kind: '',
                 metric_filter: '',
                 metric_unit: '',
-                metric_min: '',
-                metric_max: '',
+                metric_value1: '',
+                metric_value2: '',
                 metric_static: '',
             }],
         }
@@ -129,20 +132,22 @@ export default {
                 .then(res => {
 
                     for (let i = 0; i < res.data.findingsResult.length; i++) {
-                        if (res.data.findingsResult[i].metric_kind == 'threshold') {
-                            descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_min+" "+res.data.findingsResult[i].metric_unit+"]"
-                        } else {
-                            descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_min+" <= "+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_max+" "+res.data.findingsResult[i].metric_unit+"]"
-                        }
+                        // if (res.data.findingsResult[i].metric_kind == 'threshold') {
+                        //     descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_value1+" "+res.data.findingsResult[i].metric_unit+"]"
+                        // } else {
+                        //     descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_value1+" <= "+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_value2+" "+res.data.findingsResult[i].metric_unit+"]"
+                        // }
+
+                        descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"]"
 
                         items.push({
-                            description: descriptionString,                            
-                            result: res.data.findingsResult[i].result,
+                            description: descriptionString,                    
+                            results: res.data.findingsResult[i].results,
                             metric_kind: res.data.findingsResult[i].metric_kind,
                             metric_filter: res.data.findingsResult[i].metric_filter,
                             metric_unit: res.data.findingsResult[i].metric_unit,
-                            metric_min: res.data.findingsResult[i].metric_min,
-                            metric_max: res.data.findingsResult[i].metric_max,
+                            metric_value1: res.data.findingsResult[i].metric_value1,
+                            metric_value2: res.data.findingsResult[i].metric_value2,
                             metric_static: res.data.findingsResult[i].metric_static,
                         }); 
                     };                                            
@@ -158,13 +163,20 @@ export default {
     
         },
 
-        getMetricDetailSearch(idx, finding) {
+        getMetricDetailSearch(finding, result) {            
             this.finding = finding
+            if (result.result == 'count') {
+                this.$store.state.detailsearchKeyword = '';
+            } else{
+                this.$store.state.detailsearchKeyword = result.result;                
+            }  
+            this.$store.state.detailcondition = finding.metric_filter;          
             this.$store.state.popupKind = 'FindingsDetail';
             this.$store.state.popupHeader = 'Finding Detail';
             this.$store.state.popupBody = finding.description;
             this.$store.state.popupButton = 'Close';
             this.currentView = 'DetailPopup';
+    
         },
         
     },

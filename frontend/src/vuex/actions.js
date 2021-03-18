@@ -45,6 +45,8 @@ export default {
     //statistic detailpopup
     setDetailCondition({commit}, value) { commit(types.SET_DETAILCONDITION, value) },
     setDetailSearchKeyword({commit}, value) { commit(types.SET_DETAILSEARCHKEYWORD, value) },
+    setDetailCondition2({commit}, value) { commit(types.SET_DETAILCONDITION2, value) },
+    setDetailSearchKeyword2({commit}, value) { commit(types.SET_DETAILSEARCHKEYWORD2, value) },
     setThreshold({commit}, value) { commit(types.SET_THRESHOLD, value) },
     
     setToggleSearch({commit}) { commit(types.TOGGLE_SEARCH) },

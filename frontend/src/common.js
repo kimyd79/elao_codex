@@ -59,7 +59,7 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch, byteFrom, byteTo){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch, byteFrom, byteTo, staticYN){
     
     var filters="";
 
@@ -76,6 +76,9 @@ export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condit
     }
     if ( byteTo != '') {
         filters = filters + "&byteToValue="+byteTo
+    }
+    if ( staticYN != '') {
+        filters = filters + "&staticValue="+staticYN
     }
 
     return filters;
@@ -782,7 +785,7 @@ export function getFormatkindLlist() {
     return items;
 }
 
-export function getMetricskindLlist() {
+export function getMetricskindList() {
 
     var items = [];
     items.push({
@@ -793,12 +796,15 @@ export function getMetricskindLlist() {
         value: "scope",
         text: "scope"
     });
+    items.push({
+        value: "pattern",
+        text: "pattern"
+    });
 
     return items;
 }
 
-export function getMetricsfilterLlist() {
-
+export function getMetricsfilterList() {
     var items = []; 
     items.push({
         value: "ftime_taken",
@@ -808,11 +814,39 @@ export function getMetricsfilterLlist() {
         value: "fbyte",
         text: "fbyte"
     });
+    items.push({
+        value: "fip",
+        text: "fip"
+    });
+    items.push({
+        value: "frequest",
+        text: "frequest"
+    });
+    items.push({
+        value: "fuser_agent",
+        text: "fuser_agent"
+    });
+    items.push({
+        value: "fstatus",
+        text: "fstatus"
+    });
+    items.push({
+        value: "freferer",
+        text: "freferer"
+    });
+    items.push({
+        value: "freserve1",
+        text: "freserve1"
+    });
+    items.push({
+        value: "freserve2",
+        text: "freserve2"
+    });
 
     return items;
 }
 
-export function getMetricsunitLlist() {
+export function getMetricsunitList() {
 
     var items = [];
     items.push({
@@ -827,14 +861,18 @@ export function getMetricsunitLlist() {
         value: "byte",
         text: "byte"
     });
-    // items.push({
-    //     value: "%",
-    //     text: "%"
-    // });
-    // items.push({
-    //     value: "TPS",
-    //     text: "TPS"
-    // });
+    items.push({
+        value: "%",
+        text: "%"
+    });
+    items.push({
+        value: "4",
+        text: "%(4XX)"
+    });
+    items.push({
+        value: "5",
+        text: "%(5XX)"
+    });
 
     return items;
 }

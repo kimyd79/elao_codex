@@ -157,7 +157,13 @@ const mutations = {
     [types.SET_POPUPFORMATKIND] (state, value) { state.popupFormatKind = value },
 
     // metric info
-    [types.SET_METRICID] (state, value) { state.metricId = value }
+    [types.SET_METRICID] (state, value) { state.metricId = value },
+
+    [types.SET_DETAILCONDITION] (state, value) { state.detailcondition = value },
+    [types.SET_DETAILSEARCHKEYWORD] (state, value) { state.detailsearchKeyword = value },
+    [types.SET_DETAILCONDITION2] (state, value) { state.detailcondition2 = value },
+    [types.SET_DETAILSEARCHKEYWORD2] (state, value) { state.detailsearchKeyword2 = value },
+
 
 }
 

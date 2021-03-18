@@ -32,16 +32,24 @@
                     <lego-dropdown :items="items_unit" v-model="metric.metric_unit" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric min" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'scope'">
-                    <lego-text-field v-model="metric.metric_min" />
+                <ui-form-item :columns=8 label="metric min" required left-label :label-width=144 :label-padding=16 v-if="metric.metric_kind === 'scope'">
+                    <lego-text-field v-model="metric.metric_value1" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric max" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'scope'">
-                    <lego-text-field v-model="metric.metric_max" />
+                <ui-form-item :columns=8 label="metric max" required left-label :label-width=144 :label-padding=16 v-if="metric.metric_kind === 'scope'">
+                    <lego-text-field v-model="metric.metric_value2" />
                 </ui-form-item>
 
-                <ui-form-item :columns=8 label="metric value" required left-label :label-width=144 :label-padding=16 v-show="metric.metric_kind === 'threshold'">
-                    <lego-text-field v-model="metric.metric_min" />
+                <ui-form-item :columns=8 label="metric value" required left-label :label-width=144 :label-padding=16 v-if="metric.metric_kind === 'pattern'">
+                    <lego-text-field v-model="metric.metric_value1" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="metric pattern" left-label :label-width=144 :label-padding=16 v-if="metric.metric_kind === 'pattern'">
+                    <lego-text-field v-model="metric.metric_value2" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="metric value" required left-label :label-width=144 :label-padding=16 v-if="metric.metric_kind === 'threshold'">
+                    <lego-text-field v-model="metric.metric_value1" />
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="metric static" required left-label :label-width=144 :label-padding=16>
@@ -93,8 +101,8 @@ export default {
                     metric_definition: '',
                     metric_filter: '',
                     metric_unit: '',
-                    metric_min: '',
-                    metric_max: '',
+                    metric_value1: '',
+                    metric_value2: '',
                     creator: '',
                     created: ''
                 }
@@ -139,7 +147,7 @@ export default {
 
         clickSave: function () {
             if(this.metric.metric_kind == 'threshold') {
-                this.metric.metric_max = this.metric.metric_min;
+                this.metric.metric_value2 = this.metric.metric_value1;
             }
             EventBus.$emit("updateMetrics", this.metric);
         }

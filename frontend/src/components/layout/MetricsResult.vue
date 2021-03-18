@@ -18,8 +18,8 @@
                     <th>metric definition</th>
                     <th>metric filter</th>
                     <th>metric unit</th>
-                    <th>metric min</th>
-                    <th>metric max</th>
+                    <th>metric value1</th>
+                    <th>metric value2</th>
                     <th>metric static</th>
                     <th>creator</th>
                     <th>created</th>
@@ -31,8 +31,8 @@
                     <td>{{metric_list.metric_definition}}</td>
                     <td>{{metric_list.metric_filter}}</td>
                     <td>{{metric_list.metric_unit}}</td>
-                    <td>{{metric_list.metric_min}}</td>
-                    <td>{{metric_list.metric_max}}</td>
+                    <td>{{metric_list.metric_value1}}</td>
+                    <td>{{metric_list.metric_value2}}</td>
                     <td>{{metric_list.metric_static}}</td>
                     <td>{{metric_list.creator}}</td>
                     <td>{{metric_list.created}}</td>
@@ -77,8 +77,8 @@ export default {
                 metric_definition: '',
                 metric_filter: '',
                 metric_unit: '',
-                metric_min: '',
-                metric_max: '',
+                metric_value1: '',
+                metric_value2: '',
                 metric_static: '',
                 creator: '',
                 created: ''
@@ -133,8 +133,8 @@ export default {
                     this.metric.metric_definition = '';
                     this.metric.metric_filter = '';
                     this.metric.metric_unit = '';
-                    this.metric.metric_min = '';
-                    this.metric.metric_max = '';
+                    this.metric.metric_value1 = '';
+                    this.metric.metric_value2 = '';
                     this.metric.metric_static = '';
                     this.metric.creator = '';
                     this.metric.created = '';
@@ -184,8 +184,8 @@ export default {
             this.metric.metric_definition = metric_list.metric_definition;
             this.metric.metric_filter = metric_list.metric_filter;
             this.metric.metric_unit = metric_list.metric_unit;
-            this.metric.metric_min = metric_list.metric_min;
-            this.metric.metric_max = metric_list.metric_max;
+            this.metric.metric_value1 = metric_list.metric_value1;
+            this.metric.metric_value2 = metric_list.metric_value2;
             this.metric.metric_static = metric_list.metric_static;
             this.metric.creator = metric_list.creator;
             this.metric.created = metric_list.created;
