@@ -20,7 +20,7 @@
 <script>
 import EventBus from '../../EventBus';
 import {
-    getMetricskindLlist
+    getMetricskindList
 } from "@/common";
 export default {
     name: "MetricsSearch",
@@ -33,7 +33,7 @@ export default {
     },
 
     created() {
-        this.items = getMetricskindLlist();
+        this.items = getMetricskindList();
         this.items.push({
         value: "",
         text: "ALL"

@@ -51,7 +51,7 @@ import {
 } from "vuex";
 import {
     serverUrl,
-    getFormatkindLlist
+    getFormatkindList
 } from "@/common";
 import EventBus from '../../EventBus';
 
@@ -76,7 +76,7 @@ export default {
     },
 
     created() {
-        this.items = getFormatkindLlist();
+        this.items = getFormatkindList();
         this.format.creator = this.$store.state.userName
     },    
 

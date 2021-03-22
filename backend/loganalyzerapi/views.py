@@ -16,8 +16,8 @@ from django.db import transaction
 import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Sum, Max, Min, Avg, F, Value
-from django.db.models.functions import Concat, Coalesce, Substr, StrIndex, Length
+from django.db.models import Count, Sum, Max, Min, Avg, F, Value, CharField
+from django.db.models.functions import Concat, Coalesce, Substr, StrIndex, Length, Right, Left
 from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -527,12 +527,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 timeValue = round(metric_time/1000)
             elif metric_unit == 'micros':   
                 timeValue = round(metric_time/1000000)
-        else:                         # microsecond  
+        elif timetakenUnit == 'D':    # microsecond  
             if metric_unit == 'millis':
                 timeValue = metric_time * 1000
             elif metric_unit == 'micros':   
                 timeValue = metric_time
-
+        else:                          # millisecond  
+            if metric_unit == 'millis':
+                timeValue = metric_time
+            elif metric_unit == 'micros':   
+                timeValue = metric_time / 1000
         return timeValue
            
     @action(methods=['post'], detail=False)
@@ -607,8 +611,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
             # project에 설정된 metric id로 루프 돌면서 metric 조건 처리 
             for metric in metrics:
-                metric_id = str(metric['metric'])
 
+                metric_id = str(metric['metric'])
                 metricDetail = Metrics.objects.filter(metric_id=metric_id).values()
 
                 metric_kind = metricDetail[0]['metric_kind']
@@ -627,83 +631,90 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 전체건수
                 totalCnt = queryset.count()
                 results = []
+                result = ''
 
                 if metric_unit == 'millis' or metric_unit == 'micros':
                     metric_value1 = self.getMetricTimeValue(metric_unit, int(metric_value1), timetakenUnit)
                     metric_value2 = self.getMetricTimeValue(metric_unit, int(metric_value2), timetakenUnit)
 
+                # print(">>Metrics : "+metric_kind+", "+metric_filter+", "+str(metric_unit)+", "+str(metric_value1)+", "+str(metric_value2))
 
                 # TODO: if metric_filter 사용 회피 필요... 
                 # threshold : gte (<=)
                 if metric_kind == 'threshold':
-                    # timetaken / byte 조회 조건
+                    # timetaken / byte
                     if metric_filter == 'ftime_taken' or metric_filter == 'fbyte':
                         queryset = queryset.values(metric_filter).filter(**{metric_filter+'__gte': metric_value1})
-                        result_count = queryset.count()
-                        results.append({"result" : "count", "result_value" : result_count})             
+                        ratio = round(queryset.count()/totalCnt*100, 2)
+                        result_count = format(queryset.count(), ',')
+                        results.append({"result" : "count", "result_count" : result_count, "result_per" : ratio})                                     
 
-                    # annotate 조건
-                    if metric_filter == 'fip' or metric_filter == 'freferer' or metric_filter == 'freserve1' or metric_filter == 'freserve2':
+                    # fip / freferer / freserve2
+                    if metric_filter == 'fip' or metric_filter == 'freferer' or metric_filter == 'freserve2':
                         result = queryset.values(metric_filter).annotate(f_count=Count(metric_filter)).order_by('-f_count')
                         rows = result.values(metric_filter,'f_count')                       
                         for row in rows:
-                            ratio = round(row['f_count']/totalCnt*100)
+                            ratio = round(row['f_count']/totalCnt*100, 2)
                             if ratio < int(metric_value1):                                
                                 break                           
                             else:
-                                results.append({"result" : row[metric_filter], "result_value" : str(ratio) + '%'})        
+                                result_count = format(row['f_count'], ',')
+                                results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})  
 
-                    # status 4xx, 5xx 비율 
+                    # status 4xx, 5xx
                     if metric_filter == 'fstatus':
-                        result = queryset.values(metric_filter).filter(**{metric_filter+'__startswith': metric_unit}).annotate(f_count=Count(metric_filter)).order_by('-f_count')
+                        result = queryset.values(metric_filter).filter(**{metric_filter+'__startswith': metric_value2}).annotate(f_count=Count(metric_filter)).order_by('-f_count')
                         rows = result.values(metric_filter,'f_count')
                         for row in rows:
-                            ratio = round(row['f_count']/totalCnt*100)
+                            ratio = round(row['f_count']/totalCnt*100, 2)
                             if ratio < int(metric_value1):                                
                                 break                           
                             else:
-                                results.append({"result" : row[metric_filter], "result_value" : str(ratio) + '%'})  
+                                result_count = format(row['f_count'], ',')
+                                results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})
 
-                    # TODO: freserve1 서비스, IP:PORT 추출 작업 필요
-                    # Nginx Ingress : Upstream Info 서비스별 호출 비율 / $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) 
-                    # Nginx Ingress : Upstream Info IP:PORT별 호출 비율 / $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) 
-                    # if metric_filter == 'freserve1':
-                    #     # result_referer_domain = queryset.annotate(f_ipport=Substr('freserve1',StrIndex('freserve1', Value("/")))).values('f_ipport').annotate(ipport_count=Count('f_ipport')).order_by('-ipport_count')
-                    #     # result_referer_domain = queryset.annotate(f_ipport=Substr('freserve1',StrIndex('freserve1', Value('/')),Length('freserve1')-StrIndex('freserve1', Value('/'))+1)).values('f_ipport').annotate(ipport_count=Count('f_ipport')).order_by('-ipport_count')
-                    #     # result_referer_domain = queryset.annotate(f_ipport=Substr('freserve1',24,11)).values('f_ipport').annotate(f_count=Count('f_ipport')).order_by('-f_count')
-                    #     rows = result.values(metric_filter,'f_count')                       
-                    #     for row in rows:
-                    #         ratio = round(row['f_count']/totalCnt*100)
-                    #         if ratio < int(metric_value1):                                
-                    #             break                           
-                    #         else:
-                    #             results.append({"result" : row[metric_filter], "result_value" : str(ratio) + '%'})               
-
+                    # freserve1 서비스, IP:PORT 호출 비율 조회  / $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) 
+                    if metric_filter == 'freserve1':
+                        # Nginx Ingress : Upstream Info 서비스별 호출 비율
+                        if metric_unit == '%_IPPORT':
+                            result = queryset.annotate(f_reserve1=Right(metric_filter, Length(metric_filter)-StrIndex(metric_filter, Value('/')), output_field=CharField())).values('f_reserve1').annotate(f_count=Count('f_reserve1')).order_by('-f_count')
+                        # Nginx Ingress : Upstream Info IP:PORT별 호출 비율
+                        if metric_unit == '%_SVC':
+                            result = queryset.annotate(f_reserve1_tmp=Substr(metric_filter, StrIndex(metric_filter, Value('-'))+1, Length(metric_filter)-StrIndex(metric_filter, Value('-')), output_field=CharField())).annotate(f_reserve1=Left('f_reserve1_tmp', StrIndex('f_reserve1_tmp', Value('-'))-1, output_field=CharField())).values('f_reserve1').annotate(f_count=Count('f_reserve1')).order_by('-f_count') 
+                        
+                        rows = result.values('f_reserve1', 'f_count')                       
+                        for row in rows:
+                            ratio = round(row['f_count']/totalCnt*100, 2)
+                            if ratio < int(metric_value1):                                
+                                break                           
+                            else:
+                                result_count = format(row['f_count'], ',')
+                                results.append({"result" : row['f_reserve1'], "result_count" : result_count, "result_per" : ratio})   
+                        
                 # Pattern Matching / 비율,건수:
                 # frequest, fuser_agent
-                elif metric_kind == 'pattern': 
-                    queryset = queryset.values(metric_filter).filter(**{metric_filter+'__icontains': metric_value2})                        
-                    ratio = round(queryset.count()/totalCnt*100)
-                    if ratio >= int(metric_value1):                                
-                        results.append({"result" : metric_value2, "result_value" : str(ratio) + '%'})                                    
+                if metric_kind == 'pattern': 
+                    queryset = queryset.values(metric_filter).filter(**{metric_filter+'__icontains': metric_value2})
+                    result_count = queryset.count()                        
+                    ratio = round(result_count/totalCnt*100, 2)
+                    if ratio >= int(metric_value1): 
+                        result_count = format(result_count, ',')
+                        results.append({"result" : metric_value2, "result_count" : result_count, "result_per" : ratio})                                                               
 
                 # scope : Between
                 # ftime_taken, fbyte
-                elif metric_kind == 'scope': 
-                    # print(">>"+metric_kind+", "+metric_filter+", "+metric_value1+", "+metric_value2)
+                if metric_kind == 'scope': 
                     queryset = queryset.values(metric_filter).filter(**{metric_filter+'__range': (metric_value1, metric_value2)})
-                    result_count = queryset.count()
-                    results.append({"result" : "count", "result_value" : result_count})  
-
+                    ratio = round(queryset.count()/totalCnt*100, 2)
+                    result_count = format(queryset.count(), ',')                    
+                    results.append({"result" :  "count", "result_count" : result_count, "result_per" : ratio})
                 
                 tmp = list(metricDetail)
-                # 숫자 3자리(천단위) 마다 "," 표시
-                # tmp[0]['result'] = format(findingsResult, ',')  
                 tmp[0]['results'] = results
-                print(tmp[0]['results'])           
+                # print(tmp[0]['results'])           
                 findingsResultList.append(tmp[0]) 
- 
-            response = {'message': 'findings returned successfully', 'findingsResult': findingsResultList}        
+
+            response = {'message': 'findings returned successfully', 'findingsResult': findingsResultList, 'totalCnt': totalCnt}        
             return Response(response, status = status.HTTP_200_OK)
             
         except Exception as ex:

@@ -77,8 +77,14 @@ import {
 import {
     serverUrl,
     getMetricskindList,
-    getMetricsfilterList,
-    getMetricsunitList
+    getMetricsfilterListThreshold,
+    getMetricsfilterListPattern,
+    getMetricsfilterListScope,
+    getMetricsunitListFtime,
+    getMetricsunitListFstatus,
+    getMetricsunitListFreserve1,
+    getMetricsunitListEtc
+
 } from "@/common";
 import EventBus from '../../EventBus';
 
@@ -110,10 +116,36 @@ export default {
     created() {
         
         this.items_kind = getMetricskindList();
-        this.items_filter = getMetricsfilterList();
-        this.items_unit = getMetricsunitList();
+        // this.items_filter = getMetricsfilterListThreshold();
+        // this.items_unit = getMetricsunitList();
         this.metric.creator = this.$store.state.userName
     },  
+
+    watch:{
+        metric: {
+            deep: true,
+            handler(){
+                if(this.metric.metric_kind == 'threshold'){
+                    this.items_filter = getMetricsfilterListThreshold();
+                } else if (this.metric.metric_kind == 'pattern'){
+                    this.items_filter = getMetricsfilterListPattern();
+                } else if (this.metric.metric_kind == 'scope'){
+                    this.items_filter = getMetricsfilterListScope();
+                }
+                if(this.metric.metric_filter == 'ftime_taken'){
+                    this.items_unit = getMetricsunitListFtime();
+                } else if (this.metric.metric_filter == 'fstatus'){
+                    this.items_unit = getMetricsunitListFstatus();
+                } else if (this.metric.metric_filter == 'freserve1'){
+                    this.items_unit = getMetricsunitListFreserve1();
+                } else {
+                    this.items_unit = getMetricsunitListEtc();
+                }
+            }
+
+        }
+
+    },
 
     computed: {
 
@@ -139,6 +171,13 @@ export default {
         clickSave: function () {
             if(this.metric.metric_kind == 'threshold') {
                 this.metric.metric_value2 = this.metric.metric_value1;
+            }
+            if(this.metric.metric_filter == 'fstatus') {
+                if(this.metric.metric_unit == '%_4XX') {
+                    this.metric.metric_value2 = '4';
+                } else if (this.metric.metric_unit == '%_5XX') {
+                    this.metric.metric_value2 = '5';
+                }
             }
             EventBus.$emit("addMetrics", this.metric);
         },

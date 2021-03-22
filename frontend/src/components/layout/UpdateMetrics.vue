@@ -82,9 +82,19 @@ import EventBus from '../../EventBus';
 
 import {
     serverUrl,
-    getMetricskindLlist,
-    getMetricsfilterLlist,
-    getMetricsunitLlist
+    getMetricskindList,
+    getMetricsfilterList,
+    getMetricsunitList,
+    getMetricsfilterListThreshold,
+    getMetricsfilterListPattern,
+    getMetricsfilterListScope,
+    getMetricsunitListFtime,
+    getMetricsunitListFstatus,
+    getMetricsunitListFbyte,
+    getMetricsunitListFreserve1,
+    getMetricsunitListEtc
+    
+
 } from "@/common";
 
 var urlStr = serverUrl + "/metrics/";
@@ -118,9 +128,54 @@ export default {
     },
 
     created() {
-        this.items_kind = getMetricskindLlist();
-        this.items_filter = getMetricsfilterLlist();
-        this.items_unit = getMetricsunitLlist();
+        this.items_kind = getMetricskindList();
+        // this.items_filter = getMetricsfilterList();
+        // this.items_unit = getMetricsunitList();
+
+        if(this.metric.metric_kind == 'threshold'){
+            this.items_filter = getMetricsfilterListThreshold();
+        } else if (this.metric.metric_kind == 'pattern'){
+            this.items_filter = getMetricsfilterListPattern();
+        } else if (this.metric.metric_kind == 'scope'){
+            this.items_filter = getMetricsfilterListScope();
+        }
+        if(this.metric.metric_filter == 'ftime_taken'){
+            this.items_unit = getMetricsunitListFtime();
+        } else if (this.metric.metric_filter == 'fstatus'){
+            this.items_unit = getMetricsunitListFstatus();
+        } else if (this.metric.metric_filter == 'fbyte'){
+            this.items_unit = getMetricsunitListFbyte();
+        } else if (this.metric.metric_filter == 'freserve1'){
+            this.items_unit = getMetricsunitListFreserve1();
+        } else {
+            this.items_unit = getMetricsunitListEtc();
+        }
+    },
+
+    watch:{
+        metric: {
+            deep: true,
+            handler(){
+                if(this.metric.metric_kind == 'threshold'){
+                    this.items_filter = getMetricsfilterListThreshold();
+                } else if (this.metric.metric_kind == 'pattern'){
+                    this.items_filter = getMetricsfilterListPattern();
+                } else if (this.metric.metric_kind == 'scope'){
+                    this.items_filter = getMetricsfilterListScope();
+                }
+                if(this.metric.metric_filter == 'ftime_taken'){
+                    this.items_unit = getMetricsunitListFtime();
+                } else if (this.metric.metric_filter == 'fstatus'){
+                    this.items_unit = getMetricsunitListFstatus();
+                } else if (this.metric.metric_filter == 'freserve1'){
+                    this.items_unit = getMetricsunitListFreserve1();
+                } else {
+                    this.items_unit = getMetricsunitListEtc();
+                }
+            }
+
+        }
+
     },
 
     computed: {
@@ -148,6 +203,13 @@ export default {
         clickSave: function () {
             if(this.metric.metric_kind == 'threshold') {
                 this.metric.metric_value2 = this.metric.metric_value1;
+            }
+            if(this.metric.metric_filter == 'fstatus') {
+                if(this.metric.metric_unit == '%_4XX') {
+                    this.metric.metric_value2 = '4';
+                } else if (this.metric.metric_unit == '%_5XX') {
+                    this.metric.metric_value2 = '5';
+                }
             }
             EventBus.$emit("updateMetrics", this.metric);
         }

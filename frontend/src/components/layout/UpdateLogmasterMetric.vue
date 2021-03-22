@@ -56,8 +56,8 @@ import EventBus from '../../EventBus';
 
 import {
     serverUrl,
-    getProjectLlist,
-    getMetricLlist
+    getProjectList,
+    getMetricList
 } from "@/common";
 
 var urlStr = serverUrl + "/metrics/";
@@ -86,8 +86,8 @@ export default {
     },    
 
     created() {
-        this.items_project = getProjectLlist(this.$store.state.userName);
-        this.items_metric = getMetricLlist();
+        this.items_project = getProjectList(this.$store.state.userName);
+        this.items_metric = getMetricList();
     },  
 
     methods: {

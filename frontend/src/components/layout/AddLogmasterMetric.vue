@@ -52,8 +52,8 @@ import {
 } from "vuex";
 import {
     serverUrl,
-    getProjectLlist,
-    getMetricLlist
+    getProjectList,
+    getMetricList
 } from "@/common";
 
 export default {
@@ -78,8 +78,8 @@ export default {
     created() {
         this.logmastermetric.creator = this.$store.state.userName
         this.logmastermetric.metric = this.$store.state.metricId
-        this.items_project = getProjectLlist(this.$store.state.userName);
-        this.items_metric = getMetricLlist();
+        this.items_project = getProjectList(this.$store.state.userName);
+        this.items_metric = getMetricList();
     },    
 
     methods: {

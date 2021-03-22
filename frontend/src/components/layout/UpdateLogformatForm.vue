@@ -50,7 +50,7 @@ import EventBus from '../../EventBus';
 import axios from 'axios';
 import {
     serverUrl,
-    getFormatkindLlist
+    getFormatkindList
 } from "@/common";
 
 var urlStr = serverUrl + "/logformat/";
@@ -78,7 +78,7 @@ export default {
         }
     },
     created() {
-        this.items = getFormatkindLlist();
+        this.items = getFormatkindList();
     },        
 
     methods: {

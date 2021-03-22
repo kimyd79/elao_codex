@@ -20,7 +20,7 @@ import EventBus from '../../EventBus';
 import axios from 'axios';
 import {
     serverUrl,
-    getFormatkindLlist
+    getFormatkindList
 } from "@/common";
 
 export default {
@@ -35,7 +35,7 @@ export default {
     },
 
     created() {
-        this.items = getFormatkindLlist();
+        this.items = getFormatkindList();
         this.items.push({
         value: "",
         text: "ALL"

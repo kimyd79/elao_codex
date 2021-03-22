@@ -753,7 +753,7 @@ export function getMultiLineChartOptions(title, x_min, x_max, y_max_request, y_m
 }
 
 
-export function getFormatkindLlist() {
+export function getFormatkindList() {
 
     var url = serverUrl + "/logformatstring/formatkind_list/"
 
@@ -804,7 +804,7 @@ export function getMetricskindList() {
     return items;
 }
 
-export function getMetricsfilterList() {
+export function getMetricsfilterListThreshold() {
     var items = []; 
     items.push({
         value: "ftime_taken",
@@ -817,14 +817,6 @@ export function getMetricsfilterList() {
     items.push({
         value: "fip",
         text: "fip"
-    });
-    items.push({
-        value: "frequest",
-        text: "frequest"
-    });
-    items.push({
-        value: "fuser_agent",
-        text: "fuser_agent"
     });
     items.push({
         value: "fstatus",
@@ -846,7 +838,35 @@ export function getMetricsfilterList() {
     return items;
 }
 
-export function getMetricsunitList() {
+export function getMetricsfilterListScope() {
+    var items = []; 
+    items.push({
+        value: "ftime_taken",
+        text: "ftime_taken"
+    });
+    items.push({
+        value: "fbyte",
+        text: "fbyte"
+    });
+
+    return items;
+}
+
+export function getMetricsfilterListPattern() {
+    var items = []; 
+    items.push({
+        value: "frequest",
+        text: "frequest"
+    });
+    items.push({
+        value: "fuser_agent",
+        text: "fuser_agent"
+    });
+
+    return items;
+}
+
+export function getMetricsunitListFtime() {
 
     var items = [];
     items.push({
@@ -857,27 +877,63 @@ export function getMetricsunitList() {
         value: "micros",
         text: "micros"
     });
+
+    return items;
+}
+
+export function getMetricsunitListFstatus() {
+
+    var items = [];
     items.push({
-        value: "byte",
-        text: "byte"
+        value: "%_4XX",
+        text: "%(4XX CODE)"
     });
     items.push({
-        value: "%",
-        text: "%"
-    });
-    items.push({
-        value: "4",
-        text: "%(4XX)"
-    });
-    items.push({
-        value: "5",
-        text: "%(5XX)"
+        value: "%_5XX",
+        text: "%(5XX CODE)"
     });
 
     return items;
 }
 
-export function getProjectLlist(creator) {
+export function getMetricsunitListFreserve1() {
+
+    var items = [];
+    items.push({
+        value: "%_SVC",
+        text: "%(Service)"
+    });
+    items.push({
+        value: "%_IPPORT",
+        text: "%(IP:PORT)"
+    });
+
+    return items;
+}
+
+export function getMetricsunitListFbyte() {
+
+    var items = [];
+    items.push({
+        value: "byte",
+        text: "byte"
+    });
+
+    return items;
+}
+
+export function getMetricsunitListEtc() {
+
+    var items = [];
+    items.push({
+        value: "%",
+        text: "%"
+    });
+
+    return items;
+}
+
+export function getProjectList(creator) {
 
     // var url = serverUrl + "/logmaster/"
 
@@ -910,7 +966,7 @@ export function getProjectLlist(creator) {
     return items;
 }
 
-export function getMetricLlist() {
+export function getMetricList() {
 
     var url = serverUrl + "/metrics/"
 

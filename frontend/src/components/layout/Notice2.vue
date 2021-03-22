@@ -8,8 +8,8 @@
         <ui-card-item sub class="card_box">                        
             <span style="color:#553ca5" v-for="(finding, idx) in findingListResult" :key="idx"> 
                 <b>[{{idx+1}}] {{finding.description}}</b><br>
-                <span style="color:#553ca5" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
-                    > {{result.result}} : {{result.result_value}} <br>
+                <span style="color:gray" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
+                    > {{result.result}} : {{result.result_count}} ({{result.result_per}}%) <br>
                 </span>    
             </span>               
         </ui-card-item>
@@ -139,7 +139,7 @@ export default {
                         //     descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_value1+" <= "+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_value2+" "+res.data.findingsResult[i].metric_unit+"]"
                         // }
 
-                        descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"]"
+                        descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_filter+"] ["+res.data.findingsResult[i].metric_unit+"]"
 
                         items.push({
                             description: descriptionString,                    
@@ -176,10 +176,7 @@ export default {
             this.$store.state.popupHeader = 'Finding Detail2';
             this.$store.state.popupBody = finding.description;
             this.$store.state.popupButton = 'Close';
-            this.currentView = 'DetailPopup2';
-            console.log(this.$store.state.detailsearchKeyword2)
-            console.log(this.$store.state.detailcondition2)
-    
+            this.currentView = 'DetailPopup2';   
         },
     },
     watch: {
