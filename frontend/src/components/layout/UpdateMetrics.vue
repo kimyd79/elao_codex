@@ -4,7 +4,7 @@
         <ui-container-box :columns=9 vertical class="modal-container">
             <div class="popup-header">
                 <div class="popup-header__title">
-                    Modify Metrics Information
+                    Update Metrics Information
                 </div>
                 <div class="popup-header__close">
                     <lego-icon small v-on:click="clickCancle">close</lego-icon>
@@ -14,6 +14,10 @@
             <div class="popup-form">
                 <ui-form-item :columns=8 label="metric ID" required left-label :label-width=144 :label-padding=16>
                     <lego-text-field disabled v-model="metric.metric_id" />
+                </ui-form-item>
+                
+                <ui-form-item :columns=8 label="metric type" required left-label :label-width=144 :label-padding=16>
+                    <lego-dropdown :items="items_types" v-model="metric.metric_type" />
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="metric kind" required left-label :label-width=144 :label-padding=16>
@@ -26,6 +30,10 @@
 
                 <ui-form-item :columns=8 label="metric filter" required left-label :label-width=144 :label-padding=16>
                     <lego-dropdown :items="items_filter" v-model="metric.metric_filter" />
+                </ui-form-item>
+
+                <ui-form-item :columns=8 label="metric filter2" required left-label :label-width=144 :label-padding=16 v-if="metric.creator.toLowerCase() == 'leehs'||  metric.creator.toLowerCase() == 'admin'">
+                    <lego-text-field v-model="metric.metric_filter2" />
                 </ui-form-item>
 
                 <ui-form-item :columns=8 label="metric unit" required left-label :label-width=144 :label-padding=16>
@@ -108,8 +116,10 @@ export default {
                 return {
                     metric_id: '',
                     metric_kind: '',
+                    metric_type: '',
                     metric_definition: '',
                     metric_filter: '',
+                    metric_filter2: '',
                     metric_unit: '',
                     metric_value1: '',
                     metric_value2: '',
@@ -124,6 +134,13 @@ export default {
             items_kind: [],
             items_filter: [],
             items_unit: [],
+            items_types: [{
+                value: "Info",
+                text: "Information"
+            },{
+                value: "Warn",
+                text: "Warning"
+            }],
         }
     },
 
@@ -151,7 +168,6 @@ export default {
             this.items_unit = getMetricsunitListEtc();
         }
     },
-
     watch:{
         metric: {
             deep: true,

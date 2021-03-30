@@ -7,11 +7,12 @@
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-card-item sub class="card_box">                        
             <span style="color:#553ca5" v-for="(finding, idx) in findingListResult" :key="idx"> 
-                <b>[{{idx+1}}] {{finding.description}}</b><br>
+                <b>[{{idx+1}}] {{finding.description}}</b>
                 <span style="color:gray" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
-                    > {{result.result}} : {{result.result_count}} ({{result.result_per}}%) <br>
-                </span>    
-            </span>               
+                    {{result.result}} : {{result.result_count}} ( {{result.result_per}} %)
+                </span>
+                <br> 
+            </span>           
         </ui-card-item>
         <ui-card-item body></ui-card-item>
 
@@ -52,6 +53,7 @@ export default {
             finding: [{
                 description: '',
                 results: [],
+                metric_type: '',
                 metric_kind: '',
                 metric_filter: '',
                 metric_unit: '',
@@ -113,17 +115,15 @@ export default {
 
         async getMetrics() {                    
             
-            let items = []
-            let descriptionString = ''
+            let items = [];
+            let description = '';
 
             // Start Loading Spinner
-            // TODO: 로직 수정해야 함..아래 문제 생김(Loading Bar 관련)
             this.isActive = true; 
 
             let postData = {
                 project_id: this.projectID,
 
-                // TODO: Filter 로직 필요, 현재 전체에 대해서 결과를 가져온다.
                 filter: this.getFilter(),
             };
 
@@ -133,23 +133,42 @@ export default {
                 .then(res => {
 
                     for (let i = 0; i < res.data.findingsResult.length; i++) {
-                        // if (res.data.findingsResult[i].metric_kind == 'threshold') {
-                        //     descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_value1+" "+res.data.findingsResult[i].metric_unit+"]"
-                        // } else {
-                        //     descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_value1+" <= "+res.data.findingsResult[i].metric_filter+" <= "+res.data.findingsResult[i].metric_value2+" "+res.data.findingsResult[i].metric_unit+"]"
-                        // }
+                        // 0인거 제외 : Test시에는 열어둔다.
+                        //if (res.data.findingsResult[i].results.length == 0 || res.data.findingsResult[i].results[0].result_count == 0 || res.data.findingsResult[i].results[0].result_count == ''){
+                        //    continue;
+                        //}
 
-                        descriptionString = "["+res.data.findingsResult[i].metric_kind+"] "+res.data.findingsResult[i].metric_definition+" [static:"+res.data.findingsResult[i].metric_static+"] ["+res.data.findingsResult[i].metric_filter+"] ["+res.data.findingsResult[i].metric_unit+"]"
+                        // Kind : threshold, scope, pattern
+                        // [Info] Response time ＞ 3 (sec) : 769 (count)
+                        // [Info] Response time 3 ~ 5 (sec) : 769 (count)
+                        // [Warn] Response specific string for URI ＞ 30 (%) : 769 (count)
+
+                        description = "["+res.data.findingsResult[i].metric_type+"] "+ res.data.findingsResult[i].metric_definition + " ";
+                                                
+                        if (res.data.findingsResult[i].metric_kind == 'scope'){
+                            description += res.data.findingsResult[i].metric_value1 + " ~ " + res.data.findingsResult[i].metric_value2;
+                        }else {
+
+                            if (res.data.findingsResult[i].metric_kind == 'pattern'){ 
+                                description += " ["+ res.data.findingsResult[i].metric_value2 +"]";
+                            }
+
+                            // threshold
+                            description += " > " + res.data.findingsResult[i].metric_value1;
+                        }
+                        
+                        description += " ("+res.data.findingsResult[i].metric_unit+") → ";
 
                         items.push({
-                            description: descriptionString,                    
+                            description: description,                    
                             results: res.data.findingsResult[i].results,
-                            metric_kind: res.data.findingsResult[i].metric_kind,
-                            metric_filter: res.data.findingsResult[i].metric_filter,
-                            metric_unit: res.data.findingsResult[i].metric_unit,
-                            metric_value1: res.data.findingsResult[i].metric_value1,
-                            metric_value2: res.data.findingsResult[i].metric_value2,
-                            metric_static: res.data.findingsResult[i].metric_static,
+                            //metric_kind: res.data.findingsResult[i].metric_kind,
+                            //metric_type: res.data.findingsResult[i].metric_type,
+                            //metric_filter: res.data.findingsResult[i].metric_filter,
+                            //metric_unit: res.data.findingsResult[i].metric_unit,
+                            //metric_value1: res.data.findingsResult[i].metric_value1,
+                            //metric_value2: res.data.findingsResult[i].metric_value2,
+                            //metric_static: res.data.findingsResult[i].metric_static,
                         }); 
                     };                                            
                 })

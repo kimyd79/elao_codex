@@ -14,9 +14,11 @@
         <table class="page-summary-table">
             <thead>
                 <tr>
+                    <th>metric type</th>
                     <th>metric kind</th>
                     <th>metric definition</th>
                     <th>metric filter</th>
+                    <th>metric filter2</th>
                     <th>metric unit</th>
                     <th>metric value1</th>
                     <th>metric value2</th>
@@ -27,9 +29,11 @@
             </thead>
             <tbody id="list">
             <tr v-for="(metric_list, idx) in metric_lists" :key="idx" v-on:click="clickList(metric_list)" :class="{'highlight': (metric_list.metric_id == selected_metric_id) }">
+                    <td>{{metric_list.metric_type}}</td>
                     <td>{{metric_list.metric_kind}}</td>
                     <td>{{metric_list.metric_definition}}</td>
                     <td>{{metric_list.metric_filter}}</td>
+                    <td>{{metric_list.metric_filter2}}</td>
                     <td>{{metric_list.metric_unit}}</td>
                     <td>{{metric_list.metric_value1}}</td>
                     <td>{{metric_list.metric_value2}}</td>
@@ -74,8 +78,10 @@ export default {
             metric: {
                 metric_id: '',
                 metric_kind: '',
+                metric_type: '',
                 metric_definition: '',
                 metric_filter: '',
+                metric_filter2: '',
                 metric_unit: '',
                 metric_value1: '',
                 metric_value2: '',
@@ -130,8 +136,10 @@ export default {
                     this.selected_metric_id = '';
                     this.metric.metric_id = '';
                     this.metric.metric_kind = '';
+                    this.metric.metric_type = '';
                     this.metric.metric_definition = '';
                     this.metric.metric_filter = '';
+                    this.metric.metric_filter2 = '';
                     this.metric.metric_unit = '';
                     this.metric.metric_value1 = '';
                     this.metric.metric_value2 = '';
@@ -181,8 +189,10 @@ export default {
             this.selected_metric_id = metric_list.metric_id;
             this.metric.metric_id = metric_list.metric_id;
             this.metric.metric_kind = metric_list.metric_kind;
+            this.metric.metric_type = metric_list.metric_type;
             this.metric.metric_definition = metric_list.metric_definition;
             this.metric.metric_filter = metric_list.metric_filter;
+            this.metric.metric_filter2 = metric_list.metric_filter2;
             this.metric.metric_unit = metric_list.metric_unit;
             this.metric.metric_value1 = metric_list.metric_value1;
             this.metric.metric_value2 = metric_list.metric_value2;

@@ -807,6 +807,14 @@ export function getMetricskindList() {
 export function getMetricsfilterListThreshold() {
     var items = []; 
     items.push({
+        value: "frequest",
+        text: "frequest"
+    });
+    items.push({
+        value: "fuser_agent",
+        text: "fuser_agent"
+    });
+    items.push({
         value: "ftime_taken",
         text: "ftime_taken"
     });
@@ -833,6 +841,10 @@ export function getMetricsfilterListThreshold() {
     items.push({
         value: "freserve2",
         text: "freserve2"
+    });
+    items.push({
+        value: "log_line",
+        text: "log_line"
     });
 
     return items;
@@ -861,6 +873,14 @@ export function getMetricsfilterListPattern() {
     items.push({
         value: "fuser_agent",
         text: "fuser_agent"
+    });
+    items.push({
+        value: "freferer",
+        text: "freferer"
+    });
+    items.push({
+        value: "log_line",
+        text: "log_line"
     });
 
     return items;

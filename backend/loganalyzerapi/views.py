@@ -637,36 +637,37 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     metric_value1 = self.getMetricTimeValue(metric_unit, int(metric_value1), timetakenUnit)
                     metric_value2 = self.getMetricTimeValue(metric_unit, int(metric_value2), timetakenUnit)
 
-                # print(">>Metrics : "+metric_kind+", "+metric_filter+", "+str(metric_unit)+", "+str(metric_value1)+", "+str(metric_value2))
-
-                # TODO: if metric_filter 사용 회피 필요... 
-                # threshold : gte (<=)
+                # if metric_filter 사용 회피 : **{metric_filter+'__gte': metric_value1}
+                # conditions : metric_kind, filter명, unit, metric value
+                
+                # 1. threshold : gte (>=)
                 if metric_kind == 'threshold':
-                    # timetaken / byte
+                    
+                    # > value count(전체에 대해서 1번 쿼리) : timetaken / byte                    
                     if metric_filter == 'ftime_taken' or metric_filter == 'fbyte':
                         queryset = queryset.values(metric_filter).filter(**{metric_filter+'__gte': metric_value1})
-                        ratio = round(queryset.count()/totalCnt*100, 2)
+                        ratio = 0 if totalCnt == 0 else round(queryset.count()/totalCnt*100, 2)
                         result_count = format(queryset.count(), ',')
                         results.append({"result" : "count", "result_count" : result_count, "result_per" : ratio})                                     
 
-                    # fip / freferer / freserve2
-                    if metric_filter == 'fip' or metric_filter == 'freferer' or metric_filter == 'freserve2':
+                    # (각 항목에 대해서 여러번 쿼리, 비율 넘는거 모두) : fip / frequest / fuser_agent /freferer / freserve2 (ingress domain)
+                    if metric_filter == 'fip' or metric_filter == 'frequest' or metric_filter == 'fuser_agent' or metric_filter == 'freferer' or metric_filter == 'freserve2':
                         result = queryset.values(metric_filter).annotate(f_count=Count(metric_filter)).order_by('-f_count')
                         rows = result.values(metric_filter,'f_count')                       
                         for row in rows:
-                            ratio = round(row['f_count']/totalCnt*100, 2)
+                            ratio = 0 if totalCnt == 0 else round(row['f_count']/totalCnt*100, 2)
                             if ratio < int(metric_value1):                                
                                 break                           
                             else:
                                 result_count = format(row['f_count'], ',')
                                 results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})  
 
-                    # status 4xx, 5xx
+                    # (각 항목에 대해서 여러번 쿼리, 401, 402.. 501, 503..) : status 4xx, 5xx
                     if metric_filter == 'fstatus':
                         result = queryset.values(metric_filter).filter(**{metric_filter+'__startswith': metric_value2}).annotate(f_count=Count(metric_filter)).order_by('-f_count')
                         rows = result.values(metric_filter,'f_count')
                         for row in rows:
-                            ratio = round(row['f_count']/totalCnt*100, 2)
+                            ratio = 0 if totalCnt == 0 else round(row['f_count']/totalCnt*100, 2)
                             if ratio < int(metric_value1):                                
                                 break                           
                             else:
@@ -684,28 +685,29 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         
                         rows = result.values('f_reserve1', 'f_count')                       
                         for row in rows:
-                            ratio = round(row['f_count']/totalCnt*100, 2)
+                            ratio = 0 if totalCnt == 0 else round(row['f_count']/totalCnt*100, 2)
                             if ratio < int(metric_value1):                                
                                 break                           
                             else:
                                 result_count = format(row['f_count'], ',')
                                 results.append({"result" : row['f_reserve1'], "result_count" : result_count, "result_per" : ratio})   
                         
-                # Pattern Matching / 비율,건수:
+                # 2. pattern 
+                # Pattern Matching / 비율,건수
                 # frequest, fuser_agent
                 if metric_kind == 'pattern': 
                     queryset = queryset.values(metric_filter).filter(**{metric_filter+'__icontains': metric_value2})
                     result_count = queryset.count()                        
-                    ratio = round(result_count/totalCnt*100, 2)
+                    ratio = 0 if totalCnt == 0 else round(result_count/totalCnt*100, 2)
                     if ratio >= int(metric_value1): 
                         result_count = format(result_count, ',')
                         results.append({"result" : metric_value2, "result_count" : result_count, "result_per" : ratio})                                                               
 
-                # scope : Between
+                # 3. scope : Between
                 # ftime_taken, fbyte
                 if metric_kind == 'scope': 
                     queryset = queryset.values(metric_filter).filter(**{metric_filter+'__range': (metric_value1, metric_value2)})
-                    ratio = round(queryset.count()/totalCnt*100, 2)
+                    ratio = 0 if totalCnt == 0 else round(queryset.count()/totalCnt*100, 2)
                     result_count = format(queryset.count(), ',')                    
                     results.append({"result" :  "count", "result_count" : result_count, "result_per" : ratio})
                 
@@ -733,7 +735,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # 처음에는 전체 Metric 항목을 사용자에게 복사 - creator만 변경하여 추가
             # admin을 시스템 공통으로 해야 한다.(기준 Metric)
-            # TODO: Logic 추가 - metric.metric_definition이 존재하는 것은 제외
+            # Logic 추가 - metric.metric_definition이 존재하는 것은 제외
             exist_metric_definitions = []
             for metric in Metrics.objects.filter(creator=creator):
                 exist_metric_definitions.append(metric.metric_definition)

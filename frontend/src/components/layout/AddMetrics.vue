@@ -13,9 +13,13 @@
 
             <div class="popup-form">
 
+                <ui-form-item :columns=8 label="metric type" required left-label :label-width=144 :label-padding=16>
+                    <lego-dropdown :items="types" v-model="metric.metric_type" />
+                </ui-form-item>
+
                 <ui-form-item :columns=8 label="metric kind" required left-label :label-width=144 :label-padding=16>
                     <lego-dropdown :items="items_kind" v-model="metric.metric_kind" />
-                </ui-form-item>
+                </ui-form-item>                
 
                 <ui-form-item :columns=8 label="metric definition" required left-label :label-width=144 :label-padding=16>
                     <lego-text-field v-model="metric.metric_definition" />
@@ -83,6 +87,7 @@ import {
     getMetricsunitListFtime,
     getMetricsunitListFstatus,
     getMetricsunitListFreserve1,
+    getMetricsunitListFbyte,
     getMetricsunitListEtc
 
 } from "@/common";
@@ -97,6 +102,7 @@ export default {
                 default: function () {
                     return {
                         metric_kind: '',
+                        metric_type: '',
                         metric_definition: '',
                         metric_filter: '',
                         metric_unit: '',
@@ -132,12 +138,15 @@ export default {
                 } else if (this.metric.metric_kind == 'scope'){
                     this.items_filter = getMetricsfilterListScope();
                 }
+
                 if(this.metric.metric_filter == 'ftime_taken'){
                     this.items_unit = getMetricsunitListFtime();
                 } else if (this.metric.metric_filter == 'fstatus'){
                     this.items_unit = getMetricsunitListFstatus();
                 } else if (this.metric.metric_filter == 'freserve1'){
-                    this.items_unit = getMetricsunitListFreserve1();
+                    this.items_unit = getMetricsunitListFreserve1();                
+                } else if (this.metric.metric_filter == 'fbyte'){
+                    this.items_unit = getMetricsunitListFbyte();
                 } else {
                     this.items_unit = getMetricsunitListEtc();
                 }
@@ -158,6 +167,19 @@ export default {
             rtn.push({
                 value: "N",
                 text: "N"
+            });
+            return rtn;
+        },
+
+        types() {
+            let rtn = [];
+            rtn.push({
+                value: "Info",
+                text: "Information"
+            });
+            rtn.push({
+                value: "Warn",
+                text: "Warning"
             });
             return rtn;
         }

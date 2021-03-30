@@ -131,8 +131,10 @@ class Metrics(models.Model):
     # PK
     metric_id = models.UUIDField(verbose_name="mid",primary_key=True, default=uuid.uuid4, editable=False)
     metric_kind = models.CharField(max_length=10, null=False, blank=False)
+    metric_type = models.CharField(max_length=10, null=False, blank=False, default='Info')
     metric_definition = models.CharField(max_length=500, null=False, blank=False)
     metric_filter = models.CharField(max_length=500, null=False, blank=False)
+    metric_filter2 = models.CharField(max_length=10, null=False, blank=False, default='0')
     metric_unit = models.CharField(max_length=10, null=False, blank=False)
     metric_value1 = models.CharField(max_length=100, null=True, blank=True)
     metric_value2 = models.CharField(max_length=100, null=True, blank=True)
