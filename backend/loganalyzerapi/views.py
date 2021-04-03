@@ -295,6 +295,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         searchValue = ""
         project_id = ""
         
+        # TODO: Exclude 처리 - condition 부분에 적용...filter 대신 exclude
+        excludeSearch= ""
+        
         #statistic detailpopup
         detailconditionValue = ""
         detailsearchValue = ""
@@ -322,6 +325,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             conditionValue = self.request.query_params.get('conditionValue', None)
             searchValue = self.request.query_params.get('searchValue', None)
             
+            excludeSearch= self.request.query_params.get('excludeSearch', None)
+            
             project_id = self.request.query_params.get('project_id', None)
             
             #statistic detailpopup
@@ -346,6 +351,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
             conditionValue = self.request.data['filter']['conditionValue'] if self.request.data['filter']['conditionValue'] != '' else None
             searchValue = self.request.data['filter']['searchValue'] if self.request.data['filter']['searchValue'] != '' else None
+            
+            excludeSearch = self.request.data['filter']['excludeSearch'] if self.request.data['filter']['excludeSearch'] != '' else None
             
             project_id = self.request.data['filter']['project_id'] if self.request.data['filter']['project_id'] != '' else None
     
@@ -400,7 +407,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             if settings.DEBUG:
                 logger.debug('Time-taken applied!')
+        
+        # exclude search 적용 대상
+        #print("excludeSearch : ",excludeSearch) # False / true
+        if excludeSearch:
+            print('exclude checked')
             
+        # exclude search 적용 대상
         # conditionValue : Contain
         if conditionValue is not None :
             
@@ -409,24 +422,26 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 logger.debug('searchValue : %s' % searchValue)
                 
             if conditionValue == 'I':
-                queryset = queryset.filter(fip__icontains=searchValue)
+                queryset = queryset.exclude(fip__icontains=searchValue) if excludeSearch else queryset.filter(fip__icontains=searchValue)
             elif conditionValue == 'R':
-                queryset = queryset.filter(frequest__icontains=searchValue)
+                queryset = queryset.exclude(frequest__icontains=searchValue) if excludeSearch else queryset.filter(frequest__icontains=searchValue) 
             elif conditionValue == 'E':
-                queryset = queryset.filter(freferer__icontains=searchValue)
+                queryset = queryset.exclude(freferer__icontains=searchValue) if excludeSearch else queryset.filter(freferer__icontains=searchValue)
             elif conditionValue == 'U':
-                queryset = queryset.filter(fuser_agent__icontains=searchValue)
+                queryset = queryset.exclude(fuser_agent__icontains=searchValue) if excludeSearch else queryset.filter(fuser_agent__icontains=searchValue) 
             elif conditionValue == 'S':
-                queryset = queryset.filter(fstatus__icontains=searchValue)    
+                queryset = queryset.exclude(fstatus__icontains=searchValue) if excludeSearch else queryset.filter(fstatus__icontains=searchValue)   
         
+        # exclude search 적용 대상
         # String 검색
         if conditionValue is None and searchValue is not None:
             
             if settings.DEBUG:                
                 logger.debug('searchValue applied! (String Search) : %s' % searchValue)                
             
-            queryset = queryset.filter(log_line__icontains=searchValue)        
+            queryset = queryset.exclude(log_line__icontains=searchValue) if excludeSearch else queryset.filter(log_line__icontains=searchValue)       
                 
+        # exclude search 적용 대상 아님
         # conditionValue : statistic detailpopup
         if detailconditionValue is not None :
             
@@ -458,7 +473,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             # elif detailconditionValue == 'D':
             #     queryset = queryset.exclude(fextension='-')
                 # queryset = queryset.filter(fextension__in=['js', 'html','ico','jpg','png','bmp','otf','css'])
-                
+        
+        # exclude search 적용 대상? TODO: 현재 미적용
         # staticfileconditionValue : Findings detailpopup Staticfiles 
         if staticValue is not None :
             
@@ -469,11 +485,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             if staticValue == 'T':
                 queryset = queryset.exclude(fextension='-')
 
+        # exclude search 적용 대상? TODO: 현재 미적용
         # Findings detailpopup Staticfiles
-        # response byte size : Between 
-        # TODO: POST로 요청이 들어오면 "" 초기값 그대로 가지고 있음. 아래의 로직은 오류 발생함.(모든 차트와 통계값)
-        # 원본 : if (byteFromValue is not None) and (byteToValue is not None):
-        # 아래는 임시 수정이므로 전체 확인하여 처리요망
+        # response byte size : Between         
         if (byteFromValue is not None and byteFromValue != "" ) and (byteToValue is not None and byteToValue != ""):
             byteFromValue = int(byteFromValue)
             byteToValue   = int(byteToValue)
@@ -614,13 +628,18 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
                 metric_id = str(metric['metric'])
                 metricDetail = Metrics.objects.filter(metric_id=metric_id).values()
-
+                
                 metric_kind = metricDetail[0]['metric_kind']
-                metric_filter = metricDetail[0]['metric_filter']                
+                metric_filter = metricDetail[0]['metric_filter']
+                metric_filter2 = metricDetail[0]['metric_filter2']
                 metric_unit = metricDetail[0]['metric_unit']
                 metric_value1 = metricDetail[0]['metric_value1']
                 metric_value2 = metricDetail[0]['metric_value2']   
                 metric_static = metricDetail[0]['metric_static']   
+                
+                # print("metric_kind : ", metric_kind)
+                # print("metric_filter : ", metric_filter)
+                # print("metric_filter2 : ", metric_filter2)
                 
                 queryset = queryset_tmp.filter(logfile_id__in=list_logfile_id)
 
@@ -650,8 +669,26 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         result_count = format(queryset.count(), ',')
                         results.append({"result" : "count", "result_count" : result_count, "result_per" : ratio})                                     
 
-                    # (각 항목에 대해서 여러번 쿼리, 비율 넘는거 모두) : fip / frequest / fuser_agent /freferer / freserve2 (ingress domain)
-                    if metric_filter == 'fip' or metric_filter == 'frequest' or metric_filter == 'fuser_agent' or metric_filter == 'freferer' or metric_filter == 'freserve2':
+                    # TODO:(각 항목에 대해서 여러번 쿼리, 비율 넘는거 모두) : fip
+                    if metric_filter == 'fip':
+                        
+                        if metric_filter2 == '0':   # Response specific IP
+                            pass
+                            # 아래 공통 로직
+                        elif metric_filter2 == '1': # Response specific IP for top 2 URI
+                            
+                            # Step1. Top 2 URI 확인 : frequest
+                            intN = 2
+                            tempset = queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]
+                            
+                            # Step2. 각 URI에서 IP > 30%
+                            topN_uri = []
+                            for row in list(tempset):
+                                topN_uri.append(row['frequest'])
+                                
+                            queryset = queryset.filter(frequest__in=topN_uri)
+                            
+                        # fip 공통 로직
                         result = queryset.values(metric_filter).annotate(f_count=Count(metric_filter)).order_by('-f_count')
                         rows = result.values(metric_filter,'f_count')                       
                         for row in rows:
@@ -660,7 +697,82 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                                 break                           
                             else:
                                 result_count = format(row['f_count'], ',')
-                                results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})  
+                                results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})
+                    
+                    # TODO:(각 항목에 대해서 여러번 쿼리, 비율 넘는거 모두) : frequest
+                    if metric_filter == 'frequest':
+                        
+                        #if metric_filter2 == '0':   # Response specific URI
+                        #    pass
+                        if metric_filter2 == '1': # TODO: TPS increase rate per minute - 여기부터
+                            hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
+
+                            rows = hhmmRequest.values('x','y') # x = time, y = tps
+                            
+                            prev_time = ''
+                            prev_tps = 0
+                            
+                            result_count = 0
+                            results_xy = []
+                            
+                            loop_count = 0
+                            for row in rows:
+                                #print ('loop_count: ',loop_count)
+                                
+                                if loop_count == 0 :
+                                    prev_time = row['x']                # '202007010001'
+                                    prev_tps = row['y'] # round(rows[0]['y']/60, 1)     # 7
+                                    loop_count = loop_count+1
+                                    continue
+                                
+                                curr_time = row['x']
+                                curr_tps = row['y']   #round(rows[idx]['y']/60, 1)
+                                
+                                # Delta 가 30% 이상이면 결과에 추가한다.
+                                if (curr_tps - prev_tps ) * 100 >= int(metric_value1) * prev_tps:
+                                    result_count += 1
+                                    results_xy.append({"x": curr_time, "y": round(curr_tps/60, 1)})
+                                    
+                                prev_time = row['x']
+                                prev_tps = row['y']
+                                
+                                loop_count = loop_count+1
+                            
+                                    
+                            # TODO: 결과를 어떻게 다루어야 하는가?
+                            # 30%이상 개수  result_count
+                            # x, y의 집합   results_temp - 차후에 Graph도 그려야 한다.
+                            ratio = 0 if totalCnt == 0 else round(result_count/totalCnt*100, 2)
+                            # 각 xy는 1로 계산
+                            # TODO: 전체 데이터 results_xy 에 있음 - 상세 페이지 관련
+                            results.append({"result" : "count", "result_count" : result_count, "result_per" : ratio})
+                                                        
+                        #elif metric_filter2 == '2': # TODO: TPS increase rate per 30 seconds
+                        #    pass
+                        else:
+                            result = queryset.values(metric_filter).annotate(f_count=Count(metric_filter)).order_by('-f_count')
+                            rows = result.values(metric_filter,'f_count')
+                                                   
+                            for row in rows:
+                                ratio = 0 if totalCnt == 0 else round(row['f_count']/totalCnt*100, 2)
+                                if ratio < int(metric_value1):                                
+                                    break                           
+                                else:
+                                    result_count = format(row['f_count'], ',')
+                                    results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})
+                                
+                    # (각 항목에 대해서 여러번 쿼리, 비율 넘는거 모두) : fuser_agent /freferer / freserve2 (ingress domain)
+                    #if metric_filter == 'fip' or metric_filter == 'frequest' or metric_filter == 
+                    if metric_filter == 'fuser_agent' or metric_filter == 'freferer' or metric_filter == 'freserve2':
+                        result = queryset.values(metric_filter).annotate(f_count=Count(metric_filter)).order_by('-f_count')
+                        rows = result.values(metric_filter,'f_count')                       
+                        for row in rows:
+                            ratio = 0 if totalCnt == 0 else round(row['f_count']/totalCnt*100, 2)
+                            if ratio < int(metric_value1):                                
+                                break                           
+                            else:
+                                result_count = format(row['f_count'], ',')
+                                results.append({"result" : row[metric_filter], "result_count" : result_count, "result_per" : ratio})
 
                     # (각 항목에 대해서 여러번 쿼리, 401, 402.. 501, 503..) : status 4xx, 5xx
                     if metric_filter == 'fstatus':
@@ -676,12 +788,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
                     # freserve1 서비스, IP:PORT 호출 비율 조회  / $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) 
                     if metric_filter == 'freserve1':
-                        # Nginx Ingress : Upstream Info 서비스별 호출 비율
-                        if metric_unit == '%_IPPORT':
-                            result = queryset.annotate(f_reserve1=Right(metric_filter, Length(metric_filter)-StrIndex(metric_filter, Value('/')), output_field=CharField())).values('f_reserve1').annotate(f_count=Count('f_reserve1')).order_by('-f_count')
+                        
                         # Nginx Ingress : Upstream Info IP:PORT별 호출 비율
-                        if metric_unit == '%_SVC':
+                        #if metric_unit == '%_SVC':
+                        if metric_filter2 == '0':
                             result = queryset.annotate(f_reserve1_tmp=Substr(metric_filter, StrIndex(metric_filter, Value('-'))+1, Length(metric_filter)-StrIndex(metric_filter, Value('-')), output_field=CharField())).annotate(f_reserve1=Left('f_reserve1_tmp', StrIndex('f_reserve1_tmp', Value('-'))-1, output_field=CharField())).values('f_reserve1').annotate(f_count=Count('f_reserve1')).order_by('-f_count') 
+                        
+                        # Nginx Ingress : Upstream Info 서비스별 호출 비율
+                        #if metric_unit == '%_IPPORT':
+                        if metric_filter2 == '1':
+                            result = queryset.annotate(f_reserve1=Right(metric_filter, Length(metric_filter)-StrIndex(metric_filter, Value('/')), output_field=CharField())).values('f_reserve1').annotate(f_count=Count('f_reserve1')).order_by('-f_count')
                         
                         rows = result.values('f_reserve1', 'f_count')                       
                         for row in rows:
@@ -695,8 +811,25 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 2. pattern 
                 # Pattern Matching / 비율,건수
                 # frequest, fuser_agent
-                if metric_kind == 'pattern': 
-                    queryset = queryset.values(metric_filter).filter(**{metric_filter+'__icontains': metric_value2})
+                if metric_kind == 'pattern':                        
+                        
+                    # TODO: log_line 일 때     
+                    # 공통 로직
+                    queryset = queryset.values(metric_filter).filter(**{metric_filter+'__icontains': metric_value2})                    
+                    
+                    if metric_filter == 'frequest':
+                        
+                        if metric_filter2 == '0':   # URI request Top N ratio
+                            # Step1. Top 2 URI Filtering
+                            # TODO: Top N                            
+                            intN = 2
+                            queryset = queryset.values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]
+                            
+                        elif metric_filter2 == '1': # Response specific string for URI
+                            # 공통로직
+                            # TODO: URI 그룹핑 기능
+                            pass 
+                    
                     result_count = queryset.count()                        
                     ratio = 0 if totalCnt == 0 else round(result_count/totalCnt*100, 2)
                     if ratio >= int(metric_value1): 
@@ -748,8 +881,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 if creator not in admins and metric.metric_definition not in exist_metric_definitions:                    
                     
                     new_metric = Metrics.objects.create(metric_kind=metric.metric_kind, metric_definition=metric.metric_definition, metric_filter=metric.metric_filter,
-                    metric_unit=metric.metric_unit, metric_value1=metric.metric_value1,
-                    metric_value2=metric.metric_value2, metric_static=metric.metric_static, creator=creator)
+                    metric_filter2=metric.metric_filter2, metric_unit=metric.metric_unit, metric_value1=metric.metric_value1, metric_value2=metric.metric_value2, metric_static=metric.metric_static, creator=creator)
                     
                     new_metric.save()   # commit
             
