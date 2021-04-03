@@ -188,10 +188,10 @@ import {
     getLineChartOptions,
     getMultiLineChartTemplate,
     getMultiLineChartOptions,
-    setCommonStatisticInfo,
+    //setCommonStatisticInfo,
     getChartDataFromStatistics,
     getLineChartData,
-    getSearchFilter
+    //getSearchFilter
 } from "@/common"
 
 import VueElementLoading from 'vue-element-loading'
@@ -304,10 +304,11 @@ export default {
 
             conditionValue: "getCondition",
             searchValue: "getSearchKeyword",
+            excludeSearch: "getExcludeSearch",
 
             ttFromValue: "getFromTimeTaken",
             ttToValue: "getToTimeTaken",
-
+            
             logfile_id: "getLogFileID",
             project_id: "getProjectID",
             logFormat: "getLogFormat",
@@ -362,6 +363,7 @@ export default {
 
                 conditionValue: this.conditionValue,
                 searchValue: this.searchValue,
+                excludeSearch: this.excludeSearch,
 
                 ttFromValue: this.ttFromValue,
                 ttToValue: this.ttToValue,

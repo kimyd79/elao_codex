@@ -15,10 +15,10 @@ Vue.use(Layouts);
 Vue.use(VueSimpleAlert, { reverseButtons: true });
 
 // Below codes come alert for leaving this site.
-window.addEventListener('beforeunload', function (e) { 
-  e.preventDefault(); 
-  e.returnValue = ''; 
-}); 
+//window.addEventListener('beforeunload', function (e) { 
+//  e.preventDefault(); 
+//  e.returnValue = ''; 
+//}); 
 
 new Vue({
   router,

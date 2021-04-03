@@ -49,6 +49,7 @@ const state = {
     toTimeTaken: '',
     condition: '',
     searchKeyword: '',
+    excludeSearch: false,
 
     // search info2   
     fromDate2: '',
@@ -59,6 +60,7 @@ const state = {
     toTimeTaken2: '',
     condition2: '',
     searchKeyword2: '',
+    excludeSearch2: false,
 
     // statistic detailpopup
     detailcondition: '',
@@ -127,7 +129,8 @@ const mutations = {
     [types.SET_TOTIMETAKEN] (state, value) { state.toTimeTaken = value },
     [types.SET_CONDITION] (state, value) { state.condition = value },
     [types.SET_SEARCHKEYWORD] (state, value) { state.searchKeyword = value },
-
+    [types.SET_EXCLUDESEARCH] (state, value) { state.excludeSearch = value },
+    
     // search info 2
     [types.SET_FROMDATE2] (state, value) { state.fromDate2 = value },
     [types.SET_TODATE2] (state, value) { state.toDate2 = value },
@@ -137,6 +140,7 @@ const mutations = {
     [types.SET_TOTIMETAKEN2] (state, value) { state.toTimeTaken2 = value },
     [types.SET_CONDITION2] (state, value) { state.condition2 = value },
     [types.SET_SEARCHKEYWORD2] (state, value) { state.searchKeyword2 = value },
+    [types.SET_EXCLUDESEARCH2] (state, value) { state.excludeSearch2 = value },
 
     [types.TOGGLE_SEARCH] (state) { state.toggleSearch == 1 ? state.toggleSearch = 0 : state.toggleSearch = 1 },
     

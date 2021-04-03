@@ -32,6 +32,7 @@ export default {
     setToTimeTaken({commit}, value) { commit(types.SET_TOTIMETAKEN, value) },
     setCondition({commit}, value) { commit(types.SET_CONDITION, value) },
     setSearchKeyword({commit}, value) { commit(types.SET_SEARCHKEYWORD, value) },
+    setExcludeSearch({commit}, value) { commit(types.SET_EXCLUDESEARCH, value) },
 
     setFromDate2({commit}, value) { commit(types.SET_FROMDATE2, value) },
     setToDate2({commit}, value) { commit(types.SET_TODATE2, value) },
@@ -41,6 +42,7 @@ export default {
     setToTimeTaken2({commit}, value) { commit(types.SET_TOTIMETAKEN2, value) },
     setCondition2({commit}, value) { commit(types.SET_CONDITION2, value) },
     setSearchKeyword2({commit}, value) { commit(types.SET_SEARCHKEYWORD2, value) },
+    setExcludeSearch2({commit}, value) { commit(types.SET_EXCLUDESEARCH2, value) },
 
     //statistic detailpopup
     setDetailCondition({commit}, value) { commit(types.SET_DETAILCONDITION, value) },

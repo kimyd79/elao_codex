@@ -18,6 +18,8 @@
                     <lego-dropdown :items="conditions" v-model="conditionValue" />
                     &nbsp;&nbsp;&nbsp;
                     <lego-text-field v-model="searchValue" placeholder="Enter your keyword" searchable />
+                    &nbsp;&nbsp;&nbsp;&nbsp;                    
+                    <lego-checkbox v-model="excludeSearch" small >Exclude</lego-checkbox>
                 </ui-form-item>
             </ui-form-row>
 
@@ -63,6 +65,8 @@ export default {
             ttFromValue: "",
             ttToValue: "",
 
+            excludeSearch: false,
+
         };
     },
     created() {
@@ -77,10 +81,16 @@ export default {
         this.ttFromValue = this.$store.state.fromTimeTaken2
         this.ttToValue = this.$store.state.toTimeTaken2
 
+        this.excludeSearch = this.$store.state.excludeSearch2;
+
     },
     computed: {
         conditions() {
             let rtn = [];
+            rtn.push({
+                value: "N",
+                text: "None"
+            });
             rtn.push({
                 value: "I",
                 text: "IP"
@@ -116,6 +126,8 @@ export default {
             this.searchValue = "";
             this.ttFromValue = "";
             this.ttToValue = "";
+
+            this.excludeSearch = false;
         },
 
         // mapAction
@@ -127,6 +139,8 @@ export default {
 
             this.$store.dispatch("setCondition2", this.conditionValue);
             this.$store.dispatch("setSearchKeyword2", this.searchValue);
+            this.$store.dispatch("setExcludeSearch2", this.excludeSearch);
+
             this.$store.dispatch("setFromTimeTaken2", this.ttFromValue);
             this.$store.dispatch("setToTimeTaken2", this.ttToValue);
 

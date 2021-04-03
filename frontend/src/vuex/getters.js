@@ -30,6 +30,7 @@ export default {
     getToTimeTaken: state => state.toTimeTaken ,
     getCondition: state => state.condition ,
     getSearchKeyword: state => state.searchKeyword ,
+    getExcludeSearch: state => state.excludeSearch,
 
     getFromDate2: state => state.fromDate2 ,
     getToDate2: state => state.toDate2 ,
@@ -39,6 +40,7 @@ export default {
     getToTimeTaken2: state => state.toTimeTaken2 ,
     getCondition2: state => state.condition2 ,
     getSearchKeyword2: state => state.searchKeyword2 ,
+    getExcludeSearch2: state => state.excludeSearch2,
 
     // statistic detailpopup
     getDetailCondition: state => state.detailcondition ,

@@ -24,61 +24,64 @@ export var serverUrl = "http://127.0.0.1:8000/mwla";
 //////////////////////////////////////////////////////////////
 // Common Filter
 //////////////////////////////////////////////////////////////
-export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID){
+export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch){
     
-    var filters=""
+    var filters="";
 
     if ( dateFrom != '') {
-      filters = filters + "&dateFromValue="+dateFrom
+      filters = filters + "&dateFromValue="+dateFrom;
     }
     if ( dateTo != '') {
-      filters = filters + "&dateToValue="+dateTo
+      filters = filters + "&dateToValue="+dateTo;
     }
     if ( timeFrom != '') {
-      filters = filters + "&timeFromValue="+timeFrom
+      filters = filters + "&timeFromValue="+timeFrom;
     }
     if ( timeTo != '') {
-      filters = filters + "&timeToValue="+timeTo
+      filters = filters + "&timeToValue="+timeTo;
     }
     if ( condition != '') {
-      filters = filters + "&conditionValue="+condition
+      filters = filters + "&conditionValue="+condition;
     }
     if ( search != '') {
-      filters = filters + "&searchValue="+search
+      filters = filters + "&searchValue="+search;
     }
     if ( ttFrom != '') {
-      filters = filters + "&ttFromValue="+ttFrom
+      filters = filters + "&ttFromValue="+ttFrom;
     }
     if ( ttTo != '') {
-      filters = filters + "&ttToValue="+ttTo
+      filters = filters + "&ttToValue="+ttTo;
     }
     if ( projectID != '') {
-        filters = filters + "&project_id="+projectID
+        filters = filters + "&project_id="+projectID;
+    }
+    if ( excludeSearch != '') {
+        filters = filters + "&excludeSearch="+excludeSearch;
     }
 
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, detailcondition, detailsearch, byteFrom, byteTo, staticYN){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, detailcondition, detailsearch, byteFrom, byteTo, staticYN){
     
     var filters="";
 
-    filters = getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID);
+    filters = getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch);
 
     if ( detailcondition != '') {
-        filters = filters + "&detailconditionValue="+detailcondition
+        filters = filters + "&detailconditionValue="+detailcondition;
     }
     if ( detailsearch != '') {
-        filters = filters + "&detailsearchValue="+detailsearch
+        filters = filters + "&detailsearchValue="+detailsearch;
     }
     if ( byteFrom != '') {
-        filters = filters + "&byteFromValue="+byteFrom
+        filters = filters + "&byteFromValue="+byteFrom;
     }
     if ( byteTo != '') {
-        filters = filters + "&byteToValue="+byteTo
+        filters = filters + "&byteToValue="+byteTo;
     }
     if ( staticYN != '') {
-        filters = filters + "&staticValue="+staticYN
+        filters = filters + "&staticValue="+staticYN;
     }
 
     return filters;

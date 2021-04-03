@@ -42,7 +42,7 @@ import {
     mapGetters
 } from 'vuex';
 import {
-    getSearchFilter,
+    //getSearchFilter,
     getDetailSearchFilter,
     serverUrl
 } from "@/common"
@@ -178,6 +178,7 @@ export default {
 
         conditionValue: "getCondition2",
         searchValue: "getSearchKeyword2",
+        excludeSearch: "getExcludeSearch2",
 
         ttFromValue: "getFromTimeTaken2",
         ttToValue: "getToTimeTaken2",
@@ -318,7 +319,7 @@ export default {
 
             this.getDetailCondition();
 
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.detailconditionValue, this.detailsearchValue, '', '', '')
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '')
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;

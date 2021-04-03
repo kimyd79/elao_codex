@@ -313,6 +313,7 @@ export default {
 
             conditionValue: "getCondition",
             searchValue: "getSearchKeyword",
+            excludeSearch: "getExcludeSearch",
 
             ttFromValue: "getFromTimeTaken",
             ttToValue: "getToTimeTaken",
@@ -324,6 +325,7 @@ export default {
 
             conditionValue2: "getCondition2",
             searchValue2: "getSearchKeyword2",
+            excludeSearch2: "getExcludeSearch2",
 
             ttFromValue2: "getFromTimeTaken2",
             ttToValue2: "getToTimeTaken2",
@@ -381,6 +383,7 @@ export default {
 
                 conditionValue: this.conditionValue,
                 searchValue: this.searchValue,
+                excludeSearch: this.excludeSearch,
 
                 ttFromValue: this.ttFromValue,
                 ttToValue: this.ttToValue,
@@ -400,6 +403,7 @@ export default {
 
                 conditionValue: this.conditionValue2,
                 searchValue: this.searchValue2,
+                excludeSearch: this.excludeSearch2,
 
                 ttFromValue: this.ttFromValue2,
                 ttToValue: this.ttToValue2,

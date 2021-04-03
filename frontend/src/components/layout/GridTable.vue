@@ -128,6 +128,7 @@ export default {
 
         conditionValue: "getCondition",
         searchValue: "getSearchKeyword",
+        excludeSearch: "getExcludeSearch",
 
         ttFromValue: "getFromTimeTaken",
         ttToValue: "getToTimeTaken",
@@ -201,7 +202,7 @@ export default {
             //console.log("this.pagingInfo.rowsPerPage :" + this.pagingInfo.rowsPerPage);
             //console.log("this.pagingInfo.currentPage :" + this.pagingInfo.currentPage);
 
-            let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID)
+            let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch)
             //console.log("filters : " + filters)
 
             var urlstring =

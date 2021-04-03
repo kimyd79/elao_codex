@@ -82,6 +82,7 @@ export default {
 
         conditionValue: "getCondition",
         searchValue: "getSearchKeyword",
+        excludeSearch: "getExcludeSearch",        
 
         ttFromValue: "getFromTimeTaken",
         ttToValue: "getToTimeTaken",
@@ -104,6 +105,7 @@ export default {
 
                 conditionValue: this.conditionValue,
                 searchValue: this.searchValue,
+                excludeSearch: this.excludeSearch,
 
                 ttFromValue: this.ttFromValue,
                 ttToValue: this.ttToValue,
@@ -135,9 +137,9 @@ export default {
                     for (let i = 0; i < res.data.findingsResult.length; i++) {      
                         
                         // 0인거 제외 : Test시에는 열어둔다.
-                        //if (res.data.findingsResult[i].results.length == 0 || res.data.findingsResult[i].results[0].result_count == 0 || res.data.findingsResult[i].results[0].result_count == ''){
-                        //    continue;
-                        //}
+                        if (res.data.findingsResult[i].results.length == 0 || res.data.findingsResult[i].results[0].result_count == 0 || res.data.findingsResult[i].results[0].result_count == ''){
+                            continue;
+                        }
 
                         // Kind : threshold, scope, pattern
                         // [Info] Response time ＞ 3 (sec) : 769 (count)
@@ -147,15 +149,15 @@ export default {
                         description = "["+res.data.findingsResult[i].metric_type+"] "+ res.data.findingsResult[i].metric_definition + " ";
                                                 
                         if (res.data.findingsResult[i].metric_kind == 'scope'){
-                            description += res.data.findingsResult[i].metric_value1 + " ~ " + res.data.findingsResult[i].metric_value2;
+                            description += res.data.findingsResult[i].metric_value1.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " ~ " + res.data.findingsResult[i].metric_value2.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         }else {
 
                             if (res.data.findingsResult[i].metric_kind == 'pattern'){ 
-                                description += " ["+ res.data.findingsResult[i].metric_value2 +"]";
+                                description += " [pat='"+ res.data.findingsResult[i].metric_value2 +"']";
                             }
 
                             // threshold
-                            description += " > " + res.data.findingsResult[i].metric_value1;
+                            description += " > " + res.data.findingsResult[i].metric_value1.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                         }
                         
                         description += " ("+res.data.findingsResult[i].metric_unit+") → ";
@@ -163,13 +165,14 @@ export default {
                         items.push({
                             description: description,                    
                             results: res.data.findingsResult[i].results,
-                            //metric_kind: res.data.findingsResult[i].metric_kind,
-                            //metric_type: res.data.findingsResult[i].metric_type,
-                            //metric_filter: res.data.findingsResult[i].metric_filter,
-                            //metric_unit: res.data.findingsResult[i].metric_unit,
-                            //metric_value1: res.data.findingsResult[i].metric_value1,
-                            //metric_value2: res.data.findingsResult[i].metric_value2,
-                            //metric_static: res.data.findingsResult[i].metric_static,
+                            metric_kind: res.data.findingsResult[i].metric_kind,
+                            metric_type: res.data.findingsResult[i].metric_type,
+                            metric_filter: res.data.findingsResult[i].metric_filter,
+                            metric_filter2: res.data.findingsResult[i].metric_filter2,
+                            metric_unit: res.data.findingsResult[i].metric_unit,
+                            metric_value1: res.data.findingsResult[i].metric_value1,
+                            metric_value2: res.data.findingsResult[i].metric_value2,
+                            metric_static: res.data.findingsResult[i].metric_static,
                         }); 
                     };                                            
                 })
@@ -190,7 +193,7 @@ export default {
                 this.$store.state.detailsearchKeyword = '';
             } else{
                 this.$store.state.detailsearchKeyword = result.result;                
-            }  
+            }
             this.$store.state.detailcondition = finding.metric_filter;          
             this.$store.state.popupKind = 'FindingsDetail';
             this.$store.state.popupHeader = 'Finding Detail';

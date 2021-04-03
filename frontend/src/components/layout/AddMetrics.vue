@@ -141,11 +141,15 @@ export default {
 
                 if(this.metric.metric_filter == 'ftime_taken'){
                     this.items_unit = getMetricsunitListFtime();
-                } else if (this.metric.metric_filter == 'fstatus'){
-                    this.items_unit = getMetricsunitListFstatus();
-                } else if (this.metric.metric_filter == 'freserve1'){
-                    this.items_unit = getMetricsunitListFreserve1();                
-                } else if (this.metric.metric_filter == 'fbyte'){
+                } 
+                // 일반 %로 변경 for %_4XX, %_5XX, %_SVC, %_IPPORT
+                //else if (this.metric.metric_filter == 'fstatus'){
+                    //this.items_unit = getMetricsunitListFstatus();
+                //} 
+                //else if (this.metric.metric_filter == 'freserve1'){
+                    //this.items_unit = getMetricsunitListFreserve1();
+                //} 
+                else if (this.metric.metric_filter == 'fbyte'){
                     this.items_unit = getMetricsunitListFbyte();
                 } else {
                     this.items_unit = getMetricsunitListEtc();

@@ -17,9 +17,12 @@
             </ui-form-row>
 
             <ui-form-row>
-                <ui-form-item :columns="8" label="Condition">
-                    <lego-dropdown :items="conditions" v-model="conditionValue" />
+                <ui-form-item :columns="9" label="Condition">
+                    <lego-dropdown :items="conditions" v-model="conditionValue"/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                     <lego-text-field v-model="searchValue" placeholder="Enter your keyword" searchable />
+                    &nbsp;&nbsp;&nbsp;&nbsp;                    
+                    <lego-checkbox v-model="excludeSearch" small >Exclude</lego-checkbox>
                 </ui-form-item>
             </ui-form-row>
 
@@ -27,8 +30,9 @@
                 <ui-form-item :columns="6" label="TimeTaken">
                     <lego-text-field v-model="ttFromValue" placeholder="ms" />
                     &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
-                    <lego-text-field v-model="ttToValue" placeholder="ms" />
-                </ui-form-item>
+                    <lego-text-field v-model="ttToValue" placeholder="ms" />                                       
+                </ui-form-item>               
+
                 <ui-form-item :columns="8" align-right margin-right>
                     <lego-button v-on:click="initialize">Initialize</lego-button>
                     <lego-button v-on:click="search" main>Search</lego-button>
@@ -67,6 +71,7 @@ export default {
             ttToValue: "",
 
             projectID: "",
+            excludeSearch: false,
 
         };
     },
@@ -83,6 +88,7 @@ export default {
         this.ttToValue = this.$store.state.toTimeTaken
 
         this.projectID = this.$store.state.projectID
+        this.excludeSearch = this.$store.state.excludeSearch;
     },
 
     computed: {
@@ -128,10 +134,12 @@ export default {
             this.searchValue = "";
             this.ttFromValue = "";
             this.ttToValue = "";
+
+            this.excludeSearch = false;
         },
 
         // mapAction
-        setSerachCondition() {
+        setSearchCondition() {
             this.$store.dispatch("setFromDate", this.dateFromValue);
             this.$store.dispatch("setToDate", this.dateToValue);
             this.$store.dispatch("setFromTime", this.timeFromValue);
@@ -139,6 +147,8 @@ export default {
 
             this.$store.dispatch("setCondition", this.conditionValue);
             this.$store.dispatch("setSearchKeyword", this.searchValue);
+            this.$store.dispatch("setExcludeSearch", this.excludeSearch);
+
             this.$store.dispatch("setFromTimeTaken", this.ttFromValue);
             this.$store.dispatch("setToTimeTaken", this.ttToValue);
 
@@ -149,7 +159,7 @@ export default {
             // TODO : Validation Check
 
             // Set Global Variable
-            this.setSerachCondition()
+            this.setSearchCondition()
         }
     },
 

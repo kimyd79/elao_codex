@@ -26,12 +26,15 @@
         <ui-form-row>
             <ui-form-item :columns="8" label="Search Strings">                
                 <lego-text-field v-model="searchValue" placeholder="Enter your keyword" searchable />
+                &nbsp;&nbsp;&nbsp;&nbsp;                    
+                <lego-checkbox v-model="excludeSearch" small >Exclude</lego-checkbox>
             </ui-form-item>
         </ui-form-row>
 
         <ui-form-row>
             <ui-form-item :columns="6" label="Before / After">
                 <lego-text-field v-model="beforeLines" placeholder="- lines" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<lego-text-field v-model="afterLines" placeholder="+ lines" />
+                
             </ui-form-item>
             <ui-form-item :columns="8" align-right margin-right>
                 <lego-button v-on:click="initialize">Initialize</lego-button>
@@ -129,6 +132,8 @@ export default {
             // For Highlighting
             queries: [''],
 
+            excludeSearch: false,
+
         };
     },
     created() {
@@ -139,6 +144,7 @@ export default {
         this.timeFromValue = this.$store.state.fromTime
         this.timeToValue = this.$store.state.toTime
         this.searchValue = this.$store.state.searchKeyword
+        this.excludeSearch = this.$store.state.excludeSearch;
         this.projectID = this.$store.state.projectID
     },
     methods: {
@@ -156,6 +162,8 @@ export default {
             this.resultLogs = [];
             this.scrollCurrentPage = 0;
             this.totalCount = 0;
+
+            this.excludeSearch = false;
         },
 
         clear() {
@@ -170,6 +178,8 @@ export default {
             this.$store.dispatch("setToDate", this.dateToValue);
             this.$store.dispatch("setFromTime", this.timeFromValue);
             this.$store.dispatch("setToTime", this.timeToValue);
+
+            this.$store.dispatch("setExcludeSearch", this.excludeSearch);
 
             this.$store.dispatch("setToggleSearch1");
         },
@@ -186,7 +196,7 @@ export default {
 
             //console.log("this.queries : "+this.queries);
 
-            let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, "", this.searchValue, "", "", this.projectID);
+            let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, "", this.searchValue, "", "", this.projectID, this.excludeSearch);
 
             this.scrollCurrentPage++;
 
