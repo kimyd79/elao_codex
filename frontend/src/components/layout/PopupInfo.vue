@@ -13,7 +13,7 @@
             </div>
 
             <div class="popup-body"> <!-- add_scroll -->
-                <span style="color:#553ca5"><b>Version</b></span> : 1.0.0b (2021.03.01)
+                <span style="color:#553ca5"><b>Version</b></span> : 1.0.0b (2021.04.01)
                 <br><br>
                 <!--Log Formats : Apache Httpd Server, OHS, IIS(W3C, NCSA), Nginx, Webtob
                               Tomcat, Jeus7/8 -->
@@ -44,8 +44,8 @@
                     </div>
                     <div class="table-summary-item">
                         <div>Metrics</div>
-                        <div style="color:#553ca5"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545515" onclick="window.open(this.href,'_blank'); return false;"><b>7</b></a></div>
-                        <div>(14 in preparation)</div>
+                        <div style="color:#553ca5"><a href="http://devops.sdsdev.co.kr/confluence/pages/viewpage.action?pageId=230545515" onclick="window.open(this.href,'_blank'); return false;"><b>19</b></a></div>
+                        <div>(2 in preparation)</div>
                     </div>                    
                 </div>
             </div>

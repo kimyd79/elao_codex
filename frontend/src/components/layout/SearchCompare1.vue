@@ -1,5 +1,6 @@
 <template>
 <div id="search">
+    <component :is="currentView" v-on:popupClose="currentView=null" :logLine="logLine" ></component>
     <ui-container-box :columns="10" vertical>
         <ui-form-box>
             <span class="page-title__2label">Search-1</span>
@@ -31,6 +32,9 @@
                     &nbsp;&nbsp;&nbsp;
                     <lego-button v-on:click="initialize">Initialize</lego-button>
                     <lego-button v-on:click="search" main>Search</lego-button>
+
+                    <!-- TODO: TEST -->
+                    <lego-button v-on:click="diffTest" main>DiffSample</lego-button>
                 </ui-form-item>
 
             </ui-form-row>
@@ -46,12 +50,14 @@ import axios from "axios";
 // Timepicker
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
+import PopupDifferences from '@/components/layout/PopupDifferences';
 
 export default {
     name: "SearchCompare1",
 
     components: {
-        DatePicker
+        DatePicker,
+        PopupDifferences
     },
 
     data() {
@@ -67,6 +73,8 @@ export default {
             ttToValue: "",
 
             excludeSearch: false,
+
+            currentView: null,
         };
     },
     created() {
@@ -115,6 +123,11 @@ export default {
         }
     },
     methods: {
+
+        diffTest(){
+            this.currentView = 'PopupDifferences';
+        },
+
         initialize() {
 
             this.dateFromValue = this.$store.state.global_fromDate;

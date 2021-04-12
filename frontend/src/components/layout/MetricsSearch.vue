@@ -40,24 +40,6 @@ export default {
         });
     },
 
-    // computed: {
-    //     conditions() {
-    //         let rtn = [];
-    //         // rtn.push({
-    //         //     value: "N",
-    //         //     text: "None"
-    //         // });
-    //         rtn.push({
-    //             value: "threshhold",
-    //             text: "threshhold"
-    //         });
-    //         rtn.push({
-    //             value: "scope",
-    //             text: "scope"
-    //         });
-    //         return rtn;
-    //     }
-    // },
     methods: {
         getData: function() {
             if( this.metric_kind == 'ALL') {
@@ -65,7 +47,7 @@ export default {
             }
             EventBus.$emit("searchMetrics", this.metric_kind);
             //console.log(this.project_name);
-        }
+        },
     }
 };
 </script>

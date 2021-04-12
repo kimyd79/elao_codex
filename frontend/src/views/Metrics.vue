@@ -4,7 +4,7 @@
     <ui-container-box :columns=20 horizontal align-center class="page-title">
         <span class="page-title__label">Metrics</span>
     </ui-container-box>
-
+       
     <ui-container-box :columns=20 horizontal class="page-form-area">
         <MetricsSearch></MetricsSearch>
     </ui-container-box>
@@ -45,6 +45,21 @@ export default {
         return {
 
         }
+    },
+    methods:{
+        alertTest(){
+            //$swal2-background= #990000;
+
+            console.log(this.$swal)
+            this.$swal({
+            title: 'Sweet!',
+            text: 'Modal with a custom image.',
+            imageUrl: 'https://unsplash.it/400/200',
+            imageWidth: 400,
+            imageHeight: 200,
+            imageAlt: 'Custom image',
+            });        
+        },
     }
 }
 </script>

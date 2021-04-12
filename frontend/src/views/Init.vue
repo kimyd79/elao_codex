@@ -115,6 +115,8 @@
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
                 <lego-button v-on:click="deleteProjects" main v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'">DelProjects</lego-button>
                 <lego-button v-on:click="newProject">newProject</lego-button>
+
+                
             </div>
 
         </ui-container-box>
@@ -435,93 +437,102 @@ export default {
         // New Project
         newProject() {
 
-            this.$confirm("Do you want to start new project?", "Are you sure?", "question").then(() => {
-                //do something...
-                //("OK clicked")
+            this.$swal({
+                    title: 'Are you sure?',
+                    text: "Do you want to start new project?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#553ca5',
+                    //cancelButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                    reverseButtons: true,
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    this.isNewProject = true;
+                    // 로그인 풀림 방지
+                    let userToken = this.$store.state.userToken;
+                    let userName = this.$store.state.userName;
+                    localStorage.removeItem("vuex");
+                    this.$store.reset();
+                    this.$store.dispatch("setUserToken", userToken);
+                    this.$store.dispatch("setUserName", userName);
+                    this.projectName = "";
+                    this.projectDescription = "";
+                    this.fileName = "";
+                    this.fileFormat = "";
+                    
+                    this.radioValue = "1";
+                    this.isPrevShow = false;
 
-                this.isNewProject = true;
-                // 로그인 풀림 방지
-                let userToken = this.$store.state.userToken;
-                let userName = this.$store.state.userName;
-                localStorage.removeItem("vuex");
-                this.$store.reset();
-                this.$store.dispatch("setUserToken", userToken);
-                this.$store.dispatch("setUserName", userName);
-                this.projectName = "";
-                this.projectDescription = "";
-                this.fileName = "";
-                this.fileFormat = "";
-                
-                this.radioValue = "1";
-                this.isPrevShow = false;
+                    for (let i = 0; i < this.tabs.length; i++) {
+                        if (this.tabs[i].isSelected == true) {
+                            this.tabs[i].isSelected = false;
+                            this.tabs[0].isSelected = true;
+                            break;
+                        }
+                    }
+                    this.buttonName = "Next";
 
-                for (let i = 0; i < this.tabs.length; i++) {
-                    if (this.tabs[i].isSelected == true) {
-                        this.tabs[i].isSelected = false;
-                        this.tabs[0].isSelected = true;
-                        break;
+                    // Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
+                    if (this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                        this.tabs[0].isSelected = false;
+                        this.tabs[1].isSelected = true;
                     }
                 }
-                this.buttonName = "Next";
-
-                // 
-                // if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
-                //     this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';
-                // }
-
-                // Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
-                if (this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
-                    this.tabs[0].isSelected = false;
-                    this.tabs[1].isSelected = true;
-                }
-
-                //this.isNewProject = false
-
-            }).catch(() => {
-                //console.log("Cancel clicked");
-            });
+            });  
 
         },
 
         // For Test : Project 전체 지우기(인자 받으면 1개만 지우기)
         deleteProjects(projectID) {
 
-            this.$confirm("Do you want to DELETE all project?", "Are you sure?", "warning").then(() => {
+            this.$swal({
+                title: 'Are you sure?',
+                text: "Do you want to DELETE all project?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                //cancelButtonColor: '#d33',
+                confirmButtonText: 'OK',
+                reverseButtons: true,
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    
+                    let projectIDList = []
 
-                let projectIDList = []
+                    // Get Projects
 
-                // Get Projects
-
-                let axiosConfig = {
-                    headers: {
-                        //'Authorization': 'Token '+ this.token // For Django
-                    }
-                };
-
-                axios.get(serverUrl + "/logmaster/", axiosConfig)
-                    .then(res => {
-                        //console.log(res)
-
-                        for (let i = 0; i < res.data.results.length; i++) {
-
-                            projectIDList.push(res.data.results[i].project_id);
-
-                            axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
-                                .then(res => {
-                                    //console.log(res.data)
-                                })
-                                .catch(err => {
-                                    console.error(err);
-                                })
+                    let axiosConfig = {
+                        headers: {
+                            //'Authorization': 'Token '+ this.token // For Django
                         }
+                    };
 
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    })
-            }).catch(() => {
-                //console.log("Cancel clicked");
-            });
+                    axios.get(serverUrl + "/logmaster/", axiosConfig)
+                        .then(res => {
+                            //console.log(res)
+
+                            for (let i = 0; i < res.data.results.length; i++) {
+
+                                projectIDList.push(res.data.results[i].project_id);
+
+                                axios.delete(serverUrl + '/logmaster/' + res.data.results[i].project_id + '/', axiosConfig) // '가 아니라 `이다.
+                                    .then(res => {
+                                        //console.log(res.data)
+                                    })
+                                    .catch(err => {
+                                        console.error(err);
+                                    })
+                            }
+
+                        })
+                        .catch(err => {
+                            console.error(err);
+                        })
+                }
+            }); 
+            
         },
 
         setItemList(results) {
@@ -564,13 +575,23 @@ export default {
                     this.setItemList(res.data.results);
 
                     this.isActive = false                    
-                    this.$alert("Get project data completed..!!", "Notification", "success");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Get project data completed..!!',
+                        icon: 'success'
+                    });  
 
                 })
                 .catch(err => {
                     this.isActive = false
                     console.error(err);
-                    this.$alert("Get project data failed..!!", "Notification", "error");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Get project data failed..!!',
+                        icon: 'error'
+                    }); 
                 })
         },
 
@@ -672,13 +693,21 @@ export default {
                         resultMsg = resultMsg + processing_time  + " : secs"
                     }
 
-                    this.$alert(resultMsg, "Notification", "success").then(() => {
-
-                        this.getStartEnd(this.projectID);                        
-
-                    }).catch(() => {
-                        console.log("getStartEnd Error");
-                    });
+                    this.$swal({
+                        title: 'Notification',
+                        text: resultMsg,
+                        icon: 'success',
+                        showCancelButton: false,
+                        confirmButtonColor: '#553ca5',
+                        //cancelButtonColor: '#d33',
+                        confirmButtonText: 'OK',                        
+                        reverseButtons: true,
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            
+                            this.getStartEnd(this.projectID);
+                        }
+                    });  
 
                     isNext = true;
                 } catch (err) {
@@ -769,15 +798,23 @@ export default {
 
                     this.isActive = false
 
-                    this.$alert("Create Logmaster Data completed.", "Notification", "success");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Logmaster Data completed.',
+                        icon: 'success'
+                    });  
                 })
                 .catch(err => {
                     console.error(err);
                     this.isActive = false
 
-                    this.$alert("Create Logmaster Data failed.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Logmaster Data failed..!!',
+                        icon: 'error'
+                    }); 
 
-                    throw err
+                    throw err;
                 })
         },
 
@@ -801,14 +838,24 @@ export default {
 
                     this.isActive = false
 
-                    this.$alert("Create Dynamic Logdetail completed..", "Notification", "success");
+                    //this.$alert("Create Dynamic Logdetail completed..", "Notification", "success");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Dynamic Logdetail completed..!!',
+                        icon: 'success'
+                    });  
 
                 })
                 .catch(err => {
                     console.error(err);
                     this.isActive = false
 
-                    this.$alert("Create Dynamic Logdetail failed.", "Notification", "error");
+                    //this.$alert("Create Dynamic Logdetail failed.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Dynamic Logdetail failed..!!',
+                        icon: 'error'
+                    }); 
 
                     throw err
                 })
@@ -818,31 +865,7 @@ export default {
 
             this.file = this.$refs.file.files[0];
 
-            // TODO: 수정필요(크기제한 관련)
-            // Check : File Size
-            // 일반파일 : 1GB
-            // 압축파일 : 150MB
-            //            ‘.gz’, ‘.bz2’, ‘.zip’, or ‘.xz’ - Single File 압축만 가능
-            //var fileExt = this.file.name.slice(this.file.name.lastIndexOf('.') + 1).toLowerCase();
-
-            //console.log("fileExt : " + fileExt);
-
             try {
-
-                // 크기 제한로직 제거
-                //if (fileExt == 'gz' || fileExt == 'bz2' || fileExt == 'zip' || fileExt == 'xz') {
-                //    if (this.file.size > 150 * 1024 * 1024) {
-                //        // 150MB 보다 크다면
-                //        this.$alert("Compressed Logfile Size <= 150MB, Use Linesplitter please. ", "Notification", "error");
-                //        throw "FileSize Exception";
-                //    }
-                //} else {
-                //    if (this.file.size > 1 * 1024 * 1024 * 1024) {
-                //        // 1GB 보다 크다면
-                //        this.$alert("Logfile Size <= 1GB, Use Linesplitter please. ", "Notification", "error");
-                //        throw "FileSize Exception";
-                //    }
-                //}
 
                 this.fileName = this.file.name
                 this.fileSize = this.file.size
@@ -901,14 +924,26 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Create Logfile(File Upload) completed..!!", "Notification", "success");
+                    //this.$alert("Create Logfile(File Upload) completed..!!", "Notification", "success");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Logfile(File Upload) completed..!!',
+                        icon: 'success'
+                    }); 
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Create Logfile(File Upload) failed..!!", "Notification", "error");
+                    //this.$alert("Create Logfile(File Upload) failed..!!", "Notification", "error");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Logfile(File Upload) failed..!!',
+                        icon: 'error'
+                    });
 
                     throw err
                 })
@@ -970,7 +1005,13 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Create Logdetail Data failed..!!", "Notification", "error");
+                    //this.$alert("Create Logdetail Data failed..!!", "Notification", "error");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Create Logdetail Data failed..!!',
+                        icon: 'error'
+                    });
 
                     throw err
                 })
@@ -1008,14 +1049,26 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Get Logfile Data completed..!!", "Notification", "success");
+                    //this.$alert("Get Logfile Data completed..!!", "Notification", "success");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Get Logfile Data completed..!!',
+                        icon: 'success'
+                    });
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Get Logfile Data completed..!!", "Notification", "error");
+                    //this.$alert("Get Logfile Data completed..!!", "Notification", "error");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Get Logfile Data failed..!!',
+                        icon: 'error'
+                    });                    
 
                     throw err
                 })
@@ -1080,7 +1133,13 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    this.$alert("Get Logdetail Data failed..!!", "Notification", "error");
+                    //this.$alert("Get Logdetail Data failed..!!", "Notification", "error");
+
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Get Logdetail Data failed..!!',
+                        icon: 'error'
+                    }); 	
 
                     throw err
                 })
@@ -1158,18 +1217,4 @@ export default {
     margin-top: 32px;
 }
 
-
-.swal2-content {
-    z-index: 1;
-    justify-content: center;
-    margin: 0;
-    padding: 0;
-    color: #545454;
-    font-size: 1.125em;
-    font-weight: 400;
-    line-height: normal;
-    text-align: center;
-    word-wrap: break-word;
-    white-space: pre;
-}
 </style>

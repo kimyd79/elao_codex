@@ -33,16 +33,21 @@ import LogOut from "./components/layout/LogOut.vue"
 import Project from "./views/Project.vue"
 import Metrics from "./views/Metrics.vue"
 import store from "@/vuex/store";
-import VueSimpleAlert from "vue-simple-alert";
+//import VueSimpleAlert from "vue-simple-alert";
 
 Vue.use(Router)
-
 
 const requireAdmin = () => (to, from, next) => {
   if(store.state.userName.toLowerCase() == 'leehs' || store.state.userName.toLowerCase() == 'admin') {
     next();
   } else {
-    VueSimpleAlert.alert("Allow only admin to access.", "Notification", "error");
+    //VueSimpleAlert.alert("Allow only admin to access.", "Notification", "error");
+    this.$swal({
+      title: 'Notification',
+      html: 'Allow only admin to access.',
+      icon: 'error'
+    }); 
+
   }
 };
 
@@ -50,7 +55,13 @@ const checkLoggedin = () => (to, from, next) => {
   if(store.state.userName == 'Not logged in') {
     next();
   } else {
-    VueSimpleAlert.alert("You are already logged in.", "Notification", "error");
+    //VueSimpleAlert.alert("You are already logged in.", "Notification", "error");
+    this.$swal({
+      title: 'Notification',
+      html: 'You are already logged in.',
+      icon: 'error'
+    }); 	
+
     next('/initialization');
   }
 };
