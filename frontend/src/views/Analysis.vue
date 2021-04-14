@@ -101,7 +101,7 @@
                 <vue-element-loading :active="isActivePieExtension" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                 <chart-pie :chart-data="pChartDataExtension" :options="pOptions"></chart-pie>
             </div>
-
+            
             <div class="vld-parent" v-if="this.logFormat.indexOf('$http_referer')!=-1" >
                 <vue-element-loading :active="isActivePieDomain" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
                 <chart-pie :chart-data="pChartDataDomain" :options="pOptions"></chart-pie>
@@ -137,7 +137,7 @@
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
-            <!-- For Ingress Nginx -->
+             <!-- For Ingress Nginx -->
             <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
@@ -468,7 +468,6 @@ export default {
             try {
                 let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
 
-                console.log(res);
                 this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
                 this.sbOptions = getStackedBarChartOptions('Http Status Code', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {
@@ -510,6 +509,7 @@ export default {
 
             try {
                 let res = await getLineChartData(3, this.timeCondition, this.project_id, filter);
+
                 this.mlChartData = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, 'Time-Taken');
                 this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {

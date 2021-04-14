@@ -187,7 +187,8 @@ export default {
                     this.isActive = false
                 })
                 .catch(err => {
-                    console.error(err);
+
+                    console.error("ERROR : "+err);
                     //Stop Loading Spinner
                     this.isActive = false
                 })

@@ -526,9 +526,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     def getTimetakenUnit(self, logfile_id):
         file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
         
-        if file_format.find('D') != -1:
+        if file_format.find('D') != -1 or file_format.find('request_time'):
             return 'D'
-        elif file_format.find('T') != -1:
+        elif file_format.find('T') != -1 :
             return 'T'
         else:
             return None
@@ -1799,15 +1799,18 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs['freserve1'] = ''
         df_logs['freserve2'] = ''
         df_logs['freserve3'] = ''
-        
-        # freserve1 : Nginx Ingress Controller의 upstream 정보 용도로 사용 - df_logs['proxy_upstream_name'], df_logs['upstream_addr']
-        # TODO: 값이 없는 경우의 처리는?
-        if format_kind == 'nginx':
-            df_logs['freserve1'] = df_logs['proxy_upstream_name'] + '/' + df_logs['upstream_addr']
+                
+        # For Nginx Ingress Controller
+        if format_kind == 'nginx':            
             
-            # TODO: Domain 추출 - 패턴 : "http:// ~ /"            
-            p = re.compile('http://[a-zA-Z0-9.\-_]+/', re.DOTALL )
-            df_logs['freserve2']  = df_logs['freferer'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else '-')
+            # freserve1 : Nginx Ingress Controller의 upstream 정보 용도로 사용 - df_logs['proxy_upstream_name'], df_logs['upstream_addr']
+            if log_format.find('proxy_upstream_name') != -1 and log_format.find('upstream_addr') != -1:
+                df_logs['freserve1'] = df_logs['proxy_upstream_name'] + '/' + df_logs['upstream_addr']
+            
+            # freserve2 : Domain(freferer에서 추출) - 패턴 : "http:// ~ /"
+            if log_format.find('freferer') != -1:
+                p = re.compile('http://[a-zA-Z0-9.\-_]+/', re.DOTALL )
+                df_logs['freserve2']  = df_logs['freferer'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else '-')
         
         #'created'
         datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
@@ -2110,20 +2113,20 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         if log_format.find('$request_time') != -1:
             df_logs.rename(columns = {format_index['$request_time'] : 'ftime_taken'}, inplace = True)
             
-            # millisecond
+            # millisecond -> microsecond으로 계산한다.
             #df_logs['ftime_taken'].mul(1000).fillna(0).apply(np.int64)
             # 잘못 파싱되어 문자열 들어간 경우
-            df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000).astype(int)
+            df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000000).astype(int)
+        else:
+            df_logs['ftime_taken'] = -1
         
+        # TODO: Ingress 인경우만 별도로 체크 필요
         # Ingress Nginx    
         if log_format.find('$proxy_upstream_name') != -1:
             df_logs.rename(columns = {format_index['$proxy_upstream_name'] : 'proxy_upstream_name'}, inplace = True)
             
         if log_format.find('$upstream_addr') != -1:
             df_logs.rename(columns = {format_index['$upstream_addr'] : 'upstream_addr'}, inplace = True)
-                        
-        else:
-            df_logs['ftime_taken'] = -1
             
         return df_logs
         
