@@ -18,7 +18,7 @@
                         <td>{{ index+1 }}</td>
 
                         <!-- TODO: content 종류에 따라 style= "text-align:left;" 적용할 것 -->
-                        <td v-on:click="getDetail(item)">{{ item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" )}}</td>
+                        <td v-on:click="getDetail(item)">{{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}</td>
                         <td v-on:click="getDetail(item)">{{ item.result_count }} <br> {{ item.ratio }}</td>
                     </tr>
 

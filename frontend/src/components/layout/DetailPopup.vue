@@ -342,7 +342,7 @@ export default {
                 .then(res => {
                     this.pagingInfo.totalItems = res.data.count;
 
-                    console.log(res.data.results)
+                    //console.log(res.data.results)
 
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
