@@ -1264,9 +1264,17 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
                     rows = hhRequest.values('f_date', 'f_status', 'status_count')
                     
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}                   
-                    resultStatusCode = []
-                                                
+                    dateStatusCount = {}    # {'날짜' : { '2' : 'status_count', '3~5' : 'status_count', ...}, '날짜' : { 'status_code' : 'status_count'}, ...}                   
+                    resultStatusCode = []                    
+                    
+                    # x축(시간)으로 먼저 2, 3, 4, 5 Slot을 생성한다.(초기값 0)
+                    #initial_status_slot = {}
+                    x_all = hhRequest.values('f_date')
+                    
+                    for x in x_all:
+                        if x['f_date'] not in dateStatusCount:
+                            dateStatusCount[x['f_date']] = {'2':0, '3':0, '4':0, '5':0}
+
                     for row in rows:
                         # print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
                         # print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
@@ -1280,37 +1288,42 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         if row['f_status'] not in resultStatusCode:
                             resultStatusCode.append(row['f_status']) 
                             
-                        # 전체 Map 구하기     
-                        statusCount = {}               
-                        statusCount[row['f_status']] = row['status_count']
-                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                        # 전체 Map 구하기                        
+                        dateStatusCount[row['f_date']][row['f_status']] = row['status_count']
+                        
                         
                     for xDate in resultX:
-                        for yStatusCode in ['2', '3', '4', '5']:
+                        
+                        resultY_200.append(dateStatusCount[xDate]['2'])
+                        resultY_300.append(dateStatusCount[xDate]['3'])
+                        resultY_400.append(dateStatusCount[xDate]['4'])
+                        resultY_500.append(dateStatusCount[xDate]['5'])                        
+                        
+                        # for yStatusCode in ['2', '3', '4', '5']:
                             
-                            if yStatusCode == '2':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_200.append(0)
+                        #     if yStatusCode == '2':
+                        #         if yStatusCode in dateStatusCount[xDate]:
+                        #             resultY_200.append(dateStatusCount[xDate][yStatusCode])
+                        #         else:
+                        #             resultY_200.append(0)
                             
-                            if yStatusCode == '3':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_300.append(0)
+                        #     if yStatusCode == '3':
+                        #         if yStatusCode in dateStatusCount[xDate]:
+                        #             resultY_300.append(dateStatusCount[xDate][yStatusCode])
+                        #         else:
+                        #             resultY_300.append(0)
                             
-                            if yStatusCode == '4':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_400.append(0)
+                        #     if yStatusCode == '4':
+                        #         if yStatusCode in dateStatusCount[xDate]:
+                        #             resultY_400.append(dateStatusCount[xDate][yStatusCode])
+                        #         else:
+                        #             resultY_400.append(0)
                                     
-                            if yStatusCode == '5':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_500.append(0)
+                        #     if yStatusCode == '5':
+                        #         if yStatusCode in dateStatusCount[xDate]:
+                        #             resultY_500.append(dateStatusCount[xDate][yStatusCode])
+                        #         else:
+                        #             resultY_500.append(0)
                             
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -1378,9 +1391,17 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
                     rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
                     
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}                    
-                    
+                    dateStatusCount = {}    # {'날짜' : { '2' : 'status_count', '3~5' : 'status_count', ...}, '날짜' : { 'status_code' : 'status_count'}, ...}                   
                     resultStatusCode = []
+                    
+                    # x축(시간)으로 먼저 2, 3, 4, 5 Slot을 생성한다.(초기값 0)
+                    #initial_status_slot = {}
+                    x_all = hhmmRequest.values('f_date')
+                    
+                    for x in x_all:
+                        if x['f_date'] not in dateStatusCount:
+                            dateStatusCount[x['f_date']] = {'2':0, '3':0, '4':0, '5':0}
+                    
                                                 
                     for row in rows:
                         # print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
@@ -1395,37 +1416,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         if row['f_status'] not in resultStatusCode:
                             resultStatusCode.append(row['f_status']) 
                             
-                        # 전체 Map 구하기
-                        statusCount = {}
-                        statusCount[row['f_status']] = row['status_count']
-                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                        # 전체 Map 구하기                        
+                        dateStatusCount[row['f_date']][row['f_status']] = row['status_count']
                         
                     for xDate in resultX:
-                        for yStatusCode in ['2', '3', '4', '5']:
-                            
-                            if yStatusCode == '2':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_200.append(0)
-                            
-                            if yStatusCode == '3':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_300.append(0)
-                            
-                            if yStatusCode == '4':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_400.append(0)
-                                    
-                            if yStatusCode == '5':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_500.append(0)
+                        
+                        resultY_200.append(dateStatusCount[xDate]['2'])
+                        resultY_300.append(dateStatusCount[xDate]['3'])
+                        resultY_400.append(dateStatusCount[xDate]['4'])
+                        resultY_500.append(dateStatusCount[xDate]['5'])
                                 
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -1493,6 +1492,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     
                     dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
                     resultStatusCode = []
+                    
+                    # x축(시간)으로 먼저 2, 3, 4, 5 Slot을 생성한다.(초기값 0)
+                    #initial_status_slot = {}
+                    x_all = hhmmssRequest.values('f_date')
+                    
+                    for x in x_all:
+                        if x['f_date'] not in dateStatusCount:
+                            dateStatusCount[x['f_date']] = {'2':0, '3':0, '4':0, '5':0}
                                                 
                     for row in rows:
                         # print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
@@ -1508,36 +1515,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultStatusCode.append(row['f_status']) 
                             
                         # 전체 Map 구하기
-                        statusCount = {}
-                        statusCount[row['f_status']] = row['status_count']
-                        dateStatusCount[row['f_date']] = copy.deepcopy(statusCount)
+                        dateStatusCount[row['f_date']][row['f_status']] = row['status_count']
                         
                     for xDate in resultX:
-                        for yStatusCode in ['2', '3', '4', '5']:
-                            
-                            if yStatusCode == '2':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_200.append(0)
-                            
-                            if yStatusCode == '3':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_300.append(0)
-                            
-                            if yStatusCode == '4':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_400.append(0)
-                                    
-                            if yStatusCode == '5':
-                                if yStatusCode in dateStatusCount[xDate]:
-                                    resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                                else:
-                                    resultY_500.append(0)
+                        resultY_200.append(dateStatusCount[xDate]['2'])
+                        resultY_300.append(dateStatusCount[xDate]['3'])
+                        resultY_400.append(dateStatusCount[xDate]['4'])
+                        resultY_500.append(dateStatusCount[xDate]['5'])
                                                     
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
