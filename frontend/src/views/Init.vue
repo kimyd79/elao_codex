@@ -443,7 +443,7 @@ export default {
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#553ca5',
-                    //cancelButtonColor: '#d33',
+                    cancelButtonColor: '#dddddd',
                     confirmButtonText: 'OK',
                     reverseButtons: true,
                 }).then((result) => {
@@ -493,7 +493,7 @@ export default {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#553ca5',
-                //cancelButtonColor: '#d33',
+                cancelButtonColor: '#dddddd',
                 confirmButtonText: 'OK',
                 reverseButtons: true,
                 }).then((result) => {
@@ -579,7 +579,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Get project data completed..!!',
-                        icon: 'success'
+                        icon: 'success',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });  
 
                 })
@@ -590,7 +592,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Get project data failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     }); 
                 })
         },
@@ -699,7 +703,7 @@ export default {
                         icon: 'success',
                         showCancelButton: false,
                         confirmButtonColor: '#553ca5',
-                        //cancelButtonColor: '#d33',
+                        cancelButtonColor: '#dddddd',
                         confirmButtonText: 'OK',                        
                         reverseButtons: true,
                         }).then((result) => {
@@ -801,7 +805,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Logmaster Data completed.',
-                        icon: 'success'
+                        icon: 'success',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });  
                 })
                 .catch(err => {
@@ -811,7 +817,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Logmaster Data failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     }); 
 
                     throw err;
@@ -842,7 +850,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Dynamic Logdetail completed..!!',
-                        icon: 'success'
+                        icon: 'success',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });  
 
                 })
@@ -854,7 +864,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Dynamic Logdetail failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     }); 
 
                     throw err
@@ -929,7 +941,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Logfile(File Upload) completed..!!',
-                        icon: 'success'
+                        icon: 'success',                        
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',                    
                     }); 
                 })
                 .catch(err => {
@@ -942,7 +956,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Logfile(File Upload) failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });
 
                     throw err
@@ -1010,7 +1026,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Create Logdetail Data failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });
 
                     throw err
@@ -1054,7 +1072,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Get Logfile Data completed..!!',
-                        icon: 'success'
+                        icon: 'success',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });
                 })
                 .catch(err => {
@@ -1067,7 +1087,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Get Logfile Data failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     });                    
 
                     throw err
@@ -1138,7 +1160,9 @@ export default {
                     this.$swal({
                         title: 'Notification',
                         html: 'Get Logdetail Data failed..!!',
-                        icon: 'error'
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
                     }); 	
 
                     throw err
