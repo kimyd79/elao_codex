@@ -1090,6 +1090,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     
             #type=8. URI Total Byte Top N               
             elif type == 8:
+                
+                # totalCnt 값을 totalByte sum값으로 계산하여 치환(% 계산위해)
+                totalCnt = queryset.aggregate(Sum('fbyte'))['fbyte__sum']
+                
                 topn_byte = queryset.values('frequest').annotate(requestURL=F('frequest'), fbyte_sum=Sum('fbyte')).order_by('-fbyte_sum')[0:intN]
                 rows = topn_byte.values('requestURL','fbyte_sum')
                 
@@ -1116,6 +1120,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     
             #type=10. URI Average Byte Top N               
             elif type == 10:
+                
+                # totalCnt 값을 totalByte avg 값으로 계산하여 치환(% 계산위해) -우선 제외(의미 없음)
+                #totalCnt = queryset.aggregate(Avg('fbyte'))['fbyte__avg']
+                #totalCnt = queryset.aggregate(Sum('fbyte'))['fbyte__sum']
+                
                 topn_avgbyte = queryset.values('frequest').annotate(requestURL=F('frequest'), fbyte_avg=Avg('fbyte')).order_by('-fbyte_avg')[0:intN]
                 rows = topn_avgbyte.values('requestURL','fbyte_avg')
                 

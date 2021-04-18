@@ -16,10 +16,12 @@
 
                     <tr v-for="(item, index) in items">
                         <td>{{ index+1 }}</td>
-
-                        <!-- TODO: content 종류에 따라 style= "text-align:left;" 적용할 것 -->
-                        <td v-on:click="getDetail(item)">{{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}</td>
-                        <td v-on:click="getDetail(item)">{{ item.result_count }} <br> {{ item.ratio }}</td>
+                        
+                        <td><VueCustomTooltip :label="item.result">
+                            {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
+                            </VueCustomTooltip>
+                        </td>
+                        <td v-on:click="getDetail(item)"><u>{{ item.result_count }}</u> <br> {{ item.ratio }}</td>
                     </tr>
 
                 </tbody>
@@ -118,7 +120,9 @@ export default {
                 var ratio = ""
                 var result_count = ""
                 
-                if (resultType != '4' && resultType != '8' && resultType != '10' && resultType != '11') {
+                // fbyte 부분도 % 포함 (기존 : && resultType != '8' && resultType != '10')
+                // fbyte average는 %에서 의미 찾기가 어려움
+                if (resultType != '4' && resultType != '10' && resultType != '11') {
 
                     //let percentile = (results[i].result_count / totalCnt).toFixed(4) * 100;
                     //console.log("percentile = " + percentile);
@@ -130,6 +134,7 @@ export default {
                     //console.log("percentile = " + percentile);
 
                     ratio = "(" + percentile + "%)";
+                    //ratio = " | " + percentile + "%";
                 }
 
                 // 숫자 3자리(천단위) 마다 "," 표시

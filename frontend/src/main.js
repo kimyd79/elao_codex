@@ -11,11 +11,20 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 
 import Layouts from './components/layout';
 
-//import VueSimpleAlert from "vue-simple-alert"
+// for tooltip
+import VueCustomTooltip from '@adamdehaven/vue-custom-tooltip'
 
 Vue.config.productionTip = false;
 
 Vue.use(VueSweetalert2);
+Vue.use(VueCustomTooltip, {
+  name: 'VueCustomTooltip',
+  color: '#fff',
+  background: '#553ca5',
+  borderRadius: 12,
+  fontWeight: 400,
+})
+
 Vue.use(LegoComponent);
 Vue.use(Layouts);
 //Vue.use(VueSimpleAlert, { reverseButtons: true });

@@ -34,7 +34,7 @@
                     <lego-button v-on:click="search" main>Search</lego-button>
 
                     <!-- TODO: TEST -->
-                    <lego-button v-on:click="diffTest" main>DiffSample</lego-button>
+                    <lego-button v-on:click="diffTest" v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'" main>DiffSample</lego-button>
                 </ui-form-item>
 
             </ui-form-row>
@@ -75,6 +75,8 @@ export default {
             excludeSearch: false,
 
             currentView: null,
+
+            creator: this.$store.state.userName,
         };
     },
     created() {

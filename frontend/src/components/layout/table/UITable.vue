@@ -93,7 +93,7 @@
         </div>
         <div class="ui-table-body">
             <!-- log detail popup -->
-            <component :is="currentView" :logLine="logLine" v-on:popupClose="currentView=null"></component>
+            <component :is="currentView" :item="item" v-on:popupClose="currentView=null"></component>
             
             <div class="ui-table-body__list">
                     
@@ -136,7 +136,7 @@
                                 >
                                     <div class="ui-table-body__list-item-cell__content" v-on:click="selectedRow(item)">
                                         <slot v-if="editingItem === item" :name="'celledit-'+column.key" :item="item" >
-                                            {{item[column.key]}}
+                                            {{item[column.key]}} 
                                         </slot>
                                         <slot v-else :name="'cellview-'+column.key" :item="item">
                                             {{item[column.key]}}
@@ -193,13 +193,13 @@
 </template>
 
 <script>
-import CommonPopup from '../CommonPopup';
+import DetailGridPopup from '../DetailGridPopup';
 import store from '@/vuex/store';
 
 export default {
     name: 'ui-table',
     components: { 
-      CommonPopup, 
+      DetailGridPopup, 
     },
     props: {
         perPageItems : { type: Array, default: function() {
@@ -246,7 +246,7 @@ export default {
             expandingItem: null,
 
             currentView : null,
-            logLine: '',
+            item : null,
         }
     },
     computed: {
@@ -291,9 +291,11 @@ export default {
             
             // log detail table에서만 Popup 생성
             if( item.viewname == 'detail'){
-                this.logLine = item.logline;
+                
+                this.item = item;
                 this.$store.dispatch("setPopupHeader", 'Log Detail');
-                this.currentView = 'CommonPopup';
+                this.currentView = 'DetailGridPopup';                
+
             }else {              
                 this.$store.dispatch("setProjectName", item.projectName);
                 this.$store.dispatch("setProjectDescription", item.projectDescription);

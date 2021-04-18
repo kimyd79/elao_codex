@@ -85,7 +85,7 @@ export default {
                     sortValue: "asc",
                     filtable: true,
                     alignRight: false,
-                    width: 15
+                    width: 20
                 },
                 {
                     label: 'UserAgent',
@@ -98,6 +98,14 @@ export default {
                 {
                     label: 'Status',
                     key: "status",
+                    sortable: false,
+                    filtable: false,
+                    alignRight: false,
+                    width: 10
+                },
+                {
+                    label: 'Byte',
+                    key: "byte",
                     sortable: false,
                     filtable: false,
                     alignRight: false,
@@ -171,7 +179,7 @@ export default {
                     this.getDateTimeString(results[i].fsecond);
 
                 let frequest = results[i].frequest.substring(0, 60)
-                let freferrer = this.nvl(results[i].freferer, "N/A").substring(0, 10)
+                let freferrer = this.nvl(results[i].freferer, "N/A").substring(0, 30)
                 let fuser_agent = this.nvl(results[i].fuser_agent, "N/A").substring(0, 10)
 
                 this.items.push({
@@ -183,7 +191,8 @@ export default {
                     referrer: freferrer,
                     useragent: fuser_agent,
                     status: results[i].fstatus,
-                    timetaken: results[i].ftime_taken,
+                    byte: results[i].fbyte,
+                    timetaken: results[i].ftime_taken.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     isSelected: false,
                     logline: results[i].log_line,
                     viewname: 'detail'
@@ -226,7 +235,7 @@ export default {
                 .then(res => {
 
                     //console.log(res.data.count); // 전체건수
-                    //console.log(res);
+                    console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner

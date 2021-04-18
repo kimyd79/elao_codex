@@ -236,6 +236,10 @@ export function getLineChartData(kind = 1, timeCondition, project_id, filter) {
         //   Kind1 : request(요청) 건수(count)
         //   Kind2 : status code 건수(count)
         //   Kind3 : time-taken 시간(max, min, count)
+        //Type3 : 시분초(HHMMSS)기준                    
+        //   Kind1 : request(요청) 건수(count)
+        //   Kind2 : status code 건수(count)
+        //   Kind3 : time-taken 시간(max, min, count)
 
         type: timeCondition,
         kind: kind,
@@ -557,6 +561,7 @@ export function getStackedBarChartOptions(title, x_min, x_max, y_max_request) {
             padding: 20,
         },
 
+        // TODO: Data 및 Scale 설정 부분
         scales: {
             xAxes: [{
                 type: 'time',
@@ -571,9 +576,9 @@ export function getStackedBarChartOptions(title, x_min, x_max, y_max_request) {
             yAxes: [{
                 stacked: true,
                 ticks: {
-                    //beginAtZero: true,
-                    suggestedMin: 0,
-                    suggestedMax: y_max_request
+                    beginAtZero: true,
+                    //suggestedMin: 0,
+                    //suggestedMax: y_max_request
                 }                
             }]
         },

@@ -135,7 +135,7 @@ export default {
                     sortValue: "asc",
                     filtable: true,
                     alignRight: false,
-                    width: 15
+                    width: 20
                 },
                 {
                     label: 'UserAgent',
@@ -148,6 +148,14 @@ export default {
                 {
                     label: 'Status',
                     key: "status",
+                    sortable: false,
+                    filtable: false,
+                    alignRight: false,
+                    width: 10
+                },
+                {
+                    label: 'Byte',
+                    key: "byte",
                     sortable: false,
                     filtable: false,
                     alignRight: false,
@@ -225,7 +233,7 @@ export default {
                     this.getDateTimeString(results[i].fsecond);
 
                 let frequest = results[i].frequest.substring(0, 60)
-                let freferrer = this.nvl(results[i].freferer, "N/A").substring(0, 10)
+                let freferrer = this.nvl(results[i].freferer, "N/A").substring(0, 30)
                 let fuser_agent = this.nvl(results[i].fuser_agent, "N/A").substring(0, 10)
 
                 this.items.push({
@@ -237,8 +245,9 @@ export default {
                     referrer: freferrer,
                     useragent: fuser_agent,
                     status: results[i].fstatus,
+                    byte: results[i].fbyte,
                     // 숫자 3자리(천단위) 마다 "," 표시
-                    timetaken: results[i].ftime_taken.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),                    
+                    timetaken: results[i].ftime_taken.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     isSelected: false,
                     logline: results[i].log_line,
                     viewname: 'detail'
