@@ -611,7 +611,6 @@ export function getLineChartTemplate(x, y, label) {
 
 export function getLineChartOptions(title, x_min, x_max, y_max_tps){
 
-    var test;
     var options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -1019,4 +1018,21 @@ export function getMetricList() {
         });
 
     return items;
+}
+
+export function resetZoom(chart) {
+
+    var comp;
+
+    if (chart == 1) {
+        comp = this.$refs.lChart;
+    } else if (chart == 2) {
+        comp = this.$refs.mlChart;
+    } else if (chart == 3) {
+        comp = this.$refs.sbChart;
+    }    
+
+    // resetZoom 코드
+    comp._data._chart.resetZoom();
+
 }

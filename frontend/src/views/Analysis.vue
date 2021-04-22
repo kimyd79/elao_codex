@@ -35,15 +35,14 @@
                 <!--<lego-button @click="barChartData" main small>Bar</lego-button>-->
                 <lego-button @click="pieChartData(1)" main small>Http Status(P)</lego-button>
                 <lego-button @click="stackedbarChartData" main small>Http Status(T)</lego-button>
-
                 <lego-button @click="pieChartData(5)" main small>Visitor IP(5)</lego-button>
-
                 <lego-button @click="pieChartData(9)" main small>Static Files</lego-button>
                 <lego-button @click="pieChartData(13)" main small>Upstream Info</lego-button>
                 <lego-button @click="pieChartData(14)" main small>Domains</lego-button>
                 <lego-button @click="allChart()" small>ALL</lego-button>
             </ui-form-item>
         </ui-form-row>
+
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
@@ -348,35 +347,13 @@ export default {
                 comp = this.$refs.mlChart;
             } else if (chart == 3) {
                 comp = this.$refs.sbChart;
-            }
-
-            // TODO: Check for update
-            console.log(this.$refs);
-            //console.log(comp._data._chart);
-
-            // Step1 : 전체 chart rendering
-            //this.$refs.lChart.renderChart(this.lChartData, this.lOptions);
-            //comp.renderChart(this.lChartData, this.lOptions);
-
-            // Step2 : Scale 조정 후 chart rendering --> OK : 완료
-            //this.$refs.lChart.options.scales.yAxes = [{
-            //    scaleLabel: {
-            //        display: true,
-            //        labelString: 'tps change test'
-            //    },
-            //    ticks: { 
-            //         suggestedMin: 0,
-            //         suggestedMax: 50
-            //         //min: 0,
-            //         //max: ''
-            //    }
-            //}]
-            //this.$refs.lChart.renderChart(this.lChartData, this.lOptions);
+            }    
 
             // resetZoom 코드
             comp._data._chart.resetZoom();
 
         },
+
         getFilter() {
 
             let filter = {
@@ -492,15 +469,12 @@ export default {
             try {
                 let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
 
-                console.log(res);
-
-                // TODO: Data(먼저) 및 Scale 설정 부분
-
                 this.sbChartData = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)
+             
+                this.sbOptions = getStackedBarChartOptions('Http Status Code', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue);
+                
+                this.$refs.sbChart.renderChart(this.sbChartData, this.sbOptions);  
 
-                //console.log(this.sbChartData);
-
-                this.sbOptions = getStackedBarChartOptions('Http Status Code'); //, this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch
             } finally {
@@ -521,7 +495,10 @@ export default {
                 let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
                 this.lChartData = getLineChartTemplate(res.x, res.y, "TPS")
                
-                this.lOptions = getLineChartOptions('Transaction Per Second'); //, this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
+                this.lOptions = getLineChartOptions('Transaction Per Second', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue);                
+
+                this.$refs.lChart.renderChart(this.lChartData, this.lOptions);               
+               
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch
             } finally {
@@ -542,7 +519,10 @@ export default {
                 let res = await getLineChartData(3, this.timeCondition, this.project_id, filter);
 
                 this.mlChartData = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, 'Time-Taken');
-                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken'); //, this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
+                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue);
+
+                this.$refs.mlChart.renderChart(this.mlChartData, this.mlOptions);  
+                
             } catch (err) {
                 console.error(err); // TypeError: failed to fatch
             } finally {
@@ -560,7 +540,8 @@ export default {
 
         isSearch() {
             this.allChart();
-        }
+        },       
+
     }
 };
 </script>
