@@ -73,13 +73,13 @@
         <div class="vld-parent">
             <vue-element-loading :active="isActiveLine1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(1)" small>resetZoom</lego-button>
-            <chart-line ref="lChart1" :chart-data="lChartData1" :options="lOptions" :width="800" :height="400"></chart-line>
+            <chart-line ref="lChart1" :chart-data="lChartData1" :options="lOptions1" :width="800" :height="400"></chart-line>
         </div>
         <!-- search2 -->
         <div class="vld-parent">
             <vue-element-loading :active="isActiveLine2" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(4)" small>resetZoom</lego-button>
-            <chart-line ref="lChart2" :chart-data="lChartData2" :options="lOptions" :width="800" :height="400"></chart-line>
+            <chart-line ref="lChart2" :chart-data="lChartData2" :options="lOptions2" :width="800" :height="400"></chart-line>
         </div>
     </ui-container-box>
 
@@ -88,13 +88,13 @@
         <div class="vld-parent">
             <vue-element-loading :active="isActiveMultiLine1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
-            <chart-line ref="mlChart1" :chart-data="mlChartData1" :options="mlOptions" :width="800" :height="400"></chart-line>
+            <chart-line ref="mlChart1" :chart-data="mlChartData1" :options="mlOptions1" :width="800" :height="400"></chart-line>
         </div>
         <!-- search2 -->
         <div class="vld-parent">
             <vue-element-loading :active="isActiveMultiLine2" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(5)" small>resetZoom</lego-button>
-            <chart-line ref="mlChart2" :chart-data="mlChartData2" :options="mlOptions" :width="800" :height="400"></chart-line>
+            <chart-line ref="mlChart2" :chart-data="mlChartData2" :options="mlOptions2" :width="800" :height="400"></chart-line>
         </div>
     </ui-container-box>
 
@@ -103,13 +103,13 @@
         <div class="vld-parent">
             <vue-element-loading :active="isActiveStackedBar1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(3)" small>resetZoom</lego-button>
-            <chart-stacked-bar ref="sbChart1" :chart-data="sbChartData1" :options="sbOptions" :width="800" :height="400"></chart-stacked-bar>
+            <chart-stacked-bar ref="sbChart1" :chart-data="sbChartData1" :options="sbOptions1" :width="800" :height="400"></chart-stacked-bar>
         </div>
         <!-- search2 -->
         <div class="vld-parent">
             <vue-element-loading :active="isActiveStackedBar2" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(6)" small>resetZoom</lego-button>
-            <chart-stacked-bar ref="sbChart2" :chart-data="sbChartData2" :options="sbOptions" :width="800" :height="400"></chart-stacked-bar>
+            <chart-stacked-bar ref="sbChart2" :chart-data="sbChartData2" :options="sbOptions2" :width="800" :height="400"></chart-stacked-bar>
         </div>
     </ui-container-box>
 
@@ -245,19 +245,22 @@ export default {
             // for chart reactivess Test
             lChartData1: null,
             lChartData2: null,
-            lOptions: getLineChartOptions('- No Data -'),
+            lOptions1: getLineChartOptions('- No Data -'),
+            lOptions2: getLineChartOptions('- No Data -'),
 
             mlChartData1: null,
             mlChartData2: null,
-            mlOptions: getMultiLineChartOptions('- No Data -'),
+            mlOptions1: getMultiLineChartOptions('- No Data -'),
+            mlOptions2: getMultiLineChartOptions('- No Data -'),            
+
+            sbChartData1: null,
+            sbChartData2: null,
+            sbOptions1: getStackedBarChartOptions('- No Data -'),
+            sbOptions2: getStackedBarChartOptions('- No Data -'),
 
             bChartData1: null,
             bChartData2: null,
             bOptions: getBarChartOptions('- No Data -'),
-
-            sbChartData1: null,
-            sbChartData2: null,
-            sbOptions: getStackedBarChartOptions('- No Data -'),
 
             pChartData1: null,
             pChartDataVisitorTop5_1: null,
@@ -644,13 +647,18 @@ export default {
                 //console.log("scale_y_local  : "+scale_y_local)
 
                 if (searchArea == 1) {
-                    this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)                    
-                } else {
-                    this.sbChartData2 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500)                    
-                }
+                    this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500);
+                    this.sbOptions1 = getStackedBarChartOptions('Http Status Code', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
 
-                //console.log("scale_y_local  : "+scale_y_local)
-                this.sbOptions = getStackedBarChartOptions('Http Status Code', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time); //TODO:, scale_y_local);
+                    this.$refs.sbChart1.renderChart(this.sbChartData1, this.sbOptions1);
+
+                } else {
+                    this.sbChartData2 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500);
+                    this.sbOptions2 = getStackedBarChartOptions('Http Status Code', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2); 
+
+                    this.$refs.sbChart2.renderChart(this.sbChartData2, this.sbOptions2);
+                }                
+                
             } catch (err) {
 
                 console.error(err); // TypeError: failed to fatch
@@ -720,13 +728,19 @@ export default {
                 if (searchArea == 1) {
                     
                     this.lChartData1 = getLineChartTemplate(res.x, res.y, "TPS")
+                    this.lOptions1 = getLineChartOptions('Transaction Per Second', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
+
+                    this.$refs.lChart1.renderChart(this.lChartData1, this.lOptions1);
                     
                 } else {
                     
                     this.lChartData2 = getLineChartTemplate(res.x, res.y, "TPS")
+                    this.lOptions2 = getLineChartOptions('Transaction Per Second', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2); 
+
+                    this.$refs.lChart2.renderChart(this.lChartData2, this.lOptions2);
                     
                 }
-                this.lOptions = getLineChartOptions('Transaction Per Second', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);    // TODO: scale_y_local
+                
             } catch (err) {
 
                 console.error(err); // TypeError: failed to fatch               
@@ -783,12 +797,16 @@ export default {
                 
                 if (searchArea == 1) {
                     this.mlChartData1 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
-                    //this.isActiveMultiLine1 = false
+                    this.mlOptions1 = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
+
+                    this.$refs.mlChart1.renderChart(this.mlChartData1, this.mlOptions1);
                 } else {
                     this.mlChartData2 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
-                    //this.isActiveMultiLine2 = false
+                    this.mlOptions2 = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2);
+
+                    this.$refs.mlChart2.renderChart(this.mlChartData2, this.mlOptions2);
                 }
-                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken', this.x_min_date+this.x_min_time, this.x_max_date+this.x_max_time);
+                
                 // TODO:, this.$store.state.global_Y_request, this.$store.state.global_Y_duration);
 
             } catch (err) {

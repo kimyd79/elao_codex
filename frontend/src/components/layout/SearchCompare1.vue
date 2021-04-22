@@ -1,6 +1,6 @@
 <template>
 <div id="search">
-    <component :is="currentView" v-on:popupClose="currentView=null" :logLine="logLine" ></component>
+    <component :is="currentView" v-on:popupClose="currentView=null"></component>
     <ui-container-box :columns="10" vertical>
         <ui-form-box>
             <span class="page-title__2label">Search-1</span>
