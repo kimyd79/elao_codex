@@ -104,7 +104,7 @@ import axios from "axios";
   }
 </script>
 
-<style>
+<style scoped>
   input[type="file"]{
     position: absolute;
     top: -500px;
