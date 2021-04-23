@@ -73,12 +73,14 @@
         <div class="vld-parent">
             <vue-element-loading :active="isActiveLine1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(1)" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(1)" small>setScaleY</lego-button>
             <chart-line ref="lChart1" :chart-data="lChartData1" :options="lOptions1" :width="800" :height="400"></chart-line>
         </div>
         <!-- search2 -->
         <div class="vld-parent">
             <vue-element-loading :active="isActiveLine2" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(4)" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(4)" small>setScaleY</lego-button>
             <chart-line ref="lChart2" :chart-data="lChartData2" :options="lOptions2" :width="800" :height="400"></chart-line>
         </div>
     </ui-container-box>
@@ -88,12 +90,16 @@
         <div class="vld-parent">
             <vue-element-loading :active="isActiveMultiLine1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(2, 0)" small>setScaleY_L</lego-button>
+            <lego-button @click="setScaleY(2, 1)" small main>setScaleY_R</lego-button>
             <chart-line ref="mlChart1" :chart-data="mlChartData1" :options="mlOptions1" :width="800" :height="400"></chart-line>
         </div>
         <!-- search2 -->
         <div class="vld-parent">
             <vue-element-loading :active="isActiveMultiLine2" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(5)" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(5, 0)" small>setScaleY_L</lego-button>
+            <lego-button @click="setScaleY(5, 1)" small main>setScaleY_R</lego-button>
             <chart-line ref="mlChart2" :chart-data="mlChartData2" :options="mlOptions2" :width="800" :height="400"></chart-line>
         </div>
     </ui-container-box>
@@ -103,12 +109,14 @@
         <div class="vld-parent">
             <vue-element-loading :active="isActiveStackedBar1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(3)" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(3)" small>setScaleY</lego-button>
             <chart-stacked-bar ref="sbChart1" :chart-data="sbChartData1" :options="sbOptions1" :width="800" :height="400"></chart-stacked-bar>
         </div>
         <!-- search2 -->
         <div class="vld-parent">
             <vue-element-loading :active="isActiveStackedBar2" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(6)" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(6)" small>setScaleY</lego-button>
             <chart-stacked-bar ref="sbChart2" :chart-data="sbChartData2" :options="sbOptions2" :width="800" :height="400"></chart-stacked-bar>
         </div>
     </ui-container-box>
@@ -356,6 +364,71 @@ export default {
         }),
     },
     methods: {
+
+        async setScaleY(chart, direction) { // direction 0 : left, 1 : right
+
+            if ( direction == undefined ){
+                direction = 0;
+            }
+
+            const { value: scale_y } = await this.$swal({
+                title: 'Enter value of scale Y',
+                input: 'text',
+                inputLabel: 'Scale Y',
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',                        
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                    return 'You need to input y scale value!'
+                    }
+                }
+            })
+
+            if (scale_y) {
+                this.$swal(`Set scale to ${scale_y}`)
+            }
+
+            var comp;
+
+            if (chart == 1) {
+                comp = this.$refs.lChart1;
+            } else if (chart == 2) {
+                comp = this.$refs.mlChart1;
+            } else if (chart == 3) {
+                comp = this.$refs.sbChart1;
+            } else if (chart == 4) {
+                comp = this.$refs.lChart2;
+            } else if (chart == 5) {
+                comp = this.$refs.mlChart2;
+            } else if (chart == 6) {
+                comp = this.$refs.sbChart2;
+            }
+            
+            comp.options.scales.yAxes[direction].ticks = {
+                suggestedMin: 0,
+                suggestedMax: scale_y
+            }
+
+            if (chart == 1) {
+                comp.renderChart(this.lChartData1, this.lOptions1);
+            } else if (chart == 2) {
+                comp.renderChart(this.mlChartData1, this.mlOptions1);
+            } else if (chart == 3) {
+                comp.renderChart(this.sbChartData1, this.sbOptions1);
+            } else if (chart == 4) {
+                comp.renderChart(this.lChartData2, this.lOptions2);
+            } else if (chart == 5) {
+                comp.renderChart(this.mlChartData2, this.mlOptions2);
+            } else if (chart == 6) {
+                comp.renderChart(this.sbChartData2, this.sbOptions2);
+            }
+            
+        },
+
         resetZoom(chart) {
             var comp;
 

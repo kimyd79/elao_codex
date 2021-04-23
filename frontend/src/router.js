@@ -32,6 +32,10 @@ import LogIn from "./components/layout/LogIn.vue"
 import LogOut from "./components/layout/LogOut.vue"
 import Project from "./views/Project.vue"
 import Metrics from "./views/Metrics.vue"
+
+// For Test
+import FileUploadTest from "@/components/layout/FileUploadTest.vue"
+
 import store from "@/vuex/store";
 
 import Swal from 'sweetalert2'
@@ -160,6 +164,15 @@ const router = new Router({
           component: Metrics,
           // beforeEnter: requireAdmin(),
         },
+
+        // For Test
+        {
+          path: '/test',
+          name: 'fileupload',
+          component: FileUploadTest,
+          // beforeEnter: requireAdmin(),
+        },
+
       ]
     },    
     

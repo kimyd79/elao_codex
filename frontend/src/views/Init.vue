@@ -60,7 +60,6 @@
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
                         <lego-dropdown :items="items" v-model="fileFormat" width="590px" />&nbsp;&nbsp;
                         
-                        <!-- TODO: 진행할 부분 -->
                         <lego-button v-on:click="addLogFormat">Add</lego-button>
 
                     </ui-form-item>
@@ -895,6 +894,8 @@ export default {
             // TODO: Multi-file upload 필요
 
             let formData = new FormData();
+
+            formData.append('project', this.projectID);
             formData.append('file_object', this.file);
             formData.append('file_name', this.fileName);
             formData.append('file_size', this.fileSize);
@@ -909,9 +910,7 @@ export default {
 
             formData.append('format_kind', splitedFormat[0]);
             formData.append('format_name', splitedFormat[1]);
-            formData.append('file_format', splitedFormat[2]);
-
-            formData.append('project', this.projectID);
+            formData.append('file_format', splitedFormat[2]);            
 
             this.$store.dispatch("setLogFormat", this.fileFormat);
 
@@ -926,7 +925,7 @@ export default {
 
             return axios.post(url + '/logfile/', formData, axiosConfig)
                 .then(res => {
-                    //console.log(res)
+                    console.log(res)
 
                     this.logfileID = res.data.logfile_id
 
