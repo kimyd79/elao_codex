@@ -33,7 +33,8 @@ import LogOut from "./components/layout/LogOut.vue"
 import Project from "./views/Project.vue"
 import Metrics from "./views/Metrics.vue"
 import store from "@/vuex/store";
-//import VueSimpleAlert from "vue-simple-alert";
+
+import Swal from 'sweetalert2'
 
 Vue.use(Router)
 
@@ -42,10 +43,13 @@ const requireAdmin = () => (to, from, next) => {
     next();
   } else {
     //VueSimpleAlert.alert("Allow only admin to access.", "Notification", "error");
-    this.$swal({
+
+    Swal.fire({
       title: 'Notification',
       html: 'Allow only admin to access.',
-      icon: 'error'
+      icon: 'error',
+      confirmButtonColor: '#553ca5',                
+      confirmButtonText: 'OK',
     }); 
 
   }
@@ -55,11 +59,13 @@ const checkLoggedin = () => (to, from, next) => {
   if(store.state.userName == 'Not logged in') {
     next();
   } else {
-    //VueSimpleAlert.alert("You are already logged in.", "Notification", "error");
-    this.$swal({
+
+    Swal.fire({
       title: 'Notification',
       html: 'You are already logged in.',
-      icon: 'error'
+      icon: 'error',
+      confirmButtonColor: '#553ca5',                
+      confirmButtonText: 'OK',
     }); 	
 
     next('/initialization');
