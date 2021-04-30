@@ -62,7 +62,7 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, detailcondition, detailsearch, byteFrom, byteTo, staticYN){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, detailcondition, detailsearch, byteFrom, byteTo, staticYN, statusYN){
     
     var filters="";
 
@@ -82,6 +82,9 @@ export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condit
     }
     if ( staticYN != '') {
         filters = filters + "&staticValue="+staticYN;
+    }
+    if ( statusYN != '') {
+        filters = filters + "&statusValue="+statusYN;
     }
 
     return filters;
@@ -108,6 +111,13 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
     // type=12. Static file Names (count) Top N    
     // type=13. Nginx Ingress : Domain Top N - Referer에서 Domain만
     // type=14. Nginx Ingress : $proxy_upstream_name/$upstream_addr(<namespace>-<service name>-<service port>/<IP>:<port>) Top N
+    // statisticsKind = 30. Defference : Total Number of Requests (count)
+    // statisticsKind = 31. Defference : TPS Requests Top N at TPS peak
+    // statisticsKind = 32. Defference : TPS Visitors Top N at TPS peak
+    // statisticsKind = 33. Defference : timeTaken Requests Top N at TPS peak
+    // statisticsKind = 34. Defference : timeTaken Visitors Top N at TPS peak
+    // statisticsKind = 35. Defference : status Requests Top N at TPS peak
+    // statisticsKind = 36. Defference : status Visitors Top N at TPS peak
 
     var content = "";
 
@@ -153,6 +163,27 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
             break;
         case 14:
             content = "Domains (count, K8S Ingress)";            
+            break;
+        case 30:
+            content = "Total Number of Requests (count)";            
+            break;
+        case 31:
+            content = "Requests URI (count)";            
+            break;
+        case 32:
+            content = "Visitors (count)";            
+            break;
+        case 33:
+            content = "Requests URI (count)";            
+            break;
+        case 34:
+            content = "Visitors (count)";            
+            break;
+        case 35:
+            content = "Requests URI (count)";            
+            break;
+        case 36:
+            content = "Visitors (count)";            
             break;
         default:
     };
@@ -278,6 +309,66 @@ export function getLineChartData(kind = 1, timeCondition, project_id, filter) {
 
             return res
 
+        })
+        .catch(err => {
+            console.error(err);
+        })
+
+}
+
+export function getLineChartDataDiff(kind = 1, timeCondition, project_id, filter) {
+    
+    var url = serverUrl + "/logdetail_dynamic/chartdata_diff/"
+    //var url = serverUrl + "/logdetail/chartdata/"
+
+    let postData = {
+
+        project_id: project_id,
+
+        //Type1 : 시(HH)기준
+        //   Kind1 : request/TPS(요청) 건수(count)
+        //   Kind2 : IP 건수(count)
+        //Type2 : 시분(HHMM)기준                    
+        //   Kind1 : request/TPS(요청) 건수(count)
+        //   Kind2 : IP 건수(count)
+        //Type3 : 시분초(HHMMSS)기준                    
+        //   Kind1 : request/TPS(요청) 건수(count)
+        //   Kind2 : IP 건수(count)
+
+        type: timeCondition,
+        kind: kind,
+        filter: filter
+
+    };
+
+    let axiosConfig = {
+        headers: {
+            //'Authorization': 'Token '+ this.token // For Django
+        }
+    };
+
+    return axios.post(url, postData, axiosConfig)
+
+        .then(res => {
+            // console.log(res)
+
+            // kind = 0 : request 
+            // kind = 1 : TPS
+            // kind = 2 : timeTaken  
+            // kind = 3 : status 
+            
+
+            if (kind == 0 || kind == 1 ) {
+                res.xy = res.data.resultXY
+            } else if (kind == 2) {
+                res.xy = res.data.resultXY
+                res.time_unit = res.data.resultY_time_unit
+            }else if (kind == 3) {
+                res.xy_400 = res.data.resultXY_400
+                res.xy_500 = res.data.resultXY_500
+            } 
+
+            return res
         })
         .catch(err => {
             console.error(err);
@@ -759,6 +850,145 @@ export function getMultiLineChartOptions(title, x_min, x_max, y_max_request, y_m
     return options;
 }
 
+export function getMultiLineChartTemplateDiff(label1, xy1, label2, xy2) {
+
+    var chartData = {
+
+        datasets: [{
+            label: label1,
+            fill: false,
+            backgroundColor: 'rgb(188, 207, 229)',
+            borderColor: 'rgb(188, 207, 229)',
+            data: xy1,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label2,
+            fill: false,
+            backgroundColor: 'rgb(194, 157, 180)',
+            borderColor: 'rgb(194, 157, 180)',
+            data: xy2,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        }]
+
+    }
+    
+    return chartData;
+}
+
+export function getMultiLineChartTemplateStatusDiff(label1, xy1, label2, xy2, label3, xy3, label4, xy4) {
+
+    var chartData = {
+
+        datasets: [{
+            label: label1,
+            fill: false,
+            backgroundColor: 'rgb(188, 207, 229)',
+            borderColor: 'rgb(188, 207, 229)',
+            data: xy1,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label2,
+            fill: false,
+            backgroundColor: 'rgb(204, 157, 180)',
+            borderColor: 'rgb(194, 157, 180)',
+            data: xy2,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label3,
+            fill: false,
+            backgroundColor: 'rgb(86, 118, 154)',
+            borderColor: 'rgb(86, 118, 154)',
+            data: xy3,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        },{
+            label: label4,
+            fill: false,
+            backgroundColor: 'rgb(185, 76, 104)',
+            borderColor: 'rgb(185, 76, 104)',
+            data: xy4,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        }]
+
+    }
+    
+    return chartData;
+}
+
+export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_max2, y_label, y_max_request, y_max_duration) { 
+
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        title: {
+            display: true,
+            text: title,
+            fontStyle: 'bold',
+            fontColor: 'rgb(85,60,165)',
+            fontSize: 18,
+            padding: 20,
+        },
+        scales:{
+            xAxes: [{
+                type: 'time',
+                time: zoomTimeOption,
+                position: 'bottom',
+
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date/Time1'
+                },
+                ticks: {    // YYYYMMDDHHmmss
+                    min: x_min1,
+                    max: x_max1
+               },
+               id: "x-axis-1",
+            }
+            ,{
+                type: 'time',
+                time: zoomTimeOption,
+                position: 'top',
+
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date/Time2'
+                },
+                ticks: {    // YYYYMMDDHHmmss
+                    min: x_min2,
+                    max: x_max2
+                },
+                id: "x-axis-2",
+            }
+            ]
+            ,yAxes:[{
+                type: 'linear',
+                display: true,
+                position: 'left',
+                id: "y-axis-1",
+                scaleLabel: {
+                    display: true,
+                    labelString: y_label
+                },
+                ticks: { 
+                    suggestedMin: 0,
+                    suggestedMax: y_max_request
+                    //min: 0,
+                    //max: ''
+                }
+            }]
+        },
+
+        plugins: zoom_plugin_config,
+    }
+
+    return options;
+}
 
 export function getFormatkindList() {
 

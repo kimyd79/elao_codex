@@ -159,6 +159,8 @@ const mutations = {
     [types.SET_POPUPKIND] (state, value) { state.popupKind = value },
     [types.SET_POPUPFORMATID] (state, value) { state.popupFormatId = value },
     [types.SET_POPUPFORMATKIND] (state, value) { state.popupFormatKind = value },
+    [types.SET_POPUPDATE] (state, value) { state.popupDate = value },
+    [types.SET_POPUPDIFFID] (state, value) { state.popupDiffId = value },
 
     // metric info
     [types.SET_METRICID] (state, value) { state.metricId = value },
