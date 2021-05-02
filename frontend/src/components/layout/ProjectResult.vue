@@ -156,9 +156,19 @@ export default {
 
                 let project_id = this.project.project_id;
 
-                this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                
-                    try {
+                this.$swal({
+                    title: 'Notification',
+                    html: 'Are you sure want to Delete?',                
+                    icon: 'question',                        
+                    showCancelButton: true,
+                    cancelButtonColor: '#dddddd',
+                    confirmButtonColor: '#553ca5',                
+                    confirmButtonText: 'OK',         
+                    reverseButtons: true,           
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        
+                        try {
                         let res = this.deleteData(this.project);
                         
                         console.log("== project_id : " + project_id);
@@ -182,19 +192,35 @@ export default {
                                 })
 
                         }                        
-                    } catch (err) {
-                        console.error(err);
+                        } catch (err) {
+                            console.error(err);
+                        }
                     }
                 });
+               
             } else {
-                this.$alert("No Project selected", "Confirm Delete", "error");
+
+                this.$swal({
+                    title: 'Notification',
+                    html: 'No Project selected',
+                    icon: 'error',
+                    confirmButtonColor: '#553ca5',                
+                    confirmButtonText: 'OK',
+                });  
             }
         },
         clickUpdate: function () {
             if (this.project.project_id != '') {
                 this.currentView = 'UpdateProject';
             } else {
-                this.$alert("No Project selected", "Confirm Update", "error");
+
+                this.$swal({
+                    title: 'Notification',
+                    html: 'No Project selected',
+                    icon: 'error',
+                    confirmButtonColor: '#553ca5',                
+                    confirmButtonText: 'OK',
+                });
             }
         },
     }
