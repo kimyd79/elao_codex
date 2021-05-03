@@ -67,6 +67,8 @@ export default {
     getPopupKind: state => state.popupKind,
     getPopupFormatId: state => state.popupFormatId,
     getPopupFormatKind: state => state.popupFormatKind,
+    getPopupDate: state => state.popupDate,
+    getPopupDiffId: state => state.popupDiffId,
     
     getMetricId: state => state.MetricId
 

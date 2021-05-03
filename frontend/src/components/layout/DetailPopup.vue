@@ -172,7 +172,10 @@ export default {
             ],
 
             // Grid Rows
-            items: []
+            items: [],
+
+            //detailPopup filter
+            statusYN: ''
         };
     },
 
@@ -190,6 +193,18 @@ export default {
 
         ttFromValue: "getFromTimeTaken",
         ttToValue: "getToTimeTaken",
+
+        dateFromValue2: "getFromDate2",
+        dateToValue2: "getToDate2",
+        timeFromValue2: "getFromTime2",
+        timeToValue2: "getToTime2",
+
+        conditionValue2: "getCondition2",
+        searchValue2: "getSearchKeyword2",
+        excludeSearch2: "getExcludeSearch2",
+
+        ttFromValue2: "getFromTimeTaken2",
+        ttToValue2: "getToTimeTaken2",
 
         projectID: "getProjectID",
 
@@ -315,6 +330,39 @@ export default {
                     this.$store.state.popupHeader = "Domains (count, K8S Ingress)";    
                     this.$store.state.detailcondition = "V2"        
                     break;
+                // case 30:
+                //     this.$store.state.popupHeader = "Total Number of Requests (count)";    
+                //     this.$store.state.detailcondition = "R"                
+                //     break;
+                case 31:
+                    this.$store.state.popupHeader = "Requests URI (count)";    
+                    this.$store.state.detailcondition = "R"     
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    break;
+                case 32:
+                    this.$store.state.popupHeader = "Visitors (count)";    
+                    this.$store.state.detailcondition = "I"        
+                    break;
+                case 33:
+                    this.$store.state.popupHeader = "Requests URI (count)";    
+                    this.$store.state.detailcondition = "R" 
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)          
+                    break;
+                case 34:
+                    this.$store.state.popupHeader = "Visitors (count)";    
+                    this.$store.state.detailcondition = "I"         
+                    break;
+                case 35:
+                    this.$store.state.popupHeader = "Requests URI (count)"; 
+                    this.$store.state.detailcondition = "R" 
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword) 
+                    this.statusYN = "Y"            
+                    break;
+                case 36:
+                    this.$store.state.popupHeader = "Visitors (count)";    
+                    this.$store.state.detailcondition = "I"  
+                    this.statusYN = "Y"          
+                    break;                         
                 default:
             }
         },
@@ -328,7 +376,7 @@ export default {
 
             this.getDetailCondition();
 
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '')
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', '')
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -351,6 +399,53 @@ export default {
                 .then(res => {
                     this.pagingInfo.totalItems = res.data.count;
 
+                    //console.log(res.data.results)
+
+                    this.setItemList(res.data.results);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                })
+                .catch(err => {
+                    console.error(err);
+                    // Stop Loading Spinner
+                    this.isActive = false
+                });
+        },
+
+        getStatisticsLogDetailsDiff() {
+
+            let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
+
+            this.getDetailCondition();
+
+            let dateValueTmp = this.$store.state.popupDate.substring(0,8);
+            let timeValueTmp =  this.$store.state.popupDate.substring(8,12);
+            let filters;
+            if(this.$store.state.popupDiffId == '1'){
+                filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)      
+            } else if (this.$store.state.popupDiffId == '2'){
+                filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue2, this.searchValue2, this.ttFromValue2, this.ttToValue2, this.projectID, this.excludeSearch2, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)
+            }
+
+            var urlstring =
+                serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
+
+            // TODO : Set axiosConfig to set headers
+            //let axiosConfig = {
+            //  headers: {
+            //    'Authorization': 'Token '+ this.token // For Django
+            //  }
+            //};
+
+            // TODO : Set GET parametes, ex) /logdetail/?limit=10&offset=20
+
+            // Start Loading Spinner
+            this.isActive = true
+
+            axios
+                .get(urlstring)
+                .then(res => {
+                    this.pagingInfo.totalItems = res.data.count;
                     //console.log(res.data.results)
 
                     this.setItemList(res.data.results);
@@ -434,7 +529,7 @@ export default {
                 } 
             }
 
-            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue)
+            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue, '')
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -476,6 +571,8 @@ export default {
                 this.getStatisticsLogDetails();
             } else if (this.$store.state.popupKind == 'FindingsDetail') {
                 this.getFindingLogDetails();
+            } else if (this.$store.state.popupKind == 'Differences') {
+                this.getStatisticsLogDetailsDiff();
             }
         },
 
@@ -491,7 +588,9 @@ export default {
             this.getStatisticsLogDetails();
         } else if (this.$store.state.popupKind == 'FindingsDetail') {
             this.getFindingLogDetails();
-        }
+        } else if (this.$store.state.popupKind == 'Differences') {
+                this.getStatisticsLogDetailsDiff();
+            }
     },
 
     watch: {
@@ -500,6 +599,8 @@ export default {
                 this.getStatisticsLogDetails();
             } else if (this.$store.state.popupKind == 'FindingsDetail') {
                 this.getFindingLogDetails();
+            } else if (this.$store.state.popupKind == 'Differences') {
+                this.getStatisticsLogDetailsDiff();
             }
         }
     }

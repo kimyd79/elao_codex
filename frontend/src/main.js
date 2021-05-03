@@ -14,6 +14,9 @@ import Layouts from './components/layout';
 // for tooltip
 import VueCustomTooltip from '@adamdehaven/vue-custom-tooltip'
 
+import moment from 'moment'
+import VueMomentJS from "vue-momentjs"
+
 Vue.config.productionTip = false;
 
 Vue.use(VueSweetalert2);
@@ -29,6 +32,7 @@ Vue.use(LegoComponent);
 Vue.use(Layouts);
 //Vue.use(VueSimpleAlert, { reverseButtons: true });
 
+Vue.use(VueMomentJS, moment);
 
 // Below codes come alert for leaving this site.
 window.addEventListener('beforeunload', function (e) { 

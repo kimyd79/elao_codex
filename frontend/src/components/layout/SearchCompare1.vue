@@ -34,7 +34,7 @@
                     <lego-button v-on:click="search" main>Search</lego-button>
 
                     <!-- TODO: TEST -->
-                    <lego-button v-on:click="diffTest" v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'" main>DiffSample</lego-button>
+                    <lego-button v-on:click="Differences" v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'" main>Differences</lego-button>
                 </ui-form-item>
 
             </ui-form-row>
@@ -126,7 +126,7 @@ export default {
     },
     methods: {
 
-        diffTest(){
+        Differences(){
             this.currentView = 'PopupDifferences';
         },
 
