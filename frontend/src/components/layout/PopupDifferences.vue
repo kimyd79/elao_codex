@@ -81,6 +81,7 @@
             </ui-form-row>
             <ui-form-row>
             <lego-button @click="resetZoom()" small>resetZoom</lego-button>
+            <lego-button @click="setScaleY(1)" small>setScaleY</lego-button>
             <!-- <lego-button @click="multilineChartData()" small>chart</lego-button>
             <lego-button @click="getStatistics()" small>statistic</lego-button> -->
             </ui-form-row>            
@@ -421,7 +422,7 @@ export default {
         showAlert() {
         
             this.$swal('Hello Vue world!!!');
-            },
+        },
 
             clickClose: function () {
             
@@ -593,26 +594,51 @@ export default {
 
             // console.log("statistics_res1", this.tmp_res1)
             // console.log("statistics_res2", this.tmp_res2) 
+            
 
-            // Search-1:tmp_res1, Search-2:tmp_res2 한번에 조회해서 subTitle, Statistic 데이터 입력
-            let dateTmp1 = this.tmp_res1.data.results[0].result_date
-            let peakTime1 = dateTmp1.substr(0,4)+"/"+dateTmp1.substr(4,2)+"/"+dateTmp1.substr(6,2)+" "+dateTmp1.substr(8,2)+":"+dateTmp1.substr(10,2)
-            let dateTmp2 = this.tmp_res2.data.results[0].result_date
-            let peakTime2 = dateTmp2.substr(0,4)+"/"+dateTmp2.substr(4,2)+"/"+dateTmp2.substr(6,2)+" "+dateTmp2.substr(8,2)+":"+dateTmp2.substr(10,2)
-
-            // 숫자 3자리(천단위) 마다 "," 표시
-            let request_total1 = this.tmp_res1.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            let request_total2 = this.tmp_res2.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-
-            if( this.statisticsKind == 30 ){
-                this.subTitle1 = "Reqeust Counts : " + request_total1 + " / Comapre to Search-2 : " + Math.round((this.tmp_res1.data.totalCnt / this.tmp_res2.data.totalCnt) * 10000) / 100 + "%"
-                this.subTitle2 = "Reqeust Counts : " + request_total2 + " / Comapre to Search-1 : " + Math.round((this.tmp_res2.data.totalCnt / this.tmp_res1.data.totalCnt) * 10000) / 100 + "%"
+            // TODO: search-1, 2 결과값 0 일 경우 error 처리.
+            if( this.tmp_res1.data.results.length == 0 || this.tmp_res2.data.results.length == 0 ){
+                this.$swal({
+                            title: 'Notification',
+                            html: 'No data was retrieved..!!',
+                            icon: 'error',
+                            confirmButtonColor: '#553ca5',                
+                            confirmButtonText: 'OK',
+                        });
+                this.items= [{
+                    index: '',
+                    result: '- No Data -',
+                    result_count: '...',
+                    ratio: '...',
+                    date: '',
+                    result_count2: '...',
+                    ratio2: '...',
+                    date2: ''
+                }], 
+                //Stop Loading Spinner
+                this.isActiveStatistic = false
+                
             } else {
-                this.subTitle1 = "Highest point : " + peakTime1 + " , Reqeust Counts : " + request_total1
-                this.subTitle2 = "Highest point : " + peakTime2 + " , Reqeust Counts : " + request_total2
-            }  
+                // Search-1:tmp_res1, Search-2:tmp_res2 한번에 조회해서 subTitle, Statistic 데이터 입력
+                let dateTmp1 = this.tmp_res1.data.results[0].result_date
+                let peakTime1 = dateTmp1.substr(0,4)+"/"+dateTmp1.substr(4,2)+"/"+dateTmp1.substr(6,2)+" "+dateTmp1.substr(8,2)+":"+dateTmp1.substr(10,2)
+                let dateTmp2 = this.tmp_res2.data.results[0].result_date
+                let peakTime2 = dateTmp2.substr(0,4)+"/"+dateTmp2.substr(4,2)+"/"+dateTmp2.substr(6,2)+" "+dateTmp2.substr(8,2)+":"+dateTmp2.substr(10,2)
 
-            this.setStatisticItems(this.tmp_res1.data.results, this.tmp_res1.data.totalCnt, this.tmp_res1.data.resultType, this.tmp_res2.data.results, this.tmp_res2.data.totalCnt, this.tmp_res2.data.resultType)
+                // 숫자 3자리(천단위) 마다 "," 표시
+                let request_total1 = this.tmp_res1.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                let request_total2 = this.tmp_res2.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
+                if( this.statisticsKind == 30 ){
+                    this.subTitle1 = "Reqeust Counts : " + request_total1 + " / Comapre to Search-2 : " + Math.round((this.tmp_res1.data.totalCnt / this.tmp_res2.data.totalCnt) * 10000) / 100 + "%"
+                    this.subTitle2 = "Reqeust Counts : " + request_total2 + " / Comapre to Search-1 : " + Math.round((this.tmp_res2.data.totalCnt / this.tmp_res1.data.totalCnt) * 10000) / 100 + "%"
+                } else {
+                    this.subTitle1 = "Highest point : " + peakTime1 + " , Reqeust Counts : " + request_total1
+                    this.subTitle2 = "Highest point : " + peakTime2 + " , Reqeust Counts : " + request_total2
+                }  
+
+                this.setStatisticItems(this.tmp_res1.data.results, this.tmp_res1.data.totalCnt, this.tmp_res1.data.resultType, this.tmp_res2.data.results, this.tmp_res2.data.totalCnt, this.tmp_res2.data.resultType)
+            }
         },
 
         // 시계열 분석용 Line Chart
@@ -659,7 +685,53 @@ export default {
 
             }
         },
-  },
+
+        async setScaleY(chart = 1, direction) { // direction 0 : left, 1 : right
+
+            if ( direction == undefined ){
+                direction = 0;
+            }
+
+            const { value: scale_y } = await this.$swal({
+                title: 'Enter value of scale Y',
+                input: 'text',
+                inputLabel: 'Scale Y',
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',                        
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                    return 'You need to input y scale value!'
+                    }
+                }
+            })
+
+            if (scale_y) {
+                this.$swal(`Set scale to ${scale_y}`)
+            }
+
+            var comp;
+
+            if (chart == 1) {
+                comp = this.$refs.mlChart;
+            } 
+
+            comp.options.scales.yAxes[direction].ticks = {
+                suggestedMin: 0,
+                suggestedMax: scale_y
+                // min: 0,
+                // max: scale_y
+            }
+
+            if (chart == 1) {
+                comp.renderChart(this.mlChartData, this.mlOptions);
+            }
+            
+        },
+    },
 };
 </script>
 
@@ -734,7 +806,7 @@ export default {
 
 .modal-mask {
     position: fixed;
-    z-index: 9997;
+    z-index: 1059;
     top: 0;
     left: 0;
     width: 100%;

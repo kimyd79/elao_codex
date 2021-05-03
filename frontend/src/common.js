@@ -920,7 +920,7 @@ export function getMultiLineChartTemplateStatusDiff(label1, xy1, label2, xy2, la
     return chartData;
 }
 
-export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_max2, y_label, y_max_request, y_max_duration) { 
+export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_max2, y_label, y_max_request) { 
 
     var options = {
         responsive: true,
@@ -978,8 +978,8 @@ export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_ma
                 ticks: { 
                     suggestedMin: 0,
                     suggestedMax: y_max_request
-                    //min: 0,
-                    //max: ''
+                    // min: 0,
+                    // max: 
                 }
             }]
         },

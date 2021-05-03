@@ -307,6 +307,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         byteToValue = ""
         staticValue = ""
 
+        #differences detailpopup
         statusValue = ""
 
         # 조건 적용(GET)
@@ -340,6 +341,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             byteToValue = self.request.query_params.get('byteToValue', None)
             staticValue = self.request.query_params.get('staticValue', None)
 
+            #differences detailpopup
             statusValue = self.request.query_params.get('statusValue', None)
 
         
@@ -1223,40 +1225,43 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 top_request = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(date=Concat('fdate', 'fhour','fminute'), frequest_total=Count('frequest')).order_by('-frequest_total', 'date')[0:1]
 
                 # datetime 조건으로 재설정, URI TOP:N개 조회
-                tmp_date = list(top_request)[0]
-                totalCnt = tmp_date['frequest_total']
+                # print("top_request.count() : ", top_request.count()) 
+                if top_request.count() > 0:
+                    tmp_date = list(top_request)[0]
+                    totalCnt = tmp_date['frequest_total']
 
-                topn_request = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]    
-                rows = topn_request.values('frequest','frequest_count')                
-                
-                for row in rows:
+                    topn_request = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]    
+                    rows = topn_request.values('frequest','frequest_count')                
                     
-                    if settings.DEBUG:
-                        logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) - %s" % row['frequest'])
-                        logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) Count - %s" % row['frequest_count'])
-                    
-                    results.append({"result" : row['frequest'], "result_count" : row['frequest_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
+                    for row in rows:
+                        
+                        if settings.DEBUG:
+                            logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) - %s" % row['frequest'])
+                            logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) Count - %s" % row['frequest_count'])
+                        
+                        results.append({"result" : row['frequest'], "result_count" : row['frequest_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
 
             #type=32.  Difference : request(TPS) 최고점 Visitor(IP) Top N(1분 단위 합계)
             elif type == 32:
 
                  # 1분 단위 request 합계 계산. 동일값 존재 시 빠른 datetime 확인 
                 top_request = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(date=Concat('fdate', 'fhour','fminute'), frequest_total=Count('frequest')).order_by('-frequest_total', 'date')[0:1]
-
-                # datetime 조건으로 재설정, IP TOP:N개 조회
-                tmp_date = list(top_request)[0]
-                totalCnt = tmp_date['frequest_total']
-
-                topn_ip = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]    
-                rows = topn_ip.values('fip','fip_count')                
                 
-                for row in rows:
+                if top_request.count() > 0:
+                    # datetime 조건으로 재설정, IP TOP:N개 조회
+                    tmp_date = list(top_request)[0]
+                    totalCnt = tmp_date['frequest_total']
+
+                    topn_ip = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]    
+                    rows = topn_ip.values('fip','fip_count')                
                     
-                    if settings.DEBUG:
-                        logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) - %s" % row['fip'])
-                        logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) Count - %s" % row['fip_count'])
-                    
-                    results.append({"result" : row['fip'], "result_count" : row['fip_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
+                    for row in rows:
+                        
+                        if settings.DEBUG:
+                            logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) - %s" % row['fip'])
+                            logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) Count - %s" % row['fip_count'])
+                        
+                        results.append({"result" : row['fip'], "result_count" : row['fip_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
             
             #type=33. Difference : TimeTaken 평균 최고점 URI Top N(1분 단위 합계)
             elif type == 33:                
@@ -1264,20 +1269,21 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 1분 단위 TimeTaken 평균 최고점 계산. 동일값 존재 시 빠른 datetime 확인  
                 top_avg_timetaken= queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(date=Concat('fdate', 'fhour','fminute'), ftime_taken_total=Count('ftime_taken'), ftime_taken_avg=Avg('ftime_taken')).order_by('-ftime_taken_avg', 'date')[0:1]
 
-                # datetime 조건으로 재설정, URI TOP:N개 조회
-                tmp_date = list(top_avg_timetaken)[0]
-                totalCnt = tmp_date['ftime_taken_total']
+                if top_avg_timetaken.count() > 0:
+                    # datetime 조건으로 재설정, URI TOP:N개 조회
+                    tmp_date = list(top_avg_timetaken)[0]
+                    totalCnt = tmp_date['ftime_taken_total']
 
-                topn_request = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]    
-                rows = topn_request.values('frequest','frequest_count')                
-                
-                for row in rows:
+                    topn_request = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]    
+                    rows = topn_request.values('frequest','frequest_count')                
                     
-                    if settings.DEBUG:
-                        logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) - %s" % row['frequest'])
-                        logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) Count - %s" % row['frequest_count'])
-                    
-                    results.append({"result" : row['frequest'], "result_count" : row['frequest_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
+                    for row in rows:
+                        
+                        if settings.DEBUG:
+                            logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) - %s" % row['frequest'])
+                            logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) Count - %s" % row['frequest_count'])
+                        
+                        results.append({"result" : row['frequest'], "result_count" : row['frequest_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
 
             #type=34. Difference : TimeTaken 평균 최고점 Visitor(IP) Top N(1분 단위 합계)
             elif type == 34:
@@ -1285,20 +1291,21 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 1분 단위 TimeTaken 평균 최고점 계산. 동일값 존재 시 빠른 datetime 확인  
                 top_avg_timetaken= queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(date=Concat('fdate', 'fhour','fminute'), ftime_taken_total=Count('ftime_taken'), ftime_taken_avg=Avg('ftime_taken')).order_by('-ftime_taken_avg', 'date')[0:1]
 
-                # datetime 조건으로 재설정, URI TOP:N개 조회
-                tmp_date = list(top_avg_timetaken)[0]
-                totalCnt = tmp_date['ftime_taken_total']
+                if top_avg_timetaken.count() > 0:
+                    # datetime 조건으로 재설정, URI TOP:N개 조회
+                    tmp_date = list(top_avg_timetaken)[0]
+                    totalCnt = tmp_date['ftime_taken_total']
 
-                topn_ip = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]    
-                rows = topn_ip.values('fip','fip_count')                
-                
-                for row in rows:
+                    topn_ip = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]    
+                    rows = topn_ip.values('fip','fip_count')                
                     
-                    if settings.DEBUG:
-                        logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) - %s" % row['fip'])
-                        logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) Count - %s" % row['fip_count'])
-                    
-                    results.append({"result" : row['fip'], "result_count" : row['fip_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
+                    for row in rows:
+                        
+                        if settings.DEBUG:
+                            logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) - %s" % row['fip'])
+                            logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) Count - %s" % row['fip_count'])
+                        
+                        results.append({"result" : row['fip'], "result_count" : row['fip_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
             
             #type=35. Difference : 오류코드(4xx~5xx) 합계 최고점 해당 오류 코드 URI Top N(1분 단위 합계)
             elif type == 35:                
@@ -1306,20 +1313,21 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 1분 단위 오류코드(4xx~5xx) 합계 최고점 계산. 동일값 존재 시 빠른 datetime 확인                 
                 top_error_status= queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(date=Concat('fdate', 'fhour','fminute')).filter(fstatus__range=(400, 599)).annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count', 'date')[0:1]
 
-                # datetime 조건으로 재설정, URI TOP:N개 조회 - 4xx~5xx 오류 코드 URI만 조회.
-                tmp_date = list(top_error_status)[0]
-                totalCnt = tmp_date['fstatus_count']
+                if top_error_status.count() > 0:
+                    # datetime 조건으로 재설정, URI TOP:N개 조회 - 4xx~5xx 오류 코드 URI만 조회.
+                    tmp_date = list(top_error_status)[0]
+                    totalCnt = tmp_date['fstatus_count']
 
-                topn_request = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).filter(fstatus__range=(400, 599)).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]    
-                rows = topn_request.values('frequest','frequest_count')                
-                
-                for row in rows:
+                    topn_request = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).filter(fstatus__range=(400, 599)).values('frequest').annotate(frequest_count=Count('frequest')).order_by('-frequest_count')[0:intN]    
+                    rows = topn_request.values('frequest','frequest_count')                
                     
-                    if settings.DEBUG:
-                        logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) - %s" % row['frequest'])
-                        logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) Count - %s" % row['frequest_count'])
-                    
-                    results.append({"result" : row['frequest'], "result_count" : row['frequest_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
+                    for row in rows:
+                        
+                        if settings.DEBUG:
+                            logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) - %s" % row['frequest'])
+                            logger.debug("type30 : TOP"+strN+"Difference(TPS peak/request) Count - %s" % row['frequest_count'])
+                        
+                        results.append({"result" : row['frequest'], "result_count" : row['frequest_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
 
             #type=36. Difference : 오류코드(4xx~5xx) 합계 최고점 해당 오류코드 Visitor(IP) Top N(1분 단위 합계)
             elif type == 36:
@@ -1327,20 +1335,21 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 1분 단위 오류코드(4xx~5xx) 합계 최고점 계산. 동일값 존재 시 빠른 datetime 확인 
                 top_error_status= queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(date=Concat('fdate', 'fhour','fminute')).filter(fstatus__range=(400, 599)).annotate(fstatus_count=Count('fstatus')).order_by('-fstatus_count', 'date')[0:1]
 
-                # datetime 조건으로 재설정, IP TOP:N개 조회 - 4xx~5xx 오류 코드 IP만 조회
-                tmp_date = list(top_error_status)[0]
-                totalCnt = tmp_date['fstatus_count']
+                if top_error_status.count() > 0:
+                    # datetime 조건으로 재설정, IP TOP:N개 조회 - 4xx~5xx 오류 코드 IP만 조회
+                    tmp_date = list(top_error_status)[0]
+                    totalCnt = tmp_date['fstatus_count']
 
-                topn_ip = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).filter(fstatus__range=(400, 599)).values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]    
-                rows = topn_ip.values('fip','fip_count')                
-                
-                for row in rows:
+                    topn_ip = queryset.filter(fdate__exact=tmp_date['fdate']).filter(fhour__exact=tmp_date['fhour']).filter(fminute__exact=tmp_date['fminute']).filter(fstatus__range=(400, 599)).values('fip').annotate(fip_count=Count('fip')).order_by('-fip_count')[0:intN]    
+                    rows = topn_ip.values('fip','fip_count')                
                     
-                    if settings.DEBUG:
-                        logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) - %s" % row['fip'])
-                        logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) Count - %s" % row['fip_count'])
-                    
-                    results.append({"result" : row['fip'], "result_count" : row['fip_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
+                    for row in rows:
+                        
+                        if settings.DEBUG:
+                            logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) - %s" % row['fip'])
+                            logger.debug("type31 : TOP"+strN+"Difference(TPS peak/IP) Count - %s" % row['fip_count'])
+                        
+                        results.append({"result" : row['fip'], "result_count" : row['fip_count'], "result_date": tmp_date['fdate']+tmp_date['fhour']+tmp_date['fminute']})#, "request_total":totalCnt} ) 
             
             response = {'message': 'statistics returned', 'resultType': type, 'results': results, 'totalCnt': totalCnt}
             return Response(response, status = status.HTTP_200_OK)
@@ -1750,9 +1759,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # 결과 처리
             resultXY = []
-            resultY_time = []
-            resultY_time_unit = 0            
-            resultY_SCode = {}
+            result_time_unit = 0            
             resultXY_400 = []
             resultXY_500 = []
             
@@ -1810,7 +1817,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     elif file_format.find('time-taken') != -1:
                         time_unit = 2
                     
-                    resultY_time_unit = time_unit
+                    result_time_unit = time_unit
                                         
                     if time_unit != 0:
                         hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Avg('ftime_taken'))
@@ -1824,7 +1831,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultXY.append(row)
                           
                     else:
-                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'))
+                        # TODO : timetaken 값이 없는 경우 처리? time_unit = 0
+                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Avg('ftime_taken'))
                         rows = hhRequest.values('x','y')
                                     
                         for row in rows:   
@@ -1888,11 +1896,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     elif file_format.find('time-taken') != -1:
                         time_unit = 2
                     
-                    resultY_time_unit = time_unit
+                    result_time_unit = time_unit
                                         
                     if time_unit != 0:
-                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Avg('ftime_taken'))
-                        rows = hhRequest.values('x','y')
+                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Avg('ftime_taken'))
+                        rows = hhmmRequest.values('x','y')
                                     
                         for row in rows:                              
                             # 시간은 초단위로 환산한다.      
@@ -1902,8 +1910,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultXY.append(row)
                           
                     else:
-                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Count('frequest'))
-                        rows = hhRequest.values('x','y')
+                        # TODO : timetaken 값이 없는 경우 처리? time_unit = 0
+                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Avg('ftime_taken'))
+                        rows = hhmmRequest.values('x','y')
                                     
                         for row in rows:   
                             resultXY.append(row)                
@@ -1953,11 +1962,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     elif file_format.find('time-taken') != -1:
                         time_unit = 2
                     
-                    resultY_time_unit = time_unit
+                    result_time_unit = time_unit
                                         
                     if time_unit != 0:
-                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Avg('ftime_taken'))
-                        rows = hhRequest.values('x','y')
+                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Avg('ftime_taken'))
+                        rows = hhmmssRequest.values('x','y')
                                     
                         for row in rows:                              
                             # 시간은 초단위로 환산한다.      
@@ -1967,8 +1976,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultXY.append(row)
                           
                     else:
-                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Count('frequest'))
-                        rows = hhRequest.values('x','y')
+                        # TODO : timetaken 값이 없는 경우 처리? time_unit = 0
+                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Avg('ftime_taken'))
+                        rows = hhmmssRequest.values('x','y')
                                     
                         for row in rows:   
                             resultXY.append(row)                  
@@ -1986,7 +1996,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             del row['f_status']
                             resultXY_500.append(row)            
                     
-            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'resultY_time': resultY_time, 'resultY_time_unit': resultY_time_unit, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500}        
+            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500}        
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:

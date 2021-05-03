@@ -336,7 +336,8 @@ export default {
                 //     break;
                 case 31:
                     this.$store.state.popupHeader = "Requests URI (count)";    
-                    this.$store.state.detailcondition = "R"        
+                    this.$store.state.detailcondition = "R"     
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 32:
                     this.$store.state.popupHeader = "Visitors (count)";    
@@ -344,7 +345,8 @@ export default {
                     break;
                 case 33:
                     this.$store.state.popupHeader = "Requests URI (count)";    
-                    this.$store.state.detailcondition = "R"           
+                    this.$store.state.detailcondition = "R" 
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)          
                     break;
                 case 34:
                     this.$store.state.popupHeader = "Visitors (count)";    
@@ -352,7 +354,8 @@ export default {
                     break;
                 case 35:
                     this.$store.state.popupHeader = "Requests URI (count)"; 
-                    this.$store.state.detailcondition = "R"  
+                    this.$store.state.detailcondition = "R" 
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword) 
                     this.statusYN = "Y"            
                     break;
                 case 36:
@@ -373,7 +376,7 @@ export default {
 
             this.getDetailCondition();
 
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '')
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', '')
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -526,7 +529,7 @@ export default {
                 } 
             }
 
-            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue)
+            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue, '')
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
