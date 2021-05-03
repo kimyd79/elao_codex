@@ -16,11 +16,15 @@ const state = {
     // common info
     projectName: '',
     projectDescription: '',
+    projectID: '',
+
     fileNames: '',
     logFormat: '',
-
-    projectID: '',
     logFileID: '',
+
+    // Files will have fileinfo objects
+    // logfile_id, file_name, file_size, file_format, is_new
+    projectFiles: '',
 
     // Global Date, Time (immutable) -Global  Scale X 
     global_fromDate: '',
@@ -101,6 +105,8 @@ const mutations = {
     [types.SET_LOGFORMAT] (state, value) { state.logFormat = value },
     [types.SET_PROJECTID] (state, value) { state.projectID = value },
     [types.SET_LOGFILEID] (state, value) { state.logFileID = value },
+
+    [types.SET_PROJECTFILES] (state, value) { state.projectFiles = value },    
 
     // global time, date
     [types.SET_GLOBAL_FROMDATE] (state, value) { state.global_fromDate = value },

@@ -37,6 +37,13 @@
                         <lego-text-field textarea rows="3" v-model="projectDescription" />
                     </ui-form-item>
 
+                    <div class="popup-buttons" v-if="radioValue == 2 && (creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin')">
+                        <lego-button v-if="isPrevShow" v-on:click="prevButton">Prev</lego-button>
+                        <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
+                        <lego-button v-on:click="deleteProjects" main v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'">DelProjects</lego-button>
+                        <lego-button v-on:click="newProject">newProject</lego-button>
+                    </div>
+
                     <!-- GridTable for existing project -->
                     <ui-container-box :columns="11" vertical v-if="radioValue == 2">
                         <ui-table header-divider no-action :columns="columns" :items="itemList" class="mt20"></ui-table>
@@ -46,12 +53,12 @@
 
                 <!-- STEP2 start -->
                 <span id="step2" v-if="tabs[2].isSelected">
-                    <ui-form-item :columns=11 label="File" required-left left-label :label-width=144 :label-padding=16>
-                        <input type="file" id="file" ref="file" v-on:change="selectFile" />
+                    
+                    <ui-form-item :columns=11 label="Project Name" required-left left-label :label-width=144 :label-padding=16>
+                        {{ projectName }}
                     </ui-form-item>
-
-                    <ui-form-item :columns=11 label="File Size" required-left left-label :label-width=144 :label-padding=16>
-                        {{ fileSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} bytes
+                    <ui-form-item :columns=11 label="Project Description" required-left left-label :label-width=144 :label-padding=16>
+                        {{ projectDescription }}
                     </ui-form-item>
 
                     <!-- addLogFormat popup 추가 -->
@@ -63,6 +70,33 @@
                         <lego-button v-on:click="addLogFormat">Add</lego-button>
 
                     </ui-form-item>
+
+                    <ui-form-item :columns=11 label="File(s)" required-left left-label :label-width=144 :label-padding=16>
+                        <input type="file" id="files" ref="files" multiple v-on:change="selectFiles" />                        
+                    </ui-form-item>
+
+                    <div v-for="(file, key) in files" class="file-listing">
+                            {{ file.name }} {{ '( ' +file.size.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' bytes )'}}<span class="remove-file" v-on:click="removeFile( key )"> Delete</span><br>
+                    </div>
+
+                    <!-- Displays the existed files -->
+                    <ui-form-item :columns=11 label="Existed File(s)" required-left left-label :label-width=144 :label-padding=16 v-if="radioValue == 2">
+                        {{ this.addedFilesInfo.length }}
+                    </ui-form-item>
+
+                    <div v-for="(file, key) in this.addedFilesInfo" class="file-listing">
+                        [{{ key+1 }}] {{ file.file_name }} {{ '( ' +file.file_size.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' bytes )'}}
+                        <br>
+                        ☞ {{ file.file_format }}<br>                        
+                    </div>
+                    <br>
+
+
+                    <!--    
+                    <ui-form-item :columns=11 label="File Size" required-left left-label :label-width=144 :label-padding=16>
+                        {{ fileSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} bytes
+                    </ui-form-item>                    
+                    -->
 
                     <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16>
 
@@ -93,12 +127,24 @@
                     <ui-form-item :columns=11 label="Project Description" required-left left-label :label-width=144 :label-padding=16>
                         {{ projectDescription }}
                     </ui-form-item>
-                    <ui-form-item :columns=11 label="File" required-left left-label :label-width=144 :label-padding=16>
-                        {{ fileName }}
+
+                    <ui-form-item :columns=11 label="File(s)" required-left left-label :label-width=144 :label-padding=16>
+                        {{ this.addedFilesInfo.length }}
                     </ui-form-item>
+
+                    <div v-for="(file, key) in this.addedFilesInfo" class="file-listing">
+                        [{{ key+1 }}] {{ file.file_name }} {{ '( ' +file.file_size.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' bytes )'}}
+                        <br>
+                        ☞ {{ file.file_format }}<br>                        
+                    </div>
+                    <br>
+
+                    <!-- 
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
                         {{ fileFormat }}
                     </ui-form-item>
+                    -->
+
                     <!-- TODO: 필요시
                     <ui-form-item :columns=11 label="Data range" required-left left-label :label-width=144 :label-padding=16 >
                         {{ this.dateFromValue }}/{{this.timeFromValue}} ~ {{ this.dateToValue }}/{{this.timeToValue}}
@@ -114,8 +160,6 @@
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
                 <lego-button v-on:click="deleteProjects" main v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'">DelProjects</lego-button>
                 <lego-button v-on:click="newProject">newProject</lego-button>
-
-                
             </div>
 
         </ui-container-box>
@@ -182,10 +226,21 @@ export default {
             creator: this.$store.state.userName,
             projectID: "",
 
+            // TODO: Remove
             fileName: "",
             fileSize: 0,
-            fileFormat: "",
+            fileFormat: "",            
             logfileID: "",
+
+            // For multi-files
+            fileNames: [],
+            logfileIDs: [],
+            fileSizes: [],
+            fileFormats: [],
+
+            // For Display
+            addedFilesInfo: [],
+
             isNewFileAdded: false,
 
             dateFromValue: "",
@@ -202,6 +257,7 @@ export default {
 
             // For file upload
             file: '',
+            files: [],
 
             tabs: [{
                     label: "Current Info",
@@ -286,20 +342,28 @@ export default {
             this.addData(format);
             this.currentView = null;
         });
-      
+
+     
         // Initial Value Setting
+        this.projectID = this.$store.state.projectID;
         this.projectName = this.$store.state.projectName
         this.projectDescription = this.$store.state.projectDescription
-        this.fileName = this.$store.state.fileNames
-        this.fileFormat = this.$store.state.logFormat
 
-        // Current Info 값이 없을 경우 Click "Next" to create a project or load an existing one. 나타낸다.
-        // if (this.tabs[0].isSelected && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){
-      
-        //     this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.'; 
-                                  
-        // }
+        // TODO: ...mapGetter 로 변경할 것
 
+        // Array
+        this.addedFilesInfo = this.$store.state.projectFiles;
+
+        for(var file of this.addedFilesInfo){
+            //console.log(file);
+
+            this.logfileIDs.push(file.logfile_id);
+            this.fileNames.push(file.file_name);
+            this.fileSizes.push(file.file_size);
+            this.fileFormats.push(file.file_format);
+
+        }
+        
         // 처음 입력시 Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
         if (this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){
             this.tabs[0].isSelected = false;
@@ -307,30 +371,7 @@ export default {
         }
 
         // File format 가져오기
-        this.getLogformatList();  
-        // var url = serverUrl + "/logformat"
-
-        // let axiosConfig = {
-        //     headers: {
-        //         //'Authorization': 'Token '+ this.token // For Django
-        //     }
-        // };
-
-        // axios.get(url, axiosConfig)
-        //     .then(res => {
-
-        //         for (let i = 0; i < res.data.results.length; i++) {
-        //             let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
-        //             this.items.push({
-        //                 value: tmp + '/' + res.data.results[i].format_strings,
-        //                 text: tmp + ' => ' + res.data.results[i].format_strings
-        //             });
-        //         }
-
-        //     })
-        //     .catch(err => {
-        //         console.error(err);
-        //     })
+        this.getLogformatList();
 
     },
 
@@ -393,11 +434,6 @@ export default {
                             text: '▶ ' +tmp + ' → ' + result.format_strings.substr(0,130)+(result.format_strings.length > 130 ? " ..." : "" ),
                         });
 
-                        //let tmp = res.data.results[i].format_kind + '/' + res.data.results[i].format_name
-                        //this.items.push({
-                        //    value: tmp + '/' + res.data.results[i].format_strings,
-                        //    text: tmp + ' => ' + res.data.results[i].format_strings
-                        //    });
 
                     }
 
@@ -456,10 +492,17 @@ export default {
                     this.$store.reset();
                     this.$store.dispatch("setUserToken", userToken);
                     this.$store.dispatch("setUserName", userName);
+
                     this.projectName = "";
                     this.projectDescription = "";
                     this.fileName = "";
                     this.fileFormat = "";
+
+                    this.addedFilesInfo = [];
+                    this.logfileIDs = [];
+                    this.fileNames = [];
+                    this.fileFormats = [];
+                    this.fileSizes = [];
                     
                     this.radioValue = "1";
                     this.isPrevShow = false;
@@ -663,7 +706,12 @@ export default {
 
                 try {
                     this.fileSize = 0;
-                    await this.createLogfile(serverUrl)
+
+                    // Multi-file upload 필요 - Alert, Loading Spinner 필요
+                    for( var i = 0; i < this.files.length; i++ ){
+                        let file = this.files[i];
+                        await this.createLogfile(serverUrl, file);
+                    }
                     // this.buttonName = "OK"
                     this.buttonName = "Analysis"
                     this.isNewFileAdded = true;
@@ -872,16 +920,27 @@ export default {
                 })
         },
 
-        selectFile() {
+        removeFile( key ){
 
-            this.file = this.$refs.file.files[0];
+            this.files.splice( key, 1 );
+        },
 
+        selectFiles() {
+            
             try {
+                let uploadedFiles = this.$refs.files.files;
 
-                this.fileName = this.file.name
-                this.fileSize = this.file.size
+                for( var i = 0; i < uploadedFiles.length; i++ ){
+                    this.files.push( uploadedFiles[i] );
+                    
+                    this.fileName += uploadedFiles[i].name + ", ";
+                    this.fileSize += uploadedFiles[i].size;
+                }
 
-                this.$store.dispatch("setFileNames", this.fileName);
+                console.log(this.fileName.substr(0, this.fileName.length -2));
+                console.log(this.fileSize);
+
+                this.$store.dispatch("setFileNames", this.fileName.substr(0, this.fileName.length -2));
 
             } catch (err) {
                 console.error(err);
@@ -889,24 +948,19 @@ export default {
 
         },
 
-        createLogfile(url) {
-
-            // TODO: Multi-file upload 필요
+        // Multi-file upload : External Loop 사용
+        createLogfile(url, file) {
 
             let formData = new FormData();
 
             formData.append('project', this.projectID);
-            formData.append('file_object', this.file);
-            formData.append('file_name', this.fileName);
-            formData.append('file_size', this.fileSize);
 
-            let splitedFormat = this.fileFormat.split("/")
+            // TODO: Check
+            formData.append('file_object', file);
+            formData.append('file_name', file.name);
+            formData.append('file_size', file.size);
 
-            //console.log("this.fileFormat : "+this.fileFormat)
-            //console.log("splitedFormat : "+splitedFormat)
-            //console.log("splitedFormat[0] : "+splitedFormat[0])
-            //console.log("splitedFormat[1] : "+splitedFormat[1])
-            //console.log("splitedFormat[2] : "+splitedFormat[2])
+            let splitedFormat = this.fileFormat.split("/")            
 
             formData.append('format_kind', splitedFormat[0]);
             formData.append('format_name', splitedFormat[1]);
@@ -925,32 +979,48 @@ export default {
 
             return axios.post(url + '/logfile/', formData, axiosConfig)
                 .then(res => {
-                    console.log(res)
 
-                    this.logfileID = res.data.logfile_id
+                    console.log(res);
+                    this.logfileIDs.push(res.data.logfile_id);
+
+                    // For Display                    
+                    this.addedFilesInfo.push({
+                        logfile_id: res.data.logfile_id,
+                        file_name: res.data.file_name,
+                        file_size: res.data.file_size,
+                        file_format: res.data.file_format,
+                        is_new: true,       // new filse
+                    });
 
                     // Set in vuex
-                    this.$store.dispatch("setLogFileID", this.logfileID);
+                    this.$store.dispatch("setLogFileID", this.logfileIDs);
 
-                    // Stop Loading Spinner
+                    // For Multi-Files
+                    this.$store.dispatch("setProjectFiles", this.addedFilesInfo);
+
+
+                    // TODO: 외부로 이동 필요
+                    // Stop Loading Spinner : Alert, Loading Spinner 
                     this.isActive = false
-
-                    //this.$alert("Create Logfile(File Upload) completed..!!", "Notification", "success");
 
                     this.$swal({
                         title: 'Notification',
-                        html: 'Create Logfile(File Upload) completed..!!',
+                        html: 'Create Logfile(File Upload) completed..!!<br>Name : ' 
+                               +file.name,                
                         icon: 'success',                        
                         confirmButtonColor: '#553ca5',                
                         confirmButtonText: 'OK',                    
-                    }); 
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            
+                            // Confirm 버튼용
+                        }
+                    });
                 })
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
-
-                    //this.$alert("Create Logfile(File Upload) failed..!!", "Notification", "error");
 
                     this.$swal({
                         title: 'Notification',
@@ -958,6 +1028,11 @@ export default {
                         icon: 'error',
                         confirmButtonColor: '#553ca5',                
                         confirmButtonText: 'OK',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            
+                            // Confirm 버튼용
+                        }
                     });
 
                     throw err
@@ -968,7 +1043,7 @@ export default {
         createLogdetail(url) {
 
             let postData = {
-                logfile_id: this.logfileID,
+                logfile_id: this.logfileIDs,    // For Multi-files
                 project_id: this.projectID
             };
 
@@ -1009,9 +1084,6 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    // Check -> 뒤에 start_end에서 출력하도록 한다.
-                     //this.$alert("Create Logdetail Data completed..!! "+ res.data.processing_time + " : secs", "Notification", "success");
-
                     return res.data.processing_time;
 
                 })
@@ -1019,8 +1091,6 @@ export default {
                     console.error(err);
                     // Stop Loading Spinner
                     this.isActive = false
-
-                    //this.$alert("Create Logdetail Data failed..!!", "Notification", "error");
 
                     this.$swal({
                         title: 'Notification',
@@ -1048,25 +1118,47 @@ export default {
 
             return axios.get(url, axiosConfig)
                 .then(res => {
-                    //console.log(res.data)
-                    //console.log(res.data.results[0])
-                    //console.log(res.data.results[0].file_format)
-                    //console.log(res.data.results[0].file_name)
+                    //console.log(res.data);
 
-                    // TODO : 파일이 없는 경우도 있다. (프로젝트만 만들어놓은 경우)
+
+                    // TODO: 파일이 없는 경우도 있다. (프로젝트만 만들어놓은 경우)
                     //        오류처리 해야 한다.
-                    this.fileName = res.data.results[0].file_name
-                    this.fileFormat = res.data.results[0].file_format
-                    this.logfileID = res.data.results[0].logfile_id
 
-                    this.$store.dispatch("setFileNames", this.fileName);
-                    this.$store.dispatch("setLogFormat", this.fileFormat);
-                    this.$store.dispatch("setLogFileID", this.logfileID);
+                    // For multi-files
+                    this.addedFilesInfo = [];
+                    this.logfileIDs = [];
+                    this.fileNames = [];
+                    this.fileFormats = [];
+                    this.fileSizes = [];
+
+                    for(var file of res.data.results){
+                        //console.log(file);
+
+                        this.logfileIDs.push(file.logfile_id);
+                        this.fileNames.push(file.file_name);
+                        this.fileSizes.push(file.file_size);
+                        this.fileFormats.push(file.file_format);
+
+                        this.addedFilesInfo.push({
+                            logfile_id: file.logfile_id,
+                            file_name: file.file_name,
+                            file_size: file.file_size,
+                            file_format: file.file_format,
+                            is_new: false,
+
+                        });
+                    }
+
+                    this.$store.dispatch("setFileNames", this.fileNames);
+                    this.$store.dispatch("setLogFileID", this.logfileIDs);
+                    this.$store.dispatch("setLogFormat", this.fileFormats);
+
+                    // For display
+                    this.$store.dispatch("setProjectFiles", this.addedFilesInfo);
+
 
                     // Stop Loading Spinner
                     this.isActive = false
-
-                    //this.$alert("Get Logfile Data completed..!!", "Notification", "success");
 
                     this.$swal({
                         title: 'Notification',
@@ -1079,13 +1171,11 @@ export default {
                 .catch(err => {
                     console.error(err);
                     // Stop Loading Spinner
-                    this.isActive = false
-
-                    //this.$alert("Get Logfile Data completed..!!", "Notification", "error");
+                    this.isActive = false                   
 
                     this.$swal({
                         title: 'Notification',
-                        html: 'Get Logfile Data failed..!!',
+                        html: 'Get Logfile Data failed..!! or No files',
                         icon: 'error',
                         confirmButtonColor: '#553ca5',                
                         confirmButtonText: 'OK',
@@ -1154,8 +1244,6 @@ export default {
                     // Stop Loading Spinner
                     this.isActive = false
 
-                    //this.$alert("Get Logdetail Data failed..!!", "Notification", "error");
-
                     this.$swal({
                         title: 'Notification',
                         html: 'Get Logdetail Data failed..!!',
@@ -1193,6 +1281,21 @@ export default {
 </script>
 
 <style scoped>
+div.file-listing{
+    width: 600px;
+    margin-left: 180px;
+    margin-bottom: 15px;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+span.remove-file{
+    color: #553ca5;
+    cursor: pointer;
+    float: center;
+}
+  
 .popup-container {
     padding: 32px;
     border: 1px solid #D0D0D0;

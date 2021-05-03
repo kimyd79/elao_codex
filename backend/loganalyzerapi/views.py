@@ -1592,8 +1592,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         response = {}
         
         try:
-            
-            logfile_id = request.data['logfile_id']
+            # logfile_ids for multi-files
+            logfile_ids = request.data['logfile_id']
             project_id = request.data['project_id']
             
             model_name = "logdetail_"+project_id
@@ -1604,78 +1604,83 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             if LogDetail_dynamic.objects.count() == 1:
                 LogDetail_dynamic.objects.filter(id=1).delete()
             
-            # 이미 생성되어 있는지 확인
-            if LogDetail_dynamic.objects.filter(logfile_id=logfile_id).count() > 0:
-                response = {'message': 'Dynamic logdetail already created.'}
-                
-            else:                  
+            # Start Loop for each logfile
+            for logfile_id in logfile_ids:
+            
+                # 이미 생성되어 있는지 확인
+                if LogDetail_dynamic.objects.filter(logfile_id=logfile_id).count() > 0:
+                    response = {'message': 'Dynamic logdetail already created.'}
+                    
+                else:                  
+                            
+                    logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
+                    logfile = logfile_model.file_object.file    
+                    
+                    print("logfile :", logfile)
+                    
+                    # 파일 추가를 위한 기존정보 체크
+                    id_startnum = 0
+                    if LogDetail_dynamic.objects.count() > 0:
+                        id_startnum = LogDetail_dynamic.objects.all().order_by("-id")[0].id + 1
+                    
+                    # Log Parsing : postgresql copy 사용을 위해 csv파일 생성                
+                    # 로그 파일이 크면 분할한다.
+                    # 1. 압축파일인지 확인
+                    # 2. 압축파일이 풀면 1.5GB 이상인지 확인
+                    isCompressed = False
+                    limitFileSize = 1.5 * 1024 * 1024 * 1024
+                    workFileSize = 0
+                    
+                    # 1. 압축파일인지 확인(zip, gz)
+                    p = re.compile('(.zip|.gz)', re.DOTALL )
+                    if len(p.findall(logfile.name)) > 0:    # 압축 파일
+                        isCompressed = True
+                        workFileSize = self.get_original_filesize(logfile.name)
+                    else:                                   # 압축 파일 아닌 경우
+                        workFileSize = logfile.size
                         
-                logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
-                logfile = logfile_model.file_object.file    
-                
-                print("logfile :", logfile)
-                
-                # 파일 추가를 위한 기존정보 체크
-                id_startnum = 0
-                if LogDetail_dynamic.objects.count() > 0:
-                    id_startnum = LogDetail_dynamic.objects.all().order_by("-id")[0].id + 1
-                
-                # Log Parsing : postgresql copy 사용을 위해 csv파일 생성                
-                # 로그 파일이 크면 분할한다.
-                # 1. 압축파일인지 확인
-                # 2. 압축파일이 풀면 1.5GB 이상인지 확인
-                isCompressed = False
-                limitFileSize = 1.5 * 1024 * 1024 * 1024
-                workFileSize = 0
-                
-                # 1. 압축파일인지 확인(zip, gz)
-                p = re.compile('(.zip|.gz)', re.DOTALL )
-                if len(p.findall(logfile.name)) > 0:    # 압축 파일
-                    isCompressed = True
-                    workFileSize = self.get_original_filesize(logfile.name)
-                else:                                   # 압축 파일 아닌 경우
-                    workFileSize = logfile.size
+                    # 2. 압축파일이 풀면 1.5GB 이상인지 확인
+                    workFileCount = 1   # 기본값 = 1
+                    resultFiles = []
                     
-                # 2. 압축파일이 풀면 1.5GB 이상인지 확인
-                workFileCount = 1   # 기본값 = 1
-                resultFiles = []
-                
-                if workFileSize > limitFileSize:                    
-                    # 분할 파일 수를 계산해야 한다.
-                    workFileCount = math.ceil(workFileSize/limitFileSize)
-                    
-                    # 압축 해제한다.
-                    target_filename = self.decompress_file(logfile.name)
-                    
-                    # 전체 라인 카운트(gz, zip 가능)
-                    totalLines = self.get_total_lines(target_filename)
-                    
-                    # Target File Name
-                    #target_filename = logfile.name+"_decompressed"
-                    
-                    # 분할 파일 수로 나누어서 작업을 순차적으로 진행 - 메모리 사용률을 줄이기 위해서
-                    startTime = time.time()
-                                        
-                    unit = int(totalLines/workFileCount)
+                    if workFileSize > limitFileSize:                    
+                        # 분할 파일 수를 계산해야 한다.
+                        workFileCount = math.ceil(workFileSize/limitFileSize)
+                        
+                        # 압축 해제한다.
+                        target_filename = self.decompress_file(logfile.name)
+                        
+                        # 전체 라인 카운트(gz, zip 가능)
+                        totalLines = self.get_total_lines(target_filename)
+                        
+                        # Target File Name
+                        #target_filename = logfile.name+"_decompressed"
+                        
+                        # 분할 파일 수로 나누어서 작업을 순차적으로 진행 - 메모리 사용률을 줄이기 위해서
+                        startTime = time.time()
+                                            
+                        unit = int(totalLines/workFileCount)
 
-                    for idx in range(workFileCount):
-                        resultFiles.append(self.parse_log_div(target_filename, logfile_id, id_startnum+idx*unit, unit*idx, unit, idx))
-                                                            
-                    print("## 분할 csv 작업완료 까지 : 총 작업 시간 - ", round((time.time() - startTime),4))   
+                        for idx in range(workFileCount):
+                            resultFiles.append(self.parse_log_div(target_filename, logfile_id, id_startnum+idx*unit, unit*idx, unit, idx))
+                                                                
+                        print("## 분할 csv 작업완료 까지 : 총 작업 시간 - ", round((time.time() - startTime),4))   
+                        
+                    else:
+                        # 기존로직
+                        #self.parse_log(logfile, logfile_id, id_startnum )
+                        resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
+            
+                    # postgresql copy 실행                
+                    LogDetail_dynamic.objects.model.objects = CopyManager()
+                    LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
+                                    
+                    #LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',', encoding="utf-8")
                     
-                else:
-                    # 기존로직
-                    #self.parse_log(logfile, logfile_id, id_startnum )
-                    resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
-           
-                # postgresql copy 실행                
-                LogDetail_dynamic.objects.model.objects = CopyManager()
-                LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
-                                
-                #LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',', encoding="utf-8")
-                
-                for filename in resultFiles:
-                    LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
+                    for filename in resultFiles:
+                        LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
+                    
+                # End Loop for each logfile_id
                     
                 if settings.DEBUG:
                     logger.debug("To DB, Total Duration : %s sec" % (time.time() - start))

@@ -9,6 +9,8 @@ export default {
     setProjectID({commit}, value) { commit(types.SET_PROJECTID, value) },
     setLogFileID({commit}, value) { commit(types.SET_LOGFILEID, value) },
 
+    setProjectFiles({commit}, value) { commit(types.SET_PROJECTFILES, value) },
+
     setGlobalFromDate({commit}, value) { commit(types.SET_GLOBAL_FROMDATE, value) },
     setGlobalToDate({commit}, value) { commit(types.SET_GLOBAL_TODATE, value) },
     setGlobalFromTime({commit}, value) { commit(types.SET_GLOBAL_FROMTIME, value) },
