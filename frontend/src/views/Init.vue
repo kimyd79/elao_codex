@@ -72,7 +72,7 @@
                     </ui-form-item>
 
                     <ui-form-item :columns=11 label="File(s)" required-left left-label :label-width=144 :label-padding=16>
-                        <input type="file" id="files" ref="files" multiple v-on:change="selectFiles" />                        
+                        <input type="file" v-if="fileReady" id="files" ref="files" multiple v-on:change="selectFiles" />                        
                     </ui-form-item>
 
                     <div v-for="(file, key) in files" class="file-listing">
@@ -240,6 +240,9 @@ export default {
 
             // For Display
             addedFilesInfo: [],
+
+            // For file reset
+            fileReady: true,
 
             isNewFileAdded: false,
 
@@ -507,6 +510,9 @@ export default {
                     this.radioValue = "1";
                     this.isPrevShow = false;
 
+                    // 선택했던 파일 삭제
+                    this.files = [];
+
                     for (let i = 0; i < this.tabs.length; i++) {
                         if (this.tabs[i].isSelected == true) {
                             this.tabs[i].isSelected = false;
@@ -706,7 +712,7 @@ export default {
 
                 try {
                     this.fileSize = 0;
-
+                    
                     // Multi-file upload 필요 - Alert, Loading Spinner 필요
                     for( var i = 0; i < this.files.length; i++ ){
                         let file = this.files[i];
@@ -925,22 +931,44 @@ export default {
             this.files.splice( key, 1 );
         },
 
+        clearSelectFiles() {
+            this.fileReady = false;
+            this.$nextTick(() => {
+                this.fileReady = true;
+            })
+        },
         selectFiles() {
             
             try {
-                let uploadedFiles = this.$refs.files.files;
+                // Check File Format
+                if (this.fileFormat == "") {
 
-                for( var i = 0; i < uploadedFiles.length; i++ ){
-                    this.files.push( uploadedFiles[i] );
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Select logfile format first!',
+                        icon: 'info',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    }); 
+
+                    this.clearSelectFiles();
                     
-                    this.fileName += uploadedFiles[i].name + ", ";
-                    this.fileSize += uploadedFiles[i].size;
+                } else {
+
+                    let uploadedFiles = this.$refs.files.files;
+
+                    for( var i = 0; i < uploadedFiles.length; i++ ){
+                        this.files.push( uploadedFiles[i] );
+                        
+                        this.fileName += uploadedFiles[i].name + ", ";
+                        this.fileSize += uploadedFiles[i].size;
+                    }
+
+                    console.log(this.fileName.substr(0, this.fileName.length -2));
+                    console.log(this.fileSize);
+
+                    this.$store.dispatch("setFileNames", this.fileName.substr(0, this.fileName.length -2));
                 }
-
-                console.log(this.fileName.substr(0, this.fileName.length -2));
-                console.log(this.fileSize);
-
-                this.$store.dispatch("setFileNames", this.fileName.substr(0, this.fileName.length -2));
 
             } catch (err) {
                 console.error(err);
