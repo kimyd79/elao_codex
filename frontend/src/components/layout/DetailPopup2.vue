@@ -266,6 +266,7 @@ export default {
                 case 2:
                     this.$store.state.popupHeader2 = "Requests URI (count)"
                     this.$store.state.detailcondition2 = "R"
+                    this.$store.state.detailsearchKeyword2 = encodeURIComponent(this.$store.state.detailsearchKeyword2)
                     break;
                 case 3:
                     this.$store.state.popupHeader2 = "404 Requests URI (count)"

@@ -38,8 +38,12 @@
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
+        <component :is="currentView" v-on:popupClose="currentView=null" :row="valueN1" :kind="kind"></component>
 
         <ui-container-box :columns="10" vertical>
+            <ui-form-row align-left >
+                <lego-button  v-on:click="PopupStatisticsKind2" v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'" small main>PopupStatistics</lego-button>
+            </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="2"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="5"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare1>
@@ -92,6 +96,7 @@ import SearchCompare1 from "@/components/layout/SearchCompare1";
 import SearchCompare2 from "@/components/layout/SearchCompare2";
 import StatisticsCompare1 from "@/components/layout/StatisticsCompare1";
 import StatisticsCompare2 from "@/components/layout/StatisticsCompare2";
+import PopupStatistics from '@/components/layout/PopupStatistics';
 
 import * as types from "@/vuex/mutation_types";
 import {
@@ -112,7 +117,8 @@ export default {
         SearchCompare2,
         StatisticsCompare1,
         StatisticsCompare2,
-        VueElementLoading
+        VueElementLoading,
+        PopupStatistics
     },
     data() {
         return {
@@ -122,6 +128,11 @@ export default {
 
             logfile_id: '',
             project_id: '',
+
+            currentView: null,
+            creator: this.$store.state.userName,
+
+            kind: '',
 
         }
 
@@ -195,6 +206,11 @@ export default {
         }),
     },
     methods: {
+
+        PopupStatisticsKind2(){
+            this.kind = 2
+            this.currentView = 'PopupStatistics';
+        },
 
         getFilter() {
 
