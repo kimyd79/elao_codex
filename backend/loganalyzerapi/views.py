@@ -544,7 +544,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     def getTimetakenUnit(self, logfile_id):
         file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
         
-        if file_format.find('D') != -1 or file_format.find('request_time'):
+        if file_format.find('D') != -1 or file_format.find('request_time') != -1:
             return 'D'
         elif file_format.find('T') != -1 :
             return 'T'
@@ -2428,12 +2428,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         else:
             df_logs['fuser_agent'] = 'NA'
 
-        time_taken_flag = False    
-        if log_format.find('%T') != -1:
+        if log_format.find('%T') != -1:     # Second
             df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
-            time_taken_flag = True
+            
+            # django dynamic model의 float 처리 제약때문 : 0.07 -> 0.069999999
+            #if format_kind == 'tomcat' or format_kind == 'webtob':
+            #   df_logs.round({"ftime_taken":2})
 
-        if (not time_taken_flag) & (log_format.find('%D') != -1):
+        elif log_format.find('%D') != -1:
             df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)
             
             # Tomcat, WebtoB의 경우 단위가 ms이므로 *1000 필요 df_logs['ftime_taken']
