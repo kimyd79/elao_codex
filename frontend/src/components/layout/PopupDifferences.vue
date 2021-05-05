@@ -40,10 +40,14 @@
                             <tr>
                                 <th rowspan="2" style="width: 60px; color: rgb(85,60,165)"><b>{{ this.TopN }}</b></th>
                                 <th rowspan="2" style="width: 580px; color: rgb(85,60,165)"><b>{{ this.content }}</b></th>
-                                <th rowspan="2" style="width: 100px; color: rgb(85,60,165)"><b>count_1 </b></th>
-                                <th rowspan="2" style="width: 100px; color: rgb(85,60,165)"><b>percent_1</b></th>
-                                <th rowspan="2" style="width: 100px; color: rgb(85,60,165)"><b>count_2 </b></th>
-                                <th rowspan="2" style="width: 100px; color: rgb(85,60,165)"><b>percent_2 </b></th>
+                                <th colspan="2" style="width: 100px; color: rgb(85,60,165)"><b>Search-1 </b></th>
+                                <th colspan="2" style="width: 100px; color: rgb(85,60,165)"><b>Search-2</b></th>
+                            </tr>
+                            <tr>
+                                <th style="width: 100px; color: rgb(85,60,165)" ><b>count </b></th>
+                                <th style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
+                                <th style="width: 100px; color: rgb(85,60,165)"><b>count </b></th>
+                                <th style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -291,7 +295,7 @@ export default {
             });
             rtn.push({
                 value: "2",
-                text: "TOP  "+this.statisticsRow+" Visitors(IP) at TimeTaken highest point(every minute)"
+                text: "TOP  "+this.statisticsRow+" Visitors(IP) at TPS highest point(every minute)"
             });
             rtn.push({
                 value: "3",
@@ -299,7 +303,7 @@ export default {
             });
             rtn.push({
                 value: "4",
-                text: "TOP  "+this.statisticsRow+" Visitors(IP) at ErrorStatus highest point(every minute)"
+                text: "TOP  "+this.statisticsRow+" Visitors(IP) at TimeTaken highest point(every minute)"
             });
             rtn.push({
                 value: "5",
@@ -859,7 +863,7 @@ export default {
 }
 
 .add_scroll {
-    max-height: 260px;
+    max-height: 280px;
     overflow-y: auto;
 }
 
