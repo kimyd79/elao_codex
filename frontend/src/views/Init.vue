@@ -355,16 +355,20 @@ export default {
         // TODO: ...mapGetter 로 변경할 것
 
         // Array
-        this.addedFilesInfo = this.$store.state.projectFiles;
+        //console.log("created")
+        //console.log(this.$store.state.projectFiles);
+        if ( this.$store.state.projectFiles != ""){
+            this.addedFilesInfo = this.$store.state.projectFiles;
 
-        for(var file of this.addedFilesInfo){
-            //console.log(file);
+            for(var file of this.addedFilesInfo){
+                //console.log(file);
 
-            this.logfileIDs.push(file.logfile_id);
-            this.fileNames.push(file.file_name);
-            this.fileSizes.push(file.file_size);
-            this.fileFormats.push(file.file_format);
+                this.logfileIDs.push(file.logfile_id);
+                this.fileNames.push(file.file_name);
+                this.fileSizes.push(file.file_size);
+                this.fileFormats.push(file.file_format);
 
+            }
         }
         
         // 처음 입력시 Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
