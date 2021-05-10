@@ -35,14 +35,15 @@
                 <!--<lego-button @click="barChartData" main small>Bar</lego-button>-->
                 <lego-button @click="pieChartData(1)" main small>Http Status(P)</lego-button>
                 <lego-button @click="stackedbarChartData" main small>Http Status(T)</lego-button>
+
                 <lego-button @click="pieChartData(5)" main small>Visitor IP(5)</lego-button>
+
                 <lego-button @click="pieChartData(9)" main small>Static Files</lego-button>
                 <lego-button @click="pieChartData(13)" main small>Upstream Info</lego-button>
                 <lego-button @click="pieChartData(14)" main small>Domains</lego-button>
                 <lego-button @click="allChart()" small>ALL</lego-button>
             </ui-form-item>
         </ui-form-row>
-
     </ui-container-box>
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
@@ -123,26 +124,27 @@
 
     <ui-container-box :columns="20" horizontal class="page-form-area">
 
+        <!-- TODO: this.logFormat[0] -> 동일하게 1개만 우선, 단, 여러개 일때 처리 필요 -->
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
             <!-- For Ingress Nginx -->
-            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat.indexOf('$proxy_upstream_name')!=-1"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat[0].indexOf('$proxy_upstream_name')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1 || this.logFormat[0].indexOf('$request_time')!=-1 || this.logFormat[0].indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="12"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1 || this.logFormat.indexOf('$http_referer')!=-1"></statistics>            
+            <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat[0].indexOf('Referer')!=-1 || this.logFormat[0].indexOf('$http_referer')!=-1"></statistics>            
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical class="mt20">
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
              <!-- For Ingress Nginx -->
-            <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat.indexOf('$http_referer')!=-1"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1 || this.logFormat.indexOf('$request_time')!=-1 || this.logFormat.indexOf('time-taken')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat[0].indexOf('$http_referer')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')[0]!=-1 || this.logFormat[0].indexOf('%T')!=-1 || this.logFormat[0].indexOf('$request_time')!=-1 || this.logFormat[0].indexOf('time-taken')!=-1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="9"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1 || this.logFormat.indexOf('$http_user_agent')!=-1"></statistics>            
+            <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat[0].indexOf('User-Agent')!=-1 || this.logFormat[0].indexOf('$http_user_agent')!=-1"></statistics>            
         </ui-container-box>
 
     </ui-container-box>
@@ -353,7 +355,6 @@ export default {
             comp._data._chart.resetZoom();
 
         },
-
         getFilter() {
 
             let filter = {
@@ -535,6 +536,8 @@ export default {
 
     watch: {
         valueN() {
+
+            //console.log(this.logFormat);
             this.$store.dispatch("setToggleSearch");
         },
 

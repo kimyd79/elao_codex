@@ -179,8 +179,9 @@ export default {
 
             let commonInfo = setCommonStatisticInfo(this.statisticsKind, this.project_id, this.getFilter(), this.statisticsRow);
 
-            this.title = "Top " + this.statisticsRow
-            this.content = commonInfo.content
+            this.title = "Top " + this.statisticsRow;
+            this.content = commonInfo.content;
+
             // Start Loading Spinner
             this.isActive = true
 

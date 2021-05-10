@@ -44,33 +44,35 @@
             <ui-form-row align-left >
                 <lego-button  v-on:click="PopupStatisticsKind2" v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'" small main>PopupStatistics</lego-button>
             </ui-form-row>
+            <!-- TODO: this.logFormat[0] -> 동일하게 1개만 우선, 단, 여러개 일때 처리 필요 -->
+
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="2"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="5"></statistics-compare1>
-            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare1>
-            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare1>
+            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="4" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1"></statistics-compare1>
+            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="11" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="1"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="3"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="8"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="10"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="12"></statistics-compare1>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="9"></statistics-compare1>
-            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1"></statistics-compare1>
-            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1"></statistics-compare1>
+            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="6" v-if="this.logFormat[0].indexOf('Referer')!=-1"></statistics-compare1>
+            <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="7" v-if="this.logFormat[0].indexOf('User-Agent')!=-1"></statistics-compare1>
         </ui-container-box>
 
         <ui-container-box :columns="10" vertical>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="2"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="5"></statistics-compare2>
-            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="4" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare2>
-            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')!=-1 || this.logFormat.indexOf('%T')!=-1"></statistics-compare2>
+            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="4" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1"></statistics-compare2>
+            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="11" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="1"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="3"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="8"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="10"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="12"></statistics-compare2>
             <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="9"></statistics-compare2>
-            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="6" v-if="this.logFormat.indexOf('Referer')!=-1"></statistics-compare2>
-            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="7" v-if="this.logFormat.indexOf('User-Agent')!=-1"></statistics-compare2>
+            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="6" v-if="this.logFormat[0].indexOf('Referer')!=-1"></statistics-compare2>
+            <statistics-compare2 :statisticsRow="valueN2" :statisticsKind="7" v-if="this.logFormat[0].indexOf('User-Agent')!=-1"></statistics-compare2>
         </ui-container-box>
 
     </ui-container-box>
