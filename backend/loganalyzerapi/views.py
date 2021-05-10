@@ -2430,10 +2430,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         if log_format.find('%T') != -1:     # Second
             df_logs.rename(columns = {format_index['T'] : 'ftime_taken'}, inplace = True)
-            
-            # django dynamic model의 float 처리 제약때문 : 0.07 -> 0.069999999
-            #if format_kind == 'tomcat' or format_kind == 'webtob':
-            #   df_logs.round({"ftime_taken":2})
 
         elif log_format.find('%D') != -1:
             df_logs.rename(columns = {format_index['D'] : 'ftime_taken'}, inplace = True)

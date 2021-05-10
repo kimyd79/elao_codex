@@ -4,7 +4,6 @@
 import axios from "axios";
 import * as store from "@/vuex/store";
 
-//TODO: y축 Scale 맞추기
 export var serverUrl = "http://127.0.0.1:8000/mwla"; 
 //export var serverUrl = "http://172.16.1.109"
 // webport

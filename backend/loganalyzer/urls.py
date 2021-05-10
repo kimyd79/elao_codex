@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# django 직접 접속 필요 : http://127.0.0.1:8000/mwla/admin
 urlpatterns = [
     path('mwla/admin/', admin.site.urls),
     path('', include('loganalyzerapi.urls')),   
