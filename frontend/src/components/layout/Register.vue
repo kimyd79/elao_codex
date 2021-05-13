@@ -82,7 +82,13 @@ export default {
                     //     .catch((err) => {
                     //         console.error(err);
                     //     })
-                    this.$alert("Your account has been successfully created. You are able to login NOW.", "Notification", "success");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Your account has been successfully created. You are able to login NOW.',
+                        icon: 'success',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                     this.$router.push('/');
                 })
                 .catch((err) => {
@@ -92,10 +98,16 @@ export default {
                         // TODO: vue-simple-alert message 줄바꿈 방법 확인 필요.
                         // 우선 error 가 여러개일 경우 마지막 한개만 표시됨.  
                         for (var prop in err.response.data) {
-                            // console.log(prop, err.response.data[prop]); 
-                            errMsg = err.response.data[prop]
+                            console.log(prop, err.response.data[prop]); 
+                            errMsg = errMsg + prop+ " "+err.response.data[prop] + "<br>"
                         }
-                        this.$alert(errMsg, "Notification", "error");
+                        this.$swal({
+                            title: 'Notification',
+                            html: errMsg,
+                            icon: 'error',
+                            confirmButtonColor: '#553ca5',                
+                            confirmButtonText: 'OK',
+                        });
                     } else {
                         console.error(err);
                     }  

@@ -115,24 +115,32 @@ export default {
         deleteData: function (logmastermetric) {
             axios.delete(urlStr + logmastermetric.logmastermetric_id)
                 .then((response) => {
-                    //console.log(response);
                     this.getData(logmastermetric.metric);
                     //this.logmastermetric_lists = null;
                 })
-                .catch((err) => {
-                    console.error(err);  
-                    this.$alert("Delete LogmasterMetric failed. Check for required fields.", "Notification", "error");                  
+                .catch((err) => { 
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Delete LogmasterMetric failed.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });               
                 })
         },
         updateData: function (logmastermetric) {
             axios.put(urlStr + logmastermetric.logmastermetric_id + '/', logmastermetric)
                 .then((response) => {
-                    //console.log(response);
                     this.getData(logmastermetric.metric);
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Update LogmasterMetric failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Update LogmasterMetric failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
         addData(logmastermetric) {
@@ -143,12 +151,16 @@ export default {
 
             axios.post(urlStr, logmastermetric)
                 .then((response) => {
-                    //console.log(response);
                     this.getData(logmastermetric.metric);
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Add LogmasterMetric failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Add LogmasterMetric failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
         clickList: function (logmastermetric_list) {
@@ -161,20 +173,41 @@ export default {
         },
         clickDelete: function () {
             if (this.logmastermetric.logmastermetric_id != '') {
-                this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                    this.deleteData(this.logmastermetric);
-                }).catch(() => {
-                    //console.log("Cancel clicked");
+                this.$swal({
+                    title: 'Are you sure?',
+                    text: "Do you want to DELETE LogmasterMetric?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#553ca5',
+                    cancelButtonColor: '#dddddd',
+                    confirmButtonText: 'OK',
+                    reverseButtons: true,
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.deleteData(this.logmastermetric);
+                    }
                 });
             } else {
-                this.$alert("No LogmasterMetric selected", "Confirm Delete", "error");
+                this.$swal({
+                        title: 'Notification',
+                        html: 'No LogmasterMetric selected',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
             }
         },
         clickUpdate: function () {
             if (this.logmastermetric.logmastermetric_id != '') {
                 this.currentView = 'UpdateLogmasterMetric';
             } else {
-                this.$alert("No LogmasterMetric selected", "Confirm Update", "error");
+                this.$swal({
+                        title: 'Notification',
+                        html: 'No LogmasterMetric selected',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
             }
         },
         clickAdd: function () {

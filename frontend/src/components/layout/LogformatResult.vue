@@ -110,10 +110,8 @@ export default {
 
     methods: {
         getData(format_kind) {
-            //axios.get( 'http://127.0.0.1:8000/logformat/?format_kind='+format_kind)
             axios.get(urlStr + '?format_kind=' + format_kind)
                 .then((response) => {
-                    //console.log(response);
                     this.format_lists = response.data.results;
                     this.selected_format_id = '';
                     this.format.format_id = '';
@@ -127,10 +125,8 @@ export default {
                 })
         },
         getDataOne(id) {
-            //axios.get( 'http://127.0.0.1:8000/logformat/'+id)
             axios.get(urlStr + id)
                 .then((response) => {
-                    //console.log(response);
                     this.format_lists = response.data;
                 })
                 .catch((err) => {
@@ -138,10 +134,8 @@ export default {
                 })
         },
         deleteData(format) {
-            //axios.delete( 'http://127.0.0.1:8000/logformat/'+format.format_id)
             axios.delete(urlStr + format.format_id)
                 .then((response) => {
-                    //console.log(response);
                     this.getData("");
                 })
                 .catch((err) => {
@@ -149,27 +143,35 @@ export default {
                 })
         },
         addData(format) {
-            //axios.post( 'http://127.0.0.1:8000/logformat/', format)
             axios.post(urlStr, format)
                 .then((response) => {
-                    //console.log(response);
                     this.getData("");
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.$alert("Add logformat failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Add logformat failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    }); 
                 })
         },
         updateData(format) {
-            //axios.put('http://127.0.0.1:8000/logformat/'+format.format_id+'/', format)
             axios.put(urlStr + format.format_id + '/', format)
                 .then((response) => {
-                    //console.log(response);
                     this.getData("");
                 })
                 .catch((err) => {
                     console.error(err);
-                    this.$alert("Update logformat failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Update logformat failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });  
                 })
         },
         clickList(format_list) {
@@ -180,20 +182,31 @@ export default {
             this.format.format_strings = format_list.format_strings;
             this.format.creator = format_list.creator;
             EventBus.$emit("searchFormatDetail", format_list.format_kind);
-            //console.log(this.format_kind);
-            //console.log("click ID : " + format_list.format_id);
-
         },
         clickDelete() {
             if (this.format.format_id != '') {
-                 this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                    //console.log("OK clicked");
-                    this.deleteData(this.format);
-                }).catch(() => {
-                    //console.log("Cancel clicked");
+                this.$swal({
+                    title: 'Are you sure?',
+                    text: "Do you want to DELETE Logformat?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#553ca5',
+                    cancelButtonColor: '#dddddd',
+                    confirmButtonText: 'OK',
+                    reverseButtons: true,
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.deleteData(this.format);
+                    }
                 });
             } else {
-                this.$alert("No Logformat selected", "Confirm Update", "error");
+                this.$swal({
+                        title: 'Notification',
+                        html: 'No Logformat selected.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });  
             }
         },
         clickAdd() {
@@ -203,7 +216,13 @@ export default {
             if (this.format.format_id != '') {
                 this.currentView = 'updateLogformatForm';
             } else {
-                this.$alert("No Logformat selected", "Confirm Update", "error");
+                this.$swal({
+                        title: 'Notification',
+                        html: 'No Logformat selected.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });  
             }
         },
     }

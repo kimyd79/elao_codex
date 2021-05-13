@@ -409,12 +409,23 @@ export default {
             var url = serverUrl + "/logformat/"
             axios.post(url, format)
                 .then((response) => {
-                    this.$alert("Add File Format completed..!!", "Notification", "success");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Add File Format completed..!!',
+                        icon: 'success',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                     this.getLogformatList();                    
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Add logformat failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Add File Format failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
 

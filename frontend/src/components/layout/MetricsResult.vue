@@ -96,10 +96,6 @@ export default {
         EventBus.$on("cancelUpdateMetrics", () => {
             this.currentView = null;
         });
-        // EventBus.$on("updateOK", (metric) => {
-        //     this.currentView = null;
-        //     this.currentView = 'UpdateMetrics';
-        // });
         EventBus.$on("updateMetrics", (metric) => {
             this.updateData(metric);
             this.currentView = null;
@@ -112,14 +108,12 @@ export default {
     beforeDestroy(){
         EventBus.$off("searchMetrics");
         EventBus.$off("cancelUpdateMetrics");
-        // EventBus.$off("updateOK");
         EventBus.$off("updateMetrics");
         EventBus.$off("addMetrics");
     },
 
     methods: {
         getData: function (metric_kind) {           
-
 
             var url = "";
 
@@ -131,7 +125,6 @@ export default {
 
             axios.get(url)
                 .then((response) => {
-                    console.log(response);
                     this.metric_lists = response.data.results;
                     this.selected_metric_id = '';
                     this.metric.metric_id = '';
@@ -154,35 +147,47 @@ export default {
         deleteData: function (metric) {
             axios.delete(urlStr + metric.metric_id)
                 .then((response) => {
-                    //console.log(response);
                     this.getData("");
                     EventBus.$emit("searchLogmasterMetric","CLEAR");
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Delete Metrics failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Delete Metrics failed.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
         updateData: function (metric) {
             axios.put(urlStr + metric.metric_id + '/', metric)
                 .then((response) => {
-                    //console.log(response);
                     this.getData("");
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Update Metrics failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Update Metrics failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
         addData(metric) {
             axios.post(urlStr, metric)
                 .then((response) => {
-                    //console.log(response);
                     this.getData("");
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Add Metrics failed. Check for required fields.", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Add Metrics failed. Check for required fields.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
         clickList: function (metric_list) {
@@ -201,27 +206,44 @@ export default {
             this.metric.created = metric_list.created;
             this.$store.dispatch("setMetricId", metric_list.metric_id);
             EventBus.$emit("searchLogmasterMetric", metric_list.metric_id);
-            //console.log(this.metric_name);
-            //console.log("click ID : " + metric_list.metric_id);
-
         },
         clickDelete: function () {
             if (this.metric.metric_id != '') {
-                this.$confirm("Are you sure want to Delete?", "Confirm Delete", "question").then(() => {
-                    //console.log("OK clicked");
-                    this.deleteData(this.metric);
-                }).catch(() => {
-                    //console.log("Cancel clicked");
+                this.$swal({
+                    title: 'Are you sure?',
+                    text: "Do you want to DELETE Logformat?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#553ca5',
+                    cancelButtonColor: '#dddddd',
+                    confirmButtonText: 'OK',
+                    reverseButtons: true,
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.deleteData(this.metric);
+                    }
                 });
             } else {
-                this.$alert("No Metrics selected", "Confirm Delete", "error");
+                this.$swal({
+                        title: 'Notification',
+                        html: 'No Metrics selected',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
             }
         },
         clickUpdate: function () {
             if (this.metric.metric_id != '') {
                 this.currentView = 'UpdateMetrics';
             } else {
-                this.$alert("No Metrics selected", "Confirm Update", "error");
+                this.$swal({
+                        title: 'Notification',
+                        html: 'No Metrics selected',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
             }
         },
         clickAdd: function () {

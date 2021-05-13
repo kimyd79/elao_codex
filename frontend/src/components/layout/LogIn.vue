@@ -83,8 +83,13 @@ export default {
                     this.getUserInfo();
                 })
                 .catch((err) => {
-                    console.error(err);
-                    this.$alert("Login failed. Check your account info", "Notification", "error");
+                    this.$swal({
+                        title: 'Notification',
+                        html: 'Login failed. Check your account info.',
+                        icon: 'error',
+                        confirmButtonColor: '#553ca5',                
+                        confirmButtonText: 'OK',
+                    });
                 })
         },
 
