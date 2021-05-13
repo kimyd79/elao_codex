@@ -41,9 +41,9 @@
                                 <th colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-2</b></th>
                             </tr>
                             <tr>
-                                <th style="width: 100px; color: rgb(85,60,165)"><b>count </b></th>
+                                <th style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
                                 <th style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
-                                <th style="width: 100px; color: rgb(85,60,165)"><b>count </b></th>
+                                <th style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
                                 <th style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
                             </tr>
                         </thead>
@@ -291,11 +291,16 @@ export default {
                 var ratio = ""
                 var result_count = ""
 
-                // 소수 3째자리에서 반올림
-                let pos = Math.pow(10, 3);
-                let val = Math.round((results1[i].result_count / totalCnt1) * pos * 100) / pos;
-                let percentile = val.toFixed(2);
-                ratio = percentile + "%";
+                // 비율값이 없는 조건
+                if( this.statisticsKind == 4 || this.statisticsKind == 10 || this.statisticsKind == 11 ){
+                    ratio = '-'
+                } else {
+                    // 소수 3째자리에서 반올림
+                    let pos = Math.pow(10, 3);
+                    let val = Math.round((results1[i].result_count / totalCnt1) * pos * 100) / pos;
+                    let percentile = val.toFixed(2);
+                    ratio = percentile + "%";
+                }                
 
                 // 숫자 3자리(천단위) 마다 "," 표시
                 result_count = results1[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -319,13 +324,18 @@ export default {
             for (let i = 0; i < results2.length; i++) {
 
                 var ratio = ""
-                var result_count = ""              
-
-                // 소수 3째자리에서 반올림
-                let pos = Math.pow(10, 3);
-                let val = Math.round((results2[i].result_count / totalCnt2) * pos * 100) / pos;
-                let percentile = val.toFixed(2);
-                ratio = percentile + "%";
+                var result_count = ""
+                
+                // 비율값이 없는 조건
+                if( this.statisticsKind == 4 || this.statisticsKind == 10 || this.statisticsKind == 11 ){
+                    ratio = '-'
+                } else {
+                    // 소수 3째자리에서 반올림
+                    let pos = Math.pow(10, 3);
+                    let val = Math.round((results2[i].result_count / totalCnt2) * pos * 100) / pos;
+                    let percentile = val.toFixed(2);
+                    ratio = percentile + "%";
+                }
 
                 // 숫자 3자리(천단위) 마다 "," 표시
                 result_count = results2[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -430,8 +440,15 @@ export default {
                 let request_total1 = this.tmp_res1.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 let request_total2 = this.tmp_res2.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
-                this.subTitle1 = "Total number of requests : " + request_total1 
-                this.subTitle2 = "Total number of requests : " + request_total2
+                if( this.statisticsKind == 8 ){
+                    this.subTitle1 = "Total number of Bytes : " + request_total1 
+                    this.subTitle2 = "Total number of Bytes : " + request_total2
+                } else {
+                    this.subTitle1 = "Total number of Requests : " + request_total1 
+                    this.subTitle2 = "Total number of Requests : " + request_total2
+                }
+
+                
 
                 this.setStatisticItems(this.tmp_res1.data.results, this.tmp_res1.data.totalCnt, this.tmp_res1.data.resultType, this.tmp_res2.data.results, this.tmp_res2.data.totalCnt, this.tmp_res2.data.resultType)
             }
