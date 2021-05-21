@@ -1759,6 +1759,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # 결과 처리
             resultXY = []
+            resultXY2 = []
             result_time_unit = 0            
             resultXY_400 = []
             resultXY_500 = []
@@ -1777,10 +1778,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
 
             # Type1 : 시(HH)기준
-            #   Kind0 : request(요청) 건수(count)
-            #   Kind1 : TPS   
-            #   Kind2 : time-taken(평균처리시간) 
-            #   Kind3 : Status code(4XX, 5XX)
+            #   Kind = 0 : request(요청) 건수(count)
+            #   Kind = 1 : TPS   
+            #   Kind = 2 : time-taken(평균처리시간) 
+            #   Kind = 3 : Status code(4XX, 5XX)
+            #   Kind = 4 : request + time-taken
            
             if type == '1':  
 
@@ -1845,6 +1847,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     hhRequest = queryset.annotate(x=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('x', 'f_status').annotate(y=Count('f_status')).order_by('x')
                     rows = hhRequest.values('x', 'y', 'f_status')
 
+                    # Status code 4XX, 5XX 만 처리함.(Error code) 
                     for row in rows:                              
                         if row['f_status'] == '4':
                             del row['f_status']
@@ -1853,11 +1856,49 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             del row['f_status']
                             resultXY_500.append(row)
 
+                elif(kind == 4):
+                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
+                    # 0: None, 1 : second(%T), 2: microsecond(%D)
+                    time_unit = 0
+                    if file_format.find('%T') != -1:
+                        time_unit = 1 
+                    elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    elif file_format.find('$request_time') != -1:
+                        time_unit = 2
+                    elif file_format.find('time-taken') != -1:
+                        time_unit = 2
+                    
+                    result_time_unit = time_unit
+                                        
+                    if time_unit != 0:
+                        hhRequest = queryset.values('fdate','fhour').order_by('fdate', 'fhour').annotate(x=Concat('fdate', 'fhour'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                        rows = hhRequest.values('x','y','yt')
+                                    
+                        for row in rows: 
+                            # 시간은 초단위로 환산한다.
+                            row['yt'] = round(row['yt']/1000000, 1) if time_unit == 2 else row['yt']
+                            # frequest, ftime_taken dataset 분리
+                            resultXY.append({'x':row['x'], 'y':row['y']})
+                            resultXY2.append({'x':row['x'], 'y':row['yt']})
+                    else:
+                        hhRequest = queryset.values('fdate','fhour').order_by('fdate','fhour').annotate(x=Concat('fdate','fhour'), y=Count('frequest'))
+                        rows = hhRequest.values('x','y')
+                        
+                        for row in rows:
+                            print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            resultXY.append(row)
+                            # resultX.append(row['x'])
+                            # resultY.append(row['y'])
+
             # Type2 : 시분(HHMM)기준 
-            #   Kind0 : request(요청) 건수(count)                      
-            #   Kind1 : TPS  
-            #   Kind2 : time-taken(평균처리시간) 
-            #   Kind3 : Status code(4XX, 5XX)
+            #   Kind = 0 : request(요청) 건수(count)
+            #   Kind = 1 : TPS   
+            #   Kind = 2 : time-taken(평균처리시간) 
+            #   Kind = 3 : Status code(4XX, 5XX)
+            #   Kind = 4 : request + time-taken
             
             elif type == '2':          
                             
@@ -1930,11 +1971,50 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             del row['f_status']
                             resultXY_500.append(row)
 
+                elif(kind == 4):
+                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
+                    # 0: None, 1 : second(%T), 2: microsecond(%D)
+                    time_unit = 0
+                    if file_format.find('%T') != -1:
+                        time_unit = 1 
+                    elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    elif file_format.find('$request_time') != -1:
+                        time_unit = 2
+                    elif file_format.find('time-taken') != -1:
+                        time_unit = 2
+                    
+                    result_time_unit = time_unit
+                                        
+                    if time_unit != 0:
+                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate', 'fhour','fminute').annotate(x=Concat('fdate', 'fhour','fminute'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                        rows = hhmmRequest.values('x','y','yt')
+                                    
+                        for row in rows: 
+                            # 시간은 초단위로 환산한다.
+                            row['yt'] = round(row['yt']/1000000, 1) if time_unit == 2 else row['yt']
+                            # frequest, ftime_taken dataset 분리
+                            resultXY.append({'x':row['x'], 'y':row['y']})
+                            resultXY2.append({'x':row['x'], 'y':row['yt']})
+                            
+                    else:
+                        hhmmRequest = queryset.values('fdate','fhour','fminute').order_by('fdate','fhour','fminute').annotate(x=Concat('fdate','fhour','fminute'), y=Count('frequest'))
+                        rows = hhmmRequest.values('x','y')
+                        
+                        for row in rows:
+                            print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            resultXY.append(row)
+                            # resultX.append(row['x'])
+                            # resultY.append(row['y'])
+
             # Type3 : 시분초(HHMMSS)기준
-            #   Kind0 : request(요청) 건수(count)                     
-            #   Kind1 : TPS  
-            #   Kind2 : time-taken(평균처리시간) 
-            #   Kind3 : Status code(4XX, 5XX)
+            #   Kind = 0 : request(요청) 건수(count)
+            #   Kind = 1 : TPS   
+            #   Kind = 2 : time-taken(평균처리시간) 
+            #   Kind = 3 : Status code(4XX, 5XX)
+            #   Kind = 4 : request + time-taken
               
             elif type == '3':          
                 
@@ -1994,9 +2074,46 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             resultXY_400.append(row)
                         elif row['f_status'] == '5':
                             del row['f_status']
-                            resultXY_500.append(row)            
+                            resultXY_500.append(row)   
+
+                elif(kind == 4):
+                    # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
+                    # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
+                    file_format = LogFile.objects.get(logfile_id=list_logfile_id[0]).file_format
+                    # 0: None, 1 : second(%T), 2: microsecond(%D)
+                    time_unit = 0
+                    if file_format.find('%T') != -1:
+                        time_unit = 1 
+                    elif file_format.find('%D') != -1:
+                        time_unit = 2
+                    elif file_format.find('$request_time') != -1:
+                        time_unit = 2
+                    elif file_format.find('time-taken') != -1:
+                        time_unit = 2
                     
-            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500}        
+                    result_time_unit = time_unit
+                                        
+                    if time_unit != 0:
+                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate', 'fhour','fminute','fsecond').annotate(x=Concat('fdate', 'fhour','fminute','fsecond'), y=Count('frequest'), yt=Avg('ftime_taken'))
+                        rows = hhmmssRequest.values('x','y','yt')
+                                    
+                        for row in rows: 
+                            # 시간은 초단위로 환산한다.
+                            row['yt'] = round(row['yt']/1000000, 1) if time_unit == 2 else row['yt']
+                            # frequest, ftime_taken dataset 분리
+                            resultXY.append({'x':row['x'], 'y':row['y']})
+                            resultXY2.append({'x':row['x'], 'y':row['yt']})
+                    else:
+                        hhmmssRequest = queryset.values('fdate','fhour','fminute','fsecond').order_by('fdate','fhour','fminute','fsecond').annotate(x=Concat('fdate','fhour','fminute','fsecond'), y=Count('frequest'))
+                        rows = hhmmssRequest.values('x','y')
+                        
+                        for row in rows:
+                            print("type3, kind3 : request(요청) 건수(count) x - ",row['x'])
+                            resultXY.append(row)
+                            # resultX.append(row['x'])
+                            # resultY.append(row['y'])         
+                    
+            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500, 'resultXY2': resultXY2}        
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:

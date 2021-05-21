@@ -355,17 +355,20 @@ export function getLineChartDataDiff(kind = 1, timeCondition, project_id, filter
             // kind = 1 : TPS
             // kind = 2 : timeTaken  
             // kind = 3 : status 
-            
+            // kind = 4 : request + timeTaken            
 
             if (kind == 0 || kind == 1 ) {
                 res.xy = res.data.resultXY
             } else if (kind == 2) {
                 res.xy = res.data.resultXY
                 res.time_unit = res.data.resultY_time_unit
-            }else if (kind == 3) {
+            } else if (kind == 3) {
                 res.xy_400 = res.data.resultXY_400
                 res.xy_500 = res.data.resultXY_500
-            } 
+            } else if (kind == 4) {
+                res.xy = res.data.resultXY
+                res.xy2 = res.data.resultXY2
+            }
 
             return res
         })
@@ -919,6 +922,48 @@ export function getMultiLineChartTemplateStatusDiff(label1, xy1, label2, xy2, la
     return chartData;
 }
 
+export function getMultiLineChartTemplate2Diff(label1, xy1, label2, xy2, label3, xy3, label4, xy4) {
+
+    var chartData = {
+
+        datasets: [{
+            label: label1,
+            fill: false,
+            backgroundColor: 'rgb(188, 207, 229)',
+            borderColor: 'rgb(188, 207, 229)',
+            data: xy1,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label2,
+            fill: false,
+            backgroundColor: 'rgb(204, 157, 180)',
+            borderColor: 'rgb(194, 157, 180)',
+            data: xy2,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-2"
+        },{
+            label: label3,
+            fill: false,
+            backgroundColor: 'rgb(86, 118, 154)',
+            borderColor: 'rgb(86, 118, 154)',
+            data: xy3,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        },{
+            label: label4,
+            fill: false,
+            backgroundColor: 'rgb(185, 76, 104)',
+            borderColor: 'rgb(185, 76, 104)',
+            data: xy4,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-2"
+        }]
+    }
+    
+    return chartData;
+}
+
 export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_max2, y_label, y_max_request) { 
 
     var options = {
@@ -941,7 +986,7 @@ export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_ma
 
                 scaleLabel: {
                     display: true,
-                    labelString: 'Date/Time1'
+                    labelString: 'Date/Time(Search-1)'
                 },
                 ticks: {    // YYYYMMDDHHmmss
                     min: x_min1,
@@ -956,7 +1001,7 @@ export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_ma
 
                 scaleLabel: {
                     display: true,
-                    labelString: 'Date/Time2'
+                    labelString: 'Date/Time(Search-2)'
                 },
                 ticks: {    // YYYYMMDDHHmmss
                     min: x_min2,
@@ -973,6 +1018,91 @@ export function getMultiLineChartOptionsDiff(title, x_min1, x_max1, x_min2, x_ma
                 scaleLabel: {
                     display: true,
                     labelString: y_label
+                },
+                ticks: { 
+                    suggestedMin: 0,
+                    suggestedMax: y_max_request
+                    // min: 0,
+                    // max: 
+                }
+            }]
+        },
+
+        plugins: zoom_plugin_config,
+    }
+
+    return options;
+}
+
+export function getMultiLineChartOptions2Diff(title, x_min1, x_max1, x_min2, x_max2, y_label1,  y_label2, y_max_request) { 
+
+    var options = {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        title: {
+            display: true,
+            text: title,
+            fontStyle: 'bold',
+            fontColor: 'rgb(85,60,165)',
+            fontSize: 18,
+            padding: 20,
+        },
+        scales:{
+            xAxes: [{
+                type: 'time',
+                time: zoomTimeOption,
+                position: 'bottom',
+
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date/Time(Search-1)'
+                },
+                ticks: {    // YYYYMMDDHHmmss
+                    min: x_min1,
+                    max: x_max1
+               },
+               id: "x-axis-1",
+            }
+            ,{
+                type: 'time',
+                time: zoomTimeOption,
+                position: 'top',
+
+                scaleLabel: {
+                    display: true,
+                    labelString: 'Date/Time(Search-2)'
+                },
+                ticks: {    // YYYYMMDDHHmmss
+                    min: x_min2,
+                    max: x_max2
+                },
+                id: "x-axis-2",
+            }]
+            ,yAxes:[{
+                type: 'linear',
+                display: true,
+                position: 'left',
+                id: "y-axis-1",
+                scaleLabel: {
+                    display: true,
+                    labelString: y_label1
+                },
+                ticks: { 
+                    suggestedMin: 0,
+                    suggestedMax: y_max_request
+                    // min: 0,
+                    // max: 
+                }
+            }
+            ,{
+                type: 'linear',
+                display: true,
+                position: 'right',
+                id: "y-axis-2",
+                scaleLabel: {
+                    display: true,
+                    labelString: y_label2
                 },
                 ticks: { 
                     suggestedMin: 0,
