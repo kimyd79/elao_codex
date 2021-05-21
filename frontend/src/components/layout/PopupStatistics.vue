@@ -4,8 +4,8 @@
       <ui-container-box :columns=14 vertical class="modal-container">
 
         <div class="popup-header">
-            <div class="popup-header__title"> 
-                Statistic Differences : {{ this.content }}              
+            <div class="popup-header__title">
+                Statistic Differences : {{ this.content }}
             </div>
             <div class="popup-header__close">
                 <lego-icon small v-on:click="clickClose">close</lego-icon>
@@ -19,9 +19,9 @@
    
                     <ui-form-item :columns="70" align-left >
                         <span style="color:#553ca5"> <b>* Search-1</b><br>
-                        <span style="color:gray"> {{ this.subTitle1 }}</span><br><br> 
+                        <span style="color:gray"> {{ this.subTitle1 }}<br>{{ this.dateTime1 }}</span><br> 
                         <b>* Search-2</b><br>
-                        <span style="color:gray">{{ this.subTitle2 }}</span></span>
+                        <span style="color:gray">{{ this.subTitle2 }}<br>{{ this.dateTime2 }}</span></span>
                     </ui-form-item> 
                 
             </ui-container-box>
@@ -35,16 +35,16 @@
                     <table class="page-summary-table">
                         <thead>
                             <tr>
-                                <th rowspan="2" style="width: 60px; color: rgb(85,60,165)"><b>{{ this.TopN }}</b></th>
-                                <th rowspan="2" style="width: 580px; color: rgb(85,60,165)"><b>{{ this.content }}</b></th>
-                                <th colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-1 </b></th>
-                                <th colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-2</b></th>
+                                <th class="sticky-th" rowspan="2" style="width: 60px; color: rgb(85,60,165)"><b>{{ this.TopN }}</b></th>
+                                <th class="sticky-th" rowspan="2" style="width: 580px; color: rgb(85,60,165)"><b>{{ this.content }}</b></th>
+                                <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-1 </b></th>
+                                <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-2</b></th>
                             </tr>
                             <tr>
-                                <th style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
-                                <th style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
-                                <th style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
-                                <th style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
+                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
+                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
+                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
+                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,6 +108,8 @@ export default {
             title: ' URI at TPS peak',
             subTitle1: '...',
             subTitle2: '...',
+            dateTime1: '...',
+            dateTime2: '...',
             TopN: '',
             content: '',
             tmp_res1: [],
@@ -144,6 +146,13 @@ export default {
         this.logfile_id = this.$store.state.logFileID
         this.project_id = this.$store.state.projectID
         this.getStatistics();
+
+        let search1_datetime1 = this.dateFromValue.substr(0,4)+"/"+this.dateFromValue.substr(4,2)+"/"+this.dateFromValue.substr(6,2)+" "+this.timeFromValue.substr(0,2)+":"+this.timeFromValue.substr(2,2)+":"+this.timeFromValue.substr(4,2)
+        let search1_datetime2 = this.dateToValue.substr(0,4)+"/"+this.dateToValue.substr(4,2)+"/"+this.dateToValue.substr(6,2)+" "+this.timeToValue.substr(0,2)+":"+this.timeToValue.substr(2,2)+":"+this.timeToValue.substr(4,2)
+        let search2_datetime1 = this.dateFromValue2.substr(0,4)+"/"+this.dateFromValue2.substr(4,2)+"/"+this.dateFromValue2.substr(6,2)+" "+this.timeFromValue2.substr(0,2)+":"+this.timeFromValue2.substr(2,2)+":"+this.timeFromValue2.substr(4,2)
+        let search2_datetime2 = this.dateToValue2.substr(0,4)+"/"+this.dateToValue2.substr(4,2)+"/"+this.dateToValue2.substr(6,2)+" "+this.timeToValue2.substr(0,2)+":"+this.timeToValue2.substr(2,2)+":"+this.timeToValue2.substr(4,2)
+        this.dateTime1 = "Date/Time : " + search1_datetime1 + " ~ " + search1_datetime2
+        this.dateTime2 = "Date/Time : " + search2_datetime1 + " ~ " + search2_datetime2
     },
     computed: {
         ...mapGetters({
@@ -274,10 +283,10 @@ export default {
         getDetail2(result) {
             this.$store.state.popupKind = 'Statistics';
             this.$store.state.popupHeader = 'Statistics Detail';
-            this.$store.state.detailcondition2 = this.statisticsKind;
-            this.$store.state.detailsearchKeyword2 = result;
+            this.$store.state.detailcondition = this.statisticsKind;
+            this.$store.state.detailsearchKeyword = result;
             this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
-            this.$store.state.popupButton = 'Close';            
+            this.$store.state.popupButton = 'Close';
             this.currentView = 'DetailPopup2';
         },
 
@@ -378,6 +387,7 @@ export default {
 
             this.TopN = "Top " + this.statisticsRow
             this.content = commonInfo.content
+            // this.$store.dispatch("detailsearchKeyword", userName)
 
             // Start Loading Spinner
             this.isActiveStatistic = true
@@ -583,6 +593,30 @@ export default {
 .add_scroll {
     max-height: 280px;
     overflow-y: auto;
+}
+
+.page-summary-table {
+    border-spacing: 0;
+    width: 100%;
+    height: 20px;
+    overflow: auto;
+}
+
+.page-summary-table th, td {
+    height: 25px;
+    border-right: 1px solid lightgray;
+}
+
+.sticky-th {
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+}
+
+.sticky-th-two {
+    position: sticky;
+    top: 25px;
+    z-index: 1;
 }
 
 </style>

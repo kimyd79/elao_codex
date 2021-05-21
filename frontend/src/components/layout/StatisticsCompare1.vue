@@ -124,8 +124,8 @@ export default {
 
             for (let i = 0; i < results.length; i++) {
 
-                var ratio = ""                
-                
+                var ratio = ""
+
                 // fbyte 부분도 % 포함 (기존 : && resultType != '8' && resultType != '10')
                 // fbyte average는 %에서 의미 찾기가 어려움
                 if (resultType != '4' && resultType != '10' && resultType != '11') {
@@ -186,7 +186,6 @@ export default {
 
             axios.post(commonInfo.url, commonInfo.postData, commonInfo.axiosConfig)
                 .then(res => {
-                    //console.log(res)                    
                     this.setItems(res.data.results, res.data.totalCnt, res.data.resultType);
                     //Stop Loading Spinner
                     this.isActive = false

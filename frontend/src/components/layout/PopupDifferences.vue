@@ -442,7 +442,6 @@ export default {
             this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
             this.$store.state.popupButton = 'Close';
             this.$store.state.popupDate = date;
-            this.$store.state.popupDiffId = id;
             if(date != '') this.currentView = 'DetailPopup';
         },
 

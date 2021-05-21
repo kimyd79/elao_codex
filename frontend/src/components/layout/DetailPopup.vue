@@ -158,7 +158,7 @@ export default {
                     key: "byte",
                     sortable: false,
                     filtable: false,
-                    alignRight: false,
+                    alignRight: true,
                     width: 10
                 },
                 {
@@ -166,7 +166,7 @@ export default {
                     key: "timetaken",
                     sortable: false,
                     filtable: false,
-                    alignRight: false,
+                    alignRight: true,
                     width: 10
                 },
             ],
@@ -193,18 +193,6 @@ export default {
 
         ttFromValue: "getFromTimeTaken",
         ttToValue: "getToTimeTaken",
-
-        dateFromValue2: "getFromDate2",
-        dateToValue2: "getToDate2",
-        timeFromValue2: "getFromTime2",
-        timeToValue2: "getToTime2",
-
-        conditionValue2: "getCondition2",
-        searchValue2: "getSearchKeyword2",
-        excludeSearch2: "getExcludeSearch2",
-
-        ttFromValue2: "getFromTimeTaken2",
-        ttToValue2: "getToTimeTaken2",
 
         projectID: "getProjectID",
 
@@ -260,10 +248,9 @@ export default {
                     referrer: freferrer,
                     useragent: fuser_agent,
                     status: results[i].fstatus,
-                    byte: results[i].fbyte,
+                    byte: results[i].fbyte.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
                     // 숫자 3자리(천단위) 마다 "," 표시
                     timetaken: results[i].ftime_taken.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-                    isSelected: false,
                     logline: results[i].log_line,
                     viewname: 'detail'
 
@@ -290,6 +277,7 @@ export default {
                 case 4:
                     this.$store.state.popupHeader = "Requests Time-taken (s/㎲)"
                     this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 5:
                     this.$store.state.popupHeader = "Visitors (count)"
@@ -306,6 +294,7 @@ export default {
                 case 8:
                     this.$store.state.popupHeader = "Requests URI (Total Bytes)"
                     this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 9:
                     this.$store.state.popupHeader = "Static files (count)"
@@ -314,56 +303,59 @@ export default {
                 case 10:
                     this.$store.state.popupHeader = "Requests URI (Average Bytes)"
                     this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 11:
                     this.$store.state.popupHeader = "Requests Average Time-taken (s/㎲)"
                     this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 12:
                     this.$store.state.popupHeader = "Static file Names (count)"
                     this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 13:
                     this.$store.state.popupHeader = "Upstream Info (count, K8S Ingress)";
                     this.$store.state.detailcondition = "V1"
                     break;
                 case 14:
-                    this.$store.state.popupHeader = "Domains (count, K8S Ingress)";    
-                    this.$store.state.detailcondition = "V2"        
+                    this.$store.state.popupHeader = "Domains (count, K8S Ingress)";
+                    this.$store.state.detailcondition = "V2"
                     break;
                 // case 30:
-                //     this.$store.state.popupHeader = "Total Number of Requests (count)";    
-                //     this.$store.state.detailcondition = "R"                
+                //     this.$store.state.popupHeader = "Total Number of Requests (count)";
+                //     this.$store.state.detailcondition = "R"
                 //     break;
                 case 31:
-                    this.$store.state.popupHeader = "Requests URI (count)";    
-                    this.$store.state.detailcondition = "R"     
+                    this.$store.state.popupHeader = "Requests URI (count)";
+                    this.$store.state.detailcondition = "R"
                     this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 32:
-                    this.$store.state.popupHeader = "Visitors (count)";    
-                    this.$store.state.detailcondition = "I"        
+                    this.$store.state.popupHeader = "Visitors (count)";
+                    this.$store.state.detailcondition = "I"
                     break;
                 case 33:
-                    this.$store.state.popupHeader = "Requests URI (count)";    
-                    this.$store.state.detailcondition = "R" 
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)          
+                    this.$store.state.popupHeader = "Requests URI (count)";
+                    this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
                     break;
                 case 34:
-                    this.$store.state.popupHeader = "Visitors (count)";    
-                    this.$store.state.detailcondition = "I"         
+                    this.$store.state.popupHeader = "Visitors (count)";
+                    this.$store.state.detailcondition = "I"
                     break;
                 case 35:
-                    this.$store.state.popupHeader = "Requests URI (count)"; 
-                    this.$store.state.detailcondition = "R" 
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword) 
-                    this.statusYN = "Y"            
+                    this.$store.state.popupHeader = "Requests URI (count)";
+                    this.$store.state.detailcondition = "R"
+                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.statusYN = "Y"
                     break;
                 case 36:
-                    this.$store.state.popupHeader = "Visitors (count)";    
-                    this.$store.state.detailcondition = "I"  
-                    this.statusYN = "Y"          
-                    break;                         
+                    this.$store.state.popupHeader = "Visitors (count)";
+                    this.$store.state.detailcondition = "I"
+                    this.statusYN = "Y"
+                    break;
                 default:
             }
         },
@@ -421,12 +413,7 @@ export default {
 
             let dateValueTmp = this.$store.state.popupDate.substring(0,8);
             let timeValueTmp =  this.$store.state.popupDate.substring(8,12);
-            let filters;
-            if(this.$store.state.popupDiffId == '1'){
-                filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)      
-            } else if (this.$store.state.popupDiffId == '2'){
-                filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue2, this.searchValue2, this.ttFromValue2, this.ttToValue2, this.projectID, this.excludeSearch2, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)
-            }
+            let filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -591,7 +578,7 @@ export default {
             this.getFindingLogDetails();
         } else if (this.$store.state.popupKind == 'Differences') {
                 this.getStatisticsLogDetailsDiff();
-            }
+        }
     },
 
     watch: {

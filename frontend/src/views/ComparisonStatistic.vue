@@ -42,53 +42,53 @@
 
         <ui-container-box :columns="10" vertical>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(2)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(2)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <!-- TODO: this.logFormat[0] -> 동일하게 1개만 우선, 단, 여러개 일때 처리 필요 -->
 
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="2"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(5)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(5)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="5"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(4)" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(4)" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="4" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(11)" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(11)" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="11" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(1)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(1)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="1"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(3)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(3)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="3"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(8)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(8)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="8"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(10)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(10)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="10"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(12)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(12)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="12"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(9)" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(9)" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="9"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(6)" v-if="this.logFormat[0].indexOf('Referer')!=-1" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(6)" v-if="this.logFormat[0].indexOf('Referer')!=-1" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="6" v-if="this.logFormat[0].indexOf('Referer')!=-1"></statistics-compare1>
             <ui-form-row align-left >
-                <lego-button  v-on:click="PopupStatisticsKind(7)" v-if="this.logFormat[0].indexOf('User-Agent')!=-1" small main>PopupStatistics</lego-button>
+                <lego-button  v-on:click="PopupStatisticsKind(7)" v-if="this.logFormat[0].indexOf('User-Agent')!=-1" small main>ComparePopup</lego-button>
             </ui-form-row>
             <statistics-compare1 :statisticsRow="valueN1" :statisticsKind="7" v-if="this.logFormat[0].indexOf('User-Agent')!=-1"></statistics-compare1>
         </ui-container-box>

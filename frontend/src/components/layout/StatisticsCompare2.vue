@@ -37,7 +37,7 @@ import {
     mapGetters
 } from "vuex";
 import VueElementLoading from 'vue-element-loading'
-import DetailPopup from './DetailPopup';
+import DetailPopup2 from './DetailPopup2';
 import {
     serverUrl,
     setCommonStatisticInfo,
@@ -50,7 +50,7 @@ export default {
     components: {
 
         VueElementLoading,
-        DetailPopup,
+        DetailPopup2,
     },
 
     data: function () {
@@ -91,7 +91,7 @@ export default {
 
         ttFromValue: "getFromTimeTaken2",
         ttToValue: "getToTimeTaken2",
-        
+
         project_id: "getProjectID",
 
     }),
@@ -115,7 +115,7 @@ export default {
             this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
             this.$store.state.popupButton = 'Close';
             //console.log(this.items)
-            this.currentView = 'DetailPopup';
+            this.currentView = 'DetailPopup2';
         },
 
         setItems(results, totalCnt, resultType) {
