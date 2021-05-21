@@ -16,6 +16,7 @@
     </ui-container-box>
 
     <ui-container-box :columns="20" vertical align-left class="page-form-area_no_border_top">
+        <component :is="currentView" v-on:popupClose="currentView=null" :kind="kind"></component>
 
         <span class="page-title__2label">Charts</span>
 
@@ -74,6 +75,7 @@
             <vue-element-loading :active="isActiveLine1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(1)" small>resetZoom</lego-button>
             <lego-button @click="setScaleY(1)" small>setScaleY</lego-button>
+            <lego-button @click="PopupChartKind(1)" small main>ComparePopup</lego-button>
             <chart-line ref="lChart1" :chart-data="lChartData1" :options="lOptions1" :width="800" :height="400"></chart-line>
         </div>
         <!-- search2 -->
@@ -92,6 +94,7 @@
             <lego-button @click="resetZoom(2)" small>resetZoom</lego-button>
             <lego-button @click="setScaleY(2, 0)" small>setScaleY_L</lego-button>
             <lego-button @click="setScaleY(2, 1)" small main>setScaleY_R</lego-button>
+            <lego-button @click="PopupChartKind(4)" small main>ComparePopup</lego-button>
             <chart-line ref="mlChart1" :chart-data="mlChartData1" :options="mlOptions1" :width="800" :height="400"></chart-line>
         </div>
         <!-- search2 -->
@@ -110,6 +113,7 @@
             <vue-element-loading :active="isActiveStackedBar1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(3)" small>resetZoom</lego-button>
             <lego-button @click="setScaleY(3)" small>setScaleY</lego-button>
+            <lego-button @click="PopupChartKind(3)" small main>ComparePopup</lego-button>
             <chart-stacked-bar ref="sbChart1" :chart-data="sbChartData1" :options="sbOptions1" :width="800" :height="400"></chart-stacked-bar>
         </div>
         <!-- search2 -->
@@ -201,6 +205,7 @@ import Search from "@/components/layout/Search";
 import SearchCompare1 from "@/components/layout/SearchCompare1";
 import SearchCompare2 from "@/components/layout/SearchCompare2";
 import Statistics from "@/components/layout/Statistics";
+import PopupChart from '@/components/layout/PopupChart';
 
 import {
     serverUrl
@@ -244,7 +249,8 @@ export default {
         ChartBar,
         ChartPie,
         ChartStackedBar,
-        VueElementLoading
+        VueElementLoading,
+        PopupChart
     },
     data() {
         return {
@@ -298,6 +304,8 @@ export default {
             isActivePie5_2: false,
             isActivePieExtension2: false,
 
+            currentView: null,
+            kind: '',
         }
 
     },
@@ -364,6 +372,11 @@ export default {
         }),
     },
     methods: {
+
+        PopupChartKind(kind){
+            this.kind = kind
+            this.currentView = 'PopupChart';
+        },
 
         async setScaleY(chart, direction) { // direction 0 : left, 1 : right
 
