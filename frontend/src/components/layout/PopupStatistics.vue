@@ -11,18 +11,23 @@
                 <lego-icon small v-on:click="clickClose">close</lego-icon>
             </div>
 
-            <ui-container-box :columns="13" horizontal align-center class="page-form-area">
+            <ui-container-box :columns="13" horizontal align-center class="page-form-area" >
 
-                    <ui-form-item :columns="70" label="Select N" align-left>
-                        <lego-dropdown :items="listN" v-model="statisticsRow" width="100px" />
-                    </ui-form-item>
-   
-                    <ui-form-item :columns="70" align-left >
-                        <span style="color:#553ca5"> <b>* Search-1</b><br>
-                        <span style="color:gray"> {{ this.subTitle1 }}<br>{{ this.dateTime1 }}</span><br> 
-                        <b>* Search-2</b><br>
-                        <span style="color:gray">{{ this.subTitle2 }}<br>{{ this.dateTime2 }}</span></span>
-                    </ui-form-item> 
+                <div><b>* Select N</b></div>
+                <lego-dropdown :items="listN" v-model="statisticsRow" width="100px" align-left/>
+
+                <div class="table-summary" >
+                    <div class="table-summary-items" >
+                        <div style="color:#553ca5"><b>* Search-1</b></div>
+                        <div>{{ this.subTitle1 }}</div>
+                        <div>{{ this.dateTime1 }}</div>
+                    </div>
+                    <div class="table-summary-items" >
+                        <div style="color:#553ca5"><b>* Search-2</b></div>
+                        <div>{{ this.subTitle2 }}</div>
+                        <div>{{ this.dateTime2 }}</div>
+                    </div>                        
+                </div> 
                 
             </ui-container-box>
         </div>
@@ -41,9 +46,9 @@
                                 <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-2</b></th>
                             </tr>
                             <tr>
-                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
+                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>{{ this.result }}</b></th>
                                 <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
-                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>result</b></th>
+                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>{{ this.result }}</b></th>
                                 <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
                             </tr>
                         </thead>
@@ -112,6 +117,7 @@ export default {
             dateTime2: '...',
             TopN: '',
             content: '',
+            result: '',
             tmp_res1: [],
             tmp_res2: [], 
             timetakenUnit: "",
@@ -387,6 +393,7 @@ export default {
 
             this.TopN = "Top " + this.statisticsRow
             this.content = commonInfo.content
+            this.result = commonInfo.content.match(/\((.*?)\)/)[0].replaceAll(/\(|\)/g, "")
             // this.$store.dispatch("detailsearchKeyword", userName)
 
             // Start Loading Spinner
@@ -475,7 +482,7 @@ export default {
     align-items: center;
 
     font-size: 14px;
-    padding: 12px 48px;
+    padding: 10px 20px 10px 0px;
     background-color: #F6F6F6;
 }
 .table-summary-title {
@@ -487,9 +494,14 @@ export default {
     display: flex;
     flex-flow: column nowrap;
     align-items: flex-end;
+    text-align: left;
 }
-.table-summary-item + .table-summary-item {
-    margin-left: 48px;
+.table-summary-items {
+    display: flex;
+    flex-flow: column nowrap;
+    margin-left: 20px;
+    text-align: left;
+    width: 380px
 }
 
 .popup-container {
@@ -502,6 +514,8 @@ export default {
     position: relative;
     display: flex;
     flex-flow: column nowrap;
+    margin-top: 0px;
+    margin-bottom: 0px;
 
 }
 
@@ -533,7 +547,9 @@ export default {
 }
 
 .popup-form .ui-form-item {
-    margin-top: 32px;
+    /* margin-top: 32px; */
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 .modal-mask {
@@ -591,7 +607,7 @@ export default {
 }
 
 .add_scroll {
-    max-height: 280px;
+    max-height: 700px;
     overflow-y: auto;
 }
 
@@ -617,6 +633,11 @@ export default {
     position: sticky;
     top: 25px;
     z-index: 1;
+}
+
+.page-form-area {
+    padding: 10px 0;
+    border-bottom: 1px solid #CCCCCC;
 }
 
 </style>
