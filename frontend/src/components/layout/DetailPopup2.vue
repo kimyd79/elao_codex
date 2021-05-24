@@ -405,48 +405,6 @@ export default {
                 });
         },
 
-        getStatisticsLogDetailsDiff() {
-
-            let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
-
-            this.getDetailCondition();
-
-            let dateValueTmp = this.$store.state.popupDate.substring(0,8);
-            let timeValueTmp =  this.$store.state.popupDate.substring(8,12);
-            let filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)
-
-            var urlstring =
-                serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
-
-            // TODO : Set axiosConfig to set headers
-            //let axiosConfig = {
-            //  headers: {
-            //    'Authorization': 'Token '+ this.token // For Django
-            //  }
-            //};
-
-            // TODO : Set GET parametes, ex) /logdetail/?limit=10&offset=20
-
-            // Start Loading Spinner
-            this.isActive = true
-
-            axios
-                .get(urlstring)
-                .then(res => {
-                    this.pagingInfo.totalItems = res.data.count;
-                    //console.log(res.data.results)
-
-                    this.setItemList(res.data.results);
-                    // Stop Loading Spinner
-                    this.isActive = false
-                })
-                .catch(err => {
-                    console.error(err);
-                    // Stop Loading Spinner
-                    this.isActive = false
-                });
-        },
-
         getFindingDetailCondition() {
 
             if (this.$store.state.detailcondition2 == 'fstatus') {
@@ -550,8 +508,6 @@ export default {
                 });
         },
 
-
-
         pageChange(page) {
             //console.log(page);
             this.pagingInfo.currentPage = page;
@@ -559,13 +515,10 @@ export default {
                 this.getStatisticsLogDetails();
             } else if (this.$store.state.popupKind == 'FindingsDetail2') {
                 this.getFindingLogDetails();
-            } else if (this.$store.state.popupKind == 'Differences') {
-                this.getStatisticsLogDetailsDiff();
             }
         },
 
         clickClose: function () {
-            //("click Popup Close/Cancel Button");
             this.$emit('popupClose');
             //EventBus.$emit("cancel");
         },
@@ -576,8 +529,6 @@ export default {
             this.getStatisticsLogDetails();
         } else if (this.$store.state.popupKind == 'FindingsDetail2') {
             this.getFindingLogDetails();
-        } else if (this.$store.state.popupKind == 'Differences') {
-                this.getStatisticsLogDetailsDiff();
         }
     },
 
@@ -587,8 +538,6 @@ export default {
                 this.getStatisticsLogDetails();
             } else if (this.$store.state.popupKind == 'FindingsDetail2') {
                 this.getFindingLogDetails();
-            } else if (this.$store.state.popupKind == 'Differences') {
-                this.getStatisticsLogDetailsDiff();
             }
         }
     }

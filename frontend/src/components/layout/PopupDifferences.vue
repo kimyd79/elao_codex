@@ -16,16 +16,21 @@
 
             <ui-container-box :columns="13" horizontal align-center class="page-form-area">
 
-                    <ui-form-item :columns="70" label="Select N" align-left>
-                        <lego-dropdown :items="listN" v-model="statisticsRow" width="100px" />
-                    </ui-form-item>
-   
-                    <ui-form-item :columns="70" align-left >
-                        <span style="color:#553ca5"> <b>* Search-1</b><br>
-                        <span style="color:gray"> {{ this.subTitle1 }}</span><br><br> 
-                        <b>* Search-2</b><br>
-                        <span style="color:gray">{{ this.subTitle2 }}</span></span>
-                    </ui-form-item> 
+                     <div><b>* Select N</b></div>
+                    <lego-dropdown :items="listN" v-model="statisticsRow" width="100px" align-left/>
+    
+                    <div class="table-summary" >
+                        <div class="table-summary-items" >
+                            <div style="color:#553ca5"><b>* Search-1</b></div>
+                            <div>{{ this.subTitle1 }}</div>
+                            <div>{{ this.dateTime1 }}</div>
+                        </div>
+                        <div class="table-summary-items" >
+                            <div style="color:#553ca5"><b>* Search-2</b></div>
+                            <div>{{ this.subTitle2 }}</div>
+                            <div>{{ this.dateTime2 }}</div>
+                        </div>                        
+                    </div>
                 
             </ui-container-box>
         </div>
@@ -59,10 +64,10 @@
                                     {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
                                     </VueCustomTooltip>
                                 </td>
-                                <td v-on:click="getDetail(item.result, item.date, '1')"><u>{{ item.result_count }}</u></td>
-                                <td v-on:click="getDetail(item.result, item.date, '1')"><u>{{ item.ratio }}</u></td>
-                                <td v-on:click="getDetail(item.result, item.date2, '2')"><u>{{ item.result_count2 }}</u></td>
-                                <td v-on:click="getDetail(item.result, item.date2, '2')"><u>{{ item.ratio2 }}</u></td>
+                                <td v-on:click="getDetail(item.result, item.date)"><u>{{ item.result_count }}</u></td>
+                                <td v-on:click="getDetail(item.result, item.date)"><u>{{ item.ratio }}</u></td>
+                                <td v-on:click="getDetail(item.result, item.date2)"><u>{{ item.result_count2 }}</u></td>
+                                <td v-on:click="getDetail(item.result, item.date2)"><u>{{ item.ratio2 }}</u></td>
                             </tr>
 
                         </tbody>
@@ -166,6 +171,8 @@ export default {
             title: ' URI at TPS peak',
             subTitle1: '...',
             subTitle2: '...',
+            dateTime1: '...',
+            dateTime2: '...',
             TopN: '',
             content: '',
             tmp_res1: [],
@@ -226,6 +233,14 @@ export default {
         this.differenceKind = "0"
         this.getStatistics();
         this.multilineChartData();
+
+        let search1_datetime1 = this.dateFromValue.substr(0,4)+"/"+this.dateFromValue.substr(4,2)+"/"+this.dateFromValue.substr(6,2)+" "+this.timeFromValue.substr(0,2)+":"+this.timeFromValue.substr(2,2)+":"+this.timeFromValue.substr(4,2)
+        let search1_datetime2 = this.dateToValue.substr(0,4)+"/"+this.dateToValue.substr(4,2)+"/"+this.dateToValue.substr(6,2)+" "+this.timeToValue.substr(0,2)+":"+this.timeToValue.substr(2,2)+":"+this.timeToValue.substr(4,2)
+        let search2_datetime1 = this.dateFromValue2.substr(0,4)+"/"+this.dateFromValue2.substr(4,2)+"/"+this.dateFromValue2.substr(6,2)+" "+this.timeFromValue2.substr(0,2)+":"+this.timeFromValue2.substr(2,2)+":"+this.timeFromValue2.substr(4,2)
+        let search2_datetime2 = this.dateToValue2.substr(0,4)+"/"+this.dateToValue2.substr(4,2)+"/"+this.dateToValue2.substr(6,2)+" "+this.timeToValue2.substr(0,2)+":"+this.timeToValue2.substr(2,2)+":"+this.timeToValue2.substr(4,2)
+        this.dateTime1 = "Date/Time : " + search1_datetime1 + " ~ " + search1_datetime2
+        this.dateTime2 = "Date/Time : " + search2_datetime1 + " ~ " + search2_datetime2
+
     },
     computed: {
         ...mapGetters({
@@ -434,7 +449,7 @@ export default {
             
         },
 
-        getDetail(result, date, id) {
+        getDetail(result, date) {
             this.$store.state.popupKind = 'Differences';
             this.$store.state.popupHeader = 'Differnce Detail';
             this.$store.state.detailcondition = this.statisticsKind;
@@ -746,7 +761,7 @@ export default {
     align-items: center;
 
     font-size: 14px;
-    padding: 12px 48px;
+    padding: 10px 20px 10px 0px;
     background-color: #F6F6F6;
 }
 .table-summary-title {
@@ -758,9 +773,14 @@ export default {
     display: flex;
     flex-flow: column nowrap;
     align-items: flex-end;
+    text-align: left;
 }
-.table-summary-item + .table-summary-item {
-    margin-left: 48px;
+.table-summary-items {
+    display: flex;
+    flex-flow: column nowrap;
+    margin-left: 20px;
+    text-align: left;
+    width: 370px
 }
 
 .popup-container {
@@ -862,8 +882,13 @@ export default {
 }
 
 .add_scroll {
-    max-height: 280px;
+    max-height: 700px;
     overflow-y: auto;
+}
+
+.page-form-area {
+    padding: 10px 0;
+    border-bottom: 1px solid #CCCCCC;
 }
 
 </style>

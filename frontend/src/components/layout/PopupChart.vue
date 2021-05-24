@@ -12,13 +12,19 @@
             </div>
            
             <ui-container-box :columns="13" horizontal align-center class="page-form-area">
-   
-                    <ui-form-item :columns="70" align-left >
-                        <span style="color:#553ca5"> <b>* Search-1</b><br>
-                        <span style="color:gray"> {{ this.subTitle1 }}</span><br><br> 
-                        <b>* Search-2</b><br>
-                        <span style="color:gray">{{ this.subTitle2 }}</span></span>
-                    </ui-form-item> 
+
+                <div class="table-summary">
+                    <div class="table-summary-items">
+                        <div style="color:#553ca5"><b>* Search-1</b></div>
+                        <div>{{ this.subTitle1 }}</div>
+                        <!-- <div>{{ this.dateTime1 }}</div> -->
+                    </div>
+                    <div class="table-summary-items">
+                        <div style="color:#553ca5"><b>* Search-2</b></div>
+                        <div>{{ this.subTitle2 }}</div>
+                        <!-- <div>{{ this.dateTime2 }}</div> -->
+                    </div>                        
+                </div> 
                 
             </ui-container-box>
         </div>
@@ -404,7 +410,7 @@ export default {
     align-items: center;
 
     font-size: 14px;
-    padding: 12px 48px;
+    padding: 10px 20px 10px 0px;
     background-color: #F6F6F6;
 }
 .table-summary-title {
@@ -417,8 +423,12 @@ export default {
     flex-flow: column nowrap;
     align-items: flex-end;
 }
-.table-summary-item + .table-summary-item {
-    margin-left: 48px;
+.table-summary-items {
+    display: flex;
+    flex-flow: column nowrap;
+    margin-left: 20px;
+    text-align: left;
+    width: 380px
 }
 
 .popup-container {
@@ -522,6 +532,11 @@ export default {
 .add_scroll {
     max-height: 280px;
     overflow-y: auto;
+}
+
+.page-form-area {
+    padding: 10px 0;
+    border-bottom: 1px solid #CCCCCC;
 }
 
 </style>
