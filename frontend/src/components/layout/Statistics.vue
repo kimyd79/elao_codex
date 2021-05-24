@@ -15,14 +15,31 @@
                 <tbody>
 
                     <tr v-for="(item, index) in items">
-                        <td>{{ index+1 }}</td>
-                        
-                        <td><VueCustomTooltip :label="item.result">
+                        <td>{{ index+1 }}</td>                        
+
+                        <td v-on:click="getURIList(item.result)">
+                            <VueCustomTooltip :label="item.result">
                             {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
                             </VueCustomTooltip>
                         </td>
+
+                        <!-- <td>
+                            
+                            <span v-if="statisticsKind == 2 || statisticsKind == 3 || statisticsKind == 4 || statisticsKind == 8 || statisticsKind == 10 || statisticsKind == 11 "> 
+                                {{ item.result }}
+                                <lego-dropdown :items="item.result" width="580px" />
+                            </span>
+
+                            <span v-if="statisticsKind != 2 && statisticsKind != 3 &&  statisticsKind != 4 && statisticsKind != 8 && statisticsKind != 10 && statisticsKind != 11 " >
+                                <VueCustomTooltip :label="item.result">
+                                {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
+                                </VueCustomTooltip>
+                            </span>
+                        </td>-->
+                        
                         <td v-on:click="getDetail(item)"><u>{{ item.result_count }}</u> <br> {{ item.ratio }}</td>
                     </tr>
+                    
 
                 </tbody>
             </table>
@@ -69,7 +86,6 @@ export default {
             isActive: false,
 
             currentView: null,
-
         }
     },
 
@@ -138,13 +154,13 @@ export default {
                 }
 
                 // 숫자 3자리(천단위) 마다 "," 표시
-                result_count = results[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-
+                result_count = results[i].result_count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");                
+                
                 this.items.push({
                     result: results[i].result,
                     result_count: result_count,
                     ratio: ratio
-                })
+                });
 
                 if (results[i].timetakenUnit == 'D') {
                     this.timetakenUnit = "( ㎲ )"
@@ -152,6 +168,85 @@ export default {
                     this.timetakenUnit = "( s )"
                 }
             }
+        },
+
+        getURIList(uri) {
+
+            let postData = {
+                filter: this.getFilter(),
+                target_uri: uri
+            };
+
+            let axiosConfig = {
+                headers: {
+                    //'Authorization': 'Token '+ this.token // For Django
+                }
+            };
+
+            let url = serverUrl + "/logdetail_dynamic/uridetail/";
+
+            // Start Loading Spinner
+            this.isActive = true
+
+            axios.post(url, postData, axiosConfig)
+                .then(res => {
+                    
+                    //Stop Loading Spinner
+                    this.isActive = false
+
+                    this.$swal({
+                        title: 'Detailed Count',
+                        html: this.getDetailedHTML(res.data.result),
+                        icon: 'info',
+                        width: 750,
+                        showCancelButton: true,
+                        confirmButtonColor: '#553ca5',
+                        cancelButtonColor: '#dddddd',
+                        confirmButtonText: 'OK',
+                        reverseButtons: true,
+                    });
+                })
+                .catch(err => {
+
+                    console.error("ERROR : "+err);
+                    //Stop Loading Spinner
+                    this.isActive = false
+                })            
+        },
+
+        getDetailedHTML(result){
+
+            var htmlstr_header = `
+                <div style="max-height: 280px; overflow-y: auto;">
+                <table class="page-summary-table" >
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width: 60px; color: rgb(85,60,165)"><b>No</b></th>
+                            <th rowspan="2" style="width: 580px; color: rgb(85,60,165)"><b>Request URI</b></th>
+                            <th rowspan="2" style="width: 100px; color: rgb(85,60,165)"><b>Result</b></th>
+                        </tr>
+                    </thead>
+                        <tbody>`;
+            var htmlstr_body = "";
+
+            for (let i = 0; i < result.length; i++) {
+                htmlstr_body += 
+                    `<tr>
+                        <td>`+(i+1)+`</td>
+                        <td style="text-align: left; word-break: break-all; word-wrap: break-word;">`+(result[i].uri)+`</td>
+                        <td>`+(result[i].uri_cnt)+`</td></tr>`;
+                
+            }
+            
+            var htmlstr_footer = `                            
+                        </tbody>
+                </table>
+                </div>
+            `;
+
+
+
+            return htmlstr_header+htmlstr_body+htmlstr_footer;
         },
 
         getFilter() {
@@ -189,6 +284,7 @@ export default {
                 .then(res => {
                     //console.log(res)
                     this.setItems(res.data.results, res.data.totalCnt, res.data.resultType);
+                    
                     //Stop Loading Spinner
                     this.isActive = false
                 })

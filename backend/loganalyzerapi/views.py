@@ -551,7 +551,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         else:
             return None
 
-
     def getMetricTimeValue(self, metric_unit, metric_time, timetakenUnit):   
         timeValue = 0    
         if timetakenUnit == 'T':      # second
@@ -570,7 +569,55 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             elif metric_unit == 'micros':   
                 timeValue = metric_time / 1000
         return timeValue
-           
+
+    @action(methods=['post'], detail=False)
+    def uridetail(self, request, pk=None):
+        try:
+            
+            target_uri = request.data['target_uri']
+            
+            splitted_uri = target_uri.split(' ')
+            
+            urionly = splitted_uri[1]
+            delimiter_count = urionly.count('/')+urionly.count('?')+urionly.count('&');
+            p = re.compile('[/?&]', re.DOTALL )
+            delimiters = p.findall(urionly)
+            
+            # 검색 조건 적용
+            queryset_tmp = self.get_queryset()
+            
+            # step1 : uri 패턴 추출
+            uri_patters = []
+            startIdx = 0
+            endIdx = 0
+            for pos in range(delimiter_count):
+                
+                kind = delimiters[pos]
+                
+                endIdx = urionly.index(kind, startIdx + endIdx)              
+                endIdx = endIdx+1
+                
+                if pos > 0:
+                    uri_patters.append(urionly[startIdx:endIdx-1])
+
+            uri_patters.append(urionly) 
+                       
+            # step2 : 패턴별 건수 가져오기
+            results = []
+            for uri in uri_patters:
+
+                uri_cnt = queryset_tmp.filter(frequest__icontains=uri).count()
+                results.append({"uri" : uri, "uri_cnt" : format(uri_cnt, ',')})              
+            
+            response = {'message': 'uridetail returned successfully', 'result': results}        
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing uridetail : %s' % ex)
+                    
+            response = {'message': 'uridetail retrieving failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)    
+               
     @action(methods=['post'], detail=False)
     def get_before_after_detail(self, request, pk=None):        
        
