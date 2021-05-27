@@ -262,98 +262,98 @@ export default {
 
             switch (this.$store.state.detailcondition) {
                 case 1:
-                    this.$store.state.popupHeader = "HTTP Status Codes (count)"
-                    this.$store.state.detailcondition = "S"
+                    this.$store.dispatch("setPopupHeader", "HTTP Status Codes (count)");            
+                    this.$store.dispatch("setDetailCondition", "S");
                     break;
                 case 2:
-                    this.$store.state.popupHeader = "Requests URI (count)"
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 3:
-                    this.$store.state.popupHeader = "404 Requests URI (count)"
-                    this.$store.state.detailcondition = "NFR"
+                    this.$store.dispatch("setPopupHeader", "404 Requests URI (count)");            
+                    this.$store.dispatch("setDetailCondition", "NFR");
                     break;
                 case 4:
-                    this.$store.state.popupHeader = "Requests Time-taken (s/㎲)"
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests Time-taken (s/㎲)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 5:
-                    this.$store.state.popupHeader = "Visitors (count)"
-                    this.$store.state.detailcondition = "I"
+                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
+                    this.$store.dispatch("setDetailCondition", "I");
                     break;
                 case 6:
-                    this.$store.state.popupHeader = "Referers (count)"
-                    this.$store.state.detailcondition = "E"
+                    this.$store.dispatch("setPopupHeader", "Referers (count)");            
+                    this.$store.dispatch("setDetailCondition", "E");
                     break;
                 case 7:
-                    this.$store.state.popupHeader = "User Agent (count)"
-                    this.$store.state.detailcondition = "U"
+                    this.$store.dispatch("setPopupHeader", "User Agent (count)");            
+                    this.$store.dispatch("setDetailCondition", "U");
                     break;
                 case 8:
-                    this.$store.state.popupHeader = "Requests URI (Total Bytes)"
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests URI (Total Bytes)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 9:
-                    this.$store.state.popupHeader = "Static files (count)"
-                    this.$store.state.detailcondition = "F"
+                    this.$store.dispatch("setPopupHeader", "Static files (count)");            
+                    this.$store.dispatch("setDetailCondition", "F");
                     break;
                 case 10:
-                    this.$store.state.popupHeader = "Requests URI (Average Bytes)"
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests URI (Average Bytes)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 11:
-                    this.$store.state.popupHeader = "Requests Average Time-taken (s/㎲)"
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests Average Time-taken (s/㎲)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 12:
-                    this.$store.state.popupHeader = "Static file Names (count)"
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Static file Names (count)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 13:
-                    this.$store.state.popupHeader = "Upstream Info (count, K8S Ingress)";
-                    this.$store.state.detailcondition = "V1"
+                    this.$store.dispatch("setPopupHeader", "Upstream Info (count, K8S Ingress)");            
+                    this.$store.dispatch("setDetailCondition", "V1");
                     break;
                 case 14:
-                    this.$store.state.popupHeader = "Domains (count, K8S Ingress)";
-                    this.$store.state.detailcondition = "V2"
+                    this.$store.dispatch("setPopupHeader", "Domains (count, K8S Ingress)");            
+                    this.$store.dispatch("setDetailCondition", "V2");
                     break;
                 // case 30:
                 //     this.$store.state.popupHeader = "Total Number of Requests (count)";
                 //     this.$store.state.detailcondition = "R"
                 //     break;
                 case 31:
-                    this.$store.state.popupHeader = "Requests URI (count)";
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 32:
-                    this.$store.state.popupHeader = "Visitors (count)";
-                    this.$store.state.detailcondition = "I"
+                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
+                    this.$store.dispatch("setDetailCondition", "I");
                     break;
                 case 33:
-                    this.$store.state.popupHeader = "Requests URI (count)";
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     break;
                 case 34:
-                    this.$store.state.popupHeader = "Visitors (count)";
-                    this.$store.state.detailcondition = "I"
+                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
+                    this.$store.dispatch("setDetailCondition", "I");
                     break;
                 case 35:
-                    this.$store.state.popupHeader = "Requests URI (count)";
-                    this.$store.state.detailcondition = "R"
-                    this.$store.state.detailsearchKeyword = encodeURIComponent(this.$store.state.detailsearchKeyword)
+                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
+                    this.$store.dispatch("setDetailCondition", "R");
+                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
                     this.statusYN = "Y"
                     break;
                 case 36:
-                    this.$store.state.popupHeader = "Visitors (count)";
-                    this.$store.state.detailcondition = "I"
+                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
+                    this.$store.dispatch("setDetailCondition", "I");
                     this.statusYN = "Y"
                     break;
                 default:
@@ -418,15 +418,6 @@ export default {
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
 
-            // TODO : Set axiosConfig to set headers
-            //let axiosConfig = {
-            //  headers: {
-            //    'Authorization': 'Token '+ this.token // For Django
-            //  }
-            //};
-
-            // TODO : Set GET parametes, ex) /logdetail/?limit=10&offset=20
-
             // Start Loading Spinner
             this.isActive = true
 
@@ -450,29 +441,21 @@ export default {
         getFindingDetailCondition() {
 
             if (this.$store.state.detailcondition == 'fstatus') {
-                //this.$store.state.popupHeader = "HTTP Status Codes (count)"
-                this.$store.state.detailcondition = "S"
+                this.$store.dispatch("setDetailCondition", "S");
             } else if (this.$store.state.detailcondition == 'frequest') {    
-                // this.$store.state.popupHeader = "Requests URI (count)"
-                this.$store.state.detailcondition = "R"
+                this.$store.dispatch("setDetailCondition", "R");
             } else if (this.$store.state.detailcondition == 'fip') {
-                // this.$store.state.popupHeader = "Visitors (count)"
-                this.$store.state.detailcondition = "I"
+                this.$store.dispatch("setDetailCondition", "I");
             } else if (this.$store.state.detailcondition == 'freferer') {
-                // this.$store.state.popupHeader = "Referers (count)"
-                this.$store.state.detailcondition = "E"
+                this.$store.dispatch("setDetailCondition", "E");
             } else if (this.$store.state.detailcondition == 'fuser_agent') {
-                // this.$store.state.popupHeader = "User Agent (count)"
-                this.$store.state.detailcondition = "U"
+                this.$store.dispatch("setDetailCondition", "U");
             } else if (this.$store.state.detailcondition == 'fextension') {
-                // this.$store.state.popupHeader = "Static files (count)"
-                this.$store.state.detailcondition = "F"
+                this.$store.dispatch("setDetailCondition", "F");
             } else if (this.$store.state.detailcondition == 'freserve1') {
-                // this.$store.state.popupHeader = "Upstream Info (count, K8S Ingress)";
-                this.$store.state.detailcondition = "V1"
+                this.$store.dispatch("setDetailCondition", "V1");
             } else if (this.$store.state.detailcondition == 'freserve2') {
-                // this.$store.state.popupHeader = "Domains (count, K8S Ingress)";    
-                this.$store.state.detailcondition = "V2"        
+                this.$store.dispatch("setDetailCondition", "V2");
             }
         },
 
@@ -550,8 +533,6 @@ export default {
                 });
         },
 
-
-
         pageChange(page) {
             //console.log(page);
             this.pagingInfo.currentPage = page;
@@ -565,7 +546,6 @@ export default {
         },
 
         clickClose: function () {
-            //("click Popup Close/Cancel Button");
             this.$emit('popupClose');
             //EventBus.$emit("cancel");
         },

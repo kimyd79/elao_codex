@@ -16,7 +16,7 @@
             </ui-form-row>
 
             <ui-form-row>
-                <ui-form-item :columns="9" label="Condition">
+                <ui-form-item :columns="8" label="Condition">
                     <lego-dropdown :items="conditions" v-model="conditionValue" />
                     &nbsp;&nbsp;&nbsp;
                     <lego-text-field v-model="searchValue" placeholder="Enter your keyword" searchable />
@@ -26,7 +26,7 @@
             </ui-form-row>
 
             <ui-form-row>
-                <ui-form-item :columns="8" label="TimeTaken">
+                <ui-form-item :columns="9" label="TimeTaken">
                     <lego-text-field v-model="ttFromValue" placeholder="ms" />
                     <lego-text-field v-model="ttToValue" placeholder="ms" />
                     &nbsp;&nbsp;&nbsp;

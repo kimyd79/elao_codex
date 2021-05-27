@@ -190,15 +190,15 @@ export default {
         getMetricDetailSearch(finding, result) {            
             this.finding = finding
             if (result.result == 'count') {
-                this.$store.state.detailsearchKeyword = '';
+                this.$store.dispatch("setDetailSearchKeyword", "");
             } else{
-                this.$store.state.detailsearchKeyword = result.result;                
+                this.$store.dispatch("setDetailSearchKeyword", result.result);
             }
-            this.$store.state.detailcondition = finding.metric_filter;          
-            this.$store.state.popupKind = 'FindingsDetail';
-            this.$store.state.popupHeader = 'Finding Detail';
-            this.$store.state.popupBody = finding.description;
-            this.$store.state.popupButton = 'Close';
+            this.$store.dispatch("setDetailCondition", finding.metric_filter);
+            this.$store.dispatch("setPopupKind", 'FindingsDetail');
+            this.$store.dispatch("setPopupHeader", 'Findings Detail');            
+            this.$store.dispatch("setPopupBody", finding.description);
+            this.$store.dispatch("setPopupButton", 'Close');   
             this.currentView = 'DetailPopup';    
         },
         

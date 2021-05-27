@@ -107,14 +107,12 @@ export default {
         */
 
         getDetail(item) {
-            this.$store.state.popupKind = 'Statistics';
-            this.$store.state.popupHeader = 'Statistics Detail';
-            this.$store.state.detailcondition = this.statisticsKind;
-            this.$store.state.detailsearchKeyword = item.result;
-
-            this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
-            this.$store.state.popupButton = 'Close';
-            //console.log(this.items)
+            this.$store.dispatch("setPopupKind", 'Statistics');
+            this.$store.dispatch("setPopupHeader", 'Statistics Detail');
+            this.$store.dispatch("setDetailCondition", this.statisticsKind);
+            this.$store.dispatch("setDetailSearchKeyword", item.result);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupButton", 'Close');
             this.currentView = 'DetailPopup';
         },
 
