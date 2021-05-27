@@ -354,8 +354,9 @@ export function getLineChartDataDiff(kind = 1, timeCondition, project_id, filter
             // kind = 0 : request 
             // kind = 1 : TPS
             // kind = 2 : timeTaken  
-            // kind = 3 : status 
-            // kind = 4 : request + timeTaken            
+            // kind = 3 : Status code(4XX, 5XX) 
+            // kind = 4 : request + timeTaken
+            // kind = 5 : Status code(2XX, 3XX, 4XX, 5XX)
 
             if (kind == 0 || kind == 1 ) {
                 res.xy = res.data.resultXY
@@ -368,6 +369,11 @@ export function getLineChartDataDiff(kind = 1, timeCondition, project_id, filter
             } else if (kind == 4) {
                 res.xy = res.data.resultXY
                 res.xy2 = res.data.resultXY2
+            } else if (kind == 5) {
+                res.xy_200 = res.data.resultXY_200
+                res.xy_300 = res.data.resultXY_300
+                res.xy_400 = res.data.resultXY_400
+                res.xy_500 = res.data.resultXY_500
             }
 
             return res
@@ -895,7 +901,7 @@ export function getMultiLineChartTemplateStatusDiff(label1, xy1, label2, xy2, la
             label: label2,
             fill: false,
             backgroundColor: 'rgb(204, 157, 180)',
-            borderColor: 'rgb(194, 157, 180)',
+            borderColor: 'rgb(204, 157, 180)',
             data: xy2,
             xAxisID: 'x-axis-1',
             yAxisID: "y-axis-1"
@@ -913,6 +919,80 @@ export function getMultiLineChartTemplateStatusDiff(label1, xy1, label2, xy2, la
             backgroundColor: 'rgb(185, 76, 104)',
             borderColor: 'rgb(185, 76, 104)',
             data: xy4,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        }]
+    }
+    
+    return chartData;
+}
+
+export function getMultiLineChartTemplateStatus2Diff(label1, xy1, label2, xy2, label3, xy3, label4, xy4, label5, xy5, label6, xy6, label7, xy7, label8, xy8) {
+
+    var chartData = {
+
+        datasets: [{
+            label: label1,
+            fill: false,
+            backgroundColor: 'rgb(158, 194, 247)',
+            borderColor: 'rgb(158, 194, 247)',
+            data: xy1,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label2,
+            fill: false,
+            backgroundColor: 'rgb(193, 180, 213)',
+            borderColor: 'rgb(193, 180, 213)',
+            data: xy2,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label3,
+            fill: false,
+            backgroundColor: 'rgb(222, 157, 213)',
+            borderColor: 'rgb(222, 157, 213)',
+            data: xy3,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label4,
+            fill: false,
+            backgroundColor: 'rgb(194, 157, 180)',
+            borderColor: 'rgb(194, 157, 180)',
+            data: xy4,
+            xAxisID: 'x-axis-1',
+            yAxisID: "y-axis-1"
+        },{
+            label: label5,
+            fill: false,
+            backgroundColor: 'rgb(051, 102, 153)',
+            borderColor: 'rgb(051, 102, 153)',
+            data: xy5,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        },{
+            label: label6,
+            fill: false,
+            backgroundColor: 'rgb(153, 102, 204)',
+            borderColor: 'rgb(153, 102, 204)',
+            data: xy6,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        },{
+            label: label7,
+            fill: false,
+            backgroundColor: 'rgb(204, 051, 204)',
+            borderColor: 'rgb(204, 051, 204)',
+            data: xy7,
+            xAxisID: 'x-axis-2',
+            yAxisID: "y-axis-1"
+        },{
+            label: label8,
+            fill: false,
+            backgroundColor: 'rgb(102, 051, 000)',
+            borderColor: 'rgb(102, 051, 000)',
+            data: xy8,
             xAxisID: 'x-axis-2',
             yAxisID: "y-axis-1"
         }]
