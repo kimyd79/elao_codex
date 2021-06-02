@@ -2302,9 +2302,15 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         print("## 분할 csv 작업완료 까지 : 총 작업 시간 - ", round((time.time() - startTime),4))   
                         
                     else:
-                        # 기존로직
-                        #self.parse_log(logfile, logfile_id, id_startnum )
-                        resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
+                                                
+                        #resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
+                        # is App format?                        
+                        format_kind = LogFile.objects.get(logfile_id=logfile_id).format_kind
+                        
+                        if format_kind == 'app':
+                            resultFiles.append(self.parse_log_div_app(logfile.name, logfile_id, id_startnum, None, None, 0))
+                        else:
+                            resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
             
                     # postgresql copy 실행                
                     LogDetail_dynamic.objects.model.objects = CopyManager()
@@ -2330,7 +2336,146 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    # TODO: app/was 로그 파싱 추가
+    def parse_log_div_app(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
+                
+        # 시간 포맷을 입력으로 받아야 한다. 전처리처럼(전처리하고 보자. millis는 다루지 않는다.)        
+        log_lines = []
+        result = []
+        count = 0               
+        start = time.time()
+        
+        # 일단 아무거나
+        # Fileformat 가져온다.(from logfile DB using logfile_id)
+        # 예시 : log_format = '%h %l %u %t \"%r\" %>s %b'      
+        format_model = LogFile.objects.get(logfile_id=logfile_id)
+        log_format = format_model.file_format
+        
+        # format_kind : apache, tomcat, webtob, nginx, IIS-W3C, IIS-NCSA 
+        format_kind = format_model.format_kind        
+        format_name = format_model.format_name
+                
+        # 임시 csv 파일생성 for copy to postgresql
+        # For dynamic : logdetail_id -> id
+        log_line_header = ['id','log_line','fhour','fminute','fsecond','fip','freferer','fuser_agent',
+                           'fstatus','ftime_taken','freserve1','freserve2','freserve3','created','logfile_id',
+                           'frequest','fday','fmonth','fyear','fdate','ftime','fdatetime','fbyte', 'fextension']
+        
+        # app의 경우 사용 필드 : 'id','log_line',
+        #                       'fhour','fminute','fsecond','fyear','fday','fmonth',
+        #                       'fdate',ftime','fdatetime',
+        #                       'created','logfile_id'
+        
+        # 'log_line' : 그대로 들어가야 한다. - Delimiter가 없다.(\0 사용)
+        # 전체 읽을 때에는 escapechar="\\" 불필요하다.
+        df_logs = None        
+        #df_logs_all = None
+        file_name = logfile_name
+        
+        # \t 대신 \0 으로 해야한다. java exception message는 앞에 \t가 붙는다.
+        # \tat org.apache.tomcat.util.net.SocketProcesso...        
+        
+        try:
+            
+            df_logs = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
+            
+        except UnicodeDecodeError as ude:
+            
+            logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
+            
+            try:
+                df_logs = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\0", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
+            except Exception as uex:
+                logger.error('UnicodeDecodeError Occured AGAIN!')
+                raise uex            
+            
+        except Exception as ex: 
+            logger.error('Error Occured while creating logdetail read_csv#2 whole lines : %s' % ex)            
+            raise ex        
+        
+        # 한글이 있으면 유니코드로 치환
+        p = re.compile(u'[\u3130-\u318F\uAC00-\uD7A3]+', re.DOTALL )
+        df_logs = df_logs[0].apply(lambda x: str(x.encode("utf-8"))[2:-1] if len(p.findall(x)) > 0 else x) 
+        
+        #df_logs = df_logs[0].str.replace(pat='([\u3130-\u318F\uAC00-\uD7A3]+)', repl= r' ', regex=True)
+        
+        # Dataframe으로 다시 변경
+        df_logs = pd.DataFrame(df_logs.tolist(), columns=['log_line'])
+          
+        # 'fip','freferer','fuser_agent','fstatus','ftime_taken','frequest','fbyte', 'fextension'
+        df_logs['fip'] = ''
+        df_logs['freferer'] = ''
+        df_logs['fuser_agent'] = ''
+        df_logs['fstatus'] = ''
+        df_logs['ftime_taken'] = ''
+        df_logs['frequest'] = ''
+        df_logs['fbyte'] = ''
+        df_logs['fextension'] = ''
+        
+        #'freserve1', 'freserve2', 'freserve3'        
+        df_logs['freserve1'] = ''
+        df_logs['freserve2'] = ''
+        df_logs['freserve3'] = ''
+                
+        #'created'
+        #datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+        df_logs['created'] = datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S.%f')
+                
+        #'logfile_id'
+        df_logs['logfile_id'] = logfile_id
+        
+        
+        # 시간 추출로직 : 여기 대기(시간만?)
+        # 테스트 패턴 : 00:00:00 - 시/분/초 - log_format
+        p = re.compile('([0-9]{2}):([0-9]{2}):([0-9]{2})', re.DOTALL )
+        df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else None)
+                            
+        df_time = pd.DataFrame(df_time.tolist(), columns=['fhour','fminute','fsecond'])
+        
+        # 'fyear','fday','fmonth' 
+        # TODO: 년월일이 없으면 만들어줘야 함 - 고민이네.. 여기 필요
+        df_time['fyear'] = '2021'
+        df_time['fmonth'] = '06'
+        df_time['fday'] = '02'
+        
+        # 보완로직1 - 결측치 제거 : None있으면 앞의 값으로 채우기
+        df_time.fillna(method='ffill', inplace=True)
+        
+        # 보완로직2 - 결측치 제거 : 맨 앞에 None이 존재할 수 있으니 뒤의값으로도 채우기
+        df_time.fillna(method='bfill', inplace=True)
 
+        # month_map = {
+        #     'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
+        #     'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
+        # }
+
+        # df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
+        
+        # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
+        df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']        
+        df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
+        df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+        
+        # Merge : logdetail_id -> id
+        # ID 기존의 개수 + 1 만큼 + 해주어야 한다. 0부터 시작이므로        
+        df_logs = df_logs.rename_axis('id').reset_index()
+        df_logs['id'] = df_logs['id'] + existed_row_size
+        
+        df_logs = pd.concat([df_logs, df_time], axis=1)
+        
+        # 보완로직2 - 결측치 제거 : None있으면 해당 row 제거
+        # df_logs.dropna(axis=0, inplace=True)
+                        
+        # index 미사용
+        result_file_name = file_name+'_'+str(file_order)+'.csv'
+                
+        df_logs[log_line_header].to_csv(result_file_name, index=False, encoding='utf-8')
+       
+        if settings.DEBUG:
+    	    logger.debug("Duration to create temporary csv : %s" % (time.time() - start))
+        
+        return result_file_name
+    
     def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
     
         log_lines = []
