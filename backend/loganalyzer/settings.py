@@ -131,10 +131,11 @@ DATABASES = {
 DATABASES = {
 	'default': {
 	'ENGINE': 'django.db.backends.postgresql' ,
-    'NAME': 'MWLA2' ,
+    'NAME': 'MWLA2',            #'MWLA' ,
     'USER': 'postgres' ,
 	'PASSWORD': 'postgres' ,
-	'HOST': 'localhost' ,
+	#'HOST': '172.16.1.108' ,   #linux
+    'HOST': 'localhost' ,
 	'PORT': '5432' ,
 	}
 }
