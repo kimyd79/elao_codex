@@ -113,7 +113,7 @@
             <vue-element-loading :active="isActiveStackedBar1" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
             <lego-button @click="resetZoom(3)" small>resetZoom</lego-button>
             <lego-button @click="setScaleY(3)" small>setScaleY</lego-button>
-            <lego-button @click="PopupChartKind(3)" small main>ComparePopup</lego-button>
+            <lego-button @click="PopupChartKind(5)" small main>ComparePopup</lego-button>
             <chart-stacked-bar ref="sbChart1" :chart-data="sbChartData1" :options="sbOptions1" :width="800" :height="400"></chart-stacked-bar>
         </div>
         <!-- search2 -->

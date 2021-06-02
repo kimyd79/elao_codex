@@ -1807,11 +1807,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             # 결과 처리
             resultXY = []
             resultXY2 = []
-            result_time_unit = 0            
+            result_time_unit = 0
+            resultXY_200 = []
+            resultXY_300 = []
             resultXY_400 = []
             resultXY_500 = []
-            
-            start_time = time.time()
             
             #1. project_id에 연관된 logfile_id들을 가져온다.
             logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')                        
@@ -1826,12 +1826,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
             # Type1 : 시(HH)기준
             #   Kind = 0 : request(요청) 건수(count)
-            #   Kind = 1 : TPS   
+            #   Kind = 1 : TPS
             #   Kind = 2 : time-taken(평균처리시간) 
-            #   Kind = 3 : Status code(4XX, 5XX)
+            #   Kind = 3 : Status code(2XX, 3XX)
             #   Kind = 4 : request + time-taken
+            #   Kind = 5 : Status code(2XX, 3XX, 4XX, 5XX)
            
-            if type == '1':  
+            if type == '1':
 
                 if(kind == 0):
                     
@@ -1839,7 +1840,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     rows = hhRequest.values('x','y')
                                      
                     for row in rows:
-                        resultXY.append(row)        
+                        resultXY.append(row)
 
                 elif(kind == 1):
                     
@@ -1887,21 +1888,34 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         for row in rows:   
                             resultXY.append(row)
                             
-                elif(kind == 3):
-
-                    start_time = time.time()
+                elif(kind == 3 or kind == 5):
 
                     hhRequest = queryset.annotate(x=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('x', 'f_status').annotate(y=Count('f_status')).order_by('x')
                     rows = hhRequest.values('x', 'y', 'f_status')
 
-                    # Status code 4XX, 5XX 만 처리함.(Error code) 
-                    for row in rows:                              
-                        if row['f_status'] == '4':
-                            del row['f_status']
-                            resultXY_400.append(row)
-                        elif row['f_status'] == '5':
-                            del row['f_status']
-                            resultXY_500.append(row)
+                    # kind = 3 : Status code 4XX, 5XX 만 처리한다.(Error code)
+                    # kind = 5 : Status code 2XX, 3XX, 4XX, 5XX 처리한다.
+                    for row in rows: 
+                        if kind == 3:
+                            if row['f_status'] == '4':
+                                del row['f_status']
+                                resultXY_400.append(row)
+                            elif row['f_status'] == '5':
+                                del row['f_status']
+                                resultXY_500.append(row)
+                        if kind == 5:
+                            if row['f_status'] == '2':
+                                del row['f_status']
+                                resultXY_200.append(row)
+                            elif row['f_status'] == '3':
+                                del row['f_status']
+                                resultXY_300.append(row)
+                            elif row['f_status'] == '4':
+                                del row['f_status']
+                                resultXY_400.append(row)
+                            elif row['f_status'] == '5':
+                                del row['f_status']
+                                resultXY_500.append(row)
 
                 elif(kind == 4):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -1946,6 +1960,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             #   Kind = 2 : time-taken(평균처리시간) 
             #   Kind = 3 : Status code(4XX, 5XX)
             #   Kind = 4 : request + time-taken
+            #   Kind = 5 : Status code(2XX, 3XX, 4XX, 5XX)
             
             elif type == '2':          
                             
@@ -2005,18 +2020,34 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         for row in rows:   
                             resultXY.append(row)                
                                 
-                elif(kind == 3):
+                elif(kind == 3 or kind == 5):
 
                     hhmmRequest = queryset.annotate(x=Concat('fdate','fhour','fminute'), f_status=Substr('fstatus',1,1)).values('x', 'f_status').annotate(y=Count('f_status')).order_by('x')
                     rows = hhmmRequest.values('x', 'y', 'f_status')
 
-                    for row in rows:                              
-                        if row['f_status'] == '4':
-                            del row['f_status']
-                            resultXY_400.append(row)
-                        elif row['f_status'] == '5':
-                            del row['f_status']
-                            resultXY_500.append(row)
+                    # kind = 3 : Status code 4XX, 5XX 만 처리한다.(Error code)
+                    # kind = 5 : Status code 2XX, 3XX, 4XX, 5XX 처리한다.
+                    for row in rows: 
+                        if kind == 3:
+                            if row['f_status'] == '4':
+                                del row['f_status']
+                                resultXY_400.append(row)
+                            elif row['f_status'] == '5':
+                                del row['f_status']
+                                resultXY_500.append(row)
+                        if kind == 5:
+                            if row['f_status'] == '2':
+                                del row['f_status']
+                                resultXY_200.append(row)
+                            elif row['f_status'] == '3':
+                                del row['f_status']
+                                resultXY_300.append(row)
+                            elif row['f_status'] == '4':
+                                del row['f_status']
+                                resultXY_400.append(row)
+                            elif row['f_status'] == '5':
+                                del row['f_status']
+                                resultXY_500.append(row)
 
                 elif(kind == 4):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -2062,6 +2093,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             #   Kind = 2 : time-taken(평균처리시간) 
             #   Kind = 3 : Status code(4XX, 5XX)
             #   Kind = 4 : request + time-taken
+            #   Kind = 5 : Status code(2XX, 3XX, 4XX, 5XX)
               
             elif type == '3':          
                 
@@ -2110,18 +2142,34 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         for row in rows:   
                             resultXY.append(row)                  
                                                     
-                elif(kind == 3):
+                elif(kind == 3 or kind == 5):
 
                     hhmmssRequest = queryset.annotate(x=Concat('fdate','fhour','fminute','fsecond'), f_status=Substr('fstatus',1,1)).values('x', 'f_status').annotate(y=Count('f_status')).order_by('x')
                     rows = hhmmssRequest.values('x', 'y', 'f_status')
 
-                    for row in rows:                              
-                        if row['f_status'] == '4':
-                            del row['f_status']
-                            resultXY_400.append(row)
-                        elif row['f_status'] == '5':
-                            del row['f_status']
-                            resultXY_500.append(row)   
+                    # kind = 3 : Status code 4XX, 5XX 만 처리한다.(Error code)
+                    # kind = 5 : Status code 2XX, 3XX, 4XX, 5XX 처리한다.
+                    for row in rows: 
+                        if kind == 3:
+                            if row['f_status'] == '4':
+                                del row['f_status']
+                                resultXY_400.append(row)
+                            elif row['f_status'] == '5':
+                                del row['f_status']
+                                resultXY_500.append(row)
+                        if kind == 5:
+                            if row['f_status'] == '2':
+                                del row['f_status']
+                                resultXY_200.append(row)
+                            elif row['f_status'] == '3':
+                                del row['f_status']
+                                resultXY_300.append(row)
+                            elif row['f_status'] == '4':
+                                del row['f_status']
+                                resultXY_400.append(row)
+                            elif row['f_status'] == '5':
+                                del row['f_status']
+                                resultXY_500.append(row)
 
                 elif(kind == 4):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
@@ -2160,7 +2208,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             # resultX.append(row['x'])
                             # resultY.append(row['y'])         
                     
-            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500, 'resultXY2': resultXY2}        
+            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_200': resultXY_200, 'resultXY_300': resultXY_300, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500, 'resultXY2': resultXY2}        
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:

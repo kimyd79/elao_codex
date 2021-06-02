@@ -1,77 +1,78 @@
 <template>
 <div class="modal-mask" transition="modal">
     <div class="modal-wrapper">      
-      <ui-container-box :columns=14 vertical class="modal-container">
+        <ui-container-box :columns=14 vertical class="modal-container">
 
-        <div class="popup-header">
-            <div class="popup-header__title">
-                Statistic Differences : {{ this.content }}
-            </div>
-            <div class="popup-header__close">
-                <lego-icon small v-on:click="clickClose">close</lego-icon>
-            </div>
-
-            <ui-container-box :columns="13" horizontal align-center class="page-form-area" >
-
-                <div><b>* Select N</b></div>
-                <lego-dropdown :items="listN" v-model="statisticsRow" width="100px" align-left/>
-
-                <div class="table-summary" >
-                    <div class="table-summary-items" >
-                        <div style="color:#553ca5"><b>* Search-1</b></div>
-                        <div>{{ this.subTitle1 }}</div>
-                        <div>{{ this.dateTime1 }}</div>
-                    </div>
-                    <div class="table-summary-items" >
-                        <div style="color:#553ca5"><b>* Search-2</b></div>
-                        <div>{{ this.subTitle2 }}</div>
-                        <div>{{ this.dateTime2 }}</div>
-                    </div>                        
-                </div> 
-                
-            </ui-container-box>
-        </div>
-       
-        <ui-container-box :columns="13" horizontal align-center class="page-form-area">
-            <div class="vld-parent">
-                <component :is="currentView" v-on:popupClose="currentView=null"></component>
-                <vue-element-loading :active="isActiveStatistic" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
-                <div class="add_scroll">
-                    <table class="page-summary-table">
-                        <thead>
-                            <tr>
-                                <th class="sticky-th" rowspan="2" style="width: 60px; color: rgb(85,60,165)"><b>{{ this.TopN }}</b></th>
-                                <th class="sticky-th" rowspan="2" style="width: 580px; color: rgb(85,60,165)"><b>{{ this.content }}</b></th>
-                                <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-1 </b></th>
-                                <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-2</b></th>
-                            </tr>
-                            <tr>
-                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>{{ this.result }}</b></th>
-                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
-                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>{{ this.result }}</b></th>
-                                <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <tr v-for="(item, index) in items">
-                                <td>{{ item.index }}</td>
-                                
-                                <td><VueCustomTooltip :label="item.result">
-                                    {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
-                                    </VueCustomTooltip>
-                                </td>
-                                <td v-on:click="getDetail(item.result)"><u>{{ item.result_count }}</u></td>
-                                <td v-on:click="getDetail(item.result)"><u>{{ item.ratio }}</u></td>
-                                <td v-on:click="getDetail2(item.result)"><u>{{ item.result_count2 }}</u></td>
-                                <td v-on:click="getDetail2(item.result)"><u>{{ item.ratio2 }}</u></td>
-                            </tr>
-
-                        </tbody>
-                    </table>
+            <div class="popup-header">
+                <div class="popup-header__title">
+                    Statistic Differences : {{ this.content }}
                 </div>
+                <div class="popup-header__close">
+                    <lego-icon small v-on:click="clickClose">close</lego-icon>
+                </div>
+
+                <ui-container-box :columns="13" horizontal align-center class="page-form-area" >
+
+                    <div><b>* Select N</b></div>
+                    <lego-dropdown :items="listN" v-model="statisticsRow" width="100px" align-left/>
+
+                    <div class="table-summary" >
+                        <div class="table-summary-items" >
+                            <div style="color:#553ca5"><b>* Search-1</b></div>
+                            <div>{{ this.subTitle1 }}</div>
+                            <div>{{ this.dateTime1 }}</div>
+                        </div>
+                        <div class="table-summary-items" >
+                            <div style="color:#553ca5"><b>* Search-2</b></div>
+                            <div>{{ this.subTitle2 }}</div>
+                            <div>{{ this.dateTime2 }}</div>
+                        </div>
+                    </div>
+                    
+                </ui-container-box>
             </div>
-       </ui-container-box> 
+        
+            <ui-container-box :columns="13" horizontal align-center>
+                <div class="vld-parent">
+                    <component :is="currentView" v-on:popupClose="currentView=null"></component>
+                    <vue-element-loading :active="isActiveStatistic" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+                    <div class="add_scroll">
+                        <table class="page-summary-table">
+                            <thead>
+                                <tr>
+                                    <th class="sticky-th" rowspan="2" style="width: 60px; color: rgb(85,60,165)"><b>{{ this.TopN }}</b></th>
+                                    <th class="sticky-th" rowspan="2" style="width: 580px; color: rgb(85,60,165)"><b>{{ this.content }}</b></th>
+                                    <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-1 </b></th>
+                                    <th class="sticky-th" colspan="2" style="width: 200px; color: rgb(85,60,165)"><b>Search-2</b></th>
+                                </tr>
+                                <tr>
+                                    <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>{{ this.result }}</b></th>
+                                    <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent</b></th>
+                                    <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>{{ this.result }}</b></th>
+                                    <th class="sticky-th-two" style="width: 100px; color: rgb(85,60,165)"><b>percent </b></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(item, index) in items">
+                                    <td>{{ item.index }}</td>
+                                    
+                                    <td><VueCustomTooltip :label="item.result">
+                                        {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
+                                        </VueCustomTooltip>
+                                    </td>
+                                    <td v-on:click="getDetail(item.result)"><u>{{ item.result_count }}</u></td>
+                                    <td v-on:click="getDetail(item.result)"><u>{{ item.ratio }}</u></td>
+                                    <td v-on:click="getDetail2(item.result)"><u>{{ item.result_count2 }}</u></td>
+                                    <td v-on:click="getDetail2(item.result)"><u>{{ item.ratio2 }}</u></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="popup-buttons">
+                        <lego-button main v-on:click="clickClose">Close</lego-button>            
+                    </div>
+                </div>
+            </ui-container-box> 
 
       </ui-container-box>
     </div>
@@ -277,22 +278,22 @@ export default {
         },
 
         getDetail(result) {
-            this.$store.state.popupKind = 'Statistics';
-            this.$store.state.popupHeader = 'Statistics Detail';
-            this.$store.state.detailcondition = this.statisticsKind;
-            this.$store.state.detailsearchKeyword = result;
-            this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
-            this.$store.state.popupButton = 'Close';            
+            this.$store.dispatch("setPopupKind", 'Statistics');
+            this.$store.dispatch("setPopupHeader", 'Statistics Detail');
+            this.$store.dispatch("setDetailCondition", this.statisticsKind);
+            this.$store.dispatch("setDetailSearchKeyword", result);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupButton", 'Close');
             this.currentView = 'DetailPopup';
         },
 
         getDetail2(result) {
-            this.$store.state.popupKind = 'Statistics';
-            this.$store.state.popupHeader = 'Statistics Detail';
-            this.$store.state.detailcondition = this.statisticsKind;
-            this.$store.state.detailsearchKeyword = result;
-            this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
-            this.$store.state.popupButton = 'Close';
+            this.$store.dispatch("setPopupKind", 'Statistics');
+            this.$store.dispatch("setPopupHeader", 'Statistics Detail');
+            this.$store.dispatch("setDetailCondition", this.statisticsKind);
+            this.$store.dispatch("setDetailSearchKeyword", result);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupButton", 'Close');
             this.currentView = 'DetailPopup2';
         },
 
@@ -451,8 +452,6 @@ export default {
                 
             } else {
                 // Search-1:tmp_res1, Search-2:tmp_res2 한번에 조회해서 subTitle, Statistic 데이터 입력
-                // let search1Date = this.dateFromValue.substr(0,4)+"/"+ this.dateFromValue.substr(4,2)+"/"+ this.dateFromValue.substr(6,2)+" "+this.timeFromValue.substr(0,2)+":"+this.timeFromValue.substr(2,2)+":"+this.timeFromValue.substr(4,2)+"~"+this.dateToValue.substr(0,4)+"/"+ this.dateToValue.substr(4,2)+"/"+ this.dateToValue.substr(6,2)+" "+this.timeToValue.substr(0,2)+":"+this.timeToValue.substr(2,2)+":"+this.timeToValue.substr(4,2)
-                // let search2Date = this.dateFromValue2.substr(0,4)+"/"+ this.dateFromValue2.substr(4,2)+"/"+ this.dateFromValue2.substr(6,2)+" "+this.timeFromValue2.substr(0,2)+":"+this.timeFromValue2.substr(2,2)+":"+this.timeFromValue2.substr(4,2)+"~"+this.dateToValue2.substr(0,4)+"/"+ this.dateToValue2.substr(4,2)+"/"+ this.dateToValue2.substr(6,2)+" "+this.timeToValue2.substr(0,2)+":"+this.timeToValue2.substr(2,2)+":"+this.timeToValue2.substr(4,2)
                 // 숫자 3자리(천단위) 마다 "," 표시
                 let request_total1 = this.tmp_res1.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 let request_total2 = this.tmp_res2.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -464,8 +463,6 @@ export default {
                     this.subTitle1 = "Total number of Requests : " + request_total1 
                     this.subTitle2 = "Total number of Requests : " + request_total2
                 }
-
-                
 
                 this.setStatisticItems(this.tmp_res1.data.results, this.tmp_res1.data.totalCnt, this.tmp_res1.data.resultType, this.tmp_res2.data.results, this.tmp_res2.data.totalCnt, this.tmp_res2.data.resultType)
             }

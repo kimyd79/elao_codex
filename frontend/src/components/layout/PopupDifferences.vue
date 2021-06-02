@@ -450,13 +450,13 @@ export default {
         },
 
         getDetail(result, date) {
-            this.$store.state.popupKind = 'Differences';
-            this.$store.state.popupHeader = 'Differnce Detail';
-            this.$store.state.detailcondition = this.statisticsKind;
-            this.$store.state.detailsearchKeyword = result;
-            this.$store.state.popupBody = 'searchKeyword : ' + this.$store.state.detailsearchKeyword;
-            this.$store.state.popupButton = 'Close';
-            this.$store.state.popupDate = date;
+            this.$store.dispatch("setPopupKind", 'Differences');
+            this.$store.dispatch("setPopupHeader", 'Differnce Detail');
+            this.$store.dispatch("setDetailCondition", this.statisticsKind);
+            this.$store.dispatch("setDetailSearchKeyword", result);         
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupButton", 'Close');
+            this.$store.dispatch("setPopupDate", date);
             if(date != '') this.currentView = 'DetailPopup';
         },
 
@@ -691,7 +691,7 @@ export default {
                     this.mlChartData = getMultiLineChartTemplateDiff('Search-1(Duration(s))', res1.xy, 'Search-2(Duration(s))', res2.xy)                    
                     this.mlOptions = getMultiLineChartOptionsDiff('Search-1(Duration(s)) / Search-2(Duration(s))', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "Duration(s)")
                 } else if (this.multilineChartKind == 3) {
-                    this.mlChartData = getMultiLineChartTemplateStatusDiff('Search-1(Status400)', res1.xy_400, 'Search-1(Status500)', res1.xy_500, 'Search-2(Status400)', res2.xy_400, 'Search-2(Status500)', res2.xy_500)                   
+                    this.mlChartData = getMultiLineChartTemplateStatusDiff('Search-1(4xx)', res1.xy_400, 'Search-1(5xx)', res1.xy_500, 'Search-2(4xx)', res2.xy_400, 'Search-2(5xx)', res2.xy_500)                   
                     this.mlOptions = getMultiLineChartOptionsDiff('Search-1(Status) / Search-2(Status)', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, 'request(Count)')
                 }
 
@@ -855,7 +855,7 @@ export default {
     transition: all .3s ease;
     font-family: Helvetica, Arial, sans-serif;
     overflow-y: auto; 
-    max-height: 900px;
+    max-height: 930px;
 }
 
 .modal-header {
