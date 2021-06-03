@@ -2336,7 +2336,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    # TODO: app/was 로그 파싱 추가
+    # app/was 로그 파싱(log4j)
     def parse_log_div_app(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
                 
         # 시간 포맷을 입력으로 받아야 한다. 전처리처럼(전처리하고 보자. millis는 다루지 않는다.)        
@@ -2424,32 +2424,46 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         #'logfile_id'
         df_logs['logfile_id'] = logfile_id
         
+        # format_name으로 구분 : 
+        # time_format_1 : HH:mm:ss (일자정보 없음)       
+        # time_format_2 : yyyy-MM-dd HH:mm:ss
+        # TODO: 추가 포맷은 Custom으로 해야 한다.(사례수집 필요)
+        if format_name == 'time_format_1':
+            
+            # 테스트 패턴 : 00:00:00 - 시/분/초 - log_format
+            p = re.compile('([0-9]{2}):([0-9]{2}):([0-9]{2})', re.DOTALL )
+            df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else np.NaN)
+            
+            # 보완로직1 - 결측치 제거 : None있으면 앞의 값으로 채우기
+            df_time.fillna(method='ffill', inplace=True)
+            
+            # 보완로직2 - 결측치 제거 : 맨 앞에 None이 존재할 수 있으니 뒤의값으로도 채우기
+            df_time.fillna(method='bfill', inplace=True)
+            
+            df_time = pd.DataFrame(df_time.tolist(), columns=['fhour','fminute','fsecond'])
         
-        # 시간 추출로직 : 여기 대기(시간만?)
-        # 테스트 패턴 : 00:00:00 - 시/분/초 - log_format
-        p = re.compile('([0-9]{2}):([0-9]{2}):([0-9]{2})', re.DOTALL )
-        df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else None)
-                            
-        df_time = pd.DataFrame(df_time.tolist(), columns=['fhour','fminute','fsecond'])
+            # 'fyear','fday','fmonth'         
+            # 년월일이 없으므로 오늘 날짜로 한다.
+            default_date = datetime.today().strftime('%Y-%m-%d').split('-')
+            df_time['fyear'] = default_date[0]
+            df_time['fmonth'] = default_date[1]
+            df_time['fday'] = default_date[2]        
+            
+        elif format_name == 'time_format_2':
+            # %d -> %d{DEFAULT} : 예) 2012-11-02 14:34:02,123
+            # %d{yyyy-MM-dd HH:mm:ss}
+            # %d{yyyy-MM-dd HH:mm:ss.SSS}            
+            p = re.compile('([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})', re.DOTALL )
         
-        # 'fyear','fday','fmonth' 
-        # TODO: 년월일이 없으면 만들어줘야 함 - 고민이네.. 여기 필요
-        df_time['fyear'] = '2021'
-        df_time['fmonth'] = '06'
-        df_time['fday'] = '02'
-        
-        # 보완로직1 - 결측치 제거 : None있으면 앞의 값으로 채우기
-        df_time.fillna(method='ffill', inplace=True)
-        
-        # 보완로직2 - 결측치 제거 : 맨 앞에 None이 존재할 수 있으니 뒤의값으로도 채우기
-        df_time.fillna(method='bfill', inplace=True)
-
-        # month_map = {
-        #     'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
-        #     'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
-        # }
-
-        # df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
+            df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else np.NaN)
+            
+            # 보완로직1 - 결측치 제거 : None있으면 앞의 값으로 채우기
+            df_time.fillna(method='ffill', inplace=True)
+            
+            # 보완로직2 - 결측치 제거 : 맨 앞에 None이 존재할 수 있으니 뒤의값으로도 채우기
+            df_time.fillna(method='bfill', inplace=True)
+            
+            df_time = pd.DataFrame(df_time.tolist(), columns=['fyear','fmonth','fday','fhour','fminute','fsecond'])
         
         # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
         df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']        
@@ -2462,9 +2476,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs['id'] = df_logs['id'] + existed_row_size
         
         df_logs = pd.concat([df_logs, df_time], axis=1)
-        
-        # 보완로직2 - 결측치 제거 : None있으면 해당 row 제거
-        # df_logs.dropna(axis=0, inplace=True)
                         
         # index 미사용
         result_file_name = file_name+'_'+str(file_order)+'.csv'
