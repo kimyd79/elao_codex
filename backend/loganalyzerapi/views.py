@@ -10,7 +10,7 @@ from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogF
 from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer, DynamicLogDetailSerializer, MetricsSerializer, LogMasterMetricSerializer
 import time, uuid, re, csv, io
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from rest_framework.response import Response
 from django.db import transaction
 import pandas as pd
@@ -202,13 +202,68 @@ class LogFileViewSet(viewsets.ModelViewSet):
     '=' Exact matches.
     '@' Full-text search. (Currently only supported Django's PostgreSQL backend.)
     '$' Regex search. : default
-    '''   
+    '''
 
 class LogFormatViewSet(viewsets.ModelViewSet):
     queryset = LogFormat.objects.all()
     serializer_class = LogFormatSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['format_kind']
+    
+    @action(methods=['post'], detail=False)
+    def assist(self, request, pk=None):
+        try:    
+            config_text = request.data['config_text']       
+            config_type = request.data['config_type']
+            
+            print("** assist called")
+            print(config_type)
+            
+            if config_type == 'apache_httpd':
+                # Apache 
+                # 주석패턴 : #
+                pcom = re.compile(r'\s*[#].+', re.DOTALL)
+
+                # 로그패턴
+                plog = re.compile(r'.*LOG.*', re.IGNORECASE | re.MULTILINE )
+
+                line_cnt = 0
+                result = []
+                
+                lines = config_text.split("\n")
+                
+                for line in lines:
+                    
+                    if len(pcom.findall(line)) == 0:            
+                        if len(plog.findall(line)) != 0:
+                            line_cnt = line_cnt + 1
+                            result.append(line.lstrip(' ').rstrip('\n'))
+                
+                # 파일명 패턴 찾기 : 필요한가 TODO: 보완필요
+                logfile_name = "access_log"
+                logformat = ""
+                for temp in result:
+                    if temp.find(logfile_name) != -1: 
+                        logformat = temp.split()[2]        
+                        break;
+                
+                logpattern = ""
+                for temp in result:
+                    if temp.find('LogFormat') != -1 and temp.find(logformat) != -1: 
+                        logpattern = temp.replace('LogFormat','').replace(logformat,'').strip(' ').strip('"')
+                        break;
+            
+            elif config_type == 'nginx':    # TODO: 차후 적용 예정
+                pass
+            
+            response = {'message': 'Logformat assist is processes successfully', 'result': logpattern }
+            return Response(response, status = status.HTTP_200_OK)
+            
+        except Exception as ex:
+            logger.error('Error Occured while processing Logformat assist : %s' % ex)
+                    
+            response = {'message': 'Logformat assist failed.'}            
+            return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
 class LogFormatStringViewSet(viewsets.ModelViewSet):
@@ -2230,6 +2285,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             # logfile_ids for multi-files
             logfile_ids = request.data['logfile_id']
             project_id = request.data['project_id']
+            diff_hour = request.data['diff_hour']
             
             model_name = "logdetail_"+project_id
             
@@ -2308,9 +2364,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         format_kind = LogFile.objects.get(logfile_id=logfile_id).format_kind
                         
                         if format_kind == 'app':
-                            resultFiles.append(self.parse_log_div_app(logfile.name, logfile_id, id_startnum, None, None, 0))
+                            resultFiles.append(self.parse_log_div_app(logfile.name, logfile_id, id_startnum, None, None, 0, diff_hour))
                         else:
-                            resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0))
+                            resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0, diff_hour))
             
                     # postgresql copy 실행                
                     LogDetail_dynamic.objects.model.objects = CopyManager()
@@ -2337,7 +2393,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         
     # app/was 로그 파싱(log4j)
-    def parse_log_div_app(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
+    def parse_log_div_app(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order, diff_hour=0):
                 
         # 시간 포맷을 입력으로 받아야 한다. 전처리처럼(전처리하고 보자. millis는 다루지 않는다.)        
         log_lines = []
@@ -2487,7 +2543,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         return result_file_name
     
-    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order):
+    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order, diff_hour):
     
         log_lines = []
         result = []
@@ -2524,14 +2580,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         try:
             
-            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\t", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
+            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
             
         except UnicodeDecodeError as ude:
             
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
             
             try:
-                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\t", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
+                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\0", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
             except Exception as uex:
                 logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -2610,6 +2666,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         df_time = pd.DataFrame()
         if format_kind == 'IIS-W3C':
+            
+            # TODO: Time Adjust
+            if diff_hour != 0:
+                pass
                         
             series = df_logs[format_index['date']].str.split('-') + df_logs[format_index['time']].str.split(':')
             df_time = pd.DataFrame(series.tolist(), columns=['fyear','fmonth','fday','fhour','fminute','fsecond'])            
@@ -2626,19 +2686,37 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             else:
                 time_index = format_index['t']
             
-            df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[]', repl= r' ', regex=True)
+            column_names = []
+            
+            # Time Adjust
+            if diff_hour != 0:
+                temp_time = df_logs[time_index].map(lambda x: x.lstrip('[').rstrip(']'))
+                temp_time = pd.to_datetime(temp_time, format='%d/%b/%Y:%H:%M:%S')
+                manipulated_time = pd.DatetimeIndex(temp_time) + timedelta(hours=int(diff_hour))
+                df_logs[time_index] = pd.DataFrame(manipulated_time, dtype="str")
+                
+                column_names = ['fyear','fmonth','fday','fhour','fminute','fsecond']
+                
+            else:                
+                column_names = ['dummy','fday','fmonth','fyear','fhour','fminute','fsecond']
+                
+            df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[-]', repl= r' ', regex=True)
             series = df_datetime.str.split(' ')
-            df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
+            df_time = pd.DataFrame(series.tolist(), columns=column_names)
+            #df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
             
             # 보완로직1 - 결측치 제거 : None있으면 해당 row 제거
             df_time.dropna(axis=0, inplace=True)
 
-            month_map = {
-                'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
-                'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
-            }
+            # Time Adjust 적용하면 불필요
+            if diff_hour == 0:
+                
+                month_map = {
+                    'Jan' : '01', 'Feb' : '02', 'Mar' : '03', 'Apr' : '04', 'May' : '05', 'Jun' : '06',
+                    'Jul' : '07', 'Aug' : '08', 'Sep' : '09', 'Oct' : '10', 'Nov' : '11', 'Dec' : '12',
+                }
 
-            df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
+                df_time['fmonth'] = df_time['fmonth'].apply(lambda x : month_map[x])       
             
         # Add Columns : fdate YYYYMMDD(fyear+fmonth+fday), ftime hhmmss(fhour+fminute+fsecond), fdatetime(YYYYMMDDhhmmss)
         df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']

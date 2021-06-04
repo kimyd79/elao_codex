@@ -31,6 +31,8 @@ router.register(r'logdetail_dynamic/uridetail', views.DynamicLogDetailViewSet, b
 
 # For logformat
 router.register(r'logformat', views.LogFormatViewSet)
+router.register(r'logformat/assist', views.LogFormatViewSet)
+
 router.register(r'logformatstring', views.LogFormatStringViewSet)
 router.register(r'logformatstring/formatkind_list', views.LogFormatStringViewSet, basename='logformatstring')
 

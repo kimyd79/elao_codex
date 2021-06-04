@@ -65,9 +65,11 @@
                     <component :is="currentView" v-on:popupClose="currentView=null" :format="format"></component>
 
                     <ui-form-item :columns=11 label="File Format" required-left left-label :label-width=144 :label-padding=16>
-                        <lego-dropdown :items="items" v-model="fileFormat" width="590px" />&nbsp;&nbsp;
+                        <lego-dropdown :items="items" v-model="fileFormat" width="500px" />&nbsp;&nbsp;
                         
                         <lego-button v-on:click="addLogFormat">Add</lego-button>
+                        <lego-button v-on:click="assistLogFormat">Assist</lego-button>
+
 
                     </ui-form-item>
 
@@ -97,6 +99,14 @@
                         {{ fileSize.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") }} bytes
                     </ui-form-item>                    
                     -->
+
+                    <ui-form-item :columns="11" label="Time Adjust" required-left left-label :label-width=144 :label-padding=16>
+                        
+                        {{ this.diffHour }} {{ " hour(s)" }} &nbsp;&nbsp;&nbsp;&nbsp;
+                        <lego-button v-on:click="adjustTime" small>Adjust</lego-button>
+                        <lego-button v-on:click="resetAdjustTime" small>ResetAdjust</lego-button>
+                                                
+                    </ui-form-item>
 
                     <ui-form-item :columns="11" label="Data Range" required-left left-label :label-width=144 :label-padding=16>
 
@@ -160,6 +170,8 @@
                 <lego-button v-on:click="nextButton" v-model="buttonName" main>{{ buttonName }}</lego-button>
                 <lego-button v-on:click="deleteProjects" main v-if="creator.toLowerCase() == 'leehs' || creator.toLowerCase() == 'admin'">DelProjects</lego-button>
                 <lego-button v-on:click="newProject">newProject</lego-button>
+                
+                <!-- <lego-button v-on:click="assistLogFormat">assistLogFormat</lego-button> -->
             </div>
 
         </ui-container-box>
@@ -217,6 +229,8 @@ export default {
     },
     data() {
         return {
+            diffHour: 0,
+
             buttonName: "Next",
             isPrevShow: false,
             isNewProject: false,
@@ -395,6 +409,112 @@ export default {
 
     methods: {
 
+        resetAdjustTime(){
+            this.diffHour = 0;
+        },
+
+        async adjustTime() {
+            let diffHours = await this.$swal({
+                title: 'Select hours',
+                icon: 'question',
+                input: 'range',
+                inputLabel: '+, - hours',                
+                inputAttributes: {
+                    min: -24,
+                    max: 24,
+                    step: 1
+                },
+                inputValue: 0,
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',
+                reverseButtons: true,
+            })
+            
+            this.diffHour = diffHours.value;
+        },
+
+        // TODO: 차후 File로 변경필요?
+        async assistLogFormat() {
+            // Select config file
+            const inputOptions = new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                'apache_httpd': 'apache_httpd',
+                'nginx': 'nginx',
+                })
+            }, 200)
+            })
+
+            const { value: config } = await this.$swal({
+            title: 'Select Config File',
+            input: 'radio',
+            confirmButtonColor: '#553ca5',
+            inputOptions: inputOptions,
+            inputValidator: (value) => {
+                if (!value) {
+                return 'You need to choose something!'
+                }
+            }
+            })
+
+            if (config) {
+                
+                // Config file
+                const { value: text } = await this.$swal({
+                    input: 'textarea',
+                    inputLabel: 'Logfile format Assis (Beta)',
+                    inputPlaceholder: 'Input '+config+ ' config file contents.',
+                    inputAttributes: {
+                        //'aria-label': 'Type your message here'
+                    },
+                    showCancelButton: true,
+                    confirmButtonColor: '#553ca5',
+                    cancelButtonColor: '#dddddd',
+                    confirmButtonText: 'OK',
+                    reverseButtons: true,
+                })
+
+                if (text) {
+                
+                    var url = serverUrl + "/logformat/assist/"
+                    let postData = {
+                        config_text: text,
+                        config_type: config,
+                    };
+
+                    let axiosConfig = {
+                        headers: {
+                            //'Authorization': 'Token '+ this.token // For Django
+                        }
+                    };
+
+                    axios.post(url, postData, axiosConfig)
+                        .then(res => {
+                            
+                            //this.$swal(res.data.result);
+
+                            this.$swal({
+                                title: 'Result',
+                                html:  res.data.result,
+                                icon: 'info',
+                                width: 400,
+                                confirmButtonColor: '#553ca5',
+                            }); 
+
+
+
+                        })
+                        .catch(err => {
+                            console.error(err);
+                        })   
+                }
+            }
+
+
+        },
+
         // 로그 포맷을 추가한다.
         addLogFormat() {
             
@@ -450,6 +570,9 @@ export default {
                         this.items.push({
                             value: tmp + '/' + result.format_strings,
                             text: '▶ ' +tmp + ' → ' + result.format_strings.substr(0,130)+(result.format_strings.length > 130 ? " ..." : "" ),
+                            
+                            // TODO: Dropdown 부분에서 Tooltip 구현할때 사용
+                            fulltext: '▶ ' +tmp + ' → ' + result.format_strings
                         });
 
 
@@ -1086,6 +1209,7 @@ export default {
         createLogdetail(url) {
 
             let postData = {
+                diff_hour: this.diffHour,       // For Adjust hours
                 logfile_id: this.logfileIDs,    // For Multi-files
                 project_id: this.projectID
             };
