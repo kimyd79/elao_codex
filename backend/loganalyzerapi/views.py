@@ -599,7 +599,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     def getTimetakenUnit(self, logfile_id):
         file_format = LogFile.objects.get(logfile_id=logfile_id).file_format
         
-        if file_format.find('D') != -1 or file_format.find('request_time') != -1:
+        if file_format.find('D') != -1 or file_format.find('request_time') != -1 or file_format.find('time-taken') != -1 :
             return 'D'
         elif file_format.find('T') != -1 :
             return 'T'
@@ -2582,6 +2582,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
             
+            # TODO: 한글이 있는 경우 - 개별필드는 불필요하다.(여기만하면 됨)
+            if format_kind == 'IIS-W3C':
+                p = re.compile(u'[\u3130-\u318F\uAC00-\uD7A3]+', re.DOTALL )
+                df_logs_all = df_logs_all[0].apply(lambda x: str(x.encode("utf-8"))[2:-1] if len(p.findall(x)) > 0 else x) 
+            
         except UnicodeDecodeError as ude:
             
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
@@ -2612,7 +2617,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         try:           
             # IIS-W3C의 경우 Log의 내용 중 시작에 #가 있는 라인은 주석으로 처리한다.
             # Delimiter로 공백이 여러개 있을 수 있으므로 \s+ 사용한다. 
-            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, comment='#', delimiter="\s+", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=True, header=None, comment='#', delimiter="\s+", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
             
         except UnicodeDecodeError as ude:
             
@@ -2882,7 +2887,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # Tomcat, WebtoB의 경우 단위가 ms이므로 *1000 필요 df_logs['ftime_taken']
             if format_kind == 'tomcat' or format_kind == 'webtob':
-                df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000)
+                df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000).astype(int)
         else:
             df_logs['ftime_taken'] = -1
             
@@ -2908,14 +2913,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         else:
             df_logs['fstatus'] = 'NA'
             
-        # bytes    
+        # bytes
         if log_format.find('cs-bytes') != -1:
             df_logs.rename(columns = {format_index['cs-bytes'] : 'fbyte'}, inplace = True)
         else:
             df_logs['fbyte'] = 0
 
-        if log_format.find('cs(Referrer)') != -1:
-            df_logs.rename(columns = {format_index['cs(Referrer)'] : 'freferer'}, inplace = True)
+        if log_format.find('cs(Referer)') != -1:
+            df_logs.rename(columns = {format_index['cs(Referer)'] : 'freferer'}, inplace = True)
         else:
             df_logs['freferer'] = 'NA'
             
@@ -2928,7 +2933,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs.rename(columns = {format_index['time-taken'] : 'ftime_taken'}, inplace = True)
             
             # millisecond
-            df_logs['ftime_taken'] = df_logs['ftime_taken'].mul(1000).astype(int)
+            df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000).astype(int)
                     
         else:
             df_logs['ftime_taken'] = -1
