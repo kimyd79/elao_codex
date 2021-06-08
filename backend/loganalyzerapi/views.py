@@ -2617,7 +2617,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         try:           
             # IIS-W3C의 경우 Log의 내용 중 시작에 #가 있는 라인은 주석으로 처리한다.
             # Delimiter로 공백이 여러개 있을 수 있으므로 \s+ 사용한다. 
-            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=True, header=None, comment='#', delimiter="\s+", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
+            df_logs = pd.read_csv(file_name, encoding="utf-8", error_bad_lines=False, header=None, comment='#', delimiter="\s+", escapechar="\\", skiprows=skiprows, nrows=nrows, na_filter=False, quotechar='"')
             
         except UnicodeDecodeError as ude:
             
