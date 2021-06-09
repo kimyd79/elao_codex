@@ -33,8 +33,8 @@ ALLOWED_HOSTS = [ u'172.16.1.110', u'localhost', u'127.0.0.1' ]
 MEDIA_URL = '/media/'
 #MEDIA_URL = 'E:\loganalyzerMedia'
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-#MEDIA_ROOT = 'F:\loganalyzerMedia'
-MEDIA_ROOT = 'C:\loganalyzerMedia'
+MEDIA_ROOT = 'F:\loganalyzerMedia'
+# MEDIA_ROOT = 'C:\loganalyzerMedia'
 
 # Application definition
 
@@ -132,7 +132,7 @@ DATABASES = {
 DATABASES = {
 	'default': {
 	'ENGINE': 'django.db.backends.postgresql' ,
-    'NAME': 'MWLA',            #'MWLA2' ,
+    'NAME': 'MWLA2',            #'MWLA' ,
     'USER': 'postgres' ,
 	'PASSWORD': 'postgres' ,
 	#'HOST': '172.16.1.108' ,   #linux
@@ -181,42 +181,42 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Logging
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'formatters': {
-#         'verbose': {
-#             'format' : "[%(levelname)s][%(asctime)s,%(msecs)3d][%(process)d|%(thread)d][%(name)s|%(funcName)s|%(lineno)s] %(message)s",
-#             'datefmt' : "%d/%b/%Y %H:%M:%S"
-#         },
-#     },
-#     'filters': {
-#         'require_debug_true': {
-#             '()': 'django.utils.log.RequireDebugTrue',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'level': 'INFO',
-#             #'class': 'logging.FileHandler',
-#             'class': 'logging.handlers.TimedRotatingFileHandler',            
-#             'filename': os.path.join(BASE_DIR, 'logs', 'mwla.log'),   
-#             'formatter': 'verbose',
-#             'when': 'midnight',
-#             'backupCount': '30',
-#         },
-#         'console': {
-#             'level': 'INFO',
-#             'filters': ['require_debug_true'],
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'verbose'
-#         },
-#     },
-#     'loggers': {
-#         'loganalyzerapi': {
-#             'handlers': ['console', 'file'],
-#             'level': 'INFO',
-#             'propagate': True,
-#         },
-#     }
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(levelname)s][%(asctime)s,%(msecs)3d][%(process)d|%(thread)d][%(name)s|%(funcName)s|%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            #'class': 'logging.FileHandler',
+            'class': 'logging.handlers.TimedRotatingFileHandler',            
+            'filename': os.path.join(BASE_DIR, 'logs', 'mwla.log'),   
+            'formatter': 'verbose',
+            'when': 'midnight',
+            'backupCount': '30',
+        },
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'loganalyzerapi': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}

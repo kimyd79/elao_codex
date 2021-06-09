@@ -923,15 +923,6 @@ export function getMultiLineChartOptions(title, x_min, x_max, y_max_request, y_m
             padding: 20,
         },
 
-        onmouseup: function(point, event) {
-            console.log(point)
-            console.log(event)
-            console.log(event[0]['_chart'][data][datasets][0][data][event[0]['_index']])
-            if(event.length <= 0) return;
-  
-            console.log(event[0]['_index'])
-        },
-
         scales:{
             xAxes: [{
                 type: 'time',
@@ -1591,11 +1582,11 @@ export function resetZoom(chart) {
     var comp;
 
     if (chart == 1) {
-        comp = refs.lChart;
+        comp = this.$refs.lChart;
     } else if (chart == 2) {
-        comp = refs.mlChart;
+        comp = this.$refs.mlChart;
     } else if (chart == 3) {
-        comp = refs.sbChart;
+        comp = this.$refs.sbChart;
     }    
 
     // resetZoom 코드

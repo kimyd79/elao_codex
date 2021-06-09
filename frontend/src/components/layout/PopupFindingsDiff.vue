@@ -512,7 +512,7 @@ export default {
                             // index: 'New',
                             description: description,
                             result: result2[i].results[j].result,
-                            result_count2: result1[i].results[j].result_count,
+                            result_count2: result2[i].results[j].result_count,
                             ratio2: result2[i].results[j].result_per,               
                             metric_id: result2[i].metric_id,
                             metric_kind: result2[i].metric_kind,
