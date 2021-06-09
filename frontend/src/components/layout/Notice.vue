@@ -1,14 +1,15 @@
 <template>
-<div id="notice" >
-    
+<div id="notice" >    
     <ui-card :columns="10" :height="160" :padding="2" >
-        <ui-card-item header>Findings</ui-card-item>
+        <ui-card-item header>Findings &nbsp; 
+            <lego-button v-if="this.$store.state.currentMenu === '/comparison_statistic' || this.$store.state.currentMenu === '/comparison_chart'" v-on:click="FindingsDiff" small main>ComparePopup</lego-button> 
+        </ui-card-item>
         <component :is="currentView" v-on:popupClose="currentView=null" :finding="finding"></component>
         <vue-element-loading :active="isActive" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
         <ui-card-item sub class="card_box">                        
             <span style="color:#553ca5" v-for="(finding, idx) in findingListResult" :key="idx"> 
                 <b>[{{idx+1}}] {{finding.description}}</b>
-                <span style="color:gray" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
+                <span style="color:gray; cursor:pointer;" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
                     {{result.result}} : {{result.result_count}} ( {{result.result_per}} %)
                 </span>
                 <br> 
@@ -28,8 +29,9 @@ import {
 } from "vuex";
 import VueElementLoading from 'vue-element-loading'
 import DetailPopup from './DetailPopup';
+import PopupFindingsDiff from '@/components/layout/PopupFindingsDiff';
 import {
-    serverUrl
+    serverUrl,
 } from "@/common";
 
 export default {
@@ -39,6 +41,7 @@ export default {
         // export Loading Spinner components
         VueElementLoading,
         DetailPopup,
+        PopupFindingsDiff,
     },
 
     data() {
@@ -78,11 +81,9 @@ export default {
         dateToValue: "getToDate",
         timeFromValue: "getFromTime",
         timeToValue: "getToTime",
-        threshold: "getThreshold",
-
         conditionValue: "getCondition",
         searchValue: "getSearchKeyword",
-        excludeSearch: "getExcludeSearch",        
+        excludeSearch: "getExcludeSearch",
 
         ttFromValue: "getFromTimeTaken",
         ttToValue: "getToTimeTaken",
@@ -93,7 +94,10 @@ export default {
         isSearch1: "getToggleSearch1",
     }),
 
-    methods: {
+    methods: {  
+        FindingsDiff(){
+            this.currentView = 'PopupFindingsDiff';
+        },      
 
         getFilter() {
 
@@ -126,7 +130,6 @@ export default {
 
             let postData = {
                 project_id: this.projectID,
-                
                 filter: this.getFilter(),
             };
 
@@ -199,9 +202,8 @@ export default {
             this.$store.dispatch("setPopupHeader", 'Findings Detail');            
             this.$store.dispatch("setPopupBody", finding.description);
             this.$store.dispatch("setPopupButton", 'Close');   
-            this.currentView = 'DetailPopup';    
+            this.currentView = 'DetailPopup';
         },
-        
     },
     watch: {
         

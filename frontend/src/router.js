@@ -99,6 +99,7 @@ const router = new Router({
       path: '/initialization',
       name: 'initialization',
       component: Init,
+      
     },
     {
       path: '/analysis',
@@ -184,6 +185,7 @@ router.beforeEach((to, from, next) => {
   if(store.state.userName == 'Not logged in') {
     next('/login');
   } else {
+    store.dispatch("setCurrentMenu", to.path)
     next();
   }
 });

@@ -64,17 +64,17 @@
                                     {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
                                     </VueCustomTooltip>
                                 </td>
-                                <td v-on:click="getDetail(item.result, item.date)"><u>{{ item.result_count }}</u></td>
-                                <td v-on:click="getDetail(item.result, item.date)"><u>{{ item.ratio }}</u></td>
-                                <td v-on:click="getDetail(item.result, item.date2)"><u>{{ item.result_count2 }}</u></td>
-                                <td v-on:click="getDetail(item.result, item.date2)"><u>{{ item.ratio2 }}</u></td>
+                                <td style="cursor:pointer" v-on:click="getDetail(item.result, item.date)"><u>{{ item.result_count }}</u></td>
+                                <td style="cursor:pointer" v-on:click="getDetail(item.result, item.date)"><u>{{ item.ratio }}</u></td>
+                                <td style="cursor:pointer" v-on:click="getDetail(item.result, item.date2)"><u>{{ item.result_count2 }}</u></td>
+                                <td style="cursor:pointer" v-on:click="getDetail(item.result, item.date2)"><u>{{ item.ratio2 }}</u></td>
                             </tr>
 
                         </tbody>
                     </table>
                 </div>
             </div>
-       </ui-container-box> 
+        </ui-container-box> 
         <!-- Chart Area-->
         
         <span class="page-title__2label">Charts</span>
@@ -212,10 +212,8 @@ export default {
                 result_count2: '...',
                 ratio2: '...',
                 date2: ''
-            }, ],
-
-            mlChartData: null,
-
+            }],
+            
             logfile_id: '',
             project_id: '',
 
@@ -454,7 +452,7 @@ export default {
             this.$store.dispatch("setPopupHeader", 'Differnce Detail');
             this.$store.dispatch("setDetailCondition", this.statisticsKind);
             this.$store.dispatch("setDetailSearchKeyword", result);         
-            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + result);
             this.$store.dispatch("setPopupButton", 'Close');
             this.$store.dispatch("setPopupDate", date);
             if(date != '') this.currentView = 'DetailPopup';
@@ -845,8 +843,8 @@ export default {
 }
 
 .modal-container {
-    width: 50%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     margin: 0px auto;
     padding: 20px 20px 20px 20px;
     background-color: #fff;

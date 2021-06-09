@@ -54,20 +54,39 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(item, index) in items">
-                                    <td>{{ item.index }}</td>
-                                    
-                                    <td><VueCustomTooltip :label="item.result">
+                                    <td>{{ item.index }} </td>                                    
+                                    <td v-on:click="setMultiLineChart(item.result)"><VueCustomTooltip :label="item.result">
                                         {{ item.result_count != 0 ? item.result.substr(0,70)+(item.result.length > 70 ? " ..." : "" ) : "-"}}
                                         </VueCustomTooltip>
                                     </td>
-                                    <td v-on:click="getDetail(item.result)"><u>{{ item.result_count }}</u></td>
-                                    <td v-on:click="getDetail(item.result)"><u>{{ item.ratio }}</u></td>
-                                    <td v-on:click="getDetail2(item.result)"><u>{{ item.result_count2 }}</u></td>
-                                    <td v-on:click="getDetail2(item.result)"><u>{{ item.ratio2 }}</u></td>
+                                    <td style="cursor:pointer" v-on:click="getDetail(item.result, 1)"><u>{{ item.result_count }}</u></td>
+                                    <td style="cursor:pointer" v-on:click="getDetail(item.result, 1)"><u>{{ item.ratio }}</u></td>
+                                    <td style="cursor:pointer" v-on:click="getDetail(item.result, 2)"><u>{{ item.result_count2 }}</u></td>
+                                    <td style="cursor:pointer" v-on:click="getDetail(item.result, 2)"><u>{{ item.ratio2 }}</u></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+
+                    <span class="page-title__2label">Charts</span>
+                    <div class="vld-parent">
+                        <vue-element-loading :active="isActiveMultiLine" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+
+                        <ui-form-row>
+                            <ui-form-item :columns="12" label="Timeline" align-left required-left>
+                                <lego-radio v-model="timeCondition" value="1">HH</lego-radio>
+                                <lego-radio v-model="timeCondition" value="2">HHMM</lego-radio>
+                                <lego-radio v-model="timeCondition" value="3">HHMMSS</lego-radio>                
+                            </ui-form-item>            
+                        </ui-form-row>
+                        <ui-form-row>
+                        <lego-button @click="resetZoom()" small>resetZoom</lego-button>
+                        <lego-button @click="setScaleY(1)" small>setScaleY</lego-button>
+                        </ui-form-row>            
+                        
+                        <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions"></chart-line>  
+                    </div>
+
                     <div class="popup-buttons">
                         <lego-button main v-on:click="clickClose">Close</lego-button>            
                     </div>
@@ -84,6 +103,10 @@ import axios from "axios";
 import {
     // TODO: Remove Others
     setCommonStatisticInfo,
+    getMultiLineChartTemplateDiff,
+    getMultiLineChartOptionsDiff,
+    getLineChartDataDiff,
+    setDetailCondition
 } from "@/common"
 
 import {
@@ -91,8 +114,10 @@ import {
 } from "vuex";
 import VueElementLoading from 'vue-element-loading'
 import UIFormRow from './form/UIFormRow.vue';
+import ChartLine from "@/components/layout/ChartLine";
 import DetailPopup from './DetailPopup';
 import DetailPopup2 from './DetailPopup2';
+import moment from 'moment';
 export default {
 
     props: ['row', 'kind'],
@@ -100,14 +125,34 @@ export default {
     components: {
         VueElementLoading,
         UIFormRow,
+        ChartLine,
         DetailPopup,
         DetailPopup2,
+        moment
     },
   
     data() {
         return {
 
-            // For Statistics N
+            // kind = 0 : request  
+            // kind = 1 : TPS  
+            // kind = 2 : timeTaken  
+            // kind = 3 : status
+            // kind = 4 : request / timeTaken
+
+            // multilineChartKind: this.kind,
+            multilineChartKind: 1,
+
+            // For Chart
+            resetZoomV: "1",
+            timeCondition: "1", // "Hour(시) 기준"
+
+            mlChartData: null,
+            mlOptions: getMultiLineChartOptionsDiff(this.content),
+            // mlOptions: getMultiLineChartOptionsDiff('- No Data -'),
+            initailChartData: '',
+
+            // For Statistics,
             statisticsRow: this.row,
             statisticsKind: this.kind,
           
@@ -123,10 +168,6 @@ export default {
             tmp_res2: [], 
             timetakenUnit: "",
             currentView: null,
-
-            // For Chart
-            resetZoomV: "1",
-            timeCondition: "2", // "Minute(분) 기준"
 
             items: [{
                 index: '',
@@ -144,7 +185,7 @@ export default {
 
             // For Loading Spinner
             isActiveStatistic: false,
-
+            isActiveMultiLine: false,
         }
     },
 
@@ -152,7 +193,9 @@ export default {
         // TODO: Check! mapGetter로 가능?
         this.logfile_id = this.$store.state.logFileID
         this.project_id = this.$store.state.projectID
+
         this.getStatistics();
+        this.multilineChartData();
 
         let search1_datetime1 = this.dateFromValue.substr(0,4)+"/"+this.dateFromValue.substr(4,2)+"/"+this.dateFromValue.substr(6,2)+" "+this.timeFromValue.substr(0,2)+":"+this.timeFromValue.substr(2,2)+":"+this.timeFromValue.substr(4,2)
         let search1_datetime2 = this.dateToValue.substr(0,4)+"/"+this.dateToValue.substr(4,2)+"/"+this.dateToValue.substr(6,2)+" "+this.timeToValue.substr(0,2)+":"+this.timeToValue.substr(2,2)+":"+this.timeToValue.substr(4,2)
@@ -194,6 +237,9 @@ export default {
             //project_id: "getProjectID",
             logFormat: "getLogFormat",
 
+            detailconditionValue: "getDetailCondition",
+            detailsearchValue: "getDetailSearchKeyword",
+
         }),
 
         listN() {
@@ -222,9 +268,18 @@ export default {
         statisticsRow() {
             this.getStatistics();
         },
+        timeCondition() {
+            this.multilineChartData();
+        },
+        initailChartData(){
+            this.setMultiLineChart(this.initailChartData)
+        }
     },
 
     methods: {
+        resetZoom() {
+            this.$refs.mlChart._data._chart.resetZoom();
+        },
 
         getFilter1() {
 
@@ -266,35 +321,58 @@ export default {
             return filter
         },
 
+        getFilterChart1() {
+            var filters="";
+            filters = this.getFilter1();
+
+            if ( this.detailcondition != '') {
+               filters['detailconditionValue'] = this.detailconditionValue;
+            }
+            if ( this.detailsearch != '') {
+                filters['detailsearchValue'] = this.detailsearchValue;
+            }
+
+            return filters
+        },
+
+        getFilterChart2() {
+            var filters="";
+            filters = this.getFilter2();
+
+            if ( this.detailcondition != '') {
+               filters['detailconditionValue'] = this.detailconditionValue;
+            }
+            if ( this.detailsearch != '') {
+                filters['detailsearchValue'] = this.detailsearchValue;
+            }
+
+            return filters
+        },
+
         showAlert() {
         
             this.$swal('Hello Vue world!!!');
         },
 
-            clickClose: function () {
+        clickClose: function () {
             
-                this.$emit('popupClose');
+            this.$emit('popupClose');
             
         },
 
-        getDetail(result) {
+        getDetail(result, idx) {
             this.$store.dispatch("setPopupKind", 'Statistics');
-            this.$store.dispatch("setPopupHeader", 'Statistics Detail');
             this.$store.dispatch("setDetailCondition", this.statisticsKind);
             this.$store.dispatch("setDetailSearchKeyword", result);
-            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + result);
             this.$store.dispatch("setPopupButton", 'Close');
-            this.currentView = 'DetailPopup';
-        },
-
-        getDetail2(result) {
-            this.$store.dispatch("setPopupKind", 'Statistics');
-            this.$store.dispatch("setPopupHeader", 'Statistics Detail');
-            this.$store.dispatch("setDetailCondition", this.statisticsKind);
-            this.$store.dispatch("setDetailSearchKeyword", result);
-            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
-            this.$store.dispatch("setPopupButton", 'Close');
-            this.currentView = 'DetailPopup2';
+            if (idx == 1){
+                this.$store.dispatch("setPopupHeader", 'Statistics Detail(Search-1)');
+                this.currentView = 'DetailPopup';
+            } else {
+                this.$store.dispatch("setPopupHeader", 'Statistics Detail(Search-2)');
+                this.currentView = 'DetailPopup2';
+            }
         },
 
         setStatisticItems(results1, totalCnt1, resultType1, results2, totalCnt2, resultType2) {
@@ -384,6 +462,7 @@ export default {
                     this.timetakenUnit = "( s )"
                 }
             }
+            this.initailChartData = this.items[0].result
             //Stop Loading Spinner
             this.isActiveStatistic = false
         },
@@ -467,6 +546,142 @@ export default {
                 this.setStatisticItems(this.tmp_res1.data.results, this.tmp_res1.data.totalCnt, this.tmp_res1.data.resultType, this.tmp_res2.data.results, this.tmp_res2.data.totalCnt, this.tmp_res2.data.resultType)
             }
         },
+
+        setMultiLineChart(detailsearchKeyword){
+            this.$store.dispatch("setDetailSearchKeyword", detailsearchKeyword);
+            this.$store.dispatch("setDetailCondition", this.kind);
+            this.multilineChartData()     
+        },
+
+        getXaxisDatetimeFilter(filter1, filter2) {
+
+            var x_min1 = filter1.dateFromValue+filter1.timeFromValue
+            var x_max1 = filter1.dateToValue+filter1.timeToValue
+            var x_min2 = filter2.dateFromValue+filter2.timeFromValue
+            var x_max2 = filter2.dateToValue+filter2.timeToValue
+
+            //시간 차이 구하기
+            // const moment = require('moment');
+
+            var dateStart = moment(x_min1, 'YYYYMMDDhhmmss')
+            var dateEnd = moment(x_max1, 'YYYYMMDDhhmmss')
+            var dateDif1 = dateEnd.diff(dateStart, 'seconds')       
+
+            dateStart = moment(x_min2, 'YYYYMMDDhhmmss')
+            dateEnd = moment(x_max2, 'YYYYMMDDhhmmss')
+            var dateDif2 = dateEnd.diff(dateStart, 'seconds')     
+
+            // Chart X축 min/max기준을 조회기간이 긴 조회조건으로 동일하게 설정. scale 맞추기.
+            if(dateDif1 > dateDif2){
+                x_max2 = moment(x_max2, 'YYYYMMDDhhmmss').add(dateDif1-dateDif2, 'seconds')
+            } else if(dateDif1 < dateDif2) {
+                x_max1 = moment(x_max1, 'YYYYMMDDhhmmss').add(dateDif2-dateDif1, 'seconds')
+            } 
+
+            let x_datetime = {
+                x_min1: x_min1,
+                x_max1: x_max1,
+                x_min2: x_min2,
+                x_max2: x_max2
+            }
+
+            return x_datetime
+        },
+
+        
+        // 시계열 분석용 Line Chart
+        async multilineChartData() {
+
+            this.isActiveMultiLine = true
+
+            try {
+
+                setDetailCondition();
+                this.$store.dispatch("setDetailSearchKeyword", decodeURIComponent(this.$store.state.detailsearchKeyword));
+
+                let filter1 = this.getFilterChart1();
+                let filter2 = this.getFilterChart2();
+                // console.log("filter1", filter1)
+                // console.log("filter2", filter2)
+
+                var x_datetime = this.getXaxisDatetimeFilter(filter1, filter2)
+                
+                // kind = 0 : request
+                // kind = 1 : TPS
+                // kind = 2 : timeTaken  
+                // kind = 3 : status(4xx, 5xx) 
+                // kind = 4 : Request + timeTaken 
+                // kind = 5 : status(2xx, 3xx, 4xx, 5xx) 
+                let res1 = await getLineChartDataDiff(0, this.timeCondition, this.project_id, filter1)
+                let res2 = await getLineChartDataDiff(0, this.timeCondition, this.project_id, filter2)
+          
+
+                // console.log("res1", res1)
+                // console.log("res2", res2)                   
+
+                // this.content = 'Request'
+                this.mlChartData = getMultiLineChartTemplateDiff('Search-1(request)', res1.xy, 'Search-2(request)', res2.xy)                    
+                this.mlOptions = getMultiLineChartOptionsDiff(this.detailsearchValue, x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "request")
+                // this.mlOptions = getMultiLineChartOptionsDiff(this.$store.state.detailsearchKeyword, x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "request")
+                this.$refs.mlChart.renderChart(this.mlChartData, this.mlOptions);
+                
+
+
+            } catch (err) {
+                console.error(err); // TypeError: failed to fatch
+
+            } finally {
+                this.isActiveMultiLine = false
+
+            }
+        },
+
+        async setScaleY(chart = 1, direction) { // direction 0 : left, 1 : right
+
+            if ( direction == undefined ){
+                direction = 0;
+            }
+
+            const { value: scale_y } = await this.$swal({
+                title: 'Enter value of scale Y',
+                input: 'text',
+                inputLabel: 'Scale Y',
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',                        
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                    return 'You need to input y scale value!'
+                    }
+                }
+            })
+
+            if (scale_y) {
+                this.$swal(`Set scale to ${scale_y}`)
+            }
+
+            var comp;
+
+            if (chart == 1) {
+                comp = this.$refs.mlChart;
+            } 
+
+            comp.options.scales.yAxes[direction].ticks = {
+                suggestedMin: 0,
+                suggestedMax: scale_y
+                // min: 0,
+                // max: scale_y
+            }
+
+            if (chart == 1) {
+                comp.renderChart(this.mlChartData, this.mlOptions);
+            }
+            
+        },
+
     },
 };
 </script>

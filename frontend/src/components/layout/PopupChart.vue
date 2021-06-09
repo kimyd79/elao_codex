@@ -17,12 +17,12 @@
                         <div class="table-summary-items">
                             <div style="color:#553ca5"><b>* Search-1</b></div>
                             <div>{{ this.subTitle1 }}</div>
-                            <!-- <div>{{ this.dateTime1 }}</div> -->
+                            <div>{{ this.dateTime1 }}</div>
                         </div>
                         <div class="table-summary-items">
                             <div style="color:#553ca5"><b>* Search-2</b></div>
                             <div>{{ this.subTitle2 }}</div>
-                            <!-- <div>{{ this.dateTime2 }}</div> -->
+                            <div>{{ this.dateTime2 }}</div>
                         </div>
                     </div> 
                     
@@ -107,8 +107,10 @@ export default {
             multilineChartKind: this.kind,
             
             // title: ' URI at TPS peak',
-            subTitle1: this.dateFromValue,
-            subTitle2: this.dateToValue,
+            subTitle1: '...',
+            subTitle2: '...',
+            dateTime1: '...',
+            dateTime2: '...',
             TopN: '',
             content: '',
             tmp_res1: [],
@@ -122,8 +124,6 @@ export default {
 
             mlChartData: null,
             mlOptions: getMultiLineChartOptionsDiff('- No Data -'),
-
-            mlChartData: null,
 
             logfile_id: '',
             project_id: '',
@@ -145,8 +145,8 @@ export default {
         let search1_datetime2 = this.dateToValue.substr(0,4)+"/"+this.dateToValue.substr(4,2)+"/"+this.dateToValue.substr(6,2)+" "+this.timeToValue.substr(0,2)+":"+this.timeToValue.substr(2,2)+":"+this.timeToValue.substr(4,2)
         let search2_datetime1 = this.dateFromValue2.substr(0,4)+"/"+this.dateFromValue2.substr(4,2)+"/"+this.dateFromValue2.substr(6,2)+" "+this.timeFromValue2.substr(0,2)+":"+this.timeFromValue2.substr(2,2)+":"+this.timeFromValue2.substr(4,2)
         let search2_datetime2 = this.dateToValue2.substr(0,4)+"/"+this.dateToValue2.substr(4,2)+"/"+this.dateToValue2.substr(6,2)+" "+this.timeToValue2.substr(0,2)+":"+this.timeToValue2.substr(2,2)+":"+this.timeToValue2.substr(4,2)
-        this.subTitle1 = "Date/Time : " + search1_datetime1 + " ~ " + search1_datetime2
-        this.subTitle2 = "Date/Time : " + search2_datetime1 + " ~ " + search2_datetime2
+        this.dateTime1 = "Date/Time : " + search1_datetime1 + " ~ " + search1_datetime2
+        this.dateTime2 = "Date/Time : " + search2_datetime1 + " ~ " + search2_datetime2
     },
     computed: {
         ...mapGetters({
@@ -197,10 +197,8 @@ export default {
 
     methods: {
 
-        resetZoom() {       
-
-        this.$refs.mlChart._data._chart.resetZoom();
-
+        resetZoom() {
+            this.$refs.mlChart._data._chart.resetZoom();
         },
 
         getFilter1() {
@@ -248,9 +246,9 @@ export default {
             this.$swal('Hello Vue world!!!');
         },
 
-            clickClose: function () {
+        clickClose: function () {
             
-                this.$emit('popupClose');
+            this.$emit('popupClose');
             
         },
 
@@ -259,7 +257,7 @@ export default {
             this.$store.dispatch("setPopupHeader", 'Differnce Detail');
             this.$store.dispatch("setDetailCondition", this.statisticsKind);
             this.$store.dispatch("setDetailSearchKeyword", result);         
-            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + result);
             this.$store.dispatch("setPopupButton", 'Close');
             this.$store.dispatch("setPopupDate", date); 
             if(date != '') this.currentView = 'DetailPopup';
@@ -323,19 +321,23 @@ export default {
                 let res2 = await getLineChartDataDiff(this.multilineChartKind, this.timeCondition, this.project_id, filter2)
 
                 // console.log("res1", res1)
-                // console.log("res2", res2)                   
+                // console.log("res2", res2)
+
+                this.subTitle1 = "Total number of Requests : " + res1.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                this.subTitle2 = "Total number of Requests : " + res2.data.totalCnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
                 if (this.multilineChartKind == 0){
                     this.content = 'Request'
-                    this.mlChartData = getMultiLineChartTemplateDiff('Search-1(request)', res1.xy, 'Search-2(request)', res2.xy)                    
+                    this.mlChartData = getMultiLineChartTemplateDiff('Search-1(request)', res1.xy, 'Search-2(request)', res2.xy)
                     this.mlOptions = getMultiLineChartOptionsDiff('Search-1(request) / Search-2(request)', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "request")
                 } else if (this.multilineChartKind == 1){
                     this.content = 'TPS'
-                    this.mlChartData = getMultiLineChartTemplateDiff('Search-1(TPS)', res1.xy, 'Search-2(TPS)', res2.xy)                    
+                    this.mlChartData = getMultiLineChartTemplateDiff('Search-1(TPS)', res1.data.resultXY, 'Search-2(TPS)', res2.data.resultXY)  
+                    // this.mlChartData = getMultiLineChartTemplateDiff('Search-1(TPS)', res1.xy, 'Search-2(TPS)', res2.xy)
                     this.mlOptions = getMultiLineChartOptionsDiff('Search-1(TPS) / Search-2(TPS)', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "TPS")
                 } else if (this.multilineChartKind == 2){
                     this.content = 'Duration'
-                    this.mlChartData = getMultiLineChartTemplateDiff('Search-1(Duration(s))', res1.xy, 'Search-2(Duration(s))', res2.xy)                    
+                    this.mlChartData = getMultiLineChartTemplateDiff('Search-1(Duration(s))', res1.xy, 'Search-2(Duration(s))', res2.xy)
                     this.mlOptions = getMultiLineChartOptionsDiff('Search-1(Duration(s)) / Search-2(Duration(s))', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "Duration(s)")
                 } else if (this.multilineChartKind == 3) {
                     this.content = 'Status(4xx, 5xx)'
@@ -343,7 +345,7 @@ export default {
                     this.mlOptions = getMultiLineChartOptionsDiff('Search-1(Status) / Search-2(Status)', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, 'request(Count)')
                 } else if (this.multilineChartKind == 4) {
                     this.content = 'Request/timeTaken'
-                    this.mlChartData = getMultiLineChartTemplate2Diff('Search-1(request)', res1.xy, 'Search-1(timeTaken)', res1.xy2, 'Search-2(request)', res2.xy, 'Search-2(timeTaken)', res2.xy2)                    
+                    this.mlChartData = getMultiLineChartTemplate2Diff('Search-1(request)', res1.xy, 'Search-1(timeTaken)', res1.xy2, 'Search-2(request)', res2.xy, 'Search-2(timeTaken)', res2.xy2)
                     this.mlOptions = getMultiLineChartOptions2Diff('Search-1(request/timeTaken)) / Search-2(request/timeTaken)', x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "Request(s)", "timeTaken(s)")
                 } else if (this.multilineChartKind == 5) {
                     this.content = 'Status(2xx, 3xx, 4xx, 5xx)'
@@ -435,7 +437,7 @@ export default {
     flex-flow: column nowrap;
     margin-left: 20px;
     text-align: left;
-    width: 380px
+    width: 480px
 }
 
 .popup-container {
