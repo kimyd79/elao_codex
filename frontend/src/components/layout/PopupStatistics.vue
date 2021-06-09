@@ -103,8 +103,8 @@ import axios from "axios";
 import {
     // TODO: Remove Others
     setCommonStatisticInfo,
-    getMultiLineChartTemplateDiff,
-    getMultiLineChartOptionsDiff,
+    getMultiLineChartTemplate2Diff,
+    getMultiLineChartOptions2Diff,
     getLineChartDataDiff,
     setDetailCondition
 } from "@/common"
@@ -134,23 +134,14 @@ export default {
     data() {
         return {
 
-            // kind = 0 : request  
-            // kind = 1 : TPS  
-            // kind = 2 : timeTaken  
-            // kind = 3 : status
-            // kind = 4 : request / timeTaken
-
-            // multilineChartKind: this.kind,
-            multilineChartKind: 1,
-
             // For Chart
             resetZoomV: "1",
             timeCondition: "1", // "Hour(시) 기준"
 
             mlChartData: null,
-            mlOptions: getMultiLineChartOptionsDiff(this.content),
-            // mlOptions: getMultiLineChartOptionsDiff('- No Data -'),
+            mlOptions: getMultiLineChartOptions2Diff('- No Data -'),
             initailChartData: '',
+            multilineChartKind: 4, // request + time-taken
 
             // For Statistics,
             statisticsRow: this.row,
@@ -606,23 +597,23 @@ export default {
 
                 var x_datetime = this.getXaxisDatetimeFilter(filter1, filter2)
                 
-                // kind = 0 : request
-                // kind = 1 : TPS
-                // kind = 2 : timeTaken  
-                // kind = 3 : status(4xx, 5xx) 
-                // kind = 4 : Request + timeTaken 
-                // kind = 5 : status(2xx, 3xx, 4xx, 5xx) 
-                let res1 = await getLineChartDataDiff(0, this.timeCondition, this.project_id, filter1)
-                let res2 = await getLineChartDataDiff(0, this.timeCondition, this.project_id, filter2)
-          
+                // Kind = 0 : request count(요청건수)
+                // Kind = 1 : TPS
+                // Kind = 2 : time-taken(평균처리시간) 
+                // Kind = 3 : Status code(4xx, 5xx)
+                // Kind = 4 : request + time-taken
+                // Kind = 5 : Status code(2XX, 3XX, 4XX, 5XX)
+                
+                this.multilineChartKind = 4  
+
+                let res1 = await getLineChartDataDiff(this.multilineChartKind, this.timeCondition, this.project_id, filter1)
+                let res2 = await getLineChartDataDiff(this.multilineChartKind, this.timeCondition, this.project_id, filter2)
 
                 // console.log("res1", res1)
-                // console.log("res2", res2)                   
+                // console.log("res2", res2)
 
-                // this.content = 'Request'
-                this.mlChartData = getMultiLineChartTemplateDiff('Search-1(request)', res1.xy, 'Search-2(request)', res2.xy)                    
-                this.mlOptions = getMultiLineChartOptionsDiff(this.detailsearchValue, x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "request")
-                // this.mlOptions = getMultiLineChartOptionsDiff(this.$store.state.detailsearchKeyword, x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "request")
+                this.mlChartData = getMultiLineChartTemplate2Diff('Search-1(request)', res1.xy, 'Search-1(timeTaken)', res1.xy2, 'Search-2(request)', res2.xy, 'Search-2(timeTaken)', res2.xy2)                    
+                this.mlOptions = getMultiLineChartOptions2Diff(this.detailsearchValue, x_datetime.x_min1, x_datetime.x_max1, x_datetime.x_min2, x_datetime.x_max2, "Request(s)", "timeTaken(s)")
                 this.$refs.mlChart.renderChart(this.mlChartData, this.mlOptions);
                 
 

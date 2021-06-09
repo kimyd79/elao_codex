@@ -169,6 +169,8 @@ export default {
 
             mlChartData: null,
             mlOptions: getMultiLineChartOptionsDiff('- No Data -'),
+            initailChartData: '',
+            multilineChartKind: 4, // request + time-taken
 
             items: [],
 
@@ -195,7 +197,6 @@ export default {
             isActiveMultiLine: false,
             isActiveStatistic: false,
 
-            initailChartData: null
         }
     },
 
@@ -248,7 +249,6 @@ export default {
             detailconditionValue: "getDetailCondition",
             detailsearchValue: "getDetailSearchKeyword",
 
-            //logfile_id: "getLogFileID",
             project_id: "getProjectID",
             logFormat: "getLogFormat",
 
