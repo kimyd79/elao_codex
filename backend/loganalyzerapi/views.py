@@ -614,8 +614,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             return 'D'
         elif file_format.find('T') != -1 :
             return 'T'
-        else:
-            return None
+        else:   # process time 추정 기능일 경우 없음 - Microsecond으로 계산
+            return 'D'  
 
     def getMetricTimeValue(self, metric_unit, metric_time, timetakenUnit):   
         timeValue = 0    
@@ -2740,6 +2740,27 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_time['fdate'] = df_time['fyear'] + df_time['fmonth'] + df_time['fday']
         df_time['ftime'] = df_time['fhour'] + df_time['fminute'] + df_time['fsecond']
         df_time['fdatetime'] = df_time['fdate']+df_time['ftime']
+        
+        # 추청 Time-taken 처리 로직
+        if df_logs['ftime_taken'][0] == -1: # 값이 없는 경우 추정로직 시작
+            
+            # Step1 : temp_end_time 컬럼 생성 => start_time(로깅시간)에서 shift(1) 값
+            #         https://stackoverflow.com/questions/27474921/compare-two-columns-using-pandas
+
+            #         시간 연산을 위해 변환 및 비교데이터 생성(shift 1)
+            df_logs['start_time'] = pd.to_datetime(df_time['fdatetime'], format='%Y%m%d%H%M%S')
+            df_logs['temp_end_time'] = df_logs['start_time'].shift(1)
+
+            #         앞에 밀린거 1칸 채우기(뒤의 갚으로) : NaN 제거
+            df_logs['temp_end_time'].fillna(method='bfill', inplace=True)
+
+            # Step2 : end_time 컬럼 생성 => MAX(start_time, temp_end_time) 값 : 코드 확인(가능)
+            df_logs['end_time'] = np.where((df_logs['start_time'] >= df_logs['temp_end_time']) , df_logs['start_time'], df_logs['temp_end_time'])            
+
+            # Step3 : tiem-taken(기존 컬럼) 값(초단위만 가능) 계산 => end_time(Step2 계산 값) - start_time(로깅시간)
+            # 추정 time-taken : Second 까지만 환산 가능, microsecond으로 환산
+            df_logs['ftime_taken'] = (df_logs['end_time'] - df_logs['start_time']).dt.total_seconds()
+            df_logs['ftime_taken'] = pd.to_numeric(df_logs['ftime_taken'], errors='coerce').fillna(0).mul(1000000).astype(int)
         
         # fbyte 처리 : - 를 0으로 처리
         df_logs['fbyte'] = df_logs['fbyte'].apply(lambda x : 0 if x == '-' else x )      

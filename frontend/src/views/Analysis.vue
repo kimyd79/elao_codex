@@ -129,7 +129,7 @@
             <statistics :statisticsRow="valueN" :statisticsKind="2"></statistics>
             <!-- For Ingress Nginx -->
             <statistics :statisticsRow="valueN" :statisticsKind="13" v-if="this.logFormat[0].indexOf('$proxy_upstream_name')!=-1"></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="4" v-if="this.logFormat[0].indexOf('%D')!=-1 || this.logFormat[0].indexOf('%T')!=-1 || this.logFormat[0].indexOf('$request_time')!=-1 || this.logFormat[0].indexOf('time-taken')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="4"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="1"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="8"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="6" v-if="this.logFormat[0].indexOf('Referer')!=-1 || this.logFormat[0].indexOf('$http_referer')!=-1 || this.logFormat[0].indexOf('cs(Referer)')!=-1"></statistics>
@@ -141,7 +141,7 @@
             <statistics :statisticsRow="valueN" :statisticsKind="5"></statistics>
              <!-- For Ingress Nginx -->
             <statistics :statisticsRow="valueN" :statisticsKind="14" v-if="this.logFormat[0].indexOf('$http_referer')!=-1" ></statistics>
-            <statistics :statisticsRow="valueN" :statisticsKind="11" v-if="this.logFormat.indexOf('%D')[0]!=-1 || this.logFormat[0].indexOf('%T')!=-1 || this.logFormat[0].indexOf('$request_time')!=-1 || this.logFormat[0].indexOf('time-taken')!=-1"></statistics>
+            <statistics :statisticsRow="valueN" :statisticsKind="11" ></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="3"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="10"></statistics>
             <statistics :statisticsRow="valueN" :statisticsKind="7" v-if="this.logFormat[0].indexOf('User-Agent')!=-1 || this.logFormat[0].indexOf('$http_user_agent')!=-1 || this.logFormat[0].indexOf('cs(User-Agent)')!=-1"></statistics>
