@@ -69,5 +69,7 @@ export default {
     setPopupFormatKind({commit}, value) { commit(types.SET_POPUPFORMATKIND, value) },
     setPopupDate({commit}, value) { commit(types.SET_POPUPDATE, value) },
 
-    setMetricId({commit}, value) { commit(types.SET_METRICID, value) }
+    setMetricId({commit}, value) { commit(types.SET_METRICID, value) },
+
+    setCurrentMenu({commit}, value) { commit(types.SET_CURRENTMENU, value) }
 }

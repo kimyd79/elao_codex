@@ -8,7 +8,7 @@
         <ui-card-item sub class="card_box">                        
             <span style="color:#553ca5" v-for="(finding, idx) in findingListResult" :key="idx"> 
                 <b>[{{idx+1}}] {{finding.description}}</b>
-                <span style="color:gray" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
+                <span style="color:gray; cursor:pointer;" v-for="(result, idx) in finding.results" :key="idx" v-on:click="getMetricDetailSearch(finding, result)"> 
                     {{result.result}} : {{result.result_count}} ( {{result.result_per}} %)
                 </span>
                 <br> 
@@ -30,7 +30,6 @@ import VueElementLoading from 'vue-element-loading'
 import DetailPopup2 from './DetailPopup2';
 import {
     serverUrl,
-    //getSearchFilter
 } from "@/common";
 
 export default {
@@ -114,7 +113,6 @@ export default {
             return filter
         },
 
-
         async getMetrics() {                    
             
             let items = [];
@@ -125,7 +123,6 @@ export default {
 
             let postData = {
                 project_id: this.projectID,
-
                 filter: this.getFilter(),
             };
 
@@ -192,7 +189,7 @@ export default {
                 this.$store.dispatch("setDetailSearchKeyword", "");
             } else{
                 this.$store.dispatch("setDetailSearchKeyword", result.result);
-            }            
+            }
             this.$store.dispatch("setDetailCondition", finding.metric_filter);
             this.$store.dispatch("setPopupKind", 'FindingsDetail2');
             this.$store.dispatch("setPopupHeader", 'Findings Detail2');            

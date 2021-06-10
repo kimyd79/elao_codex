@@ -244,7 +244,7 @@ class LogFormatViewSet(viewsets.ModelViewSet):
                 logformat = ""
                 for temp in result:
                     if temp.find(logfile_name) != -1: 
-                        logformat = temp.split()[2]        
+                        logformat = temp.split()[2]    
                         break;
                 
                 logpattern = ""
@@ -416,6 +416,18 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             excludeSearch = self.request.data['filter']['excludeSearch'] if self.request.data['filter']['excludeSearch'] != '' else None
             
             project_id = self.request.data['filter']['project_id'] if self.request.data['filter']['project_id'] != '' else None
+
+            #statistic detailpopup(PopupStatistics chart 조회용)
+            if 'detailconditionValue' in self.request.data['filter']:
+                detailconditionValue = self.request.data['filter']['detailconditionValue'] if self.request.data['filter']['detailconditionValue'] != '' else None
+            if 'detailsearchValue' in self.request.data['filter']:
+                detailsearchValue = self.request.data['filter']['detailsearchValue'] if self.request.data['filter']['detailsearchValue'] != '' else None
+            if 'byteFromValue' in self.request.data['filter']:
+                byteFromValue = self.request.data['filter']['byteFromValue'] if self.request.data['filter']['byteFromValue'] != '' else None
+            if 'byteToValue' in self.request.data['filter']:
+                byteToValue = self.request.data['filter']['byteToValue'] if self.request.data['filter']['byteToValue'] != '' else None
+            if 'staticValue' in self.request.data['filter']:
+                staticValue = self.request.data['filter']['staticValue'] if self.request.data['filter']['staticValue'] != '' else None
     
         # Dynamic Model 처리    
         # project_id = self.request.data['project_id']
@@ -567,7 +579,6 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             if statusValue == 'Y':
                 queryset = queryset.filter(fstatus__range=(400, 599))
-
 
         return queryset           
 
@@ -1879,6 +1890,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             #2. 아래 로직을 Loop 돌린다.
             queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
 
+            totalCnt = queryset.count()
+
             # Type1 : 시(HH)기준
             #   Kind = 0 : request(요청) 건수(count)
             #   Kind = 1 : TPS
@@ -2263,7 +2276,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             # resultX.append(row['x'])
                             # resultY.append(row['y'])         
                     
-            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_200': resultXY_200, 'resultXY_300': resultXY_300, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500, 'resultXY2': resultXY2}        
+            response = {'message': 'chartdataDiff returned successfully', 'resultXY': resultXY, 'result_time_unit': result_time_unit, 'resultXY_200': resultXY_200, 'resultXY_300': resultXY_300, 'resultXY_400': resultXY_400, 'resultXY_500': resultXY_500, 'resultXY2': resultXY2, 'totalCnt': totalCnt}        
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex:

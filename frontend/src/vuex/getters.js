@@ -69,6 +69,8 @@ export default {
     getPopupFormatKind: state => state.popupFormatKind,
     getPopupDate: state => state.popupDate,
     
-    getMetricId: state => state.MetricId
+    getMetricId: state => state.MetricId,
+
+    getCurrentMenu: state => state.CurrentMenu
 
 }

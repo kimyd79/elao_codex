@@ -2,7 +2,8 @@
 // import { serverUrl, testGlobal } from '@/common'
 
 import axios from "axios";
-import * as store from "@/vuex/store";
+// import * as store from "@/vuex/store";
+import store from "@/vuex/store";
 
 export var serverUrl = "http://127.0.0.1:8000/mwla"; 
 //export var serverUrl = "http://172.16.1.109"
@@ -220,6 +221,130 @@ export function setCommonStatisticInfo(type, project_id, filter, N) {
     
 }
 
+
+export function setDetailCondition() {
+
+    switch (store.state.detailcondition) {
+        case 1:
+            store.dispatch("setPopupHeader", "HTTP Status Codes (count)");            
+            store.dispatch("setDetailCondition", "S");
+            break;
+        case 2:
+            store.dispatch("setPopupHeader", "Requests URI (count)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 3:
+            store.dispatch("setPopupHeader", "404 Requests URI (count)");            
+            store.dispatch("setDetailCondition", "NFR");
+            break;
+        case 4:
+            store.dispatch("setPopupHeader", "Requests Time-taken (s/㎲)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 5:
+            store.dispatch("setPopupHeader", "Visitors (count)");            
+            store.dispatch("setDetailCondition", "I");
+            break;
+        case 6:
+            store.dispatch("setPopupHeader", "Referers (count)");            
+            store.dispatch("setDetailCondition", "E");
+            break;
+        case 7:
+            store.dispatch("setPopupHeader", "User Agent (count)");            
+            store.dispatch("setDetailCondition", "U");
+            break;
+        case 8:
+            store.dispatch("setPopupHeader", "Requests URI (Total Bytes)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 9:
+            store.dispatch("setPopupHeader", "Static files (count)");            
+            store.dispatch("setDetailCondition", "F");
+            break;
+        case 10:
+            store.dispatch("setPopupHeader", "Requests URI (Average Bytes)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 11:
+            store.dispatch("setPopupHeader", "Requests Average Time-taken (s/㎲)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 12:
+            store.dispatch("setPopupHeader", "Static file Names (count)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 13:
+            store.dispatch("setPopupHeader", "Upstream Info (count, K8S Ingress)");            
+            store.dispatch("setDetailCondition", "V1");
+            break;
+        case 14:
+            store.dispatch("setPopupHeader", "Domains (count, K8S Ingress)");            
+            store.dispatch("setDetailCondition", "V2");
+            break;
+        // case 30:
+        //     store.state.popupHeader = "Total Number of Requests (count)";
+        //     store.state.detailcondition = "R"
+        //     break;
+        case 31:
+            store.dispatch("setPopupHeader", "Requests URI (count)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 32:
+            store.dispatch("setPopupHeader", "Visitors (count)");            
+            store.dispatch("setDetailCondition", "I");
+            break;
+        case 33:
+            store.dispatch("setPopupHeader", "Requests URI (count)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            break;
+        case 34:
+            store.dispatch("setPopupHeader", "Visitors (count)");            
+            store.dispatch("setDetailCondition", "I");
+            break;
+        case 35:
+            store.dispatch("setPopupHeader", "Requests URI (count)");            
+            store.dispatch("setDetailCondition", "R");
+            store.dispatch("setDetailSearchKeyword", encodeURIComponent(store.state.detailsearchKeyword));
+            // this.statusYN = "Y"
+            break;
+        case 36:
+            store.dispatch("setPopupHeader", "Visitors (count)");            
+            store.dispatch("setDetailCondition", "I");
+            // this.statusYN = "Y"
+            break;
+        default:
+    }
+}
+
+export function setFindingDetailCondition() {
+
+    if (store.state.detailcondition == 'fstatus') {
+        store.dispatch("setDetailCondition", "S");
+    } else if (store.state.detailcondition == 'frequest') {    
+        store.dispatch("setDetailCondition", "R");
+    } else if (store.state.detailcondition == 'fip') {
+        store.dispatch("setDetailCondition", "I");
+    } else if (store.state.detailcondition == 'freferer') {
+        store.dispatch("setDetailCondition", "E");
+    } else if (store.state.detailcondition == 'fuser_agent') {
+        store.dispatch("setDetailCondition", "U");
+    } else if (store.state.detailcondition == 'fextension') {
+        store.dispatch("setDetailCondition", "F");
+    } else if (store.state.detailcondition == 'freserve1') {
+        store.dispatch("setDetailCondition", "V1");
+    } else if (store.state.detailcondition == 'freserve2') {
+        store.dispatch("setDetailCondition", "V2");
+    }
+}
+
 export function getChartDataFromStatistics(type, project_id, filter, N) {
 
     let commonInfo = setCommonStatisticInfo(type, project_id, filter, N);
@@ -318,21 +443,14 @@ export function getLineChartData(kind = 1, timeCondition, project_id, filter) {
 export function getLineChartDataDiff(kind = 1, timeCondition, project_id, filter) {
     
     var url = serverUrl + "/logdetail_dynamic/chartdata_diff/"
-    //var url = serverUrl + "/logdetail/chartdata/"
 
     let postData = {
 
         project_id: project_id,
 
         //Type1 : 시(HH)기준
-        //   Kind1 : request/TPS(요청) 건수(count)
-        //   Kind2 : IP 건수(count)
         //Type2 : 시분(HHMM)기준                    
-        //   Kind1 : request/TPS(요청) 건수(count)
-        //   Kind2 : IP 건수(count)
         //Type3 : 시분초(HHMMSS)기준                    
-        //   Kind1 : request/TPS(요청) 건수(count)
-        //   Kind2 : IP 건수(count)
 
         type: timeCondition,
         kind: kind,

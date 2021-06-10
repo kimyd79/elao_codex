@@ -24,6 +24,25 @@
                 </ui-container-box>
             </div>
 
+            <div class="vld-parent" v-if="loaded">
+                <span class="page-title__2label">Charts</span>
+                <vue-element-loading :active="isActiveLineChart" spinner="spinner" text="Loading.." :is-full-screen="false" color="#553ca5" />
+
+                <ui-form-row>
+                    <ui-form-item :columns="12" label="Timeline" align-left required-left>
+                        <lego-radio v-model="timeCondition" value="1">HH</lego-radio>
+                        <lego-radio v-model="timeCondition" value="2">HHMM</lego-radio>
+                        <lego-radio v-model="timeCondition" value="3">HHMMSS</lego-radio>                
+                    </ui-form-item>            
+                </ui-form-row>
+                <ui-form-row>
+                <lego-button @click="resetZoom()" small>resetZoom</lego-button>
+                <lego-button @click="setScaleY(1)" small>setScaleY</lego-button>
+                </ui-form-row>            
+                
+                <chart-line ref='mlChart' :chart-data="mlChartData" :options="mlOptions"></chart-line>                        
+            </div>
+
             <div class="popup-buttons">
                 <lego-button main v-on:click="clickClose">Close</lego-button>
             </div>
@@ -38,13 +57,22 @@ import store from '@/vuex/store';
 import EventBus from '../../EventBus';
 import * as types from "@/vuex/mutation_types";
 import VueElementLoading from 'vue-element-loading'
+import ChartLine from "@/components/layout/ChartLine";
+
 import {
     mapGetters
 } from 'vuex';
 import {
     //getSearchFilter,
     getDetailSearchFilter,
-    serverUrl
+    serverUrl,
+    getLineChartTemplate,
+    getLineChartOptions,
+    getLineChartData,
+    getMultiLineChartTemplate,
+    getMultiLineChartOptions,
+    setDetailCondition,
+    setFindingDetailCondition
 } from "@/common"
 
 export default {
@@ -52,6 +80,7 @@ export default {
     components: {
         // export Loading Spinner components
         VueElementLoading,
+        ChartLine,
     },
     props: {
         item: {
@@ -59,8 +88,8 @@ export default {
             default: function () {
 
                 return {
-                    result: '',
-                    result_count: '',
+                    // result: '',
+                    // result_count: '',
                 }
             }
         },
@@ -69,21 +98,32 @@ export default {
             type: Object,
             default: function () {
                 return {
-                    description: '',
-                    result: '',
-                    metric_kind: '',
-                    metric_filter: '',
-                    metric_unit: '',
-                    metric_value1: '',
-                    metric_value2: '',
+                    // description: '',
+                    // result: '',
+                    // metric_kind: '',
+                    // metric_filter: '',
+                    // metric_unit: '',
+                    // metric_value1: '',
+                    // metric_value2: '',
                 }
             }
         }
     },
     data: function () {
         return {
+
+            // For Chart
+            resetZoomV: "1",
+            timeCondition: "1", // "Hour(시) 기준"
+
+            mlChartData: null,
+            mlOptions: getMultiLineChartOptions('- No Data -'),
+            initailChartData: '',
+
             // Loading Spinner
             isActive: false,
+            isActiveLineChart: false,
+            loaded: false,
 
             pagingInfo: {
                 rowsPerPage: 10,
@@ -203,6 +243,10 @@ export default {
     }),
 
     methods: {
+        resetZoom() {
+            this.$refs.mlChart._data._chart.resetZoom();
+        },
+
         getDateTimeString(str) {
             //return str >= 10 ? str : "0" + str;
             return str;            
@@ -258,108 +302,6 @@ export default {
             }
         },
 
-        getDetailCondition() {
-
-            switch (this.$store.state.detailcondition) {
-                case 1:
-                    this.$store.dispatch("setPopupHeader", "HTTP Status Codes (count)");            
-                    this.$store.dispatch("setDetailCondition", "S");
-                    break;
-                case 2:
-                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 3:
-                    this.$store.dispatch("setPopupHeader", "404 Requests URI (count)");            
-                    this.$store.dispatch("setDetailCondition", "NFR");
-                    break;
-                case 4:
-                    this.$store.dispatch("setPopupHeader", "Requests Time-taken (s/㎲)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 5:
-                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
-                    this.$store.dispatch("setDetailCondition", "I");
-                    break;
-                case 6:
-                    this.$store.dispatch("setPopupHeader", "Referers (count)");            
-                    this.$store.dispatch("setDetailCondition", "E");
-                    break;
-                case 7:
-                    this.$store.dispatch("setPopupHeader", "User Agent (count)");            
-                    this.$store.dispatch("setDetailCondition", "U");
-                    break;
-                case 8:
-                    this.$store.dispatch("setPopupHeader", "Requests URI (Total Bytes)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 9:
-                    this.$store.dispatch("setPopupHeader", "Static files (count)");            
-                    this.$store.dispatch("setDetailCondition", "F");
-                    break;
-                case 10:
-                    this.$store.dispatch("setPopupHeader", "Requests URI (Average Bytes)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 11:
-                    this.$store.dispatch("setPopupHeader", "Requests Average Time-taken (s/㎲)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 12:
-                    this.$store.dispatch("setPopupHeader", "Static file Names (count)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 13:
-                    this.$store.dispatch("setPopupHeader", "Upstream Info (count, K8S Ingress)");            
-                    this.$store.dispatch("setDetailCondition", "V1");
-                    break;
-                case 14:
-                    this.$store.dispatch("setPopupHeader", "Domains (count, K8S Ingress)");            
-                    this.$store.dispatch("setDetailCondition", "V2");
-                    break;
-                // case 30:
-                //     this.$store.state.popupHeader = "Total Number of Requests (count)";
-                //     this.$store.state.detailcondition = "R"
-                //     break;
-                case 31:
-                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 32:
-                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
-                    this.$store.dispatch("setDetailCondition", "I");
-                    break;
-                case 33:
-                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    break;
-                case 34:
-                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
-                    this.$store.dispatch("setDetailCondition", "I");
-                    break;
-                case 35:
-                    this.$store.dispatch("setPopupHeader", "Requests URI (count)");            
-                    this.$store.dispatch("setDetailCondition", "R");
-                    this.$store.dispatch("setDetailSearchKeyword", encodeURIComponent(this.$store.state.detailsearchKeyword));
-                    this.statusYN = "Y"
-                    break;
-                case 36:
-                    this.$store.dispatch("setPopupHeader", "Visitors (count)");            
-                    this.$store.dispatch("setDetailCondition", "I");
-                    this.statusYN = "Y"
-                    break;
-                default:
-            }
-        },
-
         getStatisticsLogDetails() {
 
             let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
@@ -367,7 +309,8 @@ export default {
             // 1 : 0~9, 2 : 10~19,
             //console.log("offset :" + offset);
 
-            this.getDetailCondition();
+            // this.getDetailCondition();
+            setDetailCondition();
 
             let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', '')
 
@@ -405,27 +348,6 @@ export default {
                 });
         },
 
-        getFindingDetailCondition() {
-
-            if (this.$store.state.detailcondition == 'fstatus') {
-                this.$store.dispatch("setDetailCondition", "S");
-            } else if (this.$store.state.detailcondition == 'frequest') {    
-                this.$store.dispatch("setDetailCondition", "R");
-            } else if (this.$store.state.detailcondition == 'fip') {
-                this.$store.dispatch("setDetailCondition", "I");
-            } else if (this.$store.state.detailcondition == 'freferer') {
-                this.$store.dispatch("setDetailCondition", "E");
-            } else if (this.$store.state.detailcondition == 'fuser_agent') {
-                this.$store.dispatch("setDetailCondition", "U");
-            } else if (this.$store.state.detailcondition == 'fextension') {
-                this.$store.dispatch("setDetailCondition", "F");
-            } else if (this.$store.state.detailcondition == 'freserve1') {
-                this.$store.dispatch("setDetailCondition", "V1");
-            } else if (this.$store.state.detailcondition == 'freserve2') {
-                this.$store.dispatch("setDetailCondition", "V2");
-            }
-        },
-
         getFindingLogDetails() {
 
             let offset = this.pagingInfo.rowsPerPage * (this.pagingInfo.currentPage - 1);
@@ -436,7 +358,8 @@ export default {
             let staticValue = ''
             let filters = ''
 
-            this.getFindingDetailCondition();
+            // this.getFindingDetailCondition();
+            setFindingDetailCondition();
 
             if (this.finding.metric_static == 'Y'){
                 staticValue = 'T'
@@ -514,13 +437,160 @@ export default {
             this.$emit('popupClose');
             //EventBus.$emit("cancel");
         },
+
+        getFilter() {
+
+            let filter = {
+                dateFromValue: this.dateFromValue,
+                dateToValue: this.dateToValue,
+                timeFromValue: this.timeFromValue,
+                timeToValue: this.timeToValue,
+
+                conditionValue: this.conditionValue,
+                searchValue: this.searchValue,
+                excludeSearch: this.excludeSearch,
+
+                ttFromValue: this.ttFromValue,
+                ttToValue: this.ttToValue,
+                project_id: this.projectID,
+
+                detailconditionValue: this.detailconditionValue,
+                detailsearchValue: this.detailsearchValue
+            }
+
+            return filter
+        },
+
+        // 시계열 분석용 Line Chart
+        async multilineChartData() {
+
+            this.isActiveLineChart = true
+
+            try {
+
+                // this.getDetailCondition();
+                setDetailCondition();
+                this.$store.dispatch("setDetailSearchKeyword", decodeURIComponent(this.$store.state.detailsearchKeyword));
+
+                let filter = this.getFilter();        
+
+                let ttFromValueThreshold = ''
+                let ttToValueThreshold = ''
+                let byteFromValueThreshold = ''
+                let byteToValueThreshold = ''
+                let staticValue = ''
+
+                // this.getFindingDetailCondition();
+                setFindingDetailCondition(); 
+
+                if (this.finding.metric_static == 'Y'){
+                    staticValue = 'T'
+                }
+
+                // timetaken 값은 microseconds -> ms 단위로 처리한다.(/1000)
+                // logdetail_dynamic ftime_taken, fbyte between 조회
+                if (this.finding.metric_kind == 'threshold'){
+                    if (this.finding.metric_unit == 'micros'){
+                        ttFromValueThreshold = this.finding.metric_value1 / 1000
+                        ttToValueThreshold = 24*60*60*1000 
+                    } else if (this.finding.metric_unit == 'millis'){
+                        ttFromValueThreshold = this.finding.metric_value1
+                        ttToValueThreshold = 24*60*60*1000
+                    } else if (this.finding.metric_unit == 'byte'){
+                        byteFromValueThreshold = this.finding.metric_value1
+                        byteToValueThreshold = 1024*1024*1024*1024
+                    } 
+                } else if (this.finding.metric_kind == 'scope'){
+                    if (this.finding.metric_unit == 'micros'){
+                        ttFromValueThreshold = this.finding.metric_value1 / 1000
+                        ttToValueThreshold =  this.finding.metric_value2 / 1000
+                    } else if (this.finding.metric_unit == 'millis'){
+                        ttFromValueThreshold = this.finding.metric_value1
+                        ttToValueThreshold = this.finding.metric_value2
+                    } else if (this.finding.metric_unit == 'byte'){
+                        byteFromValueThreshold = this.finding.metric_value1
+                        byteToValueThreshold = this.finding.metric_value2
+                    } 
+                }
+
+                filter['ttFromValue'] = ttFromValueThreshold;
+                filter['ttToValue'] = ttToValueThreshold;
+                filter['byteFromValue'] = byteFromValueThreshold;
+                filter['byteToValue'] = byteToValueThreshold;
+                filter['staticValue'] = staticValue;
+                    
+                let res = await getLineChartData(3, this.timeCondition, this.projectID, filter)
+
+                this.mlChartData = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
+                this.mlOptions = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
+                this.$refs.mlChart.renderChart(this.mlChartData, this.mlOptions);
+                
+
+            } catch (err) {
+
+                console.error(err); // TypeError: failed to fatch
+
+            } finally {
+                this.isActiveLineChart = false
+            }
+        },
+
+        async setScaleY(chart = 1, direction) { // direction 0 : left, 1 : right
+
+            if ( direction == undefined ){
+                direction = 0;
+            }
+
+            const { value: scale_y } = await this.$swal({
+                title: 'Enter value of scale Y',
+                input: 'text',
+                inputLabel: 'Scale Y',
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',                        
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                    return 'You need to input y scale value!'
+                    }
+                }
+            })
+
+            if (scale_y) {
+                this.$swal(`Set scale to ${scale_y}`)
+            }
+
+            var comp;
+
+            if (chart == 1) {
+                comp = this.$refs.mlChart;
+            } 
+
+            comp.options.scales.yAxes[direction].ticks = {
+                suggestedMin: 0,
+                suggestedMax: scale_y
+                // min: 0,
+                // max: scale_y
+            }
+
+            if (chart == 1) {
+                comp.renderChart(this.mlChartData, this.mlOptions);
+            }
+            
+        }
     },
 
     created() {
         if (this.$store.state.popupKind == 'Statistics') {
             this.getStatisticsLogDetails();
+            this.multilineChartData();
+            this.loaded = true
         } else if (this.$store.state.popupKind == 'FindingsDetail2') {
             this.getFindingLogDetails();
+            this.multilineChartData();
+            this.loaded = true
         }
     },
 
@@ -528,9 +598,13 @@ export default {
         isSearch() {
             if (this.$store.state.popupKind == 'Statistics') {
                 this.getStatisticsLogDetails();
+                this.multilineChartData();
             } else if (this.$store.state.popupKind == 'FindingsDetail2') {
                 this.getFindingLogDetails();
             }
+        },
+        timeCondition() {
+            this.multilineChartData();
         }
     }
 };
@@ -583,7 +657,7 @@ export default {
 
 .modal-mask {
     position: fixed;
-    z-index: 9997;
+    z-index: 1059;
     top: 0;
     left: 0;
     width: 100%;
@@ -599,7 +673,7 @@ export default {
 }
 
 .modal-container {
-    width: 500px;
+    width: 100%;
     height: 100%;
     margin: 0px auto;
     padding: 20px 20px 20px 20px;
@@ -608,6 +682,8 @@ export default {
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
     font-family: Helvetica, Arial, sans-serif;
+    max-height: 930px;
+    overflow-y: auto;
 }
 
 .modal-header {
@@ -632,4 +708,5 @@ export default {
 .modal-leave .modal-container {
     transform: scale(1.1);
 }
+
 </style>

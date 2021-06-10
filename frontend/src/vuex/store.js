@@ -92,7 +92,9 @@ const state = {
     popupFormatKind: '', 
 
     //metric info
-    metricId: ''
+    metricId: '',
+
+    currentMenu: ''
 }
 
 // mutation
@@ -174,6 +176,9 @@ const mutations = {
     [types.SET_DETAILSEARCHKEYWORD] (state, value) { state.detailsearchKeyword = value },
     [types.SET_DETAILCONDITION2] (state, value) { state.detailcondition2 = value },
     [types.SET_DETAILSEARCHKEYWORD2] (state, value) { state.detailsearchKeyword2 = value },
+
+    [types.SET_CURRENTMENU] (state, value) { state.currentMenu = value },
+
 
 
 }

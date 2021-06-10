@@ -37,7 +37,7 @@
                             </span>
                         </td>-->
                         
-                        <td v-on:click="getDetail(item)"><u>{{ item.result_count }}</u> <br> {{ item.ratio }}</td>
+                        <td style="cursor:pointer" v-on:click="getDetail(item)"><u>{{ item.result_count }}</u> <br> {{ item.ratio }}</td>
                     </tr>
                     
 
@@ -120,7 +120,7 @@ export default {
             this.$store.dispatch("setPopupHeader", 'Statistics Detail');
             this.$store.dispatch("setDetailCondition", this.statisticsKind);
             this.$store.dispatch("setDetailSearchKeyword", item.result);
-            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + this.$store.state.detailsearchKeyword);
+            this.$store.dispatch("setPopupBody", 'searchKeyword : ' + item.result);
             this.$store.dispatch("setPopupButton", 'Close');
             
             this.currentView = 'DetailPopup';

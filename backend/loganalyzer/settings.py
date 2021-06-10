@@ -34,6 +34,7 @@ MEDIA_URL = '/media/'
 #MEDIA_URL = 'E:\loganalyzerMedia'
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_ROOT = 'F:\loganalyzerMedia'
+# MEDIA_ROOT = 'C:\loganalyzerMedia'
 
 # Application definition
 
