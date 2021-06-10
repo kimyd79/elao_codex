@@ -492,7 +492,7 @@ export default {
                     description += " > " + result2[i].metric_value1.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 }
                 
-                description += " ("+result2[i].metric_unit+") → ";
+                description += " ("+result2[i].metric_unit+")";
 
                 // 같은 result가 존재하는지 확인. 존재 시 같은 row에 count_2, percent_2입력, 미존재 시 New row 생성. 
 
