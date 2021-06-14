@@ -8,7 +8,6 @@ Parsing 오류 정리.txt
 WelstoryError1.txt
 backend/queries_pgadmin4.txt
 backend/loganalyzer/__pycache__/settings.cpython-37.pyc
-backend/loganalyzerapi/errortest_lhs.py
 backend/loganalyzerapi/__pycache__/models.cpython-37.pyc
 backend/loganalyzerapi/__pycache__/serializers.cpython-37.pyc
 backend/loganalyzerapi/__pycache__/urls.cpython-37.pyc
@@ -24,14 +23,7 @@ backend/loganalyzer.zip
 backend/loganalyzerapi.zip
 frontend/dist.zip__
 frontend/src/debug.log
-.gitignore
-backend/loganalyzerapi/migrations/0001_initial.py
 backend/loganalyzerapi/migrations/0001_initial.py
 frontend/dist.7z
-backend/loganalyzerapi/testcode.py
-.gitignore
-<<<<<<< HEAD
 backend/logs
-=======
 backend/logs/mwla.log.2020-10-08
->>>>>>> 519163ff2bafd882229f61b3ac6a92913c171632
