@@ -5,6 +5,14 @@
         <!-- class="mb50" -->
         <ui-form-box>
             <span class="page-title__2label">Search</span>
+
+            <ui-form-row>
+                <ui-form-item :columns="11" label="Instances" required-left>                
+                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" />
+                    <!-- v-on:select="testEvent" -->
+                </ui-form-item>
+            </ui-form-row>
+
             <ui-form-row>
                 <ui-form-item :columns="12" label="Date/Time" required-left>
 
@@ -29,14 +37,15 @@
             <ui-form-row>
                 <ui-form-item :columns="6" label="TimeTaken">
                     <lego-text-field v-model="ttFromValue" placeholder="ms" />
-                    &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;&nbsp;&nbsp;
+                    &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;
                     <lego-text-field v-model="ttToValue" placeholder="ms" />                                       
-                </ui-form-item>               
+                </ui-form-item>
 
                 <ui-form-item :columns="8" align-right margin-right>
                     <lego-button v-on:click="initialize">Initialize</lego-button>
                     <lego-button v-on:click="search" main>Search</lego-button>
                 </ui-form-item>
+
             </ui-form-row>
         </ui-form-box>
     </ui-container-box>
@@ -52,11 +61,15 @@ import axios from "axios";
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 
+import Treeselect from '@riophae/vue-treeselect';
+import '@riophae/vue-treeselect/dist/vue-treeselect.css';
+
 export default {
     name: "Search",
 
     components: {
         DatePicker,
+        Treeselect,
     },
     data() {
         return {
@@ -72,6 +85,31 @@ export default {
 
             projectID: "",
             excludeSearch: false,
+
+            // For Tree
+            // define the default value
+            selectedInstances: null,
+            // define options
+            options: [ 
+                {
+                    id: 'server1',
+                    label: 'server1',
+                    children: [ {
+                        id: 'server1-instance1',
+                        label: 'instance1',
+                    }, 
+                    {
+                        id: 'server1-instance2',
+                        label: 'instance2',
+                    } ],
+                }, {
+                    id: 'server2',
+                    label: 'server2',
+                }, {
+                    id: 'server3',
+                    label: 'servr3',
+                }             
+            ],
 
         };
     },
@@ -157,10 +195,20 @@ export default {
 
         search() {
             // TODO : Validation Check
+            alert(this.selectedInstances);
 
             // Set Global Variable
             this.setSearchCondition()
+        },
+
+        // For Tree
+        testEvent(node, instanceId) {
+            alert("test");
+            console.log(node);
+            console.log(instanceId);
         }
+
+
     },
 
     watch: {}

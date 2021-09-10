@@ -60,6 +60,18 @@
                     <ui-form-item :columns=11 label="Project Description" required-left left-label :label-width=144 :label-padding=16>
                         {{ projectDescription }}
                     </ui-form-item>
+                    
+                    <!-- 서버명과 인스턴스명은 입력받되 존재하면 보여준다. -->
+                    <ui-form-item :columns=11 label="Server Name" required-left left-label :label-width=144 :label-padding=16>
+                        <lego-dropdown :items="servers" v-model="serverName" width="200px" />&nbsp;&nbsp;
+                        <lego-button v-on:click="addServer">Add</lego-button>
+                    </ui-form-item>
+
+                    <ui-form-item :columns=11 label="Instance Name" required-left left-label :label-width=144 :label-padding=16>
+                        <lego-dropdown :items="instances" v-model="instanceName" width="200px" />&nbsp;&nbsp;
+                        <lego-button v-on:click="addInstance">Add</lego-button>
+                    </ui-form-item>
+
 
                     <!-- addLogFormat popup 추가 -->
                     <component :is="currentView" v-on:popupClose="currentView=null" :format="format"></component>
@@ -240,7 +252,6 @@ export default {
             creator: this.$store.state.userName,
             projectID: "",
 
-            // TODO: Remove
             fileName: "",
             fileSize: 0,
             fileFormat: "",            
@@ -266,11 +277,19 @@ export default {
             timeToValue: "",
 
             radioValue: "1",
-            checkValue: false,
+            checkValue: true,
             dataRangeValue: "1",
 
             // for file format
             items: [],
+
+            // for server list
+            servers: [],
+            serverName: "",
+
+            // for instances list
+            instances: [],
+            instanceName: "",
 
             // For file upload
             file: '',
@@ -515,14 +534,61 @@ export default {
 
         },
 
+        // Server 추가
+        async addServer() {
+
+            const { value: server } = await this.$swal({
+                title: 'Enter a servername',
+                input: 'text',                
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',                        
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                    return 'You need to input a servername!'
+                    }
+                }
+            })
+
+            if (server) {
+                this.$swal(`The servername is ${server}`);
+                this.servers.push(`${server}`);
+            }
+
+        },
+
+        // Instance 추가
+        async addInstance() {
+
+            const { value: instance } = await this.$swal({
+                title: 'Enter a instancename',
+                input: 'text',                
+                inputValue: '',
+                showCancelButton: true,
+                confirmButtonColor: '#553ca5',
+                cancelButtonColor: '#dddddd',
+                confirmButtonText: 'OK',                        
+                reverseButtons: true,
+                inputValidator: (value) => {
+                    if (!value) {
+                    return 'You need to input a instancename!'
+                    }
+                }
+            })
+
+            if (instance) {
+                this.$swal(`The instancename is ${instance}`);
+                this.instances.push(`${instance}`);
+            }
+        },
+
         // 로그 포맷을 추가한다.
         addLogFormat() {
             
-            // TODO: 바로 추가할 수 있도록 수정할 것
             this.currentView = 'AddLogformatForm';
-
-            // 임시 : 로그포맷 입력 화면으로 돌아간다.
-            // this.$router.push('/logformat');
 
         },
         addData(format) {
@@ -536,7 +602,7 @@ export default {
                         confirmButtonColor: '#553ca5',                
                         confirmButtonText: 'OK',
                     });
-                    this.getLogformatList();                    
+                    this.getLogformatList();                
                 })
                 .catch((err) => {
                     this.$swal({
@@ -636,8 +702,9 @@ export default {
 
                     this.projectName = "";
                     this.projectDescription = "";
-                    this.fileName = "";
-                    this.fileFormat = "";
+                    
+                    //this.fileName = "";
+                    //this.fileFormat = "";
 
                     this.addedFilesInfo = [];
                     this.logfileIDs = [];
@@ -661,7 +728,7 @@ export default {
                     this.buttonName = "Next";
 
                     // Step1에서 시작한다. 기존 정보가 있으면 Current Info에서 시작
-                    if (this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                    if (this.projectName == "" && this.projectDescription == "" && this.fileNames[0] == "" && this.fileFormats[0] == "" ){      
                         this.tabs[0].isSelected = false;
                         this.tabs[1].isSelected = true;
                     }
@@ -930,7 +997,7 @@ export default {
                 for (let i = 0; i < this.tabs.length; i++) {
                     if (this.tabs[i].isSelected == true) {
 
-                        if (i-1 == 0 && this.projectName == "" && this.projectDescription == "" && this.fileName == "" && this.fileFormat == "" ){      
+                        if (i-1 == 0 && this.projectName == "" && this.projectDescription == "" && this.fileNames[0] == "" && this.fileFormats[0] == "" ){      
                             this.projectName = 'There is no project. Click "Next" to create a project or load an existing one.';
                         }
 
@@ -1102,8 +1169,8 @@ export default {
                         this.fileSize += uploadedFiles[i].size;
                     }
 
-                    console.log(this.fileName.substr(0, this.fileName.length -2));
-                    console.log(this.fileSize);
+                    //console.log(this.fileName.substr(0, this.fileName.length -2));
+                    //console.log(this.fileSize);
 
                     this.$store.dispatch("setFileNames", this.fileName.substr(0, this.fileName.length -2));
                 }
@@ -1120,8 +1187,7 @@ export default {
             let formData = new FormData();
 
             formData.append('project', this.projectID);
-
-            // TODO: Check
+            
             formData.append('file_object', file);
             formData.append('file_name', file.name);
             formData.append('file_size', file.size);
@@ -1133,6 +1199,10 @@ export default {
             formData.append('file_format', splitedFormat[2]);            
 
             this.$store.dispatch("setLogFormat", this.fileFormat);
+
+            // Add servername, instancename
+            formData.append('server_name', this.serverName);
+            formData.append('instance_name', this.instanceName);
 
             let axiosConfig = {
                 headers: {
@@ -1298,6 +1368,12 @@ export default {
                     this.fileFormats = [];
                     this.fileSizes = [];
 
+                    // For servers, instances
+                    this.servers = [];
+                    this.instances = [];
+
+                    var temp_server_instance = [];
+
                     for(var file of res.data.results){
                         //console.log(file);
 
@@ -1314,6 +1390,21 @@ export default {
                             is_new: false,
 
                         });
+
+                        // For servers : 중복제거
+                        if (!this.servers.includes(file.server_name)) {
+                            this.servers.push(file.server_name);
+                        }
+
+                        // For instances : 중복제거
+                        if (!this.instances.includes(file.instance_name)) {
+                            this.instances.push(file.instance_name);
+                        }
+
+                        temp_server_instance.push(file.server_name+"_"+file.instance_name);
+                        
+                        //this.servers.push(file.server_name);
+                        //this.instances.push(file.instance_name);
                     }
 
                     this.$store.dispatch("setFileNames", this.fileNames);
@@ -1322,7 +1413,7 @@ export default {
 
                     // For display
                     this.$store.dispatch("setProjectFiles", this.addedFilesInfo);
-
+                    this.$store.dispatch("setProjectServers", temp_server_instance);    // "servername-instance" 형태
 
                     // Stop Loading Spinner
                     this.isActive = false
@@ -1423,6 +1514,7 @@ export default {
                 })
 
         },
+        
     },
     watch: {
         async isRowChecked() {

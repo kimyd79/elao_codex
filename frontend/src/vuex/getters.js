@@ -8,6 +8,7 @@ export default {
     getLogFileID: state => state.logFileID,
 
     getProjectFiles: state => state.projectFiles,
+    getProjectServers: state => state.projectServers,
 
     getGlobalFromDate: state => state.global_fromDate ,
     getGlobalToDate: state => state.global_toDate ,

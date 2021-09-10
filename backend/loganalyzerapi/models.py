@@ -41,6 +41,10 @@ class LogFile(models.Model):
     file_size = models.PositiveIntegerField(default=0)
     created = models.DateTimeField(auto_now=True, verbose_name="date create")
     
+    # multiple-instance
+    server_name = models.CharField(max_length=50, null=True, blank=False)
+    instance_name = models.CharField(max_length=50, null=True, blank=False)
+    
     def __str__(self):
         return self.file_name
 

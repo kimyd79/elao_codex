@@ -6,6 +6,7 @@ export const SET_PROJECTID      = "SET_PROJECTID"
 export const SET_LOGFILEID      = "SET_LOGFILEID"
 
 export const SET_PROJECTFILES = "SET_PROJECTFILES"
+export const SET_PROJECTSERVERS = "SET_PROJECTSERVERS"
 
 // global time, date
 export const SET_GLOBAL_FROMDATE       = "SET_GLOBAL_FROMDATE"

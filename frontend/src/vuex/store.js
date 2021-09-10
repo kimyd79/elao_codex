@@ -26,6 +26,9 @@ const state = {
     // logfile_id, file_name, file_size, file_format, is_new
     projectFiles: '',
 
+    // Servers will have "servers-instances" list
+    projectServers: '',
+
     // Global Date, Time (immutable) -Global  Scale X 
     global_fromDate: '',
     global_toDate: '',
@@ -109,6 +112,7 @@ const mutations = {
     [types.SET_LOGFILEID] (state, value) { state.logFileID = value },
 
     [types.SET_PROJECTFILES] (state, value) { state.projectFiles = value },    
+    [types.SET_PROJECTSERVERS] (state, value) { state.projectServers = value }, 
 
     // global time, date
     [types.SET_GLOBAL_FROMDATE] (state, value) { state.global_fromDate = value },

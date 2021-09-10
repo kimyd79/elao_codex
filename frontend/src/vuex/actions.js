@@ -10,6 +10,7 @@ export default {
     setLogFileID({commit}, value) { commit(types.SET_LOGFILEID, value) },
 
     setProjectFiles({commit}, value) { commit(types.SET_PROJECTFILES, value) },
+    setProjectServers({commit}, value) { commit(types.SET_PROJECTSERVERS, value) },
 
     setGlobalFromDate({commit}, value) { commit(types.SET_GLOBAL_FROMDATE, value) },
     setGlobalToDate({commit}, value) { commit(types.SET_GLOBAL_TODATE, value) },
