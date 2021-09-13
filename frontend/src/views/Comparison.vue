@@ -369,6 +369,9 @@ export default {
             global_Y_request: "getGlobalYRequest2",            
             global_Y_duration: "getGlobalYDuration2",
             global_Y_request_sbar: "getGlobalYRequestSBar2",
+
+            projectServers: "getProjectServers",
+            projectServers2: "getProjectServers2",
         }),
     },
     methods: {
@@ -477,6 +480,8 @@ export default {
                 ttFromValue: this.ttFromValue,
                 ttToValue: this.ttToValue,
                 project_id: this.project_id,
+
+                projectServers: this.projectServers,
             }
 
             return filter
@@ -497,6 +502,8 @@ export default {
                 ttFromValue: this.ttFromValue2,
                 ttToValue: this.ttToValue2,
                 project_id: this.project_id,
+
+                projectServers: this.projectServers2,
             }
 
             return filter

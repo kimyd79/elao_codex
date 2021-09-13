@@ -92,6 +92,8 @@ export default {
 
         isSearch: "getToggleSearch",
         isSearch1: "getToggleSearch1",
+
+        projectServers: "getProjectServers",
     }),
 
     methods: {  
@@ -115,6 +117,8 @@ export default {
                 ttToValue: this.ttToValue,
 
                 project_id: this.projectID,
+
+                projectServers: this.projectServers,
             }
 
             return filter

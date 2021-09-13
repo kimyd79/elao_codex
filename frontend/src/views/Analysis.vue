@@ -322,6 +322,8 @@ export default {
             x_max_date: "getGlobalToDate",
             x_max_time: "getGlobalToTime",
 
+            projectServers: "getProjectServers",
+
         })
     },
 
@@ -372,6 +374,10 @@ export default {
                 ttToValue: this.ttToValue,
 
                 project_id: this.project_id,
+
+                projectServers: this.projectServers,
+
+
             }
 
             return filter

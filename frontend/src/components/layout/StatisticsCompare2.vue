@@ -93,6 +93,8 @@ export default {
         ttToValue: "getToTimeTaken2",
 
         project_id: "getProjectID",
+        projectServers: "getProjectServers2",
+        
 
     }),
 
@@ -167,6 +169,7 @@ export default {
                 ttToValue: this.ttToValue,
 
                 project_id: this.project_id,
+                projectServers: this.projectServers,
             }
 
             return filter

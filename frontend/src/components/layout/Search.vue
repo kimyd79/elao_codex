@@ -8,7 +8,7 @@
 
             <ui-form-row>
                 <ui-form-item :columns="11" label="Instances" required-left>                
-                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" />
+                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1" />
                     <!-- v-on:select="testEvent" -->
                 </ui-form-item>
             </ui-form-row>
@@ -64,6 +64,9 @@ import 'vue2-datepicker/index.css';
 import Treeselect from '@riophae/vue-treeselect';
 import '@riophae/vue-treeselect/dist/vue-treeselect.css';
 
+import { serverUrl } from "@/common";
+
+
 export default {
     name: "Search",
 
@@ -94,20 +97,22 @@ export default {
                 {
                     id: 'server1',
                     label: 'server1',
-                    children: [ {
-                        id: 'server1-instance1',
-                        label: 'instance1',
-                    }, 
-                    {
-                        id: 'server1-instance2',
-                        label: 'instance2',
-                    } ],
+                    children: [ 
+                        {
+                            id: 'server1-instance1',
+                            label: 'instance1',
+                        }, 
+                        {
+                            id: 'server1-instance2',
+                            label: 'instance2',
+                        } 
+                    ],
                 }, {
                     id: 'server2',
                     label: 'server2',
                 }, {
                     id: 'server3',
-                    label: 'servr3',
+                    label: 'server3',
                 }             
             ],
 
@@ -127,6 +132,79 @@ export default {
 
         this.projectID = this.$store.state.projectID
         this.excludeSearch = this.$store.state.excludeSearch;
+
+        this.selectedInstances = this.$store.state.projectServers;
+
+        // server, instance 목록 가져오기 by project_id
+        var url = serverUrl + "/logfile?project=" + this.projectID
+
+        let axiosConfig = {
+            headers: {
+                //'Authorization': 'Token '+ this.token // For Django
+            }
+        };
+
+        axios.get(url, axiosConfig)
+        .then(res => {
+            // console.log(res.data);
+
+            // Tree 구성
+            var treeOptions = []
+            
+            for(var result of res.data.results){
+                //console.log(result);
+                //console.log(result.server_name);
+                //console.log(result.instance_name);
+
+                var nodeServer = {};    // id, label, children
+                var nodeInstance = {};  // id, label
+
+                // check node ids
+                var isExist = false;
+                var nodeIdx = 0;
+                for(var node of treeOptions){
+                    if (node.id == result.server_name){
+                        isExist = true;
+                        break;
+                    }
+                    nodeIdx = nodeIdx + 1;
+                }
+
+                if (isExist) {  // Already Exist -> Add children attribute as array
+
+                    nodeInstance.id = result.server_name+"-"+result.instance_name;
+                    nodeInstance.label = result.server_name+"-"+result.instance_name;
+
+                    // check instance duplication
+                    for(var child of treeOptions[nodeIdx].children){
+
+                        if (child.id != nodeInstance.id) {
+                            //console.log("Not duplicate");
+                            treeOptions[nodeIdx].children.push(nodeInstance);
+                        }                         
+                    }
+
+                }else {         // Not Exist -> Add as object
+                    nodeServer.id = result.server_name;
+                    nodeServer.label = result.server_name;
+
+                    nodeInstance.id = result.server_name+"-"+result.instance_name;
+                    nodeInstance.label = result.server_name+"-"+result.instance_name;
+
+                    nodeServer.children = [ nodeInstance ];
+
+                    treeOptions.push(nodeServer);                    
+                }
+
+            }
+
+            this.options = treeOptions;
+        })
+        .catch(err => {        
+            console.error(err);
+            throw err;
+        })
+
     },
 
     computed: {
@@ -190,12 +268,14 @@ export default {
             this.$store.dispatch("setFromTimeTaken", this.ttFromValue);
             this.$store.dispatch("setToTimeTaken", this.ttToValue);
 
+            this.$store.dispatch("setProjectServers", this.selectedInstances);
+
             this.$store.dispatch("setToggleSearch");
         },
 
         search() {
             // TODO : Validation Check
-            alert(this.selectedInstances);
+            //alert(this.selectedInstances);
 
             // Set Global Variable
             this.setSearchCondition()

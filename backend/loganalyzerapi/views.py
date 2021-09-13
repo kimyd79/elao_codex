@@ -16,7 +16,7 @@ from django.db import transaction
 import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Sum, Max, Min, Avg, F, Value, CharField
+from django.db.models import Count, Sum, Max, Min, Avg, F, Value, CharField, Q
 from django.db.models.functions import Concat, Coalesce, Substr, StrIndex, Length, Right, Left
 from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
@@ -364,6 +364,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         #differences detailpopup
         statusValue = ""
+        
+        # multiple intances
+        projectServers = ""
 
         # 조건 적용(GET)
         if method == 'get' :
@@ -398,7 +401,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
             #differences detailpopup
             statusValue = self.request.query_params.get('statusValue', None)
-
+            
+            # multiple intances
+            projectServers = self.request.query_params.get('projectServers', None)
+            if projectServers is not None:
+                projectServers = projectServers.split(",")
+            else:
+                projectServers = []
         
         elif method == 'post':
             
@@ -428,6 +437,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 byteToValue = self.request.data['filter']['byteToValue'] if self.request.data['filter']['byteToValue'] != '' else None
             if 'staticValue' in self.request.data['filter']:
                 staticValue = self.request.data['filter']['staticValue'] if self.request.data['filter']['staticValue'] != '' else None
+                
+            # multiple intances
+            projectServers = self.request.data['filter']['projectServers'] if self.request.data['filter']['projectServers'] != '' else None
     
         # Dynamic Model 처리    
         # project_id = self.request.data['project_id']
@@ -445,14 +457,27 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         timeTakenUnit = ""            
         # 관련 project만 가져온다. : multifile 처리
         if project_id is not None:        
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
-            list_logfile_id = []         
+            # 기존
+            # logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')
             
-            # logfile id 가져오기
-            for logfile in logfiles:
-                list_logfile_id.append(str(logfile['logfile_id']))
-                # timeTakenUnit 가져오기
-                timeTakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))                
+            logfiles = LogFile.objects.filter(project_id=project_id)
+            
+            list_logfile_id = []
+            
+            # multi-instance 처리 : 예 - ['server1-ins1', 'server2'] - list
+            for server in projectServers:
+                instances = server.split('-')               
+                
+                if len(instances) == 1:                    
+                    temp_logfiles = logfiles.filter(server_name=instances[0])
+                elif len(instances) == 2:
+                    temp_logfiles = logfiles.filter(server_name=instances[0], instance_name=instances[1])            
+            
+                # logfile id 가져오기
+                for logfile in temp_logfiles.values('logfile_id'):
+                    list_logfile_id.append(str(logfile['logfile_id']))
+                    # timeTakenUnit 가져오기
+                    timeTakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))
             
             queryset = queryset.filter(logfile_id__in=list_logfile_id)
         

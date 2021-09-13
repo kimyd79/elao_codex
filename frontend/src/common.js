@@ -24,7 +24,7 @@ export var serverUrl = "http://127.0.0.1:8000/mwla";
 //////////////////////////////////////////////////////////////
 // Common Filter
 //////////////////////////////////////////////////////////////
-export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch){
+export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, projectServers){
     
     var filters="";
 
@@ -58,7 +58,10 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     if ( excludeSearch != '') {
         filters = filters + "&excludeSearch="+excludeSearch;
     }
-
+    if ( projectServers != '') {
+        filters = filters + "&projectServers="+projectServers;
+    }
+    
     return filters;
 }
 

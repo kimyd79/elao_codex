@@ -88,6 +88,8 @@ export default {
         threshold: "getThreshold",
 
         isSearch: "getToggleSearch2",
+
+        projectServers: "getProjectServers2",
     }),
 
     methods: {
@@ -108,6 +110,7 @@ export default {
                 ttToValue: this.ttToValue,
 
                 project_id: this.projectID,
+                projectServers: this.projectServers,
             }
 
             return filter

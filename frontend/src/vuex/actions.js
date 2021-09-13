@@ -11,6 +11,7 @@ export default {
 
     setProjectFiles({commit}, value) { commit(types.SET_PROJECTFILES, value) },
     setProjectServers({commit}, value) { commit(types.SET_PROJECTSERVERS, value) },
+    setProjectServers2({commit}, value) { commit(types.SET_PROJECTSERVERS2, value) },
 
     setGlobalFromDate({commit}, value) { commit(types.SET_GLOBAL_FROMDATE, value) },
     setGlobalToDate({commit}, value) { commit(types.SET_GLOBAL_TODATE, value) },

@@ -9,6 +9,7 @@ export default {
 
     getProjectFiles: state => state.projectFiles,
     getProjectServers: state => state.projectServers,
+    getProjectServers2: state => state.projectServers2,
 
     getGlobalFromDate: state => state.global_fromDate ,
     getGlobalToDate: state => state.global_toDate ,

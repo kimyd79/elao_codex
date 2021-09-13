@@ -28,6 +28,7 @@ const state = {
 
     // Servers will have "servers-instances" list
     projectServers: '',
+    projectServers2: '',
 
     // Global Date, Time (immutable) -Global  Scale X 
     global_fromDate: '',
@@ -113,6 +114,7 @@ const mutations = {
 
     [types.SET_PROJECTFILES] (state, value) { state.projectFiles = value },    
     [types.SET_PROJECTSERVERS] (state, value) { state.projectServers = value }, 
+    [types.SET_PROJECTSERVERS2] (state, value) { state.projectServers2 = value }, 
 
     // global time, date
     [types.SET_GLOBAL_FROMDATE] (state, value) { state.global_fromDate = value },
