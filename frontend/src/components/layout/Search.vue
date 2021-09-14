@@ -131,9 +131,12 @@ export default {
         this.ttToValue = this.$store.state.toTimeTaken
 
         this.projectID = this.$store.state.projectID
-        this.excludeSearch = this.$store.state.excludeSearch;
+        this.excludeSearch = this.$store.state.excludeSearch;       
 
-        this.selectedInstances = this.$store.state.projectServers;
+        if ( this.$store.state.projectServers == "")
+            this.selectedInstances = null;
+        else
+            this.selectedInstances = this.$store.state.projectServers;
 
         // server, instance 목록 가져오기 by project_id
         var url = serverUrl + "/logfile?project=" + this.projectID

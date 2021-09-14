@@ -125,7 +125,11 @@ export default {
 
         this.projectID = this.$store.state.projectID
         this.excludeSearch = this.$store.state.excludeSearch2;
-        this.selectedInstances = this.$store.state.projectServers2;
+
+        if ( this.$store.state.projectServers2 == "")
+            this.selectedInstances = null;
+        else
+            this.selectedInstances = this.$store.state.projectServers2;
 
         // server, instance 목록 가져오기 by project_id
         var url = serverUrl + "/logfile?project=" + this.projectID

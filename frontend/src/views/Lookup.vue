@@ -191,7 +191,11 @@ export default {
         this.projectID = this.$store.state.projectID;
 
         this.projectServers = this.$store.state.projectServers;
-        this.selectedInstances = this.$store.state.projectServers;
+
+        if ( this.$store.state.projectServers == "")
+            this.selectedInstances = null;
+        else
+            this.selectedInstances = this.$store.state.projectServers;
 
         // server, instance 목록 가져오기 by project_id
         var url = serverUrl + "/logfile?project=" + this.projectID;
@@ -303,6 +307,8 @@ export default {
         
         async search($state) {
             
+
+            var idx = 0;
             //console.log("this.searchValue : "+this.searchValue);            
             this.setSearchCondition();
 
@@ -313,7 +319,7 @@ export default {
 
             //console.log("this.queries : "+this.queries);
 
-            let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, "", this.searchValue, "", "", this.projectID, this.excludeSearch, this.projectServers);
+            let filters = getSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, "", this.searchValue, "", "", this.projectID, this.excludeSearch, this.selectedInstances);
 
             this.scrollCurrentPage++;
 
@@ -340,22 +346,28 @@ export default {
             //         /getBeforeAfterDetail 생성필요
             
             // Step1 : log line 가져오기 - Step1 없으면 출력
-            var tempResult = ""
-            
-            await axios.get(urlstring) 
-                .then(res => {                    
-                    tempResult = res.data;
-                    
-                    if (tempResult.results.length) {
-                
-                        this.resultLogs.push(...tempResult.results);
-                        $state.loaded();
-                        
-                    } else {                
+            var tempResult = null;
 
-                        this.resultLogs.push(...tempResult.results);
-                        $state.complete();
+            await axios.get(urlstring) 
+                .then(res => {
+                    
+                    if ( this.beforeLines == "" && this.afterLines == ""){ 
+            
+                        if (res.data.results.length) {
+                
+                            this.resultLogs.push(...res.data.results);
+
+                            $state.loaded();
+                            
+                        } else {                
+
+                            this.resultLogs.push(...res.data.results);
+
+                            $state.complete();
+                        }
                     }
+
+                    tempResult = res.data;                    
                 })
                 .catch(err => {
                     console.error(err);                   
@@ -382,7 +394,6 @@ export default {
                 var url = serverUrl + "/logdetail_dynamic/get_before_after_detail/"                
 
                 let postData = {
-
                     project_id: this.projectID,
                     before: this.beforeLines,
                     after: this.afterLines,
@@ -396,20 +407,20 @@ export default {
                     }
                 };
 
-               await axios.post(url, postData, axiosConfig)
+                await axios.post(url, postData, axiosConfig)
 
-                    .then(res => {                              
-
-                        tempResult = res.data;;
-
-                        if (tempResult.results.length) {
+                    .then(res => {                        
+                        
+                        if (res.data.results.length) {
                 
-                            this.resultLogs.push(...tempResult.results);
+                            this.resultLogs.push(...res.data.results);
+
                             $state.loaded();
                             
                         } else {                
 
-                            this.resultLogs.push(...tempResult.results);
+                            this.resultLogs.push(...res.data.results);
+
                             $state.complete();
                         }
 
@@ -420,10 +431,7 @@ export default {
             }
 
             //console.table(tempResult);
-
-            
-
-            
+            //console.log($state)
             
         }
 
