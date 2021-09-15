@@ -7,8 +7,9 @@
             
             <ui-form-row>
                 <ui-form-item :columns="11" label="Instances" required-left>                
-                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1" />
-                    <!-- v-on:select="testEvent" -->
+                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1"
+                    :disable-branch-nodes="true" />
+                    <!-- v-on:select="setInstances" -->
                 </ui-form-item>
             </ui-form-row>
             
@@ -136,7 +137,10 @@ export default {
         this.projectID = this.$store.state.projectID
         this.excludeSearch = this.$store.state.excludeSearch;
 
-        this.selectedInstances = this.$store.state.projectServers;
+        if ( this.$store.state.projectServers == "")
+            this.selectedInstances = null;
+        else
+            this.selectedInstances = this.$store.state.projectServers;
 
         // server, instance 목록 가져오기 by project_id
         var url = serverUrl + "/logfile?project=" + this.projectID

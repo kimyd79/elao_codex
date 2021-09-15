@@ -8,8 +8,8 @@
 
             <ui-form-row>
                 <ui-form-item :columns="11" label="Instances" required-left>                
-                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1" />
-                    <!-- v-on:select="testEvent" -->
+                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1" :disable-branch-nodes="true" />
+                    <!-- v-on:select="setInstances" -->
                 </ui-form-item>
             </ui-form-row>
 
@@ -38,7 +38,7 @@
                 <ui-form-item :columns="6" label="TimeTaken">
                     <lego-text-field v-model="ttFromValue" placeholder="ms" />
                     &nbsp;&nbsp;&nbsp;&nbsp;~&nbsp;&nbsp;
-                    <lego-text-field v-model="ttToValue" placeholder="ms" />                                       
+                    <lego-text-field v-model="ttToValue" placeholder="ms" />
                 </ui-form-item>
 
                 <ui-form-item :columns="8" align-right margin-right>
@@ -285,8 +285,10 @@ export default {
         },
 
         // For Tree
-        testEvent(node, instanceId) {
-            alert("test");
+        setInstances(node, instanceId) {
+            console.log("Call setInstances");
+            console.log(this.selectedInstances);
+            
             console.log(node);
             console.log(instanceId);
         }

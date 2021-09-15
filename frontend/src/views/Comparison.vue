@@ -217,13 +217,17 @@ import {
     getStackedBarChartTemplate,
     getLineChartTemplate,
     getMultiLineChartTemplate,
+    getLineChartTemplates,
+    getMultiLineChartTemplates,
     getMultiLineChartOptions,
     getPieChartOptions,
     getBarChartOptions,
     getStackedBarChartOptions,
     getLineChartOptions,
     getChartDataFromStatistics,
-    getLineChartData
+    getLineChartData,
+    makeYs,
+    makeX,
 } from "@/common"
 
 import * as types from "@/vuex/mutation_types";
@@ -689,55 +693,7 @@ export default {
             let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
 
             try {
-                let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)
-
-                // Global Scale : 200, 300, 400, 500을 모두 더해주어야 한다.                
-                //console.log(res)
-
-                //var sumsbarY = new Array;
-//
-                //let scale_y_global = this.$store.state.global_Y_request_sbar;
-                //let scale_y_global2 = this.$store.state.global_Y_request_sbar2;
-                //let scale_y_local = 0;
-                //
-                //for (let i = 0 ; i < res.sbarX.length ; i++){
-                //    sumsbarY.push(res.sbarY_200[i] + res.sbarY_300[i] + res.sbarY_400[i] + res.sbarY_500[i]);
-                //}
-
-                //let currentMax = Math.max.apply(null, sumsbarY);               
-//
-                //console.log("currentMax  : "+currentMax)
-                //console.log("scale_y_global  : "+ scale_y_global)
-                //console.log("scale_y_global2  : "+ scale_y_global2)
-//
-                //// Initialization
-                //if (scale_y_global == "" || scale_y_global == "undefined" || scale_y_global == null )//{               
-                //    this.$store.state.global_Y_request_sbar = currentMax;
-                //}
-//
-                //if (scale_y_global2 == "" || scale_y_global2 == "undefined" || scale_y_global2 == null )//{               
-                //    this.$store.state.global_Y_request_sbar2 = currentMax;
-                //}
-//
-                //// Update global scale
-                //scale_y_local = currentMax;
-                //if (searchArea == 1) {                        
-                //    this.$store.state.global_Y_request_sbar = currentMax;
-                //    scale_y_global = currentMax;
-                //    
-                //} else if (searchArea == 2) {
-                //    
-                //    this.$store.state.global_Y_request_sbar2 = currentMax;
-                //    scale_y_global2 = currentMax;                    
-                //}
-//
-                //if (scale_y_global < scale_y_global2) {
-                //    scale_y_local = scale_y_global2;                    
-                //} else {
-                //    scale_y_local = scale_y_global;                    
-                //}
-                //
-                //console.log("scale_y_local  : "+scale_y_local)
+                let res = await getLineChartData(2, this.timeCondition, this.project_id, filter)                
 
                 if (searchArea == 1) {
                     this.sbChartData1 = getStackedBarChartTemplate(res.sbarX, res.sbarY_200, res.sbarY_300, res.sbarY_400, res.sbarY_500);
@@ -776,58 +732,45 @@ export default {
 
             try {
                 let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
-                let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
+                                
+                //let res = await getLineChartData(1, this.timeCondition, this.project_id, filter)
 
-                //let scale_y_global = this.$store.state.global_Y_tps;
-                //let scale_y_global2 = this.$store.state.global_Y_tps2;
-                //let scale_y_local = 0;
-//
-                //let currentMax = Math.max.apply(null, res.y);
-//
-                //console.log("currentMax  : "+currentMax)
-                //console.log("scale_y_global  : "+ scale_y_global)
-                //console.log("scale_y_global2  : "+ scale_y_global2)
-//
-                //// Initialization
-                //if (scale_y_global == "" || scale_y_global == "undefined" || scale_y_global == null )//{               
-                //    this.$store.state.global_Y_tps = currentMax;
-                //}
-//
-                //if (scale_y_global2 == "" || scale_y_global2 == "undefined" || scale_y_global2 == null )//{               
-                //    this.$store.state.global_Y_tps2 = currentMax;
-                //}
-//
-                //// Update global scale
-                //scale_y_local = currentMax;
-                //if (searchArea == 1) {                        
-                //    this.$store.state.global_Y_tps = currentMax;
-                //    scale_y_global = currentMax;
-                //    
-                //} else if (searchArea == 2) {
-                //    
-                //    this.$store.state.global_Y_tps2 = currentMax;
-                //    scale_y_global2 = currentMax;                    
-                //}
-//
-                //if (scale_y_global < scale_y_global2) {
-                //    scale_y_local = scale_y_global2;                    
-                //} else {
-                //    scale_y_local = scale_y_global;                    
-                //}
-                //
-                //console.log("scale_y_local  : "+scale_y_local)
+                var valueX = [];     // x는 N개
+                var valueY = [];     // y는 N개
+                var res = null;
+                
+                // multi-instance 적용 : Loop
+                for(var instance of this.projectServers){
+                
+                    //console.log(instance);
+                    filter.projectServers = [ instance ];                    
 
+                    res = await getLineChartData(1, this.timeCondition, this.project_id, filter);                
+                    //console.log(res);
+
+                    valueX.push(res.x);
+                    valueY.push(res.y);
+
+                }
+
+                // Step1. Make X
+                var sortedX = makeX(valueX);
+               
+                // Step2. Make template for Ys
+                var templateY = makeYs(valueX, valueY, sortedX, this.projectServers);
 
                 if (searchArea == 1) {
                     
-                    this.lChartData1 = getLineChartTemplate(res.x, res.y, "TPS")
+                    //this.lChartData1 = getLineChartTemplate(res.x, res.y, "TPS")
+                    this.lChartData1 = getLineChartTemplates(sortedX, templateY, this.projectServers, "TPS");
                     this.lOptions1 = getLineChartOptions('Transaction Per Second', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
 
                     this.$refs.lChart1.renderChart(this.lChartData1, this.lOptions1);
                     
                 } else {
                     
-                    this.lChartData2 = getLineChartTemplate(res.x, res.y, "TPS")
+                    //this.lChartData2 = getLineChartTemplate(res.x, res.y, "TPS")
+                    this.lChartData2 = getLineChartTemplates(sortedX, templateY, this.projectServers, "TPS");
                     this.lOptions2 = getLineChartOptions('Transaction Per Second', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2); 
 
                     this.$refs.lChart2.renderChart(this.lChartData2, this.lOptions2);
@@ -858,53 +801,52 @@ export default {
             try {
                 let filter = searchArea == 1 ? this.getFilter1() : this.getFilter2();
                 
-                let res = await getLineChartData(3, this.timeCondition, this.project_id, filter)
+                //let res = await getLineChartData(3, this.timeCondition, this.project_id, filter)
 
-                //console.log(res.y)
-                //console.log(res.yt)
+                var valueX = [];     // x는 N개
+                var valueY = [];     // y는 N개 : request
+                var valueYT = [];    // yt는 N개 : time-taken
+                var res = null;
 
-                // Global Scale 
-                //let scale_y_request = this.$store.state.global_Y_request;                
+                // multi-instance 적용 : Loop
+                for(var instance of this.projectServers){
 
-                //if (scale_y_request == "" || scale_y_request == "undefined" || scale_y_request == null ){
-                //    this.$store.state.global_Y_request = Math.max.apply(null, res.y);
+                    filter.projectServers = [ instance ];
 
-                //} else {
+                    res = await getLineChartData(3, this.timeCondition, this.project_id, filter);
 
-                //    if (scale_y_request < Math.max.apply(null, res.y)){
-                //        this.$store.state.global_Y_request = Math.max.apply(null, res.y);
-                //    }                    
-                //}
+                    valueX.push(res.x);
+                    valueY.push(res.y);
+                    valueYT.push(res.yt);
+                }
 
-                //let scale_y_duration = this.$store.state.global_Y_duration;
+                // Step1. Make X
+                var sortedX = makeX(valueX);
 
-                //if (scale_y_duration == "" || scale_y_duration == "undefined" || scale_y_duration == null ){
-                //    this.$store.state.global_Y_duration = Math.max.apply(null, res.yt);
+                // Step2. Make template for Ys
+                var templateY = makeYs(valueX, valueY, sortedX, this.projectServers);
 
-                //} else {
+                // Step3. Make template for YTs
+                var templateYT = makeYs(valueX, valueYT, sortedX, this.projectServers);
 
-                //    if (scale_y_duration < Math.max.apply(null, res.yt)){
-                //        this.$store.state.global_Y_duration = Math.max.apply(null, res.yt);
-                //    }                    
-                //}
-                
                 if (searchArea == 1) {
-                    this.mlChartData1 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
+                    //this.mlChartData1 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
+                    this.mlChartData1 = getMultiLineChartTemplates(sortedX, templateY, 'Request (count)', templateYT, 'Time-Taken', this.projectServers);
                     this.mlOptions1 = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
 
                     this.$refs.mlChart1.renderChart(this.mlChartData1, this.mlOptions1);
                 } else {
-                    this.mlChartData2 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
+                    //this.mlChartData2 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
+                    this.mlChartData2 = getMultiLineChartTemplates(sortedX, templateY, 'Request (count)', templateYT, 'Time-Taken', this.projectServers);
                     this.mlOptions2 = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2);
 
                     this.$refs.mlChart2.renderChart(this.mlChartData2, this.mlOptions2);
                 }
                 
-                // TODO:, this.$store.state.global_Y_request, this.$store.state.global_Y_duration);
 
             } catch (err) {
 
-                console.error(err); // TypeError: failed to fatch
+                console.error(err); // TypeError: failed to fetch
 
             } finally {
                 if (searchArea == 1) {

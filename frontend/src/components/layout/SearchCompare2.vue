@@ -6,7 +6,8 @@
 
             <ui-form-row>
                 <ui-form-item :columns="11" label="Instances" required-left>                
-                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1" />
+                    <treeselect v-model="selectedInstances" :multiple="true" :options="options" :defaultExpandLevel="1" :disable-branch-nodes="true" />
+                    <!-- v-on:select="setInstances" -->
                     <!-- v-on:select="testEvent" -->
                 </ui-form-item>
             </ui-form-row>

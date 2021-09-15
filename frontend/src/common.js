@@ -809,6 +809,92 @@ export function getStackedBarChartOptions(title, x_min, x_max, y_max_request) {
     return options;
 }
 
+const COLORS = [
+    '#4dc9f6',
+    '#f67019',
+    '#f53794',
+    '#537bc4',
+    '#acc236',
+    '#166a8f',
+    '#00a950',
+    '#58595b',
+    '#8549ba'
+];
+
+export function color(index) {
+  return COLORS[index % COLORS.length];
+}
+
+export function makeX(xArray) {
+    var concatX = [];
+
+    for(var x of xArray){
+        concatX = concatX.concat(x);
+    }
+
+    return Array.from(new Set(concatX)).sort();
+}
+
+export function makeYs(xArray, yArray, sortedX, instArray) {
+    var templateY = [];
+    var index = 0;
+    for(var instance of instArray){
+        
+        // Initialization
+        templateY[index] = {};
+        for(var i of sortedX){
+            templateY[index][i] = 0;
+        }
+
+        //console.log(templateY[index]);
+        //console.log(instance);
+
+        var idx = 0;
+        for(var x of xArray[index]){
+            templateY[index][x] = yArray[index][idx];
+            idx = idx + 1;
+        }
+
+        index = index + 1;
+    }
+
+    return templateY;
+}
+
+
+// Multi-instance 구현
+export function getLineChartTemplates(x, yArray, instArray, label) {
+
+    
+    var chartData = {
+        labels: x,
+        datasets: []
+    };
+
+    var index = 0;
+    for(var instance_name of instArray){
+
+        var label_name = label+":"+instance_name;
+
+        var dataset = {
+            label: label_name,
+            fill: false,
+            backgroundColor: color(index),
+            borderColor:  color(index),
+            data: Object.values(yArray[index])
+        };
+
+        chartData.datasets.push(dataset);
+
+        index++;
+    }
+    
+    //console.log(chartData);
+
+    return chartData;
+}
+
+// Single-instance 구현
 export function getLineChartTemplate(x, y, label) {
 
     var chartData = {
@@ -821,11 +907,9 @@ export function getLineChartTemplate(x, y, label) {
             backgroundColor: 'rgb(188, 207, 229)',
             borderColor: 'rgb(188, 207, 229)',
             data: y
-        }, ]
-    }
-
-
-    
+        },
+     ]
+    }    
     return chartData;
 }
 
@@ -884,6 +968,48 @@ export function getLineChartOptions(title, x_min, x_max, y_max_tps){
     return options;
 }
 
+// Multi-instance 구현
+export function getMultiLineChartTemplates(x, y1Array, label1, y2Array, label2, instArray) {
+
+
+    var chartData = {
+        labels: x,
+        datasets: []
+    };
+
+    var index = 0;
+    for(var instance_name of instArray){
+
+        var dataset1 = {
+            label: label1+":"+instance_name,
+            fill: false,
+            backgroundColor: color(index),
+            borderColor:  color(index),
+            data: Object.values(y1Array[index]),
+            yAxisID: "request"
+        };
+
+        chartData.datasets.push(dataset1);
+
+        var dataset2 = {
+            label: label2+":"+instance_name,
+            fill: false,
+            backgroundColor: color(index+1*instArray.length),
+            borderColor:  color(index+1*instArray.length),
+            data: Object.values(y2Array[index]),
+            yAxisID: "time_taken"
+        };
+
+        chartData.datasets.push(dataset2);
+
+        index++;
+    }
+        
+    
+    return chartData;
+}
+
+// Single-instance 구현
 export function getMultiLineChartTemplate(x, y1, label1, y2, label2) {
 
     var chartData = {
