@@ -335,6 +335,16 @@ export default {
 
         allChart() {
 
+            if (this.projectServers == ""){
+                this.$swal({
+                    title: 'Notification',
+                    html: 'Select servers and instances first!',
+                    icon: 'info',
+                    confirmButtonColor: '#553ca5',                
+                    confirmButtonText: 'OK',
+                });
+            }
+
             this.lineChartData();
             this.multilineChartData();
             //this.barChartData();

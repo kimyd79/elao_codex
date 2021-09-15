@@ -55,20 +55,29 @@ export default {
                     key: "time",
                     sortable: true,
                     sortValue: "desc",
-                    filtable: true,
-                    filterValue: [],
+                    filtable: false,
+                    //filterValue: [],
                     alignRight: false,
-                    width: 10
+                    width: 8
                 },
+                // TODO: 필요한가?
+                //{
+                //    label: 'Instance',
+                //    key: "Instance",
+                //    sortable: false,
+                //    filtable: false,
+                //    alignRight: false,
+                //    width: 12,
+                //},
                 {
                     label: 'IP',
                     key: "ip",
                     sortable: false,
-                    filtable: true,
-                    filterValue: [],
+                    filtable: false,
+                    //filterValue: [],
                     alignRight: false,
-                    width: 10,
-                    filterList: ["Success", "Error", "Processing"]
+                    width: 12,
+                    //filterList: ["Success", "Error", "Processing"]
                 },
                 {
                     label: 'Request',
@@ -85,7 +94,7 @@ export default {
                     sortValue: "asc",
                     filtable: true,
                     alignRight: false,
-                    width: 20
+                    width: 15
                 },
                 {
                     label: 'UserAgent',
@@ -101,7 +110,7 @@ export default {
                     sortable: false,
                     filtable: false,
                     alignRight: false,
-                    width: 10
+                    width: 7
                 },
                 {
                     label: 'Byte',
@@ -109,7 +118,7 @@ export default {
                     sortable: false,
                     filtable: false,
                     alignRight: false,
-                    width: 10
+                    width: 8
                 },
                 {
                     label: 'TimeTaken',
@@ -189,6 +198,7 @@ export default {
                     time: timeString,
                     ip: results[i].fip,
 
+                    // TODO: Innstance가 필요한가?
                     request: frequest,
                     referrer: freferrer,
                     useragent: fuser_agent,
@@ -237,7 +247,7 @@ export default {
                 .then(res => {
 
                     //console.log(res.data.count); // 전체건수
-                    console.log(res);
+                    //console.log(res);
                     this.pagingInfo.totalItems = res.data.count;
                     this.setItemList(res.data.results);
                     // Stop Loading Spinner
