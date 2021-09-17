@@ -270,8 +270,9 @@ export default {
     created() {
         //this.logfile_id = this.$store.state.logFileID
         //this.project_id = this.$store.state.projectID
+        
         // 초기깂 로딩
-        this.$store.dispatch("setToggleSearch");
+        //this.$store.dispatch("setToggleSearch");
     },
 
     mounted() {

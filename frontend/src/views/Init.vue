@@ -422,7 +422,7 @@ export default {
     computed: {
 
         ...mapGetters({
-            isRowChecked: "getToggleSearch"
+            isRowChecked: "getToggleSearch",
         }),
     },
 
@@ -556,6 +556,7 @@ export default {
             if (server) {
                 this.$swal(`The servername is ${server}`);
                 this.servers.push(`${server}`);
+                this.serverName = `${server}`;
             }
 
         },
@@ -582,6 +583,7 @@ export default {
             if (instance) {
                 this.$swal(`The instancename is ${instance}`);
                 this.instances.push(`${instance}`);
+                this.instanceName = `${instance}`;
             }
         },
 
@@ -916,6 +918,20 @@ export default {
             } else if (this.tabs[2].isSelected) { // Step2 : this.projectID
 
                 try {
+
+                    // check servername, instancename, fileformat, files
+                    if ( this.serverName == "" || this.instanceName == "" || this.fileFormat == "" || this.files.length == 0){
+                        this.$swal({
+                            title: 'Notification',
+                            html: 'Fill required fields..!!',
+                            icon: 'error',
+                            confirmButtonColor: '#553ca5',                
+                            confirmButtonText: 'OK',
+                        });
+
+                        return;
+                    }
+
                     this.fileSize = 0;
                     
                     // Multi-file upload 필요 - Alert, Loading Spinner 필요
@@ -966,6 +982,9 @@ export default {
                         reverseButtons: true,
                         }).then((result) => {
                         if (result.isConfirmed) {
+                            
+                            this.$store.dispatch("setProjectServers", null);
+                            this.$store.dispatch("setProjectServers2", null);
                             
                             this.getStartEnd(this.projectID);
                         }

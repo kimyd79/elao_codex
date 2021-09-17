@@ -739,8 +739,13 @@ export default {
                 var valueY = [];     // y는 N개
                 var res = null;
                 
+                var servers = searchArea == 1 ? this.projectServers : this.projectServers2;
+                
+                console.log("servers");
+                console.log(servers);
+
                 // multi-instance 적용 : Loop
-                for(var instance of this.projectServers){
+                for(var instance of servers){
                 
                     //console.log(instance);
                     filter.projectServers = [ instance ];                    
@@ -757,12 +762,12 @@ export default {
                 var sortedX = makeX(valueX);
                
                 // Step2. Make template for Ys
-                var templateY = makeYs(valueX, valueY, sortedX, this.projectServers);
+                var templateY = makeYs(valueX, valueY, sortedX, servers);
 
                 if (searchArea == 1) {
                     
                     //this.lChartData1 = getLineChartTemplate(res.x, res.y, "TPS")
-                    this.lChartData1 = getLineChartTemplates(sortedX, templateY, this.projectServers, "TPS");
+                    this.lChartData1 = getLineChartTemplates(sortedX, templateY, servers, "TPS");
                     this.lOptions1 = getLineChartOptions('Transaction Per Second', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
 
                     this.$refs.lChart1.renderChart(this.lChartData1, this.lOptions1);
@@ -770,7 +775,7 @@ export default {
                 } else {
                     
                     //this.lChartData2 = getLineChartTemplate(res.x, res.y, "TPS")
-                    this.lChartData2 = getLineChartTemplates(sortedX, templateY, this.projectServers, "TPS");
+                    this.lChartData2 = getLineChartTemplates(sortedX, templateY, servers, "TPS");
                     this.lOptions2 = getLineChartOptions('Transaction Per Second', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2); 
 
                     this.$refs.lChart2.renderChart(this.lChartData2, this.lOptions2);
@@ -808,8 +813,9 @@ export default {
                 var valueYT = [];    // yt는 N개 : time-taken
                 var res = null;
 
+                var servers = searchArea == 1 ? this.projectServers : this.projectServers2;
                 // multi-instance 적용 : Loop
-                for(var instance of this.projectServers){
+                for(var instance of servers){
 
                     filter.projectServers = [ instance ];
 
@@ -824,20 +830,20 @@ export default {
                 var sortedX = makeX(valueX);
 
                 // Step2. Make template for Ys
-                var templateY = makeYs(valueX, valueY, sortedX, this.projectServers);
+                var templateY = makeYs(valueX, valueY, sortedX, servers);
 
                 // Step3. Make template for YTs
-                var templateYT = makeYs(valueX, valueYT, sortedX, this.projectServers);
+                var templateYT = makeYs(valueX, valueYT, sortedX, servers);
 
                 if (searchArea == 1) {
                     //this.mlChartData1 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
-                    this.mlChartData1 = getMultiLineChartTemplates(sortedX, templateY, 'Request (count)', templateYT, 'Time-Taken', this.projectServers);
+                    this.mlChartData1 = getMultiLineChartTemplates(sortedX, templateY, 'Request (count)', templateYT, 'Time-Taken', servers);
                     this.mlOptions1 = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue+this.timeFromValue, this.dateToValue+this.timeToValue); 
 
                     this.$refs.mlChart1.renderChart(this.mlChartData1, this.mlOptions1);
                 } else {
                     //this.mlChartData2 = getMultiLineChartTemplate(res.x, res.y, 'Request (count)', res.yt, "Time-Taken")
-                    this.mlChartData2 = getMultiLineChartTemplates(sortedX, templateY, 'Request (count)', templateYT, 'Time-Taken', this.projectServers);
+                    this.mlChartData2 = getMultiLineChartTemplates(sortedX, templateY, 'Request (count)', templateYT, 'Time-Taken', servers);
                     this.mlOptions2 = getMultiLineChartOptions('Request (count) / Time-Taken', this.dateFromValue2+this.timeFromValue2, this.dateToValue2+this.timeToValue2);
 
                     this.$refs.mlChart2.renderChart(this.mlChartData2, this.mlOptions2);

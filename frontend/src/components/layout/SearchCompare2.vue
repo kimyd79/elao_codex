@@ -87,28 +87,29 @@ export default {
             // define the default value
             selectedInstances: null,
             // define options
-            options: [ 
-                {
-                    id: 'server1',
-                    label: 'server1',
-                    children: [ 
-                        {
-                            id: 'server1-instance1',
-                            label: 'instance1',
-                        }, 
-                        {
-                            id: 'server1-instance2',
-                            label: 'instance2',
-                        } 
-                    ],
-                }, {
-                    id: 'server2',
-                    label: 'server2',
-                }, {
-                    id: 'server3',
-                    label: 'server3',
-                }             
-            ],
+            options: null,
+            //[ 
+            //    {
+            //        id: 'server1',
+            //        label: 'server1',
+            //        children: [ 
+            //            {
+            //                id: 'server1-instance1',
+            //                label: 'instance1',
+            //            }, 
+            //            {
+            //                id: 'server1-instance2',
+            //                label: 'instance2',
+            //            } 
+            //        ],
+            //    }, {
+            //        id: 'server2',
+            //        label: 'server2',
+            //    }, {
+            //        id: 'server3',
+            //        label: 'server3',
+            //    }             
+            //],
 
         };
     },
@@ -266,7 +267,17 @@ export default {
 
             this.$store.dispatch("setProjectServers2", this.selectedInstances);
 
-            this.$store.dispatch("setToggleSearch2");
+            if (this.selectedInstances == "" || this.selectedInstances == null ){
+                this.$swal({
+                    title: 'Notification',
+                    html: 'Select server(s) and instance(s) first..!!',
+                    icon: 'info',
+                    confirmButtonColor: '#553ca5',                
+                    confirmButtonText: 'OK',
+                });
+            } else {
+                this.$store.dispatch("setToggleSearch2");
+            } 
         },
 
         search() {
