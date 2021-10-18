@@ -88,7 +88,7 @@ export default {
             default: function () {
                 return {
                     // result: '',
-                    // result_count: '',                    
+                    // result_count: '',
                 }
             }
         },
@@ -239,6 +239,8 @@ export default {
         detailsearchValue: "getDetailSearchKeyword",
         threshold: "getThreshold",
 
+        projectServers: "getProjectServers",
+
     }),
 
     methods: {
@@ -311,7 +313,7 @@ export default {
             // this.getDetailCondition();
             setDetailCondition();
 
-            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', '')
+            let filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.projectServers, this.detailconditionValue, this.detailsearchValue, '', '', '', '')
 
             var urlstring =
                 //serverUrl + "/logdetail/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -361,7 +363,7 @@ export default {
 
             let dateValueTmp = this.$store.state.popupDate.substring(0,8);
             let timeValueTmp =  this.$store.state.popupDate.substring(8,12);
-            let filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)
+            let filters = getDetailSearchFilter(dateValueTmp, dateValueTmp, timeValueTmp+'00', timeValueTmp+'59', this.conditionValue, this.searchValue, this.ttFromValue, this.ttToValue, this.projectID, this.excludeSearch, this.projectServers, this.detailconditionValue, this.detailsearchValue, '', '', '', this.statusYN)
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -428,7 +430,7 @@ export default {
                 } 
             }
 
-            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.excludeSearch, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue, '')
+            filters = getDetailSearchFilter(this.dateFromValue, this.dateToValue, this.timeFromValue, this.timeToValue, this.conditionValue, this.searchValue, ttFromValueThreshold, ttToValueThreshold, this.projectID, this.excludeSearch, this.projectServers, this.detailconditionValue, this.detailsearchValue, byteFromValueThreshold, byteToValueThreshold, staticValue, '')
 
             var urlstring =
                 serverUrl + "/logdetail_dynamic/?limit=" + this.pagingInfo.rowsPerPage + "&offset=" + offset + filters;
@@ -495,7 +497,9 @@ export default {
                 project_id: this.projectID,
 
                 detailconditionValue: this.detailconditionValue,
-                detailsearchValue: this.detailsearchValue
+                detailsearchValue: this.detailsearchValue,
+
+                projectServers: this.projectServers,
             }
 
             return filter

@@ -233,6 +233,7 @@ export default {
 
             ttFromValue: "getFromTimeTaken",
             ttToValue: "getToTimeTaken",
+            projectServers: "getProjectServers",
 
             dateFromValue2: "getFromDate2",
             dateToValue2: "getToDate2",
@@ -245,6 +246,7 @@ export default {
 
             ttFromValue2: "getFromTimeTaken2",
             ttToValue2: "getToTimeTaken2",
+            projectServers2: "getProjectServers2",
 
             detailconditionValue: "getDetailCondition",
             detailsearchValue: "getDetailSearchKeyword",
@@ -287,6 +289,8 @@ export default {
                 ttToValue: this.ttToValue,
                 project_id: this.project_id,
 
+                projectServers: this.projectServers
+
             }
 
             return filter
@@ -307,6 +311,8 @@ export default {
                 ttFromValue: this.ttFromValue2,
                 ttToValue: this.ttToValue2,
                 project_id: this.project_id,
+
+                projectServers: this.projectServers2
 
             }
 

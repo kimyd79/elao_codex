@@ -231,6 +231,9 @@ export default {
             detailconditionValue: "getDetailCondition",
             detailsearchValue: "getDetailSearchKeyword",
 
+            projectServers: "getProjectServers",
+            projectServers2: "getProjectServers2",
+
         }),
 
         listN() {
@@ -287,6 +290,8 @@ export default {
                 ttFromValue: this.ttFromValue,
                 ttToValue: this.ttToValue,
                 project_id: this.project_id,
+
+                projectServers: this.projectServers
             }
 
             return filter
@@ -307,6 +312,8 @@ export default {
                 ttFromValue: this.ttFromValue2,
                 ttToValue: this.ttToValue2,
                 project_id: this.project_id,
+
+                projectServers: this.projectServers2
             }
 
             return filter

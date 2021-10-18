@@ -65,11 +65,11 @@ export function getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, s
     return filters;
 }
 
-export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, detailcondition, detailsearch, byteFrom, byteTo, staticYN, statusYN){
+export function getDetailSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, projectServers, detailcondition, detailsearch, byteFrom, byteTo, staticYN, statusYN){
     
     var filters="";
 
-    filters = getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch);
+    filters = getSearchFilter(dateFrom, dateTo, timeFrom, timeTo, condition, search, ttFrom, ttTo, projectID, excludeSearch, projectServers);
 
     if ( detailcondition != '') {
         filters = filters + "&detailconditionValue="+detailcondition;
