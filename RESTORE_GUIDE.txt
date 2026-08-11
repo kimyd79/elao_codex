@@ -1,0 +1,133 @@
+EALO LOCAL BACKUP RESTORE GUIDE
+===============================
+
+This guide restores a backup created under C:\Codex\ELAO\backups.
+Use PowerShell for all commands. Replace <BACKUP_DIR> with the actual backup
+directory, for example:
+
+  C:\Codex\ELAO\backups\ELAO_BACKUP_20260811_170000
+
+The backup contains:
+
+  elao-source.zip      Source snapshot, including current uncommitted changes
+  elao_dev.dump        PostgreSQL custom-format dump
+  media.zip            Uploaded log files
+  .env                 Local settings, including the DB password
+  SHA256.txt           Checksums
+
+CAUTION
+-------
+
+The .env file contains a database password. Keep the backup private.
+Restore to a new directory and a new database first. Do not use --clean or
+drop the current database unless its deletion has been explicitly approved.
+
+1. VERIFY THE BACKUP
+--------------------
+
+  $backupDir = '<BACKUP_DIR>'
+  Get-Content "$backupDir\SHA256.txt"
+  Get-ChildItem $backupDir -File |
+    Where-Object Name -ne 'SHA256.txt' |
+    Get-FileHash -Algorithm SHA256 |
+    Format-Table Path, Hash
+
+Compare the displayed hashes with SHA256.txt.
+
+2. RESTORE THE SOURCE
+---------------------
+
+Choose an empty destination. The example uses C:\Codex\ELAO_RESTORED.
+
+  New-Item -ItemType Directory -Path C:\Codex\ELAO_RESTORED | Out-Null
+  Expand-Archive `
+    -Path "$backupDir\elao-source.zip" `
+    -DestinationPath C:\Codex\ELAO_RESTORED
+  cd C:\Codex\ELAO_RESTORED
+  Copy-Item "$backupDir\.env" .env
+
+3. CREATE A SEPARATE RESTORE DATABASE
+-------------------------------------
+
+Adjust the PostgreSQL version in the path if necessary.
+
+  $postgresBin = 'C:\Program Files\PostgreSQL\16\bin'
+  & "$postgresBin\createdb.exe" `
+    -h localhost -p 5432 -U postgres -W elao_restore
+
+Restore the dump:
+
+  & "$postgresBin\pg_restore.exe" `
+    -h localhost -p 5432 -U postgres -W `
+    -d elao_restore -v "$backupDir\elao_dev.dump"
+
+Edit C:\Codex\ELAO_RESTORED\.env and set:
+
+  POSTGRES_DB=elao_restore
+  DJANGO_MEDIA_ROOT=C:\Codex\ELAO_RESTORED\EALO\backend\media
+
+Keep POSTGRES_PASSWORD equal to the password of the local postgres account.
+
+4. RESTORE UPLOADED LOG FILES
+-----------------------------
+
+  New-Item -ItemType Directory `
+    -Path C:\Codex\ELAO_RESTORED\EALO\backend\media `
+    -Force | Out-Null
+  Expand-Archive `
+    -Path "$backupDir\media.zip" `
+    -DestinationPath C:\Codex\ELAO_RESTORED\EALO\backend\media `
+    -Force
+
+5. RECREATE PYTHON AND NODE DEPENDENCIES
+----------------------------------------
+
+  cd C:\Codex\ELAO_RESTORED
+  $env:EALO_NODE_HOME = 'C:\Tools\node-v14.21.1-win-x64'
+  $python38 = "$env:LocalAppData\Programs\Python\Python38\python.exe"
+  $postgresBin = 'C:\Program Files\PostgreSQL\16\bin'
+
+  powershell -ExecutionPolicy Bypass `
+    -File .\scripts\setup-windows.ps1 `
+    -Python $python38 `
+    -PostgresBin $postgresBin
+
+The setup script may report that migrations are already applied. That is
+expected because the database dump contains migration history.
+
+6. START AND VERIFY
+-------------------
+
+  $env:EALO_NODE_HOME = 'C:\Tools\node-v14.21.1-win-x64'
+  powershell -ExecutionPolicy Bypass -File .\scripts\start-windows.ps1
+
+Open:
+
+  Frontend:     http://127.0.0.1:8080
+  API:          http://127.0.0.1:8000/mwla/
+  Admin:        http://127.0.0.1:8000/mwla/admin/
+
+Verify all of the following:
+
+  - Existing user can log in.
+  - The sample project appears.
+  - The uploaded access.log is listed.
+  - Analysis shows the expected 90 rows.
+  - Dynamic logdetail queries work.
+
+Stop the restored application with:
+
+  powershell -ExecutionPolicy Bypass -File .\scripts\stop-windows.ps1
+
+7. SWITCHING BACK TO THE ORIGINAL ENVIRONMENT
+----------------------------------------------
+
+Stop the restored application, return to C:\Codex\ELAO, and start it there.
+Only one environment can use ports 8000 and 8080 at a time.
+
+  cd C:\Codex\ELAO
+  $env:EALO_NODE_HOME = 'C:\Tools\node-v14.21.1-win-x64'
+  powershell -ExecutionPolicy Bypass -File .\scripts\start-windows.ps1
+
+Never delete the original elao_dev database or original media directory until
+the restored copy has been fully verified.
