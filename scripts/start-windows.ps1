@@ -1,5 +1,6 @@
 . (Join-Path $PSScriptRoot 'windows-common.ps1')
 Import-EaloEnvironment
+Normalize-EaloProcessEnvironment
 Enable-EaloNode
 $python = Get-EaloPython
 

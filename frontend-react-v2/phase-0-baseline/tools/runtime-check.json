@@ -1,0 +1,56 @@
+﻿{
+    "backend":  false,
+    "frontend":  false,
+    "backend_pid":  14312,
+    "frontend_pid":  15012,
+    "checks":  [
+                   {
+                       "uri":  "http://127.0.0.1:8000/mwla/",
+                       "status":  200,
+                       "samples_ms":  [
+                                          92.62,
+                                          50.95,
+                                          33.12
+                                      ],
+                       "median_ms":  50.95,
+                       "p95_ms":  92.62,
+                       "bytes":  559
+                   },
+                   {
+                       "uri":  "http://127.0.0.1:8000/mwla/logmaster/",
+                       "status":  200,
+                       "samples_ms":  [
+                                          136.65,
+                                          139.15,
+                                          137.97
+                                      ],
+                       "median_ms":  137.97,
+                       "p95_ms":  139.15,
+                       "bytes":  411
+                   },
+                   {
+                       "uri":  "http://127.0.0.1:8000/mwla/logfile/",
+                       "status":  200,
+                       "samples_ms":  [
+                                          136.81,
+                                          127.4,
+                                          150.86
+                                      ],
+                       "median_ms":  136.81,
+                       "p95_ms":  150.86,
+                       "bytes":  1496
+                   },
+                   {
+                       "uri":  "http://127.0.0.1:8080/",
+                       "status":  200,
+                       "samples_ms":  [
+                                          32.1,
+                                          30.31,
+                                          33.49
+                                      ],
+                       "median_ms":  32.1,
+                       "p95_ms":  33.49,
+                       "bytes":  677
+                   }
+               ]
+}

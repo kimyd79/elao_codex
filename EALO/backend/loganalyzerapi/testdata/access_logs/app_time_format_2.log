@@ -1,0 +1,5 @@
+2026-08-11 10:30:00 INFO application started
+2026-08-11 10:30:01 INFO request accepted id=synthetic-001
+2026-08-11 10:30:02 WARN synthetic retry requested
+2026-08-11 10:30:03 ERROR synthetic downstream failure
+2026-08-11 10:30:04 INFO application recovered

@@ -1,4 +1,4 @@
-FROM python:3.8-slim-bullseye
+FROM python:3.12-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -10,9 +10,9 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.runtime.txt ./
-RUN python -m pip install --upgrade "pip<25" "setuptools<70" wheel \
-    && python -m pip install --no-cache-dir -r requirements.runtime.txt
+COPY requirements.lock.txt ./
+RUN python -m pip install --upgrade pip setuptools wheel \
+    && python -m pip install --no-cache-dir -r requirements.lock.txt
 
 COPY . .
 RUN mkdir -p /app/media /app/logs \

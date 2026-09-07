@@ -19,4 +19,6 @@ db.sqlite3
 *.sw?
 
 **/__pycache__
-**/migrations
+# Django migration source files are part of the application and must be tracked.
+# Only generated Python bytecode inside migration directories is ignored by the
+# __pycache__ rule above.

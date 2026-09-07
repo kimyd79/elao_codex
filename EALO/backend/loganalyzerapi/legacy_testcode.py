@@ -1,3 +1,10 @@
+"""Legacy manual experiments.
+
+This module is intentionally not named ``test*.py`` because it reads files from
+the original developer's workstation at import time.  It is retained only as
+historical reference and is not part of the automated test suite.
+"""
+
 import re
 
 # TODO: 날짜가 들어간 부분을 어떻게 처리할 것인가? 숫자 나타나기 전 까지를 파일명으로 보고 매칭한다.(뱔도 로직)

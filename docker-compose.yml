@@ -49,10 +49,11 @@ services:
 
   frontend:
     build:
-      context: ./EALO/frontend
+      context: ./frontend-react-v2
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/mwla}
     environment:
-      VUE_APP_API_URL: ${VUE_APP_API_URL:-http://127.0.0.1:8000/mwla}
-      CHOKIDAR_USEPOLLING: "true"
+      VITE_REACT_V2_ENABLED: ${VITE_REACT_V2_ENABLED:-true}
     ports:
       - "8080:8080"
     depends_on:

@@ -1,0 +1,5 @@
+203.0.113.40 - - [11/Aug/2026:11:00:00 +0900] "GET /valid-one HTTP/1.1" 200 100 "-" "ELAO-Test/1.0" 10000
+this row does not match the configured apache format
+203.0.113.41 - - [11/Aug/2026:11:00:01 +0900] "GET /bad-status HTTP/1.1" BAD 200 "-" "ELAO-Test/1.0" 20000
+203.0.113.42 - - [99/Bad/2026:25:61:61 +0900] "GET /bad-date HTTP/1.1" 200 300 "-" "ELAO-Test/1.0" 30000
+203.0.113.43 - - [11/Aug/2026:11:00:03 +0900] "GET /valid-two HTTP/1.1" 404 400 "-" "ELAO-Test/1.0" 40000

@@ -1,0 +1,159 @@
+[ERROR][11/Aug/2026 15:53:44,173][9064|14252][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:44,227][9064|9356][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:44,761][9064|8932][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:44,776][9064|14252][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:44,823][9064|6828][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:44,829][9064|9356][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:45, 49][9064|9356][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:45, 50][9064|5840][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:45, 50][9064|6828][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:45,100][9064|14252][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:45,116][9064|2936][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:45,135][9064|8932][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:51,347][9064|8932][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:51,356][9064|9356][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:53:51,385][9064|14252][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:57:46,907][9064|6828][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:57:46,931][9064|2936][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 15:57:46,948][9064|14252][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:08,672][9064|412][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:08,725][9064|8724][loganalyzerapi.views|findings|1012] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:08,730][9064|13036][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:08,811][9064|11736][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:08,819][9064|10396][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:08,862][9064|412][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:09, 12][9064|10396][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:09, 13][9064|11736][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:09, 32][9064|8724][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:09, 47][9064|13036][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:09, 70][9064|8804][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:15:09, 71][9064|412][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 16:22:20,207][9064|8564][loganalyzerapi.views|create|2428] Error Occured while creating logdetail : 'ftime_taken'
+[ERROR][11/Aug/2026 16:28:47,628][9064|11224][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:47,741][9064|3636][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:47,759][9064|5124][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:47,789][9064|12128][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:47,849][9064|11224][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:47,860][9064|12812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:47,969][9064|5124][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:48, 12][9064|7588][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:48, 14][9064|12128][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:48, 17][9064|3636][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:28:48, 66][9064|11224][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:29:19, 60][9064|12812][loganalyzerapi.views|start_end|1098] Error Occured while processing start_end : 'NoneType' object has no attribute 'fdate'
+[ERROR][11/Aug/2026 16:32:45,762][9064|12128][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:45,802][9064|7588][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:45,839][9064|3636][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:45,856][9064|11224][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:45,885][9064|5124][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:45,917][9064|12128][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46,  8][9064|7588][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46, 36][9064|12812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46, 85][9064|3636][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46,100][9064|12128][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46,123][9064|5124][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46,127][9064|11224][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46,211][9064|12812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:46,212][9064|7588][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:32:52,100][9064|12812][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:39:39,159][9064|13564][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:39:54,472][9064|13156][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:39:54,591][9064|13564][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:39:54,629][9064|7752][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:39:54,660][9064|9840][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:39:54,735][9064|3648][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:39:54,749][9064|6720][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:17,910][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:17,947][9064|4656][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18, 11][9064|2068][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18, 66][9064|4684][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,115][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,121][9064|9032][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,211][9064|4684][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,265][9064|9632][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,305][9064|2068][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,315][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:18,343][9064|4656][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22, 36][9064|4656][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22, 81][9064|2068][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22, 93][9064|4684][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,123][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,159][9064|9632][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,198][9064|9032][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,338][9064|4656][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,347][9064|13812][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,384][9064|2068][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:22,476][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,657][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,754][9064|9632][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,761][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,780][9064|9032][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,792][9064|4656][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,868][9064|4684][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,941][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,989][9064|2068][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:23,993][9064|9632][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:24, 20][9064|9032][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:24, 30][9064|4656][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:27,970][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:45:45, 43][9064|4684][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:45, 49][9064|9632][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:45, 86][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:45,106][9064|4656][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:45,156][9064|2068][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:45,240][9064|9032][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:45:47, 12][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:45:48,501][9064|9032][loganalyzerapi.views|chartdata|1876] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:48,502][9064|4684][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:48,531][9064|13812][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:48,552][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:45:48,583][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:48,621][9064|4656][loganalyzerapi.views|statistics|1496] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][11/Aug/2026 16:45:54,642][9064|13812][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:45:55,675][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:27,891][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:27,893][9064|13812][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:36,791][9064|4656][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:36,848][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:38,788][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:39,383][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:39,767][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:58,131][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:58,173][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:58,821][9064|9032][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:47:58,822][9064|4656][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:00,682][9064|9032][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:00,685][9064|4656][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:00,805][9064|13812][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:01,895][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:07,709][9064|9032][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:09, 60][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:10,464][9064|9632][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:10,487][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:11, 47][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:19,275][9064|9032][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:19,333][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:19,672][9064|4684][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:19,751][9064|13812][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:20,519][9064|2068][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 16:48:20,539][9064|4656][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 19:26:44,470][5816|7344][loganalyzerapi.views|create|2457] Error Occured while creating logdetail : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 19:58:38, 12][5536|4408][loganalyzerapi.views|create|2537] Error Occured while creating logdetail : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 19:59:24,254][3648|5832][loganalyzerapi.views|create|2537] Error Occured while creating logdetail : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 20:00:26,110][3452|5824][loganalyzerapi.views|create|2537] Error Occured while creating logdetail : ModelSchema matching query does not exist.
+[ERROR][11/Aug/2026 20:07:18,996][13804|1216][loganalyzerapi.views|create|2610] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][11/Aug/2026 20:07:20,583][13804|1216][loganalyzerapi.views|create|2610] Error Occured while creating logdetail : You are attempting to drop constraints or indexes inside a transaction block, which is very likely to fail.  If it doesn't fail, you wouldn't gain any significant benefit from it anyway.  Either remove the transaction block, or set drop_constraints=False and drop_indexes=False.
+[ERROR][11/Aug/2026 20:07:21,520][13804|1216][loganalyzerapi.views|create|2610] Error Occured while creating logdetail : You are attempting to drop constraints or indexes inside a transaction block, which is very likely to fail.  If it doesn't fail, you wouldn't gain any significant benefit from it anyway.  Either remove the transaction block, or set drop_constraints=False and drop_indexes=False.
+[ERROR][11/Aug/2026 20:08:07,626][9428|9784][loganalyzerapi.views|create|2615] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][11/Aug/2026 20:08:33,802][8924|8940][loganalyzerapi.views|create|2614] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][11/Aug/2026 20:08:35,377][8924|8940][loganalyzerapi.views|create|2614] Error Occured while creating logdetail : You are attempting to drop constraints or indexes inside a transaction block, which is very likely to fail.  If it doesn't fail, you wouldn't gain any significant benefit from it anyway.  Either remove the transaction block, or set drop_constraints=False and drop_indexes=False.
+[ERROR][11/Aug/2026 20:08:36,312][8924|8940][loganalyzerapi.views|create|2614] Error Occured while creating logdetail : You are attempting to drop constraints or indexes inside a transaction block, which is very likely to fail.  If it doesn't fail, you wouldn't gain any significant benefit from it anyway.  Either remove the transaction block, or set drop_constraints=False and drop_indexes=False.
+[ERROR][11/Aug/2026 20:09:11,233][4092|11304][loganalyzerapi.views|create|2619] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][11/Aug/2026 20:09:43,735][12304|3968][loganalyzerapi.views|create|2619] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][11/Aug/2026 20:09:44,570][12304|3968][loganalyzerapi.views|create|2619] Error Occured while creating logdetail : synthetic COPY failure
+[ERROR][11/Aug/2026 20:10:14,605][2036|788][loganalyzerapi.views|create|2619] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][11/Aug/2026 20:10:15,443][2036|788][loganalyzerapi.views|create|2619] Error Occured while creating logdetail : synthetic COPY failure
+[ERROR][11/Aug/2026 21:24:21,184][9064|10804][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 21:24:38,634][9064|10804][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 22:20:13,539][9064|552][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment
+[ERROR][11/Aug/2026 22:20:18,275][9064|8668][loganalyzerapi.views|findings|1012] Error Occured while processing findings : local variable 'totalCnt' referenced before assignment

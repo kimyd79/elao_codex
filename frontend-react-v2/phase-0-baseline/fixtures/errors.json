@@ -1,0 +1,5 @@
+{
+  "empty": { "status": 200, "items": [] },
+  "validation": { "status": 400, "code": "validation_error", "fields": {} },
+  "server_error": { "status": 500, "code": "internal_error" }
+}

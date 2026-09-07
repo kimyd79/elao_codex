@@ -1,0 +1,5 @@
+198.51.100.20 - - [11/Aug/2026:00:10:00 +0000] "GET / HTTP/1.1" 200 1500 "-" "ELAO-Nginx-Test/1.0" 0.015
+198.51.100.21 - - [11/Aug/2026:00:10:01 +0000] "GET /health HTTP/1.1" 200 32 "-" "ELAO-Probe/1.0" 0.002
+198.51.100.22 - - [11/Aug/2026:00:10:02 +0000] "POST /api/orders HTTP/1.1" 201 640 "https://shop.example.test/cart" "ELAO-Nginx-Test/1.0" 0.240
+198.51.100.23 - - [11/Aug/2026:00:10:03 +0000] "GET /private HTTP/1.1" 403 128 "-" "ELAO-Nginx-Test/1.0" 0.008
+198.51.100.24 - - [11/Aug/2026:00:10:04 +0000] "GET /gateway HTTP/1.1" 502 96 "-" "ELAO-Nginx-Test/1.0" 1.500

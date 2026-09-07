@@ -33,6 +33,7 @@ class LogFile(models.Model):
     project = models.ForeignKey(LogMaster, on_delete=models.CASCADE)    
     file_name = models.CharField(max_length=100, blank=True, default='')    
     file_object = models.FileField(upload_to=upload_directory_path)
+    content_sha256 = models.CharField(max_length=64, null=True, blank=True, db_index=True)
     file_format = models.CharField(max_length=400, null=False, blank=False)
     
     format_kind = models.CharField(max_length=50, null=True, blank=False)
@@ -100,6 +101,84 @@ class LogDetail(models.Model):
 
     class Meta:
         ordering = ['created']
+
+
+class LogDetailV2(models.Model):
+    """Typed staging model for parallel validation before dynamic-table cutover."""
+    log_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    logfile = models.ForeignKey(LogFile, on_delete=models.CASCADE, related_name='typed_details')
+    event_at = models.DateTimeField(null=True, blank=True)
+    status = models.SmallIntegerField(null=True, blank=True)
+    response_time = models.BigIntegerField(null=True, blank=True)
+    response_bytes = models.BigIntegerField(null=True, blank=True)
+    request = models.TextField(null=True, blank=True)
+    client_ip = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    raw_line = models.TextField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['logfile', 'event_at']),
+            models.Index(fields=['logfile', 'status']),
+            models.Index(fields=['request']),
+        ]
+
+
+class LogParseReject(models.Model):
+    logfile = models.ForeignKey(
+        LogFile,
+        on_delete=models.CASCADE,
+        related_name='parse_rejects',
+    )
+    line_number = models.PositiveIntegerField()
+    raw_line = models.TextField()
+    error_code = models.CharField(max_length=50)
+    error_message = models.CharField(max_length=300)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['line_number']
+
+
+class LogAnalysisJob(models.Model):
+    STATUS_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('PROCESSING', 'Processing'),
+        ('COMPLETED', 'Completed'),
+        ('PARTIAL', 'Partial'),
+        ('FAILED', 'Failed'),
+    )
+
+    job_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    project = models.ForeignKey(
+        LogMaster,
+        on_delete=models.CASCADE,
+        related_name='analysis_jobs',
+    )
+    logfile = models.ForeignKey(
+        LogFile,
+        on_delete=models.CASCADE,
+        related_name='analysis_jobs',
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='PENDING',
+    )
+    diff_hour = models.IntegerField(default=0)
+    source_count = models.PositiveIntegerField(default=0)
+    parsed_count = models.PositiveIntegerField(default=0)
+    rejected_count = models.PositiveIntegerField(default=0)
+    stored_count = models.PositiveIntegerField(default=0)
+    error_message = models.TextField(blank=True, default='')
+    started = models.DateTimeField(null=True, blank=True)
+    finished = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created']
     
 class LogFormat(models.Model):
     # PK

@@ -33,6 +33,7 @@ backend/logs/mwla.log.2020-10-08
 EALO/backend/media/
 EALO/backend/logs/mwla.log
 .venv/
+.venv312/
 .runtime/
 EALO/frontend/node_modules/
 EALO/frontend/dist/

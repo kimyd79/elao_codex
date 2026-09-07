@@ -1,0 +1,23 @@
+# Fully pinned Python 3.12 / Django 5.2 runtime verified on Windows.
+asgiref==3.12.1
+certifi==2026.7.22
+charset-normalizer==3.4.9
+dj-rest-auth==7.2.0
+Django==5.2.15
+django-allauth==65.13.1
+django-cors-headers==4.7.0
+django-dynamic-model==0.2.0
+django-filter==25.1
+django-postgres-copy==2.4.2
+djangorestframework==3.16.1
+idna==3.18
+numpy==1.26.4
+pandas==2.2.3
+psycopg2==2.9.10
+python-dateutil==2.9.0.post0
+pytz==2026.3.post1
+requests==2.32.5
+six==1.17.0
+sqlparse==0.5.5
+tzdata==2026.3
+urllib3==2.7.0

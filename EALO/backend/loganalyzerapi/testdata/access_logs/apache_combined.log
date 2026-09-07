@@ -1,0 +1,5 @@
+203.0.113.10 - - [11/Aug/2026:09:00:00 +0900] "GET /index.html HTTP/1.1" 200 1024 "https://portal.example.test/" "ELAO-TestBrowser/1.0" 120000
+203.0.113.11 - alice [11/Aug/2026:09:00:01 +0900] "GET /assets/app.js HTTP/1.1" 304 0 "https://portal.example.test/index.html" "ELAO-TestBrowser/1.0" 8000
+203.0.113.12 - - [11/Aug/2026:09:00:02 +0900] "POST /api/login HTTP/1.1" 401 256 "-" "ELAO-TestClient/2.0" 350000
+203.0.113.13 - - [11/Aug/2026:09:00:03 +0900] "GET /missing HTTP/1.1" 404 512 "https://portal.example.test/" "ELAO-TestBrowser/1.0" 42000
+203.0.113.14 - - [11/Aug/2026:09:00:04 +0900] "GET /api/report?id=42 HTTP/1.1" 500 2048 "-" "ELAO-TestClient/2.0" 1000000

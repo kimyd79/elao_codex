@@ -1,5 +1,5 @@
 param(
-    [string]$Python = 'python',
+    [string]$Python = '',
     [string]$PostgresBin = ''
 )
 
@@ -7,18 +7,25 @@ param(
 Import-EaloEnvironment
 Enable-EaloNode
 
-$detectedPython = & $Python -c "import sys; print('.'.join(map(str, sys.version_info[:2])))" 2>$null
-if ($detectedPython -ne '3.8') {
-    throw "Python 3.8 is required; detected '$detectedPython'. Pass its full path with -Python."
+if (-not $Python) {
+    $Python = (& py -3.12 -c "import sys; print(sys.executable)" 2>$null | Select-Object -First 1)
+    if (-not $Python) {
+        throw 'Python 3.12 was not found. Install it or pass its full path with -Python.'
+    }
 }
 
-$venv = Join-Path $script:RepoRoot '.venv'
+$detectedPython = & $Python -c "import sys; print('.'.join(map(str, sys.version_info[:2])))" 2>$null
+if ($detectedPython -ne '3.12') {
+    throw "Python 3.12 is required; detected '$detectedPython'. Pass its full path with -Python."
+}
+
+$venv = Join-Path $script:RepoRoot '.venv312'
 if (-not (Test-Path -LiteralPath $venv)) {
     & $Python -m venv $venv
 }
 $venvPython = Join-Path $venv 'Scripts\python.exe'
-& $venvPython -m pip install --upgrade "pip<25" "setuptools<70" wheel
-& $venvPython -m pip install -r (Join-Path $script:RepoRoot 'EALO\backend\requirements.runtime.txt')
+& $venvPython -m pip install --upgrade pip setuptools wheel
+& $venvPython -m pip install -r (Join-Path $script:RepoRoot 'EALO\backend\requirements.lock.txt')
 
 if (-not $PostgresBin) {
     $installRoot = 'C:\Program Files\PostgreSQL'

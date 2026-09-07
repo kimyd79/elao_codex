@@ -6,13 +6,14 @@ from rest_framework.response import Response
 from rest_framework import renderers
 from rest_framework import viewsets, status
 from rest_framework.renderers import JSONRenderer
-from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString, Metrics, LogMasterMetric
-from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer, DynamicLogDetailSerializer, MetricsSerializer, LogMasterMetricSerializer
+from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogDetailV2, LogFormat, LogFormatString, Metrics, LogMasterMetric, LogParseReject, LogAnalysisJob
+from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer, DynamicLogDetailSerializer, MetricsSerializer, LogMasterMetricSerializer, LogAnalysisJobSerializer, LogDetailV2Serializer
+import hashlib
 import time, uuid, re, csv, io
 
 from datetime import datetime, timezone, timedelta
 from rest_framework.response import Response
-from django.db import transaction
+from django.db import transaction, connection
 import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -23,7 +24,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.http import QueryDict
 import os
-from postgres_copy import CopyManager
+import shutil
+import shlex
+import tempfile
 import copy
 import numpy as np
 from zipfile import ZipFile
@@ -35,11 +38,26 @@ from multiprocessing import Process, Queue
 from threading import Thread
 
 from dynamic_models.models import ModelSchema, FieldSchema
+from loganalyzerapi.parsers import validate_log_line as validate_format_log_line
 from django.apps import apps
+from django.db.models.signals import post_save
 
 from django.conf import settings
+from django.utils import timezone as django_timezone
 import logging
 logger = logging.getLogger(__name__)
+
+
+def _separate_dynamic_field_schema_timestamps(sender, **kwargs):
+    """Keep django-dynamic-models cache invalidation monotonic on Windows."""
+    time.sleep(0.001)
+
+
+post_save.connect(
+    _separate_dynamic_field_schema_timestamps,
+    sender=FieldSchema,
+    dispatch_uid='elao.dynamic-field-schema-timestamp',
+)
     
 # 기본 CRUD생성
 class LogMasterViewSet(viewsets.ModelViewSet):
@@ -140,14 +158,14 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             logdetail_dynamic = logdetail_schema.as_model() # LogDetail       
             logdetail_dynamic.objects.create()
             
-            # For postgresql copy            
-            # logdetail_dynamic.objects = CopyManager()                       
+            # Dynamic rows use the native COPY helper during analysis.
             
             response = {'message': 'Dynamic LogDetail created successfully', 'model_name': model_name}        
             return Response(response, status = status.HTTP_200_OK)
             
         except Exception as ex:
             print('Error Occured while creating Dynamic LogDetail...', ex)
+            logger.exception('Error Occured while creating Dynamic LogDetail')
                     
             response = {'message': 'Dynamic LogDetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)  
@@ -195,7 +213,88 @@ class LogFileViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     
     search_fields = ['file_name']    
-    filterset_fields = ['project']    
+    filterset_fields = ['project']
+
+    @action(methods=['post'], detail=False, url_path='validate_sample')
+    def validate_sample(self, request, pk=None):
+        upload = request.FILES.get('file_object')
+        format_kind = request.data.get('format_kind', '')
+        format_name = request.data.get('format_name', '')
+        file_format = request.data.get('file_format', '')
+        if upload is None or not format_kind or not file_format:
+            return Response(
+                {'message': 'file_object, format_kind, and file_format are required.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        parser = DynamicLogDetailViewSet()
+        try:
+            format_index = parser.get_logformat_index(file_format, format_kind)
+            expected_count = max(format_index.values()) + 1 if format_index else None
+            samples = []
+            upload.seek(0)
+            for line_number, raw_line in enumerate(upload.read().decode('utf-8').splitlines(), 1):
+                if raw_line.startswith('#'):
+                    continue
+                error = validate_format_log_line(
+                    raw_line, format_kind, format_name, format_index, expected_count
+                )
+                samples.append({
+                    'line_number': line_number,
+                    'valid': error is None,
+                    'error_code': error[0] if error else None,
+                    'error_message': error[1] if error else None,
+                })
+                if len(samples) >= 10:
+                    break
+            return Response({
+                'message': 'sample validation completed',
+                'format_kind': format_kind,
+                'sample_count': len(samples),
+                'valid_count': sum(item['valid'] for item in samples),
+                'samples': samples,
+            }, status=status.HTTP_200_OK)
+        except (UnicodeDecodeError, ValueError, KeyError) as error:
+            return Response(
+                {'message': 'sample validation failed', 'error': str(error)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def perform_create(self, serializer):
+        upload = self.request.FILES.get('file_object')
+        if upload is None:
+            serializer.save()
+            return
+
+        digest = hashlib.sha256()
+        for chunk in upload.chunks():
+            digest.update(chunk)
+        upload.seek(0)
+        checksum = digest.hexdigest()
+        project = serializer.validated_data['project']
+        if LogFile.objects.filter(
+                project=project, content_sha256=checksum
+        ).exists():
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'file_object': 'An identical file is already registered for this project.'
+            })
+        serializer.save(content_sha256=checksum)
+
+
+class LogAnalysisJobViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = LogAnalysisJob.objects.select_related(
+        'project', 'logfile'
+    ).all()
+    serializer_class = LogAnalysisJobSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['project', 'logfile', 'status']
+
+
+class LogDetailV2ViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = LogDetailV2.objects.select_related('logfile').all()
+    serializer_class = LogDetailV2Serializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['logfile', 'status']
     
     '''
     '^' Starts-with search.
@@ -439,7 +538,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 staticValue = self.request.data['filter']['staticValue'] if self.request.data['filter']['staticValue'] != '' else None
                 
             # multiple intances
-            projectServers = self.request.data['filter']['projectServers'] if self.request.data['filter']['projectServers'] != '' else None
+            projectServers = self.request.data['filter'].get('projectServers') or []
+
+            # The frontend sends null until a server/instance selection is ready.
+            # Treat that transient state as an empty selection instead of raising
+            # TypeError while iterating below.
+            if isinstance(projectServers, str):
+                projectServers = [projectServers]
     
         # Dynamic Model 처리    
         # project_id = self.request.data['project_id']
@@ -723,7 +828,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     	        logger.debug('get_before_after_detail project_id : %s' % project_id)
             
             model_name = "logdetail_"+project_id
-            LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()
+            LogDetail_dynamic = LogDetail_dynamic
             
             for log in logs['results']:
                 
@@ -759,6 +864,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             project_id = request.data['project_id']
             timetakenUnit = ""
             findingsResultList = []
+            totalCnt = 0
             
             # 검색 조건 적용 TODO: 검증
             queryset_tmp = self.get_queryset()
@@ -775,6 +881,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 list_logfile_id.append(str(logfile['logfile_id']))
                 # timetakenUnit 가져오기
                 timetakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))
+
+            # Keep the response contract valid even when the project has no
+            # configured metrics yet.
+            totalCnt = queryset_tmp.filter(logfile_id__in=list_logfile_id).count()
             
             # project에 설정된 metric 가져오기
             metrics = LogMasterMetric.objects.filter(project_id=project_id).values('metric')
@@ -2318,20 +2428,65 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         start = time.time()
         response = {}
+        work_directory = tempfile.mkdtemp(prefix='elao-log-analysis-')
+        analysis_jobs = {}
+        advisory_locks = []
+        processed_logfile_ids = []
+        LogDetail_dynamic = None
         
         try:
             # logfile_ids for multi-files
             logfile_ids = request.data['logfile_id']
             project_id = request.data['project_id']
             diff_hour = request.data['diff_hour']
-            
-            model_name = "logdetail_"+project_id
-            
-            LogDetail_dynamic = ModelSchema.objects.get(name=model_name).as_model()  
+
+            project_model = LogMaster.objects.get(project_id=project_id)
+            model_name = "logdetail_" + project_id
+            LogDetail_dynamic = ModelSchema.objects.get(
+                name=model_name
+            ).as_model()
+            for requested_logfile_id in logfile_ids:
+                requested_logfile = LogFile.objects.get(
+                    logfile_id=requested_logfile_id,
+                    project=project_model,
+                )
+                analysis_jobs[str(requested_logfile_id)] = (
+                    LogAnalysisJob.objects.create(
+                        project=project_model,
+                        logfile=requested_logfile,
+                        status='PENDING',
+                        diff_hour=int(diff_hour),
+                    )
+                )
+
+            for lock_id in sorted(str(item) for item in logfile_ids):
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        'SELECT pg_advisory_lock(hashtext(%s))', [lock_id]
+                    )
+                advisory_locks.append(lock_id)
+            locked_logfiles = {
+                str(item.logfile_id): item
+                for item in LogFile.objects.filter(
+                    logfile_id__in=logfile_ids,
+                    project=project_model,
+                )
+            }
+            LogAnalysisJob.objects.filter(
+                job_id__in=[job.job_id for job in analysis_jobs.values()]
+            ).update(
+                status='PROCESSING',
+                started=datetime.now(timezone.utc),
+                error_message='',
+            )
+
+            # The dynamic model was materialized before entering the data
+            # transaction because the legacy package performs schema checks.
            
             # id=1인 행(null 행) 삭제
             if LogDetail_dynamic.objects.count() == 1:
                 LogDetail_dynamic.objects.filter(id=1).delete()
+            file_results = []
             
             # Start Loop for each logfile
             for logfile_id in logfile_ids:
@@ -2339,13 +2494,38 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 # 이미 생성되어 있는지 확인
                 if LogDetail_dynamic.objects.filter(logfile_id=logfile_id).count() > 0:
                     response = {'message': 'Dynamic logdetail already created.'}
+                    existing_count = LogDetail_dynamic.objects.filter(
+                        logfile_id=logfile_id
+                    ).count()
+                    analysis_job = analysis_jobs[str(logfile_id)]
+                    LogAnalysisJob.objects.filter(
+                        job_id=analysis_job.job_id
+                    ).update(
+                        status='COMPLETED',
+                        source_count=existing_count,
+                        parsed_count=existing_count,
+                        rejected_count=0,
+                        stored_count=existing_count,
+                        finished=datetime.now(timezone.utc),
+                    )
+                    file_results.append({
+                        'job_id': str(analysis_job.job_id),
+                        'logfile_id': str(logfile_id),
+                        'source_count': existing_count,
+                        'parsed_count': existing_count,
+                        'rejected_count': 0,
+                        'stored_count': existing_count,
+                        'status': 'ALREADY_COMPLETED',
+                    })
                     
                 else:                  
+                    processed_logfile_ids.append(str(logfile_id))
                             
-                    logfile_model = LogFile.objects.get(logfile_id=logfile_id)   
-                    logfile = logfile_model.file_object.file    
+                    logfile_model = locked_logfiles[str(logfile_id)]
+                    logfile_name = logfile_model.file_object.path
+                    logfile_size = logfile_model.file_object.size
                     
-                    print("logfile :", logfile)
+                    print("logfile :", logfile_name)
                     
                     # 파일 추가를 위한 기존정보 체크
                     id_startnum = 0
@@ -2357,30 +2537,68 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     # 1. 압축파일인지 확인
                     # 2. 압축파일이 풀면 1.5GB 이상인지 확인
                     isCompressed = False
-                    limitFileSize = 1.5 * 1024 * 1024 * 1024
+                    limitFileSize = int(getattr(
+                        settings,
+                        'LOG_PARSER_SPLIT_SIZE_BYTES',
+                        1.5 * 1024 * 1024 * 1024,
+                    ))
                     workFileSize = 0
                     
                     # 1. 압축파일인지 확인(zip, gz)
-                    p = re.compile('(.zip|.gz)', re.DOTALL )
-                    if len(p.findall(logfile.name)) > 0:    # 압축 파일
+                    if logfile_name.lower().endswith(('.zip', '.gz')):    # 압축 파일
                         isCompressed = True
-                        workFileSize = self.get_original_filesize(logfile.name)
+                        workFileSize = self.get_original_filesize(logfile_name)
+                        max_expanded_size = int(getattr(
+                            settings,
+                            'LOG_PARSER_MAX_EXPANDED_BYTES',
+                            10 * 1024 * 1024 * 1024,
+                        ))
+                        if workFileSize > max_expanded_size:
+                            raise ValueError(
+                                'Expanded compressed log exceeds the configured size limit'
+                            )
                     else:                                   # 압축 파일 아닌 경우
-                        workFileSize = logfile.size
+                        workFileSize = logfile_size
                         
                     # 2. 압축파일이 풀면 1.5GB 이상인지 확인
+                    target_filename = logfile_name
+                    if isCompressed and workFileSize > limitFileSize:
+                        target_filename = self.decompress_file(
+                            logfile_name, work_directory
+                        )
+                    validation = self.prepare_validated_logfile(
+                        target_filename, logfile_model, work_directory
+                    )
+                    target_filename = validation['validated_file']
+                    LogParseReject.objects.filter(
+                        logfile=logfile_model
+                    ).delete()
+                    LogParseReject.objects.bulk_create([
+                        LogParseReject(
+                            logfile=logfile_model,
+                            line_number=item['line_number'],
+                            raw_line=item['raw_line'],
+                            error_code=item['error_code'],
+                            error_message=item['error_message'],
+                        )
+                        for item in validation['rejects']
+                    ])
+
                     workFileCount = 1   # 기본값 = 1
                     resultFiles = []
                     
-                    if workFileSize > limitFileSize:                    
+                    if validation['parsed_count'] == 0:
+                        pass
+                    elif workFileSize > limitFileSize:
                         # 분할 파일 수를 계산해야 한다.
                         workFileCount = math.ceil(workFileSize/limitFileSize)
                         
-                        # 압축 해제한다.
-                        target_filename = self.decompress_file(logfile.name)
+                        # Compressed inputs need decompression; a large plain
+                        # logfile can be parsed directly.
+                        # Validation already produced a clean temporary file.
                         
                         # 전체 라인 카운트(gz, zip 가능)
-                        totalLines = self.get_total_lines(target_filename)
+                        totalLines = validation['parsed_count']
                         
                         # Target File Name
                         #target_filename = logfile.name+"_decompressed"
@@ -2389,9 +2607,26 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         startTime = time.time()
                                             
                         unit = int(totalLines/workFileCount)
+                        if unit == 0:
+                            unit = 1
+                            workFileCount = totalLines
 
                         for idx in range(workFileCount):
-                            resultFiles.append(self.parse_log_div(target_filename, logfile_id, id_startnum+idx*unit, unit*idx, unit, idx))
+                            skiprows = unit * idx
+                            rows_in_chunk = (
+                                totalLines - skiprows
+                                if idx == workFileCount - 1 else unit
+                            )
+                            resultFiles.append(self.parse_log_div(
+                                target_filename,
+                                logfile_id,
+                                id_startnum + skiprows,
+                                skiprows,
+                                rows_in_chunk,
+                                idx,
+                                diff_hour,
+                                work_directory,
+                            ))
                                                                 
                         print("## 분할 csv 작업완료 까지 : 총 작업 시간 - ", round((time.time() - startTime),4))   
                         
@@ -2401,37 +2636,308 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         # is App format?                        
                         format_kind = LogFile.objects.get(logfile_id=logfile_id).format_kind
                         
-                        if format_kind == 'app':
-                            resultFiles.append(self.parse_log_div_app(logfile.name, logfile_id, id_startnum, None, None, 0, diff_hour))
-                        else:
-                            resultFiles.append(self.parse_log_div(logfile.name, logfile_id, id_startnum, None, None, 0, diff_hour))
+                        parser = {
+                            'app': self.parse_app_log,
+                            'nginx': self.parse_nginx_log,
+                            'IIS-W3C': self.parse_iis_log,
+                            'IIS-NCSA': self.parse_iis_log,
+                        }.get(format_kind, self.parse_apache_log)
+                        resultFiles.append(parser(
+                            target_filename, logfile_id, id_startnum, None,
+                            None, 0, diff_hour, work_directory,
+                        ))
             
-                    # postgresql copy 실행                
-                    LogDetail_dynamic.objects.model.objects = CopyManager()
-                    LogDetail_dynamic.objects.model = ModelSchema.objects.get(name=model_name).as_model()
-                                    
-                    #LogDetail_dynamic.objects.from_csv(logfile.name+'.csv', delimiter=',', encoding="utf-8")
-                    
                     for filename in resultFiles:
-                        LogDetail_dynamic.objects.from_csv(filename, delimiter=',', encoding="utf-8")
+                        self.copy_csv_to_model(LogDetail_dynamic, filename)
+
+                    stored_count = LogDetail_dynamic.objects.filter(
+                        logfile_id=logfile_id
+                    ).count()
+                    if stored_count != validation['parsed_count']:
+                        raise ValueError(
+                            'Stored row count does not match parsed row count: '
+                            '%s != %s' % (
+                                stored_count,
+                                validation['parsed_count'],
+                            )
+                        )
+                    v2_count = 0
+                    v2_comparison = {'matches': True, 'differences': {}}
+                    if settings.LOG_STORAGE_MODE in {'dual', 'v2'}:
+                        v2_count = self.mirror_dynamic_rows_to_v2(
+                            LogDetail_dynamic, logfile_id
+                        )
+                        if v2_count != stored_count:
+                            raise ValueError(
+                                'V2 row count does not match dynamic row count: '
+                                '%s != %s' % (v2_count, stored_count)
+                            )
+                        v2_comparison = self.compare_dynamic_v2(
+                            LogDetail_dynamic, logfile_id
+                        )
+                        if not v2_comparison['matches']:
+                            raise ValueError(
+                                'V2 field comparison failed: %s'
+                                % v2_comparison['differences']
+                            )
+                    analysis_job = analysis_jobs[str(logfile_id)]
+                    job_status = (
+                        'PARTIAL'
+                        if validation['rejected_count'] else 'COMPLETED'
+                    )
+                    LogAnalysisJob.objects.filter(
+                        job_id=analysis_job.job_id
+                    ).update(
+                        status=job_status,
+                        source_count=validation['source_count'],
+                        parsed_count=validation['parsed_count'],
+                        rejected_count=validation['rejected_count'],
+                        stored_count=stored_count,
+                        finished=datetime.now(timezone.utc),
+                    )
+                    file_results.append({
+                        'job_id': str(analysis_job.job_id),
+                        'logfile_id': str(logfile_id),
+                        'source_count': validation['source_count'],
+                        'parsed_count': validation['parsed_count'],
+                        'rejected_count': validation['rejected_count'],
+                        'stored_count': stored_count,
+                        'v2_count': v2_count,
+                        'v2_comparison': v2_comparison,
+                        'status': (
+                            'PARTIAL'
+                            if validation['rejected_count'] else 'COMPLETED'
+                        ),
+                    })
                     
                 # End Loop for each logfile_id
                     
                 if settings.DEBUG:
                     logger.debug("To DB, Total Duration : %s sec" % (time.time() - start))
                 
-                response = {'message': 'logdetail created successfully.', 'processing_time': round(time.time() - start, 3) }
+                response = {
+                    'message': 'logdetail created successfully.',
+                    'processing_time': round(time.time() - start, 3),
+                    'files': file_results,
+                    'source_count': sum(
+                        item['source_count'] for item in file_results
+                    ),
+                    'parsed_count': sum(
+                        item['parsed_count'] for item in file_results
+                    ),
+                    'rejected_count': sum(
+                        item['rejected_count'] for item in file_results
+                    ),
+                    'stored_count': sum(
+                        item['stored_count'] for item in file_results
+                    ),
+                    'status': (
+                        'PARTIAL'
+                        if any(
+                            item['rejected_count'] for item in file_results
+                        ) else 'COMPLETED'
+                    ),
+                }
                 
             return Response(response, status = status.HTTP_200_OK)
         
         except Exception as ex: 
             logger.error('Error Occured while creating logdetail : %s' % ex)
+            if LogDetail_dynamic is not None and processed_logfile_ids:
+                LogDetail_dynamic.objects.filter(
+                    logfile_id__in=processed_logfile_ids
+                ).delete()
+                LogParseReject.objects.filter(
+                    logfile_id__in=processed_logfile_ids
+                ).delete()
+            if analysis_jobs:
+                LogAnalysisJob.objects.filter(
+                    job_id__in=[
+                        job.job_id for job in analysis_jobs.values()
+                    ]
+                ).exclude(
+                    status__in=['COMPLETED', 'PARTIAL']
+                ).update(
+                    status='FAILED',
+                    error_message=str(ex)[:2000],
+                    finished=datetime.now(timezone.utc),
+                )
             
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+        finally:
+            for lock_id in reversed(advisory_locks):
+                try:
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            'SELECT pg_advisory_unlock(hashtext(%s))',
+                            [lock_id],
+                        )
+                except Exception as unlock_error:
+                    logger.error(
+                        'Failed to release analysis lock %s: %s',
+                        lock_id,
+                        unlock_error,
+                    )
+            try:
+                shutil.rmtree(work_directory)
+            except FileNotFoundError:
+                pass
+            except Exception as cleanup_error:
+                logger.error(
+                    'Failed to clean analysis work directory %s: %s',
+                    work_directory,
+                    cleanup_error,
+                )
         
     # app/was 로그 파싱(log4j)
-    def parse_log_div_app(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order, diff_hour=0):
+    def prepare_validated_logfile(self, logfile_name, logfile_model, output_dir):
+        """Write valid input rows to a temporary file and describe rejects."""
+        encoding = 'utf-8'
+        try:
+            with open(logfile_name, 'r', encoding=encoding) as source:
+                while source.read(1024 * 1024):
+                    pass
+        except UnicodeDecodeError:
+            encoding = 'cp1252'
+
+        format_index = self.get_logformat_index(
+            logfile_model.file_format, logfile_model.format_kind
+        )
+        expected_count = max(format_index.values()) + 1 if format_index else None
+        validated_file = os.path.join(
+            output_dir,
+            '%s_%s_validated.log' % (
+                logfile_model.logfile_id, uuid.uuid4().hex
+            ),
+        )
+        rejects = []
+        source_count = 0
+        parsed_count = 0
+
+        with open(logfile_name, 'r', encoding=encoding) as source, open(
+            validated_file, 'w', encoding='utf-8', newline=''
+        ) as validated:
+            for line_number, raw_line in enumerate(source, 1):
+                line = raw_line.rstrip('\r\n')
+                if line.startswith('#'):
+                    continue
+                source_count += 1
+                error = self.validate_log_line(
+                    line, logfile_model.format_kind, logfile_model.format_name,
+                    format_index, expected_count,
+                )
+                if error is not None:
+                    rejects.append({
+                        'line_number': line_number,
+                        'raw_line': line,
+                        'error_code': error[0],
+                        'error_message': error[1],
+                    })
+                    continue
+                validated.write(line + '\n')
+                parsed_count += 1
+
+        return {
+            'validated_file': validated_file,
+            'source_count': source_count,
+            'parsed_count': parsed_count,
+            'rejected_count': len(rejects),
+            'rejects': rejects,
+        }
+
+    def validate_log_line(self, line, format_kind, format_name,
+                          format_index, expected_count):
+        return validate_format_log_line(
+            line, format_kind, format_name, format_index, expected_count
+        )
+
+        # Kept below as a compatibility reference while parser variants are
+        # migrated to loganalyzerapi.parsers.
+        if format_kind == 'app':
+            if format_name == 'time_format_1':
+                pattern = r'([0-9]{2}):([0-9]{2}):([0-9]{2})'
+                date_format = '%H:%M:%S'
+            elif format_name == 'time_format_2':
+                pattern = (r'([0-9]{4})-([0-9]{2})-([0-9]{2}) '
+                           r'([0-9]{2}):([0-9]{2}):([0-9]{2})')
+                date_format = '%Y-%m-%d %H:%M:%S'
+            else:
+                return ('unsupported_time_format', format_name)
+            match = re.search(pattern, line)
+            if match is None:
+                return ('invalid_timestamp', 'Timestamp was not found')
+            try:
+                datetime.strptime(match.group(0), date_format)
+            except ValueError as error:
+                return ('invalid_timestamp', str(error))
+            return None
+
+        try:
+            tokens = shlex.split(line)
+        except ValueError as error:
+            return ('invalid_quoting', str(error))
+        if expected_count is not None and len(tokens) != expected_count:
+            return ('field_count_mismatch',
+                    'Expected %s fields but found %s' %
+                    (expected_count, len(tokens)))
+
+        try:
+            if format_kind == 'IIS-W3C':
+                timestamp = '%s %s' % (
+                    tokens[format_index['date']], tokens[format_index['time']]
+                )
+                datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
+            elif format_kind == 'nginx':
+                timestamp = tokens[format_index['$time_local']].lstrip('[')
+                datetime.strptime(timestamp, '%d/%b/%Y:%H:%M:%S')
+            else:
+                timestamp = tokens[format_index['t']].lstrip('[')
+                datetime.strptime(timestamp, '%d/%b/%Y:%H:%M:%S')
+        except (KeyError, IndexError, ValueError) as error:
+            return ('invalid_timestamp', str(error))
+
+        key_map = {
+            'IIS-W3C': ('sc-status', 'cs-bytes', 'time-taken'),
+            'nginx': ('$status', '$body_bytes_sent', '$request_time'),
+        }
+        status_key, byte_key, duration_key = key_map.get(
+            format_kind, ('s', 'b', 'D' if 'D' in format_index else 'T')
+        )
+        try:
+            status_value = int(tokens[format_index[status_key]])
+            if status_value < 100 or status_value > 599:
+                raise ValueError('HTTP status is outside 100..599')
+        except (KeyError, IndexError, ValueError) as error:
+            return ('invalid_status', str(error))
+
+        if byte_key in format_index:
+            try:
+                value = tokens[format_index[byte_key]]
+                if value != '-':
+                    int(value)
+            except (IndexError, ValueError) as error:
+                return ('invalid_bytes', str(error))
+        if duration_key in format_index:
+            try:
+                float(tokens[format_index[duration_key]])
+            except (IndexError, ValueError) as error:
+                return ('invalid_duration', str(error))
+        return None
+
+    def parse_app_log(self, *args, **kwargs):
+        return self.parse_log_div_app(*args, **kwargs)
+
+    def parse_apache_log(self, *args, **kwargs):
+        return self.parse_log_div(*args, **kwargs)
+
+    def parse_nginx_log(self, *args, **kwargs):
+        return self.parse_log_div(*args, **kwargs)
+
+    def parse_iis_log(self, *args, **kwargs):
+        return self.parse_log_div(*args, **kwargs)
+
+    def parse_log_div_app(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order, diff_hour=0, output_dir=None):
                 
         # 시간 포맷을 입력으로 받아야 한다. 전처리처럼(전처리하고 보자. millis는 다루지 않는다.)        
         log_lines = []
@@ -2471,14 +2977,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         try:
             
-            df_logs = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
+            df_logs = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", on_bad_lines='skip', skiprows=skiprows, nrows=nrows, na_filter=False)
             
         except UnicodeDecodeError as ude:
             
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
             
             try:
-                df_logs = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\0", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
+                df_logs = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\0", on_bad_lines='skip', skiprows=skiprows, nrows=nrows, na_filter=False)
             except Exception as uex:
                 logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -2526,13 +3032,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # 테스트 패턴 : 00:00:00 - 시/분/초 - log_format
             p = re.compile('([0-9]{2}):([0-9]{2}):([0-9]{2})', re.DOTALL )
-            df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else np.NaN)
+            df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else np.nan)
             
             # 보완로직1 - 결측치 제거 : None있으면 앞의 값으로 채우기
-            df_time.fillna(method='ffill', inplace=True)
+            df_time.ffill(inplace=True)
             
             # 보완로직2 - 결측치 제거 : 맨 앞에 None이 존재할 수 있으니 뒤의값으로도 채우기
-            df_time.fillna(method='bfill', inplace=True)
+            df_time.bfill(inplace=True)
             
             df_time = pd.DataFrame(df_time.tolist(), columns=['fhour','fminute','fsecond'])
         
@@ -2549,13 +3055,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             # %d{yyyy-MM-dd HH:mm:ss.SSS}            
             p = re.compile('([0-9]{4})-([0-9]{2})-([0-9]{2}) ([0-9]{2}):([0-9]{2}):([0-9]{2})', re.DOTALL )
         
-            df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else np.NaN)
+            df_time = df_logs['log_line'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else np.nan)
             
             # 보완로직1 - 결측치 제거 : None있으면 앞의 값으로 채우기
-            df_time.fillna(method='ffill', inplace=True)
+            df_time.ffill(inplace=True)
             
             # 보완로직2 - 결측치 제거 : 맨 앞에 None이 존재할 수 있으니 뒤의값으로도 채우기
-            df_time.fillna(method='bfill', inplace=True)
+            df_time.bfill(inplace=True)
             
             df_time = pd.DataFrame(df_time.tolist(), columns=['fyear','fmonth','fday','fhour','fminute','fsecond'])
         
@@ -2572,7 +3078,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs = pd.concat([df_logs, df_time], axis=1)
                         
         # index 미사용
-        result_file_name = file_name+'_'+str(file_order)+'.csv'
+        result_file_name = (
+            os.path.join(output_dir, os.path.basename(file_name)+'_'+str(file_order)+'.csv')
+            if output_dir else file_name+'_'+str(file_order)+'.csv'
+        )
                 
         df_logs[log_line_header].to_csv(result_file_name, index=False, encoding='utf-8')
        
@@ -2581,7 +3090,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         return result_file_name
     
-    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order, diff_hour):
+    def parse_log_div(self, logfile_name, logfile_id, existed_row_size, skiprows, nrows, file_order, diff_hour, output_dir=None):
     
         log_lines = []
         result = []
@@ -2628,7 +3137,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         try:
             
-            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", error_bad_lines=False,  skiprows=skiprows, nrows=nrows, na_filter=False)
+            df_logs_all = pd.read_csv(file_name, encoding="utf-8", header=None, comment='#', delimiter="\0", on_bad_lines='skip', skiprows=skiprows, nrows=nrows, na_filter=False)
             
             # TODO: 한글이 있는 경우 - 개별필드는 불필요하다.(여기만하면 됨)
             if format_kind == 'IIS-W3C':
@@ -2640,7 +3149,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             logger.error('UnicodeDecodeError Occured! Trying again with another encoding = cp1252 : %s' % ude)    
             
             try:
-                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\0", error_bad_lines=False, skiprows=skiprows, nrows=nrows, na_filter=False)
+                df_logs_all = pd.read_csv(file_name, encoding="cp1252", header=None, comment='#', delimiter="\0", on_bad_lines='skip', skiprows=skiprows, nrows=nrows, na_filter=False)
             except Exception as uex:
                 logger.error('UnicodeDecodeError Occured AGAIN!')
                 raise uex            
@@ -2655,10 +3164,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         if (log_format.find('h') == -1 and log_format.find('X-Forwarded-For') != -1) or (log_format.find('$remote_addr') == -1 and log_format.find('$http_x_forwarded_for') != -1):
             repl = lambda m: m.group(0)[:-1:]
             df_logs_re = df_logs_all[0].str.replace(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\, )+', repl)            
-            np.savetxt(logfile_name+"_X-Forwarded-For", df_logs_re.values, fmt="%s")
+            forwarded_file_name = (
+                os.path.join(output_dir, os.path.basename(logfile_name)+"_X-Forwarded-For")
+                if output_dir else logfile_name+"_X-Forwarded-For"
+            )
+            np.savetxt(forwarded_file_name, df_logs_re.values, fmt="%s")
             
             # 파일이 나누어서 만들어진다. 대상 파일이 변경됨
-            file_name = logfile_name+"_X-Forwarded-For"            
+            file_name = forwarded_file_name
             skiprows = None
             nrows = None
                         
@@ -2668,11 +3181,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs = pd.read_csv(
                 file_name,
                 encoding="utf-8",
-                error_bad_lines=False,
+                on_bad_lines='skip',
                 header=None,
                 names=expected_column_names,
                 comment='#',
-                delimiter="\s+",
+                delimiter=r"\s+",
                 escapechar="\\",
                 skiprows=skiprows,
                 nrows=nrows,
@@ -2688,11 +3201,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 df_logs = pd.read_csv(
                     file_name,
                     encoding="cp1252",
-                    error_bad_lines=False,
+                    on_bad_lines='skip',
                     header=None,
                     names=expected_column_names,
                     comment='#',
-                    delimiter="\s+",
+                    delimiter=r"\s+",
                     escapechar="\\",
                     skiprows=skiprows,
                     nrows=nrows,
@@ -2733,7 +3246,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # freserve2 : Domain(freferer에서 추출) - 패턴 : "http:// ~ /"
             if log_format.find('freferer') != -1:
-                p = re.compile('http://[a-zA-Z0-9.\-_]+/', re.DOTALL )
+                p = re.compile(r'http://[a-zA-Z0-9._-]+/', re.DOTALL)
                 df_logs['freserve2']  = df_logs['freferer'].apply(lambda x: p.findall(x)[0] if len(p.findall(x)) > 0 else '-')
         
         #'created'
@@ -2779,7 +3292,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             else:                
                 column_names = ['dummy','fday','fmonth','fyear','fhour','fminute','fsecond']
                 
-            df_datetime = df_logs[time_index].str.replace(pat='[\:\/\[-]', repl= r' ', regex=True)
+            df_datetime = df_logs[time_index].str.replace(
+                pat=r'[:/\[-]', repl=' ', regex=True
+            )
             series = df_datetime.str.split(' ')
             df_time = pd.DataFrame(series.tolist(), columns=column_names)
             #df_time = pd.DataFrame(series.tolist(), columns=['dummy','fday','fmonth','fyear','fhour','fminute','fsecond'])
@@ -2813,7 +3328,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             df_logs['temp_end_time'] = df_logs['start_time'].shift(1)
 
             #         앞에 밀린거 1칸 채우기(뒤의 갚으로) : NaN 제거
-            df_logs['temp_end_time'].fillna(method='bfill', inplace=True)
+            df_logs['temp_end_time'] = df_logs['temp_end_time'].bfill()
 
             # Step2 : end_time 컬럼 생성 => MAX(start_time, temp_end_time) 값 : 코드 확인(가능)
             df_logs['end_time'] = np.where((df_logs['start_time'] >= df_logs['temp_end_time']) , df_logs['start_time'], df_logs['temp_end_time'])            
@@ -2828,7 +3343,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
         # fextension 처리 : frequest로부터 처리한다.
         # 정적파일 추출 : js, html, ico, jpg, png, bmp, otf, css
-        p = re.compile('(.js|.html|.ico|.jpg|.png|.bmp|.otf|.css)\s', re.DOTALL )
+        p = re.compile(
+            r'(?:\.js|\.html|\.ico|\.jpg|\.png|\.bmp|\.otf|\.css)\s',
+            re.DOTALL,
+        )
         df_logs['fextension'] = df_logs['frequest'].apply(lambda x: p.findall(x)[0][1:] if len(p.findall(x)) > 0 else '-')
         
         # Merge : logdetail_id -> id
@@ -2842,7 +3360,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         df_logs.dropna(axis=0, inplace=True)
                         
         # index 미사용
-        result_file_name = file_name+'_'+str(file_order)+'.csv'
+        result_file_name = (
+            os.path.join(output_dir, os.path.basename(file_name)+'_'+str(file_order)+'.csv')
+            if output_dir else file_name+'_'+str(file_order)+'.csv'
+        )
         df_logs[log_line_header].to_csv(result_file_name, index=False)
        
         if settings.DEBUG:
@@ -3097,43 +3618,155 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         
     
     def get_original_filesize(self, logfile_name):
-        
-        if 'zip' in logfile_name:
-            
+        if logfile_name.lower().endswith('.zip'):
             with ZipFile(logfile_name) as zip_archive:
-                for item in zip_archive.filelist:
-                    print(item)
-                    print("# file_size = ", item.file_size)
-                    
-                #print(f'\nThere are {len(zip_archive.filelist)} ZipInfo objects present in archive')                
-                return item.file_size
+                members = [item for item in zip_archive.infolist()
+                           if not item.is_dir()]
+                if len(members) != 1:
+                    raise ValueError('ZIP uploads must contain exactly one log file')
+                return members[0].file_size
 
-        else:   # 'gz'
-            
+        if logfile_name.lower().endswith('.gz'):
             with gzip.open(logfile_name, "rb") as f:
-                #data = f.read()
                 f.seek(0, 2)
                 return f.tell()
-                
-    def decompress_file(self, logfile_name):
+        raise ValueError('Unsupported compressed file type')
+
+    def copy_csv_to_model(self, model, filename):
+        """Stream a parser CSV into PostgreSQL without altering constraints."""
+        started = time.time()
+        file_size = os.path.getsize(filename)
+        with open(filename, 'r', encoding='utf-8', newline='') as source:
+            header = next(csv.reader(source), None)
+            if not header:
+                return
+            model_fields = {field.name for field in model._meta.local_fields}
+            if any(column not in model_fields for column in header):
+                raise ValueError('CSV contains a column not present in the target model')
+            quote = connection.ops.quote_name
+            table_name = quote(model._meta.db_table)
+            columns = ', '.join(quote(column) for column in header)
+            copy_sql = (
+                'COPY %s (%s) FROM STDIN WITH (FORMAT CSV, NULL \'\')'
+                % (table_name, columns)
+            )
+            with connection.cursor() as cursor:
+                cursor.cursor.copy_expert(copy_sql, source)
+        elapsed = max(time.time() - started, 0.001)
+        logger.info(
+            'COPY loaded %s bytes into %s in %.3fs (%.2f KiB/s)',
+            file_size,
+            model._meta.db_table,
+            elapsed,
+            file_size / elapsed / 1024,
+        )
+
+    def mirror_dynamic_rows_to_v2(self, dynamic_model, logfile_id):
+        """Mirror typed fields while retaining the dynamic table as source of truth."""
+        rows = dynamic_model.objects.filter(logfile_id=logfile_id).values(
+            'id', 'fdatetime', 'fstatus', 'ftime_taken', 'fbyte',
+            'frequest', 'fip', 'fuser_agent', 'log_line',
+        )
+        LogDetailV2.objects.filter(logfile_id=logfile_id).delete()
+        typed_rows = []
+        for row in rows:
+            event_at = None
+            if row['fdatetime']:
+                try:
+                    event_at = django_timezone.make_aware(
+                        datetime.strptime(str(row['fdatetime']), '%Y%m%d%H%M%S')
+                    )
+                except (TypeError, ValueError):
+                    event_at = None
+            typed_rows.append(LogDetailV2(
+                logfile_id=logfile_id,
+                event_at=event_at,
+                status=int(row['fstatus']) if str(row['fstatus']).isdigit() else None,
+                response_time=int(row['ftime_taken']) if row['ftime_taken'] is not None else None,
+                response_bytes=int(row['fbyte']) if row['fbyte'] is not None else None,
+                request=row['frequest'],
+                client_ip=row['fip'],
+                user_agent=row['fuser_agent'],
+                raw_line=row['log_line'],
+            ))
+        LogDetailV2.objects.bulk_create(typed_rows, batch_size=1000)
+        return len(typed_rows)
+
+    def compare_dynamic_v2(self, dynamic_model, logfile_id):
+        started = time.perf_counter()
+        dynamic_rows = list(dynamic_model.objects.filter(
+            logfile_id=logfile_id
+        ).values('fstatus', 'frequest', 'fbyte'))
+        v2_rows = list(LogDetailV2.objects.filter(
+            logfile_id=logfile_id
+        ).values('status', 'request', 'response_bytes'))
+        dynamic_status = {}
+        v2_status = {}
+        for row in dynamic_rows:
+            key = str(row['fstatus'])
+            dynamic_status[key] = dynamic_status.get(key, 0) + 1
+        for row in v2_rows:
+            key = str(row['status'])
+            v2_status[key] = v2_status.get(key, 0) + 1
+        differences = {}
+        if dynamic_status != v2_status:
+            differences['status_counts'] = {
+                'dynamic': dynamic_status, 'v2': v2_status
+            }
+        if len(dynamic_rows) != len(v2_rows):
+            differences['row_count'] = {
+                'dynamic': len(dynamic_rows), 'v2': len(v2_rows)
+            }
+        dynamic_bytes = sum(int(row['fbyte'] or 0) for row in dynamic_rows)
+        v2_bytes = sum(int(row['response_bytes'] or 0) for row in v2_rows)
+        if dynamic_bytes != v2_bytes:
+            differences['response_bytes_sum'] = {
+                'dynamic': dynamic_bytes, 'v2': v2_bytes
+            }
+        result = {
+            'matches': not differences,
+            'differences': differences,
+            'dynamic_count': len(dynamic_rows),
+            'v2_count': len(v2_rows),
+            'elapsed_ms': round((time.perf_counter() - started) * 1000, 3),
+        }
+        logger.info('V2 comparison logfile=%s result=%s', logfile_id, result)
+        return result
+
+    def decompress_file(self, logfile_name, output_dir=None):
         
         # 저장할 디렉토리 설정
         #target_dir = os.path.dirname(logfile_name)+os.path.sep+"decompressed"
         #original_filename = os.path.basename(logfile_name)
-        result_filename = logfile_name+"_decompressed"
+        result_filename = (
+            os.path.join(output_dir, os.path.basename(logfile_name)+"_decompressed")
+            if output_dir else logfile_name+"_decompressed"
+        )
         
         #if not(os.path.isdir(target_dir)):
         #    os.makedirs(os.path.join(target_dir))
         
         decompressedFile = ""
         
-        if 'zip' in logfile_name:
+        if logfile_name.lower().endswith('.zip'):
             with ZipFile(logfile_name, 'r') as zip_ref:
-                zip_ref.extractall(result_filename)
-                # 단일 파일만 지원
-                decompressedFile = result_filename+os.path.sep+zip_ref.filelist[0].filename
-                
-        else:                     
+                members = [item for item in zip_ref.infolist()
+                           if not item.is_dir()]
+                if len(members) != 1:
+                    raise ValueError('ZIP uploads must contain exactly one log file')
+                member = members[0]
+                member_path = os.path.normpath(member.filename)
+                if (os.path.isabs(member_path)
+                        or member_path == '..'
+                        or member_path.startswith('..' + os.sep)):
+                    raise ValueError('ZIP member path escapes extraction directory')
+                os.makedirs(result_filename, exist_ok=True)
+                decompressedFile = os.path.join(result_filename, member_path)
+                os.makedirs(os.path.dirname(decompressedFile), exist_ok=True)
+                with zip_ref.open(member) as source, open(decompressedFile, 'wb') as target:
+                    shutil.copyfileobj(source, target)
+
+        elif logfile_name.lower().endswith('.gz'):
             with gzip.open(logfile_name, 'rb') as s_file, \
                 open(result_filename, 'wb') as d_file:   # 파일명까지 지정해줘여 하는가?
                 
@@ -3144,7 +3777,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     else:
                         d_file.write(block)       
                                 
-            decompressedFile = result_filename    
+            decompressedFile = result_filename
+        else:
+            raise ValueError('Unsupported compressed file type')
         
         # 생성된 파일 경로를 리턴                
         return decompressedFile
@@ -3163,8 +3798,13 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
         linecount = 0
 
-        with open(file_name, "r", encoding="utf-8", errors='ignore') as f:
-            linecount = sum(bl.count("\n") for bl in blocks(f))
+        with open(file_name, "rb") as f:
+            last_byte = b''
+            for block in blocks(f):
+                linecount += block.count(b"\n")
+                last_byte = block[-1:]
+            if last_byte and last_byte != b"\n":
+                linecount += 1
             print (linecount)
         
         endTime = time.time()

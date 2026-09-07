@@ -12,6 +12,34 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
+
+def env_bool(name, default=False):
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    normalized = value.strip().lower()
+    if normalized in ('1', 'true', 'yes', 'on'):
+        return True
+    if normalized in ('0', 'false', 'no', 'off'):
+        return False
+    raise ImproperlyConfigured(
+        "%s must be one of true/false, 1/0, yes/no, or on/off" % name
+    )
+
+
+def env_list(name, default=''):
+    return [
+        item.strip() for item in os.environ.get(name, default).split(',')
+        if item.strip()
+    ]
+
+
+def env_value(name, default=''):
+    value = os.environ.get(name)
+    return value if value not in (None, '') else default
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -20,22 +48,31 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'local-development-only-change-me')
+SECRET_KEY = env_value(
+    'DJANGO_SECRET_KEY', 'local-development-only-change-me'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('1', 'true', 'yes')
+DEBUG = env_bool('DJANGO_DEBUG', True)
+
+if not DEBUG and SECRET_KEY == 'local-development-only-change-me':
+    raise ImproperlyConfigured(
+        'DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is false'
+    )
 
 # To use local ip not localhost, 127.0.0.1
 # npm run serve 172.16.1.110:8000
 # Need to change in production
-ALLOWED_HOSTS = [host.strip() for host in os.environ.get(
+ALLOWED_HOSTS = env_list(
     'DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,backend'
-).split(',') if host.strip()]
+)
 
 MEDIA_URL = '/media/'
 #MEDIA_URL = 'E:\loganalyzerMedia'
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_ROOT = os.environ.get('DJANGO_MEDIA_ROOT', os.path.join(BASE_DIR, 'media'))
+MEDIA_ROOT = env_value(
+    'DJANGO_MEDIA_ROOT', os.path.join(BASE_DIR, 'media')
+)
 # MEDIA_ROOT = 'C:\loganalyzerMedia'
 
 # Application definition
@@ -52,11 +89,12 @@ INSTALLED_APPS = [
     'loganalyzerapi',
     'corsheaders',
     'rest_framework.authtoken',
-    'rest_auth',
+    'dj_rest_auth',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'rest_auth.registration',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
     'dynamic_models',
 ]
 
@@ -66,7 +104,7 @@ DYNAMIC_MODELS = {
 
 
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 MIDDLEWARE = [
@@ -76,6 +114,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -113,14 +152,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'loganalyzer.wsgi.application'
 
-CORS_ORIGIN_ALLOW_ALL = os.environ.get(
-    'DJANGO_CORS_ALLOW_ALL', 'True'
-).lower() in ('1', 'true', 'yes')
+CORS_ORIGIN_ALLOW_ALL = env_bool('DJANGO_CORS_ALLOW_ALL', DEBUG)
 
-CORS_ORIGIN_WHITELIST = [origin.strip() for origin in os.environ.get(
+CORS_ORIGIN_WHITELIST = env_list(
     'DJANGO_CORS_ORIGINS',
     'http://localhost:8080,http://127.0.0.1:8080',
-).split(',') if origin.strip()]
+)
+
+if not DEBUG and CORS_ORIGIN_ALLOW_ALL:
+    raise ImproperlyConfigured(
+        'DJANGO_CORS_ALLOW_ALL must be false when DJANGO_DEBUG is false'
+    )
 
 
 # Database
@@ -137,13 +179,30 @@ DATABASES = {
 DATABASES = {
 	'default': {
 	'ENGINE': 'django.db.backends.postgresql' ,
-    'NAME': os.environ.get('POSTGRES_DB', 'mwla2'),
-    'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-	'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'postgres'),
-    'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-	'PORT': os.environ.get('POSTGRES_PORT', '5432'),
+    'NAME': env_value('POSTGRES_DB', 'mwla2'),
+    'USER': env_value('POSTGRES_USER', 'postgres'),
+	'PASSWORD': env_value('POSTGRES_PASSWORD', 'postgres'),
+    'HOST': env_value('POSTGRES_HOST', 'localhost'),
+	'PORT': env_value('POSTGRES_PORT', '5432'),
 	}
 }
+
+# The Vue client uses DRF token authentication. Keep registration and login
+# responses compatible with the existing {"key": "..."} API contract.
+REST_AUTH = {
+    'SESSION_LOGIN': False,
+    'USE_JWT': False,
+}
+
+LOG_PARSER_SPLIT_SIZE_BYTES = int(env_value(
+    'LOG_PARSER_SPLIT_SIZE_BYTES', str(int(1.5 * 1024 * 1024 * 1024))
+))
+LOG_PARSER_MAX_EXPANDED_BYTES = int(env_value(
+    'LOG_PARSER_MAX_EXPANDED_BYTES', str(10 * 1024 * 1024 * 1024)
+))
+LOG_STORAGE_MODE = env_value('LOG_STORAGE_MODE', 'dual').lower()
+if LOG_STORAGE_MODE not in {'dynamic', 'dual', 'v2'}:
+    raise ValueError('LOG_STORAGE_MODE must be dynamic, dual, or v2')
 
 
 # Password validation
@@ -174,9 +233,11 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
+
+# Preserve the primary-key type used by the existing schema and migrations.
+# Django 3.2 otherwise defaults new models to BigAutoField.
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -185,6 +246,35 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Logging
+LOG_TO_FILE = env_bool('DJANGO_LOG_TO_FILE', True)
+LOG_DIRECTORY = env_value(
+    'DJANGO_LOG_DIR', os.path.join(BASE_DIR, 'logs')
+)
+if LOG_TO_FILE:
+    os.makedirs(LOG_DIRECTORY, exist_ok=True)
+
+LOG_HANDLERS = ['console']
+if LOG_TO_FILE:
+    LOG_HANDLERS.append('file')
+
+LOG_HANDLER_CONFIG = {
+    'console': {
+        'level': 'INFO',
+        'filters': ['require_debug_true'],
+        'class': 'logging.StreamHandler',
+        'formatter': 'verbose'
+    },
+}
+if LOG_TO_FILE:
+    LOG_HANDLER_CONFIG['file'] = {
+        'level': 'INFO',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': os.path.join(LOG_DIRECTORY, 'mwla.log'),
+        'formatter': 'verbose',
+        'when': 'midnight',
+        'backupCount': 30,
+    }
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -199,26 +289,10 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugTrue',
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            #'class': 'logging.FileHandler',
-            'class': 'logging.handlers.TimedRotatingFileHandler',            
-            'filename': os.path.join(BASE_DIR, 'logs', 'mwla.log'),   
-            'formatter': 'verbose',
-            'when': 'midnight',
-            'backupCount': '30',
-        },
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose'
-        },
-    },
+    'handlers': LOG_HANDLER_CONFIG,
     'loggers': {
         'loganalyzerapi': {
-            'handlers': ['console', 'file'],
+            'handlers': LOG_HANDLERS,
             'level': 'INFO',
             'propagate': True,
         },

@@ -313,7 +313,7 @@ Vue → Django API → Redis → Worker → PostgreSQL
 ### 최초 기준선 구축
 
 ```text
-STACK_MODERNIZATION_PLAN.md의 0~1단계를 수행해줘.
+plans/STACK_MODERNIZATION_PLAN.md의 0~1단계를 수행해줘.
 
 저장소와 현재 실행 구조를 먼저 조사하고, Docker Compose 기반 재현 환경과
 핵심 회귀 테스트를 구축해. 실제 프로덕션 코드는 테스트 실행에 필요한
@@ -333,7 +333,7 @@ STACK_MODERNIZATION_PLAN.md의 0~1단계를 수행해줘.
 ### 보안 및 의존성 정리
 
 ```text
-STACK_MODERNIZATION_PLAN.md의 2~3단계를 수행해줘.
+plans/STACK_MODERNIZATION_PLAN.md의 2~3단계를 수행해줘.
 인증과 보안 문제를 수정하고 백엔드 의존성을 정리해.
 각 변경 후 테스트와 빌드를 실행하고, 검증 실패 시 다음 단계로 넘어가지 마.
 운영 데이터나 기존 동적 테이블은 변경하지 마.
@@ -342,7 +342,7 @@ STACK_MODERNIZATION_PLAN.md의 2~3단계를 수행해줘.
 ### Django 업그레이드
 
 ```text
-STACK_MODERNIZATION_PLAN.md의 Django 업그레이드를 한 구간만 진행해줘.
+plans/STACK_MODERNIZATION_PLAN.md의 Django 업그레이드를 한 구간만 진행해줘.
 현재 버전에서 다음 목표 버전까지만 올리고, 호환성 문제와 deprecation 경고를
 수정해. 전체 테스트, 마이그레이션 검사, Docker 빌드 및 API 스모크 테스트가
 모두 통과해야 완료로 판단해. 데이터 삭제는 수행하지 마.
@@ -351,7 +351,7 @@ STACK_MODERNIZATION_PLAN.md의 Django 업그레이드를 한 구간만 진행해
 ### 프론트엔드 업그레이드
 
 ```text
-STACK_MODERNIZATION_PLAN.md의 프론트엔드 현대화를 다음 미완료 항목 하나까지만
+plans/STACK_MODERNIZATION_PLAN.md의 프론트엔드 현대화를 다음 미완료 항목 하나까지만
 진행해줘. 변경 전 컴포넌트와 E2E 테스트를 보강하고, 프로덕션 빌드 및 전체
 회귀 테스트가 통과하도록 수정해. lego-component 호환성 문제가 발생하면
 기존 화면을 제거하지 말고 호환 래퍼 또는 점진적 대체안을 적용해.

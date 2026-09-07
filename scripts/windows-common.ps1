@@ -18,11 +18,34 @@ function Import-EaloEnvironment {
 }
 
 function Get-EaloPython {
-    $python = Join-Path $script:RepoRoot '.venv\Scripts\python.exe'
-    if (-not (Test-Path -LiteralPath $python)) {
-        throw 'Python virtual environment is missing. Run scripts\setup-windows.ps1 first.'
+    $python312 = Join-Path $script:RepoRoot '.venv312\Scripts\python.exe'
+    if (Test-Path -LiteralPath $python312) {
+        return $python312
     }
-    return $python
+
+    $legacyPython = Join-Path $script:RepoRoot '.venv\Scripts\python.exe'
+    if (Test-Path -LiteralPath $legacyPython) {
+        return $legacyPython
+    }
+
+    throw 'Python virtual environment is missing. Run scripts\setup-windows.ps1 first.'
+}
+
+function Normalize-EaloProcessEnvironment {
+    $processEnvironment = [Environment]::GetEnvironmentVariables('Process')
+    $pathKeys = @(
+        $processEnvironment.Keys |
+            Where-Object { [string]::Equals($_, 'Path', 'OrdinalIgnoreCase') }
+    )
+    if ($pathKeys.Count -le 1) { return }
+
+    $pathValue = ($pathKeys | ForEach-Object {
+        [string]$processEnvironment[$_]
+    }) -join ';'
+    foreach ($pathKey in $pathKeys) {
+        [Environment]::SetEnvironmentVariable($pathKey, $null, 'Process')
+    }
+    [Environment]::SetEnvironmentVariable('Path', $pathValue, 'Process')
 }
 
 function Enable-EaloNode {
@@ -34,11 +57,15 @@ function Enable-EaloNode {
         $npmCommand = (Get-Command npm.cmd -ErrorAction SilentlyContinue).Source
     }
     if (-not $nodeCommand -or -not (Test-Path -LiteralPath $nodeCommand)) {
-        throw 'Node.js was not found. Set EALO_NODE_HOME to the Node 14 directory.'
+        throw 'Node.js was not found. Install Node.js 20.19 or newer, or set EALO_NODE_HOME.'
     }
     $version = & $nodeCommand --version 2>$null
-    if (-not $version -or $version -notmatch '^v14\.') {
-        throw "Node.js 14.x is required; detected '$version'. Set EALO_NODE_HOME to a Node 14 directory."
+    $parsedVersion = $null
+    if ($version) {
+        [version]::TryParse($version.TrimStart('v'), [ref]$parsedVersion) | Out-Null
+    }
+    if (-not $parsedVersion -or $parsedVersion -lt [version]'20.19.0') {
+        throw "Node.js 20.19 or newer is required; detected '$version'. Set EALO_NODE_HOME to a supported Node directory."
     }
     $script:EaloNode = $nodeCommand
     $script:EaloNpm = $npmCommand

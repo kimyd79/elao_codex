@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogFormat, LogFormatString, Metrics, LogMasterMetric
+from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogDetailV2, LogFormat, LogFormatString, Metrics, LogMasterMetric, LogAnalysisJob
 from django.contrib.auth.models import User
 
 class LogMasterSerializer(serializers.ModelSerializer):
@@ -19,6 +19,24 @@ class LogDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = LogDetail
         fields = '__all__'
+
+
+class LogAnalysisJobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogAnalysisJob
+        fields = '__all__'
+        read_only_fields = (
+            'job_id', 'status', 'source_count', 'parsed_count',
+            'rejected_count', 'stored_count', 'error_message',
+            'started', 'finished', 'created', 'updated',
+        )
+
+
+class LogDetailV2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = LogDetailV2
+        fields = '__all__'
+        read_only_fields = ('log_id', 'created')
         
 class LogFormatSerializer(serializers.ModelSerializer):
     

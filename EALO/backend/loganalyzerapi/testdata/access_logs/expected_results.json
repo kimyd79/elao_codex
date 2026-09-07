@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "counting_convention": {
+    "physical_line_count": "All physical lines in the fixture",
+    "comment_line_count": "Lines beginning with # and intentionally ignored",
+    "data_line_count": "Non-comment input records",
+    "invariant": "expected_parsed_count + expected_rejected_count = data_line_count"
+  },
+  "fixtures": {
+    "apache_combined.log": {
+      "format_kind": "apache",
+      "format_name": "baseline_combined_with_duration",
+      "format_string": "%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\" %D",
+      "physical_line_count": 5,
+      "comment_line_count": 0,
+      "data_line_count": 5,
+      "expected_parsed_count": 5,
+      "expected_rejected_count": 0,
+      "first_timestamp": "2026-08-11T09:00:00+09:00",
+      "last_timestamp": "2026-08-11T09:00:04+09:00",
+      "status_counts": {"200": 1, "304": 1, "401": 1, "404": 1, "500": 1},
+      "bytes_sum": 3840,
+      "duration_us_sum": 1520000
+    },
+    "nginx_combined.log": {
+      "format_kind": "nginx",
+      "format_name": "baseline_combined_with_request_time",
+      "format_string": "$remote_addr - $remote_user [$time_local] \\\"$request\\\" $status $body_bytes_sent \\\"$http_referer\\\" \\\"$http_user_agent\\\" $request_time",
+      "physical_line_count": 5,
+      "comment_line_count": 0,
+      "data_line_count": 5,
+      "expected_parsed_count": 5,
+      "expected_rejected_count": 0,
+      "first_timestamp": "2026-08-11T00:10:00+00:00",
+      "last_timestamp": "2026-08-11T00:10:04+00:00",
+      "status_counts": {"200": 2, "201": 1, "403": 1, "502": 1},
+      "bytes_sum": 2396,
+      "duration_us_sum": 1765000
+    },
+    "iis_w3c.log": {
+      "format_kind": "IIS-W3C",
+      "format_name": "baseline_w3c",
+      "format_string": "date time c-ip cs-method cs-uri-stem cs-uri-query sc-status cs-bytes time-taken cs(Referer) cs(User-Agent)",
+      "physical_line_count": 8,
+      "comment_line_count": 3,
+      "data_line_count": 5,
+      "expected_parsed_count": 5,
+      "expected_rejected_count": 0,
+      "first_timestamp": "2026-08-11T01:20:00Z",
+      "last_timestamp": "2026-08-11T01:20:04Z",
+      "status_counts": {"200": 1, "304": 1, "401": 1, "404": 1, "503": 1},
+      "bytes_sum": 1364,
+      "duration_ms_sum": 2166
+    },
+    "app_time_format_2.log": {
+      "format_kind": "app",
+      "format_name": "time_format_2",
+      "format_string": "%d{yyyy-MM-dd HH:mm:ss}",
+      "physical_line_count": 5,
+      "comment_line_count": 0,
+      "data_line_count": 5,
+      "expected_parsed_count": 5,
+      "expected_rejected_count": 0,
+      "first_timestamp": "2026-08-11T10:30:00",
+      "last_timestamp": "2026-08-11T10:30:04"
+    },
+    "apache_mixed_invalid.log": {
+      "format_kind": "apache",
+      "format_name": "baseline_combined_with_duration",
+      "format_string": "%h %l %u %t \\\"%r\\\" %>s %b \\\"%{Referer}i\\\" \\\"%{User-Agent}i\\\" %D",
+      "physical_line_count": 5,
+      "comment_line_count": 0,
+      "data_line_count": 5,
+      "expected_parsed_count": 2,
+      "expected_rejected_count": 3,
+      "expected_rejected_lines": {
+        "2": "field_count_mismatch",
+        "3": "invalid_status",
+        "4": "invalid_timestamp"
+      },
+      "status_counts": {"200": 1, "404": 1},
+      "bytes_sum": 500,
+      "duration_us_sum": 50000
+    }
+  }
+}
