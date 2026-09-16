@@ -1,37 +1,41 @@
-import { Link, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './auth'
 import { featureFlags } from '@/lib/flags'
 
 export function AppShell() {
   const { userName, signOut } = useAuth()
+  const { pathname, search } = useLocation()
   return (
     <div className="dense-shell">
       <header className="dense-header">
-        <strong style={{ letterSpacing: '-0.02em', fontSize: 17 }}>
+        <strong className="app-brand">
           {import.meta.env.VITE_APP_NAME ?? 'Easy Log Analyzer'}
         </strong>
-        <nav style={{ marginLeft: 24, display: 'flex', gap: 12 }}>
-          <Link to="/initialization" style={{ color: 'white' }}>
-            Init
-          </Link>
-          <Link to="/lookup" style={{ color: 'white' }}>
+        <nav className="app-navigation" aria-label="Main navigation">
+          <NavLink to="/initialization" className="app-nav-link">
+            Initialization
+          </NavLink>
+          <NavLink to="/lookup" className="app-nav-link">
             Lookup
-          </Link>
-          <Link to="/analysis" style={{ color: 'white' }}>
+          </NavLink>
+          <NavLink to={pathname === '/detail' || pathname === '/analysis' ? `/analysis${search}` : '/analysis'} className="app-nav-link">
             Analysis
-          </Link>
-          <a href={featureFlags.vueFallbackUrl} style={{ color: 'white' }}>
-            Vue fallback
-          </a>
+          </NavLink>
+          <NavLink to={pathname === '/analysis' ? `/detail${search}` : '/detail'} className="app-nav-link">
+            Detail
+          </NavLink>
+          <NavLink to={`/comparison_chart${search}`} className="app-nav-link">Comparison-Chart</NavLink>
+          <NavLink to={`/comparison_statistic${search}`} className="app-nav-link">Comparison-Statistic</NavLink>
         </nav>
-        <span style={{ marginLeft: 'auto' }}>
-          {userName}
-          <button onClick={signOut} style={{ marginLeft: 12 }}>
+        <div className="app-account">
+          <a className="app-fallback-link" href={featureFlags.vueFallbackUrl}>Vue fallback</a>
+          <span className="app-user-name">{userName}</span>
+          <button className="app-logout" onClick={signOut}>
             Logout
           </button>
-        </span>
+        </div>
       </header>
-      <main className="dense-main">
+      <main className={`dense-main${['/analysis', '/detail', '/comparison_chart', '/comparison_statistic'].includes(pathname) ? ' dense-main-fluid' : ''}`}>
         <Outlet />
       </main>
     </div>

@@ -11,6 +11,10 @@ ELAO의 기술 현대화와 기능 개선 계획은 이 디렉터리에서 관�
 3. [기술 스택 현대화 계획](STACK_MODERNIZATION_PLAN.md)
    - Python, Django, Node, Vue 및 관련 의존성의 현대화 상세 절차
 
+## 기능별 구현 계획
+
+- [AI Findings 단계별 구현 계획](AI_FINDINGS_IMPLEMENTATION_PLAN.md): 현재 조회조건 기반 AI 분석, 데이터 구성부터 운영 검증까지 5단계.
+
 ## 관리 원칙
 
 - 작업 진행 상태는 통합 실행 로드맵을 기준으로 갱신한다.

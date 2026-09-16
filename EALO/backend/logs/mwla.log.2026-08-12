@@ -1,0 +1,29 @@
+[ERROR][12/Aug/2026 00:28:27,600][8328|1132][loganalyzerapi.views|findings|1024] Error Occured while processing findings : cannot access local variable 'totalCnt' where it is not associated with a value
+[ERROR][12/Aug/2026 00:30:03,951][8328|1132][loganalyzerapi.views|findings|1024] Error Occured while processing findings : cannot access local variable 'totalCnt' where it is not associated with a value
+[ERROR][12/Aug/2026 00:30:27,626][8328|10840][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,651][8328|12252][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,704][8328|3172][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,715][8328|1132][loganalyzerapi.views|findings|1024] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,758][8328|7656][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,857][8328|10840][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,917][8328|1132][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,944][8328|3172][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:27,998][8328|5536][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:28,  2][8328|7656][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:28,  4][8328|12252][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:28, 65][8328|10840][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:28, 83][8328|3172][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:28,105][8328|1132][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:29,782][8328|1132][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:29,830][8328|3172][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:29,845][8328|5536][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:29,898][8328|10840][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:29,950][8328|12252][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:29,953][8328|7656][loganalyzerapi.views|statistics|1508] Error Occured while creating statistics : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:30, 23][8328|1132][loganalyzerapi.views|findings|1024] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:30, 45][8328|3172][loganalyzerapi.views|chartdata|1888] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:30,114][8328|5536][loganalyzerapi.views|findings|1024] Error Occured while processing findings : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:30,150][8328|10840][loganalyzerapi.views|chartdata|1888] Error Occured while creating chartdata : 'NoneType' object is not iterable
+[ERROR][12/Aug/2026 00:30:36,981][8328|10840][loganalyzerapi.views|findings|1024] Error Occured while processing findings : cannot access local variable 'totalCnt' where it is not associated with a value
+[ERROR][12/Aug/2026 00:30:41,642][8328|5536][loganalyzerapi.views|findings|1024] Error Occured while processing findings : cannot access local variable 'totalCnt' where it is not associated with a value
+[ERROR][12/Aug/2026 08:01:36,489][8328|10948][loganalyzerapi.views|findings|1024] Error Occured while processing findings : cannot access local variable 'totalCnt' where it is not associated with a value

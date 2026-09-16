@@ -43,6 +43,28 @@ export async function listLogFiles(projectId: string) {
     params: { project: projectId },
   })
 }
+export function deleteLogFile(logfileId: string | number) {
+  return apiRequest<void>({ method: 'DELETE', url: `/logfile/${encodeURIComponent(String(logfileId))}/` })
+}
+export function deleteProject(projectId: string | number) {
+  return apiRequest<void>({ method: 'DELETE', url: `/logmaster/${encodeURIComponent(String(projectId))}/` })
+}
+export type FormatDetectionResult = {
+  sample_count: number
+  exact: boolean
+  candidates: Array<{ format_id: string; format_kind: string; format_name: string; format_strings: string; valid_count: number; inferred?: boolean }>
+}
+export function detectLogFormat(file: File, signal?: AbortSignal) {
+  const data = new FormData()
+  data.append('file_object', file)
+  return apiRequest<FormatDetectionResult>({ method: 'POST', url: '/logfile/detect_format/', data, signal, timeout: 15_000 })
+}
+export function listLogFormatKinds() {
+  return apiRequest<{ list_format_kind: string[] }>({ method: 'GET', url: '/logformatstring/formatkind_list/' })
+}
+export function createLogFormat(data: { format_kind: string; format_name: string; format_strings: string; creator: string }) {
+  return apiRequest<LogFormatSummary>({ method: 'POST', url: '/logformat/', data })
+}
 export async function createProject(data: {
   project_name: string
   project_description?: string
@@ -66,7 +88,9 @@ export async function uploadLogFile(
   onProgress?: (percent: number) => void,
   signal?: AbortSignal,
 ) {
-  const [formatKind = '', formatName = '', fileFormat = ''] = format.split('/')
+  const [formatKind = '', formatName = '', ...formatParts] = format.split('/')
+  const fileFormat = formatParts.join('/')
+  if (!formatKind || !formatName || !fileFormat) throw new Error('Select a valid log format.')
   const data = new FormData()
   data.append('project', projectId)
   data.append('file_object', file)
@@ -86,4 +110,53 @@ export async function uploadLogFile(
       if (event.total) onProgress?.(Math.round((event.loaded / event.total) * 100))
     },
   })
+}
+
+export type ParseResult = {
+  status: string
+  source_count: number
+  parsed_count: number
+  stored_count: number
+  rejected_count: number
+  files: Array<{ logfile_id: string; status: string; parsed_count: number; stored_count: number }>
+}
+
+export type AnalysisJob = {
+  job_id: string
+  status: string
+  phase: string
+  processed_units: number
+  total_units: number
+  progress_unit: string
+}
+
+export async function listAnalysisJobs(projectId: string, runId: string, signal: AbortSignal) {
+  const jobs: AnalysisJob[] = []
+  let page = 1
+  for (;;) {
+    const result = await apiRequest<{ results: AnalysisJob[]; next?: string | null }>({
+      method: 'GET', url: '/loganalysisjob/',
+      params: { project: projectId, run_id: runId, page }, signal, timeout: 5000,
+    })
+    jobs.push(...result.results)
+    if (!result.next) return jobs
+    page += 1
+  }
+}
+
+export async function parseProjectFiles(projectId: string, logfileIds: string[], runId?: string) {
+  if (!projectId || !logfileIds.length) throw new Error('Upload or select at least one log file.')
+  const result = await apiRequest<ParseResult>({
+    method: 'POST', url: '/logdetail_dynamic/',
+    data: { project_id: projectId, logfile_id: logfileIds, diff_hour: 0, ...(runId ? { run_id: runId } : {}) },
+    // This legacy endpoint responds only after parsing and COPY have finished.
+    timeout: 0,
+  })
+  if (result.status !== 'COMPLETED' || result.rejected_count !== 0 ||
+      !(result.stored_count > 0) || result.parsed_count !== result.stored_count ||
+      !logfileIds.every((id) => result.files?.some((file) => file.logfile_id === id &&
+        ['COMPLETED', 'ALREADY_COMPLETED'].includes(file.status) && file.parsed_count === file.stored_count))) {
+    throw new Error(`Parsing incomplete: stored ${result.stored_count ?? 0}, rejected ${result.rejected_count ?? 0}. Check parsing results before continuing.`)
+  }
+  return result
 }

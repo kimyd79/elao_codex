@@ -4,15 +4,42 @@ export type AnalysisQuery = Record<string, string | number | string[] | undefine
 
 export function toAnalysisRequest(query: AnalysisQuery) {
   const { project_id, type = '1', kind = 1, ...filter } = query
+  delete filter.N
   // DynamicLogDetailViewSet reads project_id both from the request body and
   // from filter when constructing the project-specific dynamic model.
-  return { project_id, type, kind, filter: { ...filter, project_id } }
+  return {
+    project_id,
+    type,
+    kind,
+    filter: {
+      dateFromValue: '',
+      dateToValue: '',
+      timeFromValue: '',
+      timeToValue: '',
+      ttFromValue: '',
+      ttToValue: '',
+      conditionValue: '',
+      searchValue: '',
+      ...filter,
+      project_id,
+      excludeSearch: String(filter.excludeSearch) === 'true',
+      projectServers: Array.isArray(filter.projectServers)
+        ? filter.projectServers
+        : String(filter.projectServers ?? '')
+            .split(',')
+            .filter(Boolean),
+    },
+  }
+}
+
+export function toStatisticsRequest(query: AnalysisQuery) {
+  return { ...toAnalysisRequest(query), type: Number(query.type ?? 1), N: Number(query.N ?? 5) }
 }
 
 export type ChartPayload = {
   resultX?: string[]
   resultY?: number[]
-  resultY_time?: number[]
+  resultY_time?: Array<number | null>
   resultY_200?: number[]
   resultY_300?: number[]
   resultY_400?: number[]
@@ -37,7 +64,7 @@ export function fetchStatistics(query: AnalysisQuery, signal?: AbortSignal) {
   return apiRequest<ChartPayload>({
     method: 'POST',
     url: '/logdetail_dynamic/statistics/',
-    data: { ...toAnalysisRequest(query), N: 1 },
+    data: toStatisticsRequest(query),
     signal,
   })
 }

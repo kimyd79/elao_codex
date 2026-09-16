@@ -62,6 +62,8 @@ export function LoginApiPage() {
         <button disabled={pending || !username || !password} onClick={() => void submit()}>
           Sign in
         </button>
+        <div className="auth-divider">CREATE ACCOUNT</div>
+        <button type="button" onClick={() => navigate('/register')}>회원가입</button>
         <div className="auth-divider">LOCAL PREVIEW</div>
         <button
           onClick={() => {

@@ -8,6 +8,7 @@ import { RegisterPage } from '@/features/auth/RegisterPage'
 import { ManagementPage } from '@/features/management/ManagementPage'
 import { ResourcePage } from '@/features/management/ResourcePage'
 import { DetailPage } from '@/features/lookup/DetailPage'
+import { ComparisonStatisticPage } from '@/features/analysis/ComparisonStatisticPage'
 import { HomePage, LogoutPage, NotFoundPage } from './pages'
 import { AnalysisWorkspacePage } from '@/features/analysis/AnalysisWorkspacePage'
 const StatisticsPage = lazy(() =>
@@ -51,7 +52,7 @@ export const router = createBrowserRouter([
           { path: '/analysis', element: <AnalysisWorkspacePage /> },
           { path: '/statistics', element: <LazyAnalysis component={StatisticsPage} /> },
           { path: '/comparison_chart', element: <LazyAnalysis component={ComparisonPage} /> },
-          { path: '/comparison_statistic', element: <LazyAnalysis component={StatisticsPage} /> },
+          { path: '/comparison_statistic', element: <ComparisonStatisticPage /> },
         ],
       },
     ],

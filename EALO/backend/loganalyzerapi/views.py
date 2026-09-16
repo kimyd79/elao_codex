@@ -39,6 +39,8 @@ from threading import Thread
 
 from dynamic_models.models import ModelSchema, FieldSchema
 from loganalyzerapi.parsers import validate_log_line as validate_format_log_line
+from loganalyzerapi.chart_aggregation import status_timeline
+from loganalyzerapi.analysis_progress import AnalysisProgress, CopyProgressReader
 from django.apps import apps
 from django.db.models.signals import post_save
 
@@ -79,6 +81,30 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['creator', 'project_name']
     search_fields = ['project_name']
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete a project and every project-scoped analysis artifact."""
+        instance = self.get_object()
+        project_id = str(instance.project_id)
+        try:
+            with transaction.atomic():
+                try:
+                    schema = ModelSchema.objects.get(name='logdetail_' + project_id)
+                    schema.as_model().objects.all().delete()
+                    schema.delete()
+                except ModelSchema.DoesNotExist:
+                    pass
+                files = list(LogFile.objects.filter(project=instance))
+                for logfile in files:
+                    # File rows are deleted below by the project cascade, but
+                    # their uploaded blobs require explicit cleanup.
+                    logfile.file_object.delete(save=False)
+                LogDetailV2.objects.filter(logfile__project=instance).delete()
+                self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as error:
+            logger.exception('Failed to delete project %s: %s', project_id, error)
+            return Response({'message': 'Project deletion failed.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     # Multiple Search
     # http://127.0.0.1:8000/logmaster/?search=aa,22
     #search_fields = ['project_name', 'project_description', 'creator']
@@ -215,6 +241,151 @@ class LogFileViewSet(viewsets.ModelViewSet):
     search_fields = ['file_name']    
     filterset_fields = ['project']
 
+    @staticmethod
+    def infer_sample_format(samples):
+        """Infer each token column from up to 20 rows; unknowns stay %X."""
+        timestamp = re.compile(r'^\[?\d{2}/[A-Za-z]{3}/\d{4}:\d{2}:\d{2}:\d{2}')
+
+        def logical_columns(line):
+            tokens = shlex.split(line)
+            result = []
+            index = 0
+            while index < len(tokens):
+                # Apache timestamps contain a space before the timezone. The
+                # parser treats this as one %t column, so inference must too.
+                if (timestamp.match(tokens[index]) and index + 1 < len(tokens)
+                        and tokens[index + 1].endswith(']')):
+                    result.append(tokens[index] + ' ' + tokens[index + 1])
+                    index += 2
+                else:
+                    result.append(tokens[index])
+                    index += 1
+            return result
+
+        columns = [logical_columns(line) for line in samples]
+        width = max(len(row) for row in columns)
+        values = [[row[i] for row in columns if len(row) > i] for i in range(width)]
+        request = re.compile(r'^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS|CONNECT|TRACE)\s')
+        ip = re.compile(r'^(?:\d{1,3}\.){3}\d{1,3}$|^[0-9a-fA-F:]+$')
+        numeric = re.compile(r'^-?\d+(?:\.\d+)?$')
+        inferred = ['%X'] * width
+        for index, column in enumerate(values):
+            if column and all(ip.match(value or '') and ('.' in value or ':' in value) for value in column if value != '-') and any(value != '-' for value in column):
+                inferred[index] = '%h'
+            elif column and all(timestamp.match(value or '') for value in column):
+                inferred[index] = '%t'
+            elif column and all(request.match(value or '') for value in column):
+                inferred[index] = '%r'
+            elif column and all(value.isdigit() and 100 <= int(value) <= 599 for value in column):
+                inferred[index] = '%>s'
+        # Apache's first three identity columns have fixed positions when
+        # represented as '-', but do not guess non-placeholder values.
+        if width > 1 and all(value == '-' for value in values[1]): inferred[1] = '%l'
+        if width > 2 and all(value == '-' for value in values[2]): inferred[2] = '%u'
+        status_index = next((i for i, item in enumerate(inferred) if item == '%>s'), None)
+        # Apache combined logs have a stable prefix. Use the column position
+        # as a fallback when a request/status sample is unusual, rather than
+        # inserting an unknown placeholder before the request field.
+        if '%r' not in inferred and width > 4 and inferred[4] == '%X':
+            inferred[4] = '%r'
+        if status_index is None and width > 5 and all(
+                value.isdigit() and 100 <= int(value) <= 599 for value in values[5]):
+            inferred[5] = '%>s'
+            status_index = 5
+        if status_index is not None:
+            if status_index + 1 < width and all(numeric.match(v or '') for v in values[status_index + 1]):
+                inferred[status_index + 1] = '%b'
+            if width > status_index + 2 and all(numeric.match(v or '') for v in values[-1]):
+                inferred[-1] = '%D'
+            # Remaining quoted columns in the conventional combined format
+            # are identifiable by position, while any other ambiguity stays X.
+            remaining = [i for i, item in enumerate(inferred) if item == '%X']
+            for index in remaining:
+                column = values[index]
+                if any(value.startswith(('http://', 'https://')) for value in column):
+                    inferred[index] = '%{Referer}i'
+                elif any(re.search(r'(Mozilla|Chrome|Safari|Firefox|curl|wget)', value, re.I) for value in column):
+                    inferred[index] = '%{User-Agent}i'
+        return ' '.join('"%r"' if item == '%r' else item for item in inferred)
+
+    @action(methods=['post'], detail=False, url_path='detect_format')
+    def detect_format(self, request, pk=None):
+        """Suggest registered formats from a small, non-persisted log sample."""
+        upload = request.FILES.get('file_object')
+        if upload is None:
+            return Response({'message': 'file_object is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            raw = upload.read(1024 * 1024)
+            try:
+                text = raw.decode('utf-8')
+            except UnicodeDecodeError:
+                text = raw.decode('cp1252')
+            samples = [line for line in text.splitlines() if line and not line.startswith('#')][:20]
+            formats = list(LogFormat.objects.all().order_by('format_kind', 'format_name'))
+            scored = []
+            parser = DynamicLogDetailViewSet()
+            for fmt in formats:
+                index = parser.get_logformat_index(fmt.format_strings, fmt.format_kind)
+                expected = max(index.values()) + 1 if index else None
+                valid = sum(
+                    validate_format_log_line(line, fmt.format_kind, fmt.format_name, index, expected) is None
+                    for line in samples
+                )
+                scored.append((valid, fmt))
+            scored.sort(key=lambda item: (-item[0], item[1].format_kind, item[1].format_name))
+            exact = [fmt for valid, fmt in scored if samples and valid == len(samples)]
+            selected = exact[:3] if exact else [fmt for _, fmt in scored[:2]]
+            inferred = None
+            if samples and not exact:
+                try:
+                    token_counts = [len(shlex.split(line)) for line in samples]
+                    if len(set(token_counts)) == 1 and token_counts[0] >= 7:
+                        count = token_counts[0]
+                        inferred_format = self.infer_sample_format(samples)
+                        inferred = {
+                            'format_id': '', 'format_kind': 'apache',
+                            'format_name': 'sample-inferred',
+                            'format_strings': inferred_format,
+                            'valid_count': len(samples), 'inferred': True,
+                        }
+                except ValueError:
+                    inferred = None
+            return Response({
+                'sample_count': len(samples),
+                'exact': len(exact) == 1,
+                'candidates': ([inferred] if inferred else []) + [
+                    {'format_id': str(fmt.format_id), 'format_kind': fmt.format_kind,
+                     'format_name': fmt.format_name, 'format_strings': fmt.format_strings,
+                     'valid_count': next(valid for valid, item in scored if item.pk == fmt.pk),
+                     'inferred': False}
+                    for fmt in selected
+                ],
+            }, status=status.HTTP_200_OK)
+        except (UnicodeDecodeError, ValueError, KeyError) as error:
+            return Response({'message': 'format detection failed', 'error': str(error)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        """Delete one file and all rows produced from that file."""
+        instance = self.get_object()
+        logfile_id = str(instance.logfile_id)
+        project_id = str(instance.project_id)
+        try:
+            with transaction.atomic():
+                try:
+                    schema = ModelSchema.objects.get(name='logdetail_' + project_id)
+                    schema.as_model().objects.filter(logfile_id=logfile_id).delete()
+                except ModelSchema.DoesNotExist:
+                    pass
+                # LogDetailV2 has a real FK and is normally cascaded, but the
+                # explicit filter also handles legacy rows consistently.
+                LogDetailV2.objects.filter(logfile_id=logfile_id).delete()
+                instance.file_object.delete(save=False)
+                self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Exception as error:
+            logger.exception('Failed to delete logfile %s: %s', logfile_id, error)
+            return Response({'message': 'Log file deletion failed.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     @action(methods=['post'], detail=False, url_path='validate_sample')
     def validate_sample(self, request, pk=None):
         upload = request.FILES.get('file_object')
@@ -287,7 +458,7 @@ class LogAnalysisJobViewSet(viewsets.ReadOnlyModelViewSet):
     ).all()
     serializer_class = LogAnalysisJobSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['project', 'logfile', 'status']
+    filterset_fields = ['project', 'logfile', 'status', 'run_id']
 
 
 class LogDetailV2ViewSet(viewsets.ReadOnlyModelViewSet):
@@ -1672,73 +1843,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         resultY.append(round(row['y']/3600,1))  # TPS
                         
                 elif(kind == 2):
-                    
-                    start_time = time.time()
-                    
-                    hhRequest = queryset.annotate(f_date=Concat('fdate','fhour'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                    rows = hhRequest.values('f_date', 'f_status', 'status_count')
-                    
-                    dateStatusCount = {}    # {'날짜' : { '2' : 'status_count', '3~5' : 'status_count', ...}, '날짜' : { 'status_code' : 'status_count'}, ...}                   
-                    resultStatusCode = []                    
-                    
-                    # x축(시간)으로 먼저 2, 3, 4, 5 Slot을 생성한다.(초기값 0)
-                    #initial_status_slot = {}
-                    x_all = hhRequest.values('f_date')
-                    
-                    for x in x_all:
-                        if x['f_date'] not in dateStatusCount:
-                            dateStatusCount[x['f_date']] = {'2':0, '3':0, '4':0, '5':0}
+                    resultX, resultY_200, resultY_300, resultY_400, resultY_500 = status_timeline(queryset, '1')
 
-                    for row in rows:
-                        # print("type1, kind2 : status code 건수(count) x - ",row['f_date'])
-                        # print("type1, kind2 : status code 건수(count) y - ",row['f_status'])
-                        # print("type1, kind2 : status code 건수(count) y - ",row['status_count'])
-                        
-                        # x축 : 중복제거
-                        if row['f_date'] not in resultX:
-                            resultX.append(row['f_date'])
-                            
-                        # y축-1 : status 코드 중복제거
-                        if row['f_status'] not in resultStatusCode:
-                            resultStatusCode.append(row['f_status']) 
-                            
-                        # 전체 Map 구하기                        
-                        dateStatusCount[row['f_date']][row['f_status']] = row['status_count']
-                        
-                        
-                    for xDate in resultX:
-                        
-                        resultY_200.append(dateStatusCount[xDate]['2'])
-                        resultY_300.append(dateStatusCount[xDate]['3'])
-                        resultY_400.append(dateStatusCount[xDate]['4'])
-                        resultY_500.append(dateStatusCount[xDate]['5'])                        
-                        
-                        # for yStatusCode in ['2', '3', '4', '5']:
-                            
-                        #     if yStatusCode == '2':
-                        #         if yStatusCode in dateStatusCount[xDate]:
-                        #             resultY_200.append(dateStatusCount[xDate][yStatusCode])
-                        #         else:
-                        #             resultY_200.append(0)
-                            
-                        #     if yStatusCode == '3':
-                        #         if yStatusCode in dateStatusCount[xDate]:
-                        #             resultY_300.append(dateStatusCount[xDate][yStatusCode])
-                        #         else:
-                        #             resultY_300.append(0)
-                            
-                        #     if yStatusCode == '4':
-                        #         if yStatusCode in dateStatusCount[xDate]:
-                        #             resultY_400.append(dateStatusCount[xDate][yStatusCode])
-                        #         else:
-                        #             resultY_400.append(0)
-                                    
-                        #     if yStatusCode == '5':
-                        #         if yStatusCode in dateStatusCount[xDate]:
-                        #             resultY_500.append(dateStatusCount[xDate][yStatusCode])
-                        #         else:
-                        #             resultY_500.append(0)
-                            
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
@@ -1801,45 +1907,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         resultY.append(round(row['y']/60,1))  # TPS
                     
                 elif(kind == 2):
-                    
-                    hhmmRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                    rows = hhmmRequest.values('f_date', 'f_status', 'status_count')
-                    
-                    dateStatusCount = {}    # {'날짜' : { '2' : 'status_count', '3~5' : 'status_count', ...}, '날짜' : { 'status_code' : 'status_count'}, ...}                   
-                    resultStatusCode = []
-                    
-                    # x축(시간)으로 먼저 2, 3, 4, 5 Slot을 생성한다.(초기값 0)
-                    #initial_status_slot = {}
-                    x_all = hhmmRequest.values('f_date')
-                    
-                    for x in x_all:
-                        if x['f_date'] not in dateStatusCount:
-                            dateStatusCount[x['f_date']] = {'2':0, '3':0, '4':0, '5':0}
-                    
-                                                
-                    for row in rows:
-                        # print("type2, kind2 : status code 건수(count) x - ",row['f_date'])
-                        # print("type2, kind2 : status code 건수(count) y - ",row['f_status'])
-                        # print("type2, kind2 : status code 건수(count) y - ",row['status_count'])
-                        
-                        # x축 : 중복제거
-                        if row['f_date'] not in resultX:
-                            resultX.append(row['f_date'])
-                            
-                        # y축-1 : status 코드 중복제거
-                        if row['f_status'] not in resultStatusCode:
-                            resultStatusCode.append(row['f_status']) 
-                            
-                        # 전체 Map 구하기                        
-                        dateStatusCount[row['f_date']][row['f_status']] = row['status_count']
-                        
-                    for xDate in resultX:
-                        
-                        resultY_200.append(dateStatusCount[xDate]['2'])
-                        resultY_300.append(dateStatusCount[xDate]['3'])
-                        resultY_400.append(dateStatusCount[xDate]['4'])
-                        resultY_500.append(dateStatusCount[xDate]['5'])
-                                
+                    resultX, resultY_200, resultY_300, resultY_400, resultY_500 = status_timeline(queryset, '2')
+
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
@@ -1900,43 +1969,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         resultY.append(row['y'])    # TPS
                     
                 elif(kind == 2):
-                    
-                    hhmmssRequest = queryset.annotate(f_date=Concat('fdate','fhour', 'fminute','fsecond'), f_status=Substr('fstatus',1,1)).values('f_date', 'f_status').annotate(status_count=Count('f_status')).order_by('f_date')
-                    rows = hhmmssRequest.values('f_date', 'f_status', 'status_count')
-                    
-                    dateStatusCount = {}    # {'날짜' : { 'status_code' : 'status_count'}, '날짜' : { 'status_code' : 'status_count'}, ...}
-                    resultStatusCode = []
-                    
-                    # x축(시간)으로 먼저 2, 3, 4, 5 Slot을 생성한다.(초기값 0)
-                    #initial_status_slot = {}
-                    x_all = hhmmssRequest.values('f_date')
-                    
-                    for x in x_all:
-                        if x['f_date'] not in dateStatusCount:
-                            dateStatusCount[x['f_date']] = {'2':0, '3':0, '4':0, '5':0}
-                                                
-                    for row in rows:
-                        # print("type3, kind2 : status code 건수(count) x - ",row['f_date'])
-                        # print("type3, kind2 : status code 건수(count) y - ",row['f_status'])
-                        # print("type3, kind2 : status code 건수(count) y - ",row['status_count'])
-                        
-                        # x축 : 중복제거
-                        if row['f_date'] not in resultX:
-                            resultX.append(row['f_date'])
-                            
-                        # y축-1 : status 코드 중복제거
-                        if row['f_status'] not in resultStatusCode:
-                            resultStatusCode.append(row['f_status']) 
-                            
-                        # 전체 Map 구하기
-                        dateStatusCount[row['f_date']][row['f_status']] = row['status_count']
-                        
-                    for xDate in resultX:
-                        resultY_200.append(dateStatusCount[xDate]['2'])
-                        resultY_300.append(dateStatusCount[xDate]['3'])
-                        resultY_400.append(dateStatusCount[xDate]['4'])
-                        resultY_500.append(dateStatusCount[xDate]['5'])
-                                                    
+                    resultX, resultY_200, resultY_300, resultY_400, resultY_500 = status_timeline(queryset, '3')
+
                 elif(kind == 3):
                     # Step1 : logfile_id 로 Logfile 에서 Format 찾아서 %D나 %T 있는지 확인하고
                     # Step2 : 있으면 단위까지 리턴한다. 없으면 비어있는 결과로 리턴한다.
@@ -2433,12 +2467,14 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         advisory_locks = []
         processed_logfile_ids = []
         LogDetail_dynamic = None
+        self.analysis_progress = None
         
         try:
             # logfile_ids for multi-files
             logfile_ids = request.data['logfile_id']
             project_id = request.data['project_id']
             diff_hour = request.data['diff_hour']
+            run_id = uuid.UUID(str(request.data['run_id'])) if request.data.get('run_id') else uuid.uuid4()
 
             project_model = LogMaster.objects.get(project_id=project_id)
             model_name = "logdetail_" + project_id
@@ -2455,6 +2491,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         project=project_model,
                         logfile=requested_logfile,
                         status='PENDING',
+                        run_id=run_id,
                         diff_hour=int(diff_hour),
                     )
                 )
@@ -2490,6 +2527,10 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             # Start Loop for each logfile
             for logfile_id in logfile_ids:
+                if self.analysis_progress:
+                    self.analysis_progress.close()
+                self.analysis_progress = AnalysisProgress(analysis_jobs[str(logfile_id)].job_id)
+                self.analysis_progress.report('PREPARING')
             
                 # 이미 생성되어 있는지 확인
                 if LogDetail_dynamic.objects.filter(logfile_id=logfile_id).count() > 0:
@@ -2612,6 +2653,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             workFileCount = totalLines
 
                         for idx in range(workFileCount):
+                            self.analysis_progress.report('PARSING', idx, workFileCount, 'chunks', force=True)
                             skiprows = unit * idx
                             rows_in_chunk = (
                                 totalLines - skiprows
@@ -2642,6 +2684,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                             'IIS-W3C': self.parse_iis_log,
                             'IIS-NCSA': self.parse_iis_log,
                         }.get(format_kind, self.parse_apache_log)
+                        self.analysis_progress.report('PARSING')
                         resultFiles.append(parser(
                             target_filename, logfile_id, id_startnum, None,
                             None, 0, diff_hour, work_directory,
@@ -2653,6 +2696,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     stored_count = LogDetail_dynamic.objects.filter(
                         logfile_id=logfile_id
                     ).count()
+                    self.analysis_progress.report('VERIFYING')
                     if stored_count != validation['parsed_count']:
                         raise ValueError(
                             'Stored row count does not match parsed row count: '
@@ -2766,6 +2810,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'logdetail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         finally:
+            if self.analysis_progress:
+                self.analysis_progress.close()
             for lock_id in reversed(advisory_locks):
                 try:
                     with connection.cursor() as cursor:
@@ -2793,11 +2839,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
     # app/was 로그 파싱(log4j)
     def prepare_validated_logfile(self, logfile_name, logfile_model, output_dir):
         """Write valid input rows to a temporary file and describe rejects."""
+        progress = getattr(self, 'analysis_progress', None)
+        total_bytes = os.path.getsize(logfile_name)
+        if progress:
+            progress.report('READING', 0, total_bytes, 'bytes')
         encoding = 'utf-8'
         try:
             with open(logfile_name, 'r', encoding=encoding) as source:
                 while source.read(1024 * 1024):
-                    pass
+                    if progress:
+                        progress.report('READING', min(source.buffer.tell(), total_bytes), total_bytes, 'bytes')
         except UnicodeDecodeError:
             encoding = 'cp1252'
 
@@ -2814,11 +2865,17 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         rejects = []
         source_count = 0
         parsed_count = 0
+        processed_bytes = 0
+        if progress:
+            progress.report('VALIDATING', 0, total_bytes, 'bytes')
 
-        with open(logfile_name, 'r', encoding=encoding) as source, open(
+        with open(logfile_name, 'r', encoding=encoding, newline='') as source, open(
             validated_file, 'w', encoding='utf-8', newline=''
         ) as validated:
             for line_number, raw_line in enumerate(source, 1):
+                processed_bytes += len(raw_line.encode(encoding))
+                if progress:
+                    progress.report('VALIDATING', processed_bytes, total_bytes, 'bytes')
                 line = raw_line.rstrip('\r\n')
                 if line.startswith('#'):
                     continue
@@ -3398,6 +3455,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     format_index['D'] = index
                 elif "%T" in tmp:   # second
                     format_index['T'] = index   
+                elif "%X" in tmp:
+                    # Inferred formats use %X for an unknown/reserved field.
+                    # It still occupies a physical token, so retain its
+                    # position for field-count validation and parsing.
+                    format_index['X%d' % index] = index
                         
             elif format_kind == 'nginx':
                 if tmp.find('$http_referer') != -1:
@@ -3651,7 +3713,16 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 % (table_name, columns)
             )
             with connection.cursor() as cursor:
-                cursor.cursor.copy_expert(copy_sql, source)
+                progress = getattr(self, 'analysis_progress', None)
+                if progress:
+                    # Exclude the CSV header already consumed above.
+                    with open(filename, 'rb') as binary_source:
+                        header_bytes = len(binary_source.readline())
+                    total = max(file_size - header_bytes, 0)
+                    progress.report('COPY', 0, total, 'bytes', force=True)
+                    cursor.cursor.copy_expert(copy_sql, CopyProgressReader(source, progress.report, total))
+                else:
+                    cursor.cursor.copy_expert(copy_sql, source)
         elapsed = max(time.time() - started, 0.001)
         logger.info(
             'COPY loaded %s bytes into %s in %.3fs (%.2f KiB/s)',

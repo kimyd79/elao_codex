@@ -8,6 +8,7 @@ from unittest import mock
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from django.contrib.auth.models import User
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import override_settings
@@ -530,7 +531,8 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                 self.assertEqual(analysis_response.data["parsed_count"], 5)
                 self.assertEqual(analysis_response.data["rejected_count"], 0)
                 self.assertEqual(analysis_response.data["stored_count"], 5)
-                self.assertEqual(analysis_response.data["files"][0]["v2_count"], 5)
+                expected_v2_count = 0 if settings.LOG_STORAGE_MODE == 'dynamic' else 5
+                self.assertEqual(analysis_response.data["files"][0]["v2_count"], expected_v2_count)
                 self.assertTrue(
                     analysis_response.data["files"][0]["v2_comparison"]["matches"]
                 )
@@ -541,9 +543,11 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                 self.assertEqual(job.status, "COMPLETED")
                 self.assertEqual(job.source_count, 5)
                 self.assertEqual(job.stored_count, 5)
+                self.assertEqual(job.phase, 'VERIFYING')
+                self.assertIsNotNone(job.run_id)
                 job_response = client.get(
                     "/mwla/loganalysisjob/",
-                    {"logfile": logfile_id},
+                    {"logfile": logfile_id, "run_id": str(job.run_id)},
                 )
                 self.assertEqual(job_response.status_code, 200)
                 self.assertEqual(job_response.data["count"], 1)
@@ -583,7 +587,7 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                 )
                 self.assertEqual(
                     LogDetailV2.objects.filter(logfile_id=logfile_id).count(),
-                    expected["expected_parsed_count"],
+                    expected_v2_count,
                 )
 
                 empty_filter = {
@@ -644,6 +648,17 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                     format="json",
                 )
                 self.assertEqual(delete_response.status_code, 200)
+
+    @override_settings(LOG_STORAGE_MODE='dynamic')
+    def test_dynamic_mode_never_calls_v2_mirroring_or_comparison(self):
+        with mock.patch.object(DynamicLogDetailViewSet, 'mirror_dynamic_rows_to_v2') as mirror, mock.patch.object(DynamicLogDetailViewSet, 'compare_dynamic_v2') as compare:
+            self.test_minimal_upload_and_analysis_api_workflow()
+            mirror.assert_not_called()
+            compare.assert_not_called()
+
+    @override_settings(LOG_STORAGE_MODE='dual')
+    def test_explicit_dual_mode_remains_available(self):
+        self.test_minimal_upload_and_analysis_api_workflow()
 
     def test_invalid_rows_are_counted_and_persisted(self):
         manifest = load_manifest()

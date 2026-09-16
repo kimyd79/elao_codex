@@ -142,6 +142,11 @@ class LogParseReject(models.Model):
 
 
 class LogAnalysisJob(models.Model):
+    run_id = models.UUIDField(null=True, blank=True, db_index=True)
+    phase = models.CharField(max_length=32, blank=True, default='')
+    processed_units = models.PositiveBigIntegerField(default=0)
+    total_units = models.PositiveBigIntegerField(default=0)
+    progress_unit = models.CharField(max_length=16, blank=True, default='')
     STATUS_CHOICES = (
         ('PENDING', 'Pending'),
         ('PROCESSING', 'Processing'),

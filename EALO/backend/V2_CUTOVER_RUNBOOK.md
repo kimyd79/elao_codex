@@ -1,7 +1,12 @@
 # LogDetailV2 cutover runbook
 
-The application currently runs in `LOG_STORAGE_MODE=dual`. Dynamic tables remain
-the source of truth while every new analysis mirrors rows into `LogDetailV2`.
+The operational default is `LOG_STORAGE_MODE=dynamic` (2026-09-09). New analyses
+write only to the original project-specific dynamic tables; V2 mirroring and
+comparison are disabled. Existing V2 rows are retained but can become incomplete
+relative to dynamic storage. Do not cut over using historical V2 coverage alone.
+
+The following is an optional future migration procedure, not the current operating
+configuration. Enable `dual` explicitly only when migration validation is authorized.
 
 ## Pre-cutover gate
 

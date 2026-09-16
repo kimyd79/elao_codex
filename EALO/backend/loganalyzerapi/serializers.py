@@ -29,6 +29,7 @@ class LogAnalysisJobSerializer(serializers.ModelSerializer):
             'job_id', 'status', 'source_count', 'parsed_count',
             'rejected_count', 'stored_count', 'error_message',
             'started', 'finished', 'created', 'updated',
+            'run_id', 'phase', 'processed_units', 'total_units', 'progress_unit',
         )
 
 

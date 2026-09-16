@@ -1,0 +1,7 @@
+[INFO][10/Sep/2026 09:12:35,512][4356|5880][loganalyzerapi.views|copy_csv_to_model|3553] COPY loaded 59211429 bytes into loganalyzerapi_logdetail_e13c9b46_84c6_4e21_91ea_5174df1637a8 in 2.731s (21171.88 KiB/s)
+[ERROR][10/Sep/2026 09:17:18,891][4356|5880][loganalyzerapi.views|chartdata|1851] Error Occured while creating chartdata : can only concatenate str (not "NoneType") to str
+[ERROR][10/Sep/2026 09:17:18,891][4356|136][loganalyzerapi.views|statistics|1608] Error Occured while creating statistics : can only concatenate str (not "NoneType") to str
+[ERROR][10/Sep/2026 09:17:18,912][4356|8100][loganalyzerapi.views|chartdata|1851] Error Occured while creating chartdata : can only concatenate str (not "NoneType") to str
+[ERROR][10/Sep/2026 09:17:18,913][4356|7500][loganalyzerapi.views|chartdata|1851] Error Occured while creating chartdata : can only concatenate str (not "NoneType") to str
+[ERROR][10/Sep/2026 09:17:18,948][4356|2428][loganalyzerapi.views|statistics|1608] Error Occured while creating statistics : can only concatenate str (not "NoneType") to str
+[ERROR][10/Sep/2026 09:17:18,970][4356|2684][loganalyzerapi.views|statistics|1608] Error Occured while creating statistics : can only concatenate str (not "NoneType") to str

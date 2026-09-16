@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { AnalysisChartPage, StatisticsPage } from './AnalysisChartPage'
 import { apiRequest } from '@/lib/api/client'
 import {
@@ -15,12 +15,12 @@ export function AnalysisWorkspacePage() {
   const projectId = params.get('project_id') ?? ''
   return (
     <section className="dense-card analysis-workspace">
-      <div className="workspace-heading">
+      <div className="analysis-heading">
         <div>
           <p className="auth-kicker" style={{ color: '#5269d4' }}>
             ANALYSIS WORKSPACE
           </p>
-          <h1>Analysis</h1>
+          <h1 className="analysis-title">Analysis</h1>
           <p className="muted">
             Explore project information, findings, search, charts and statistics.
           </p>
@@ -50,6 +50,16 @@ function Information({ projectId }: { projectId: string }) {
   const [files, setFiles] = useState<LogFileSummary[]>([])
   const [total, setTotal] = useState<string>('-')
   const [period, setPeriod] = useState('-')
+  const formatDate = (value: unknown) => {
+    const text = String(value ?? '').replace(/[^0-9]/g, '')
+    return text.length === 8 ? `${text.slice(0, 4)}-${text.slice(4, 6)}-${text.slice(6, 8)}` : String(value ?? '-')
+  }
+  const formatTime = (value: unknown) => {
+    const raw = String(value ?? '').replace(/[^0-9]/g, '')
+    if (!raw) return '-'
+    const text = raw.padStart(6, '0')
+    return text.length === 6 ? `${text.slice(0, 2)}:${text.slice(2, 4)}:${text.slice(4, 6)}` : String(value ?? '-')
+  }
   useEffect(() => {
     if (!projectId) return
     void listProjects().then((r) =>
@@ -64,13 +74,13 @@ function Information({ projectId }: { projectId: string }) {
     void fetchPeriod(projectId, 'admin')
       .then((r) =>
         setPeriod(
-          `${r.start_date ?? '-'} ${r.start_time ?? ''} ~ ${r.end_date ?? '-'} ${r.end_time ?? ''}`,
+          `${formatDate(r.start_date)} ${formatTime(r.start_time)}  ~  ${formatDate(r.end_date)} ${formatTime(r.end_time)}`,
         ),
       )
       .catch(() => undefined)
   }, [projectId])
   const formats =
-    Array.from(new Set(files.map((f) => f.file_format).filter(Boolean))).join(' / ') || '-'
+    Array.from(new Set(files.map((f) => f.file_format).filter(Boolean))).join(', ') || '-'
   return (
     <div className="analysis-panel">
       <h2>Information</h2>
@@ -143,19 +153,25 @@ function Findings({ projectId }: { projectId: string }) {
     </div>
   )
 }
-function Search({ projectId }: { projectId: string }) {
+export function Search({ projectId, targetPath = '/analysis', onSearch, isolated = false, eventName = 'elao:analysis-search', title = 'Search' }: { projectId: string; targetPath?: string; onSearch?: (query: Record<string, unknown>) => void; isolated?: boolean; eventName?: string; title?: string }) {
+  const navigate = useNavigate()
+  const urlParams = new URLSearchParams(window.location.search)
+  const urlSearch = window.location.search
+  const initialServers = urlParams.get('projectServers')?.split(',').filter(Boolean) ?? []
   const [files, setFiles] = useState<import('@/features/init/service').LogFileSummary[]>([])
-  const [selected, setSelected] = useState<string[]>([])
-  const [period, setPeriod] = useState({ from: '', to: '' })
+  const [selected, setSelected] = useState<string[]>(initialServers)
+  const [period, setPeriod] = useState({ from: urlParams.get('dateFromValue') && urlParams.get('timeFromValue') ? `${urlParams.get('dateFromValue')} ${urlParams.get('timeFromValue')}` : '', to: urlParams.get('dateToValue') && urlParams.get('timeToValue') ? `${urlParams.get('dateToValue')} ${urlParams.get('timeToValue')}` : '' })
   // Keep the period returned for the project so Initialize can restore it
   // after the user edits the date/time controls.
   const [initialPeriod, setInitialPeriod] = useState({ from: '', to: '' })
-  const [condition, setCondition] = useState('N')
-  const [keyword, setKeyword] = useState('')
-  const [exclude, setExclude] = useState(false)
-  const [timeTaken, setTimeTaken] = useState(['', ''])
+  const [condition, setCondition] = useState(urlParams.get('conditionValue') ?? 'N')
+  const [keyword, setKeyword] = useState(urlParams.get('searchValue') ?? '')
+  const [exclude, setExclude] = useState(urlParams.get('excludeSearch') === 'true')
+  const [timeTaken, setTimeTaken] = useState([urlParams.get('ttFromValue') ?? '', urlParams.get('ttToValue') ?? ''])
+  const initialSearchDone = useRef(false)
   useEffect(() => {
     if (!projectId) return
+    initialSearchDone.current = false
     void listLogFiles(projectId).then((r) => setFiles(r.results ?? []))
     void fetchPeriod(projectId, 'admin')
       .then((r) => {
@@ -163,18 +179,39 @@ function Search({ projectId }: { projectId: string }) {
           from: `${r.start_date ?? ''} ${r.start_time ?? ''}`,
           to: `${r.end_date ?? ''} ${r.end_time ?? ''}`,
         }
-        setPeriod(next)
+        const from = urlParams.get('dateFromValue') && urlParams.get('timeFromValue') ? `${urlParams.get('dateFromValue')} ${urlParams.get('timeFromValue')}` : next.from
+        const to = urlParams.get('dateToValue') && urlParams.get('timeToValue') ? `${urlParams.get('dateToValue')} ${urlParams.get('timeToValue')}` : next.to
+        setPeriod({ from, to })
         setInitialPeriod(next)
       })
       .catch(() => undefined)
-  }, [projectId])
+  // urlParams is derived from urlSearch; keeping the primitive dependency
+  // avoids rerunning this effect on every render.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, urlSearch])
+  useEffect(() => {
+    // Step3 enters Analysis with the project's initial values. Dispatch the
+    // same event as the Search button once those values are available so the
+    // charts and statistics do not remain blank until a manual click.
+    if (isolated || !projectId || !files.length || !period.from || initialSearchDone.current) return
+    initialSearchDone.current = true
+    // Defer one tick so the Charts and Statistics listeners are mounted too.
+    const timer = window.setTimeout(() => search({
+      instances: selected.length ? selected : instances,
+      period,
+    }), 0)
+    return () => window.clearTimeout(timer)
+    // The initial search intentionally waits for the fetched project values;
+    // the button-driven search remains independent of this effect.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, files, period, selected])
   const instances = Array.from(
     new Set(files.map((f) => `${f.server_name ?? '-'}-${f.instance_name ?? '-'}`)),
   )
   // Match the original Analysis screen: all configured server/instances are
   // selected when the project is first loaded.
   useEffect(() => {
-    setSelected(instances)
+    if (!initialServers.length) setSelected(instances)
     // `instances` is derived from the just-loaded file list; only react when
     // that list changes so manual checkbox edits are preserved.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,29 +232,32 @@ function Search({ projectId }: { projectId: string }) {
     setExclude(false)
     setTimeTaken(['', ''])
   }
-  const search = () => {
+  const search = (initial?: { instances?: string[]; period?: { from: string; to: string } }) => {
+    const searchInstances = initial?.instances ?? selected
+    const searchPeriod = initial?.period ?? period
     const query = new URLSearchParams({
       project_id: projectId,
       conditionValue: condition,
       searchValue: keyword,
       excludeSearch: String(exclude),
-      projectServers: selected.join(','),
+      projectServers: searchInstances.join(','),
       ttFromValue: timeTaken[0],
       ttToValue: timeTaken[1],
-      dateFromValue: period.from.slice(0, 8),
-      dateToValue: period.to.slice(0, 8),
-      timeFromValue: period.from.slice(9),
-      timeToValue: period.to.slice(9),
+      dateFromValue: searchPeriod.from.slice(0, 8),
+      dateToValue: searchPeriod.to.slice(0, 8),
+      timeFromValue: searchPeriod.from.slice(9),
+      timeToValue: searchPeriod.to.slice(9),
     })
-    window.history.replaceState({}, '', `/analysis?${query.toString()}`)
-    const detail = { ...Object.fromEntries(query), projectServers: selected }
+    if (!isolated) navigate(`${targetPath}?${query.toString()}`, { replace: true })
+    const detail = { ...Object.fromEntries(query), projectServers: searchInstances }
+    onSearch?.(detail)
     window.dispatchEvent(
-      new CustomEvent('elao:analysis-search', { detail }),
+      new CustomEvent(eventName, { detail }),
     )
   }
   return (
     <div className="analysis-panel">
-      <h2>Search</h2>
+      <h2>{title}</h2>
       <div className="search-form">
         <fieldset>
           <legend>Instances</legend>
@@ -320,17 +360,13 @@ function Search({ projectId }: { projectId: string }) {
           </div>
         </fieldset>
       </div>
-      <p className="muted">Select instances and filters, then continue to raw log search.</p>
       <div className="search-actions">
         <button type="button" onClick={initialize}>
           Initialize
         </button>
-        <button type="button" className="primary-action" onClick={search}>
+        <button type="button" className="primary-action" onClick={() => search()}>
           Search
         </button>
-        <Link className="primary-link" to={`/lookup?project_id=${encodeURIComponent(projectId)}`}>
-          Open Lookup search
-        </Link>
       </div>
     </div>
   )

@@ -104,7 +104,7 @@ DYNAMIC_MODELS = {
 
 
 SITE_ID = 1
-ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 MIDDLEWARE = [
@@ -190,6 +190,7 @@ DATABASES = {
 # The Vue client uses DRF token authentication. Keep registration and login
 # responses compatible with the existing {"key": "..."} API contract.
 REST_AUTH = {
+    'REGISTER_SERIALIZER': 'loganalyzerapi.registration.RegistrationSerializer',
     'SESSION_LOGIN': False,
     'USE_JWT': False,
 }
@@ -200,7 +201,9 @@ LOG_PARSER_SPLIT_SIZE_BYTES = int(env_value(
 LOG_PARSER_MAX_EXPANDED_BYTES = int(env_value(
     'LOG_PARSER_MAX_EXPANDED_BYTES', str(10 * 1024 * 1024 * 1024)
 ))
-LOG_STORAGE_MODE = env_value('LOG_STORAGE_MODE', 'dual').lower()
+# Original project-specific tables are the operational default. V2 mirroring
+# is opt-in for migration validation, never an implicit upload cost.
+LOG_STORAGE_MODE = env_value('LOG_STORAGE_MODE', 'dynamic').lower()
 if LOG_STORAGE_MODE not in {'dynamic', 'dual', 'v2'}:
     raise ValueError('LOG_STORAGE_MODE must be dynamic, dual, or v2')
 
