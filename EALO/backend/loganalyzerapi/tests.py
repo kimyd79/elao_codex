@@ -10,17 +10,24 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import connection
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.test.utils import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.urls import resolve
 from rest_framework.test import APIClient
 from rest_framework.authtoken.models import Token
 
-from dynamic_models.models import ModelSchema
+from dynamic_models.models import FieldSchema, ModelSchema
 
 from loganalyzerapi.models import LogAnalysisJob, LogDetailV2, LogFile, LogMaster
 from loganalyzerapi.parsers import get_parser, validate_log_line
-from loganalyzerapi.views import DynamicLogDetailViewSet
+from loganalyzerapi.views import (
+    DynamicLogDetailViewSet,
+    _xview_response_time_ms,
+    _xview_status_group,
+    _xview_uri,
+)
 
 
 FIXTURE_DIR = Path(__file__).resolve().parent / "testdata" / "access_logs"
@@ -94,6 +101,7 @@ class RouterContractTests(SimpleTestCase):
             "/mwla/logdetail_dynamic/statistics/": "post",
             "/mwla/logdetail_dynamic/chartdata/": "post",
             "/mwla/logdetail_dynamic/chartdata_diff/": "post",
+            "/mwla/logdetail_dynamic/xview/": "post",
             "/mwla/logdetail_dynamic/findings/": "post",
             "/mwla/logdetail_dynamic/get_before_after_detail/": "post",
             "/mwla/logdetail_dynamic/uridetail/": "post",
@@ -114,6 +122,22 @@ class RouterContractTests(SimpleTestCase):
     def test_v2_readonly_url_resolves(self):
         match = resolve('/mwla/logdetail_v2/')
         self.assertEqual(match.func.cls.__name__, 'LogDetailV2ViewSet')
+
+
+class XViewContractTests(SimpleTestCase):
+    def test_request_uri_and_response_time_normalization(self):
+        self.assertEqual(_xview_uri('GET /orders?id=7 HTTP/1.1'), '/orders?id=7')
+        self.assertEqual(_xview_uri('/health'), '/health')
+        self.assertEqual(_xview_response_time_ms(250000, 'D'), 250.0)
+        self.assertEqual(_xview_response_time_ms(0.25, 'T'), 250.0)
+        self.assertIsNone(_xview_response_time_ms(-1, 'D'))
+
+    def test_status_groups_match_xview_colors(self):
+        self.assertEqual(_xview_status_group(200), '20x')
+        self.assertEqual(_xview_status_group(302), '30x')
+        self.assertEqual(_xview_status_group(404), '40x')
+        self.assertEqual(_xview_status_group(503), '50x')
+        self.assertEqual(_xview_status_group('-'), 'other')
 
 
 class AccessLogFixtureContractTests(SimpleTestCase):
@@ -178,13 +202,16 @@ class AccessLogFixtureContractTests(SimpleTestCase):
             '[12/Aug/2026:00:00:00 200 12',
             'apache', 'combined', apache_index, 3,
         ))
-        self.assertEqual(
-            validate_log_line(
-                '[12/Aug/2026:00:00:00 700 12',
+        for nonstandard_status in ('000', '099', '600', '700', '999'):
+            self.assertIsNone(validate_log_line(
+                '[12/Aug/2026:00:00:00 %s 12' % nonstandard_status,
                 'apache', 'combined', apache_index, 3,
-            )[0],
-            'invalid_status',
-        )
+            ))
+        for invalid_status in ('99', '1000', 'BAD', '2O0'):
+            self.assertEqual(validate_log_line(
+                '[12/Aug/2026:00:00:00 %s 12' % invalid_status,
+                'apache', 'combined', apache_index, 3,
+            )[0], 'invalid_status')
         self.assertEqual(
             validate_log_line('raw', 'unknown', 'unknown', {}, None)[0],
             'unsupported_format',
@@ -198,6 +225,23 @@ class AccessLogFixtureContractTests(SimpleTestCase):
         self.assertIsNone(validate_log_line(
             '[12/Aug/2026:00:00:00 200 12 0.001',
             'nginx', 'combined', nginx_index, 4,
+        ))
+
+    def test_apache_cookie_field_counts_as_a_physical_field(self):
+        parser = DynamicLogDetailViewSet()
+        log_format = (
+            r'%h %l %u %t \"%r\" %>s %b %D '
+            r'\"%{Referer}i\" \"%{User-Agent}i\" \"%{Cookie}i\"'
+        )
+        format_index = parser.get_logformat_index(log_format, 'apache')
+        expected_count = max(format_index.values()) + 1
+
+        self.assertEqual(format_index['Cookie'], 11)
+        self.assertEqual(expected_count, 12)
+        self.assertIsNone(validate_log_line(
+            '127.0.0.1 - user [12/Aug/2026:00:00:00 +0900] '
+            '"GET / HTTP/1.1" 200 123 42 "-" "Test Agent" "session=abc"',
+            'apache', 'combined', format_index, expected_count,
         ))
 
     def test_sample_validation_api_returns_preview(self):
@@ -375,6 +419,68 @@ class AuthenticationApiRegressionTests(TestCase):
 class DynamicLogSchemaRegressionTests(TransactionTestCase):
     """Exercise real dynamic table creation in the isolated test database."""
 
+    def test_project_delete_drops_dynamic_table_without_deleting_its_rows(self):
+        client = APIClient()
+        with tempfile.TemporaryDirectory() as media_root:
+            with override_settings(MEDIA_ROOT=media_root):
+                project = LogMaster.objects.create(
+                    project_name='fast-project-delete',
+                    project_description='delete regression',
+                    creator='test-suite',
+                )
+                project_id = str(project.project_id)
+                response = client.post(
+                    '/mwla/logmaster/create_dynamic_logdetail/',
+                    {'project_id': project_id}, format='json',
+                )
+                self.assertEqual(response.status_code, 200)
+                logfile = LogFile.objects.create(
+                    project=project,
+                    file_name='delete.log',
+                    file_object=SimpleUploadedFile('delete.log', b'log data'),
+                    file_format='%h %>s',
+                    format_kind='apache',
+                    format_name='delete-test',
+                    file_size=8,
+                    server_name='server',
+                    instance_name='instance',
+                )
+                schema = ModelSchema.objects.get(name='logdetail_' + project_id)
+                dynamic_model = schema.as_model()
+                dynamic_model.objects.bulk_create([
+                    dynamic_model(logfile_id=str(logfile.logfile_id))
+                    for _ in range(100)
+                ])
+                LogDetailV2.objects.create(logfile=logfile, status=200)
+                table_name = dynamic_model._meta.db_table
+                storage_delete_atomic_states = []
+                original_storage_delete = logfile.file_object.storage.delete
+
+                def tracked_storage_delete(name):
+                    storage_delete_atomic_states.append(connection.in_atomic_block)
+                    return original_storage_delete(name)
+
+                with mock.patch.object(
+                    logfile.file_object.storage, 'delete',
+                    side_effect=tracked_storage_delete,
+                ), CaptureQueriesContext(connection) as queries:
+                    response = client.delete('/mwla/logmaster/%s/' % project_id)
+
+                self.assertEqual(response.status_code, 204)
+                sql = [item['sql'] for item in queries.captured_queries]
+                self.assertTrue(any(
+                    'DROP TABLE' in query and table_name in query
+                    for query in sql
+                ))
+                self.assertFalse(any(
+                    'DELETE FROM' in query and table_name in query
+                    for query in sql
+                ))
+                self.assertEqual(storage_delete_atomic_states, [False])
+                self.assertFalse(LogMaster.objects.filter(pk=project.pk).exists())
+                self.assertFalse(ModelSchema.objects.filter(name='logdetail_' + project_id).exists())
+                self.assertFalse(LogDetailV2.objects.filter(logfile_id=logfile.pk).exists())
+
     def test_create_and_delete_project_logdetail_schema(self):
         project = LogMaster.objects.create(
             project_name="dynamic-schema-regression",
@@ -458,6 +564,20 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                     format="json",
                 )
                 self.assertEqual(schema_response.status_code, 200)
+                self.assertEqual(
+                    set(
+                        FieldSchema.objects.filter(
+                            model_schema__name=model_name,
+                            name__in=('log_line', 'frequest', 'freferer', 'fuser_agent'),
+                        ).values_list('name', 'data_type', 'max_length')
+                    ),
+                    {
+                        ('log_line', 'text', None),
+                        ('frequest', 'text', None),
+                        ('freferer', 'text', None),
+                        ('fuser_agent', 'text', None),
+                    },
+                )
 
                 upload = SimpleUploadedFile(
                     "apache_combined.log",
@@ -661,6 +781,18 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
         self.test_minimal_upload_and_analysis_api_workflow()
 
     def test_invalid_rows_are_counted_and_persisted(self):
+        self._check_row_loss(300, True)
+
+    def test_exactly_one_percent_row_loss_fails(self):
+        self._check_row_loss(295, False)
+
+    def test_above_one_percent_row_loss_fails(self):
+        self._check_row_loss(0, False)
+
+    def test_nul_row_below_one_percent_completes(self):
+        self._check_row_loss(300, True, nul_row=True)
+
+    def _check_row_loss(self, extra_valid_rows, succeeds, nul_row=False):
         manifest = load_manifest()
         expected = manifest["fixtures"]["apache_mixed_invalid.log"]
         client = APIClient()
@@ -681,9 +813,13 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                 )
                 self.assertEqual(schema_response.status_code, 200)
 
+                source = (FIXTURE_DIR / "apache_mixed_invalid.log").read_bytes().splitlines()
+                if nul_row:
+                    source[1] = b'\0' * 1174 + source[0]
                 upload = SimpleUploadedFile(
                     "apache_mixed_invalid.log",
-                    (FIXTURE_DIR / "apache_mixed_invalid.log").read_bytes(),
+                    b'\n'.join(source) + b'\n'
+                    + (source[0] + b'\n') * extra_valid_rows,
                     content_type="text/plain",
                 )
                 logfile = LogFile.objects.create(
@@ -708,17 +844,38 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                     format="json",
                 )
 
+                if not succeeds:
+                    self.assertEqual(response.status_code, 500)
+                    self.assertEqual(response.data['status'], 'FAILED')
+                    self.assertEqual(response.data['rejected_count'], 3)
+                    self.assertEqual(response.data['stored_count'], 0)
+                    self.assertEqual(len(response.data['files'][0]['failure_samples']), 3)
+                    job = LogAnalysisJob.objects.get(logfile=logfile)
+                    self.assertEqual(job.status, 'FAILED')
+                    self.assertIn('below 1%', job.error_message)
+                    dynamic_model = ModelSchema.objects.get(name=model_name).as_model()
+                    self.assertEqual(dynamic_model.objects.filter(logfile_id=logfile.pk).count(), 0)
+                    client.post('/mwla/logmaster/delete_dynamic_logdetail/',
+                                {'project_id': project_id}, format='json')
+                    return
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.data["source_count"], 5)
-                self.assertEqual(response.data["parsed_count"], 2)
+                self.assertEqual(response.data["source_count"], 5 + extra_valid_rows)
+                self.assertEqual(response.data["parsed_count"], 2 + extra_valid_rows)
                 self.assertEqual(response.data["rejected_count"], 3)
-                self.assertEqual(response.data["stored_count"], 2)
-                self.assertEqual(response.data["status"], "PARTIAL")
+                self.assertEqual(response.data["stored_count"], 2 + extra_valid_rows)
+                self.assertEqual(response.data["status"], "COMPLETED")
                 job = LogAnalysisJob.objects.get(
                     job_id=response.data["files"][0]["job_id"]
                 )
-                self.assertEqual(job.status, "PARTIAL")
+                self.assertEqual(job.status, "COMPLETED")
                 self.assertEqual(job.rejected_count, 3)
+                details = response.data['files'][0]
+                self.assertEqual(sum(item['count'] for item in details['failure_reasons']), 3)
+                self.assertEqual(len(details['failure_samples']), 3)
+                if nul_row:
+                    self.assertEqual(details['failure_samples'][0]['error_code'], 'invalid_nul')
+                    self.assertNotIn('\0', details['failure_samples'][0]['raw_line_excerpt'])
+                    self.assertTrue(details['failure_samples'][0]['truncated'])
                 self.assertEqual(
                     response.data["source_count"],
                     response.data["parsed_count"]
@@ -729,10 +886,17 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                     "line_number", "error_code"
                 ))
                 self.assertEqual(rejects, [
-                    (2, "field_count_mismatch"),
+                    (2, "invalid_nul" if nul_row else "field_count_mismatch"),
                     (3, "invalid_status"),
                     (4, "invalid_timestamp"),
                 ])
+                repeated = client.post('/mwla/logdetail_dynamic/', {
+                    'project_id': project_id, 'logfile_id': [str(logfile.logfile_id)], 'diff_hour': 0,
+                }, format='json')
+                self.assertEqual(repeated.status_code, 200)
+                self.assertEqual(repeated.data['source_count'], 5 + extra_valid_rows)
+                self.assertEqual(repeated.data['rejected_count'], 3)
+                self.assertEqual(repeated.data['files'][0]['failure_samples'], details['failure_samples'])
                 dynamic_model = ModelSchema.objects.get(
                     name=model_name
                 ).as_model()
@@ -740,7 +904,7 @@ class DynamicLogSchemaRegressionTests(TransactionTestCase):
                     dynamic_model.objects.filter(
                         logfile_id=str(logfile.logfile_id)
                     ).count(),
-                    2,
+                    2 + extra_valid_rows,
                 )
 
                 delete_response = client.post(

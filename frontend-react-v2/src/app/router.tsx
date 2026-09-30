@@ -11,6 +11,7 @@ import { DetailPage } from '@/features/lookup/DetailPage'
 import { ComparisonStatisticPage } from '@/features/analysis/ComparisonStatisticPage'
 import { HomePage, LogoutPage, NotFoundPage } from './pages'
 import { AnalysisWorkspacePage } from '@/features/analysis/AnalysisWorkspacePage'
+import { XViewPage } from '@/features/analysis/XViewPage'
 const StatisticsPage = lazy(() =>
   import('@/features/analysis/AnalysisChartPage').then((module) => ({
     default: module.StatisticsPage,
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
           { path: '/logformat', element: <ResourcePage kind="logformat" /> },
           { path: '/metrics', element: <ResourcePage kind="metrics" /> },
           { path: '/analysis', element: <AnalysisWorkspacePage /> },
+          { path: '/x-view', element: <XViewPage /> },
           { path: '/statistics', element: <LazyAnalysis component={StatisticsPage} /> },
           { path: '/comparison_chart', element: <LazyAnalysis component={ComparisonPage} /> },
           { path: '/comparison_statistic', element: <ComparisonStatisticPage /> },

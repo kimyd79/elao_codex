@@ -60,7 +60,9 @@ class LogDetail(models.Model):
     # PK
     logdetail_id = models.UUIDField(verbose_name="did",primary_key=True, default=uuid.uuid4, editable=False) 
     logfile = models.ForeignKey(LogFile, on_delete=models.CASCADE)
-    log_line = models.CharField(max_length=1000, null=True, blank=True)
+    # Access-log request targets, referrers, and user agents can legitimately
+    # exceed varchar limits. Preserve the original line without truncation.
+    log_line = models.TextField(null=True, blank=True)
     
     # Filters
     fyear = models.CharField(max_length=4, null=True, blank=True)
@@ -75,10 +77,10 @@ class LogDetail(models.Model):
     ftime = models.CharField(max_length=6, null=True, blank=True)    
     fdatetime = models.CharField(max_length=14, null=True, blank=True)    
     
-    frequest = models.CharField(max_length=500, null=True, blank=True)
+    frequest = models.TextField(null=True, blank=True)
     fip = models.CharField(max_length=40, null=True, blank=True)
-    freferer = models.CharField(max_length=500, null=True, blank=True)
-    fuser_agent = models.CharField(max_length=500, null=True, blank=True)
+    freferer = models.TextField(null=True, blank=True)
+    fuser_agent = models.TextField(null=True, blank=True)
     fstatus = models.CharField(max_length=10, null=True, blank=True)
     ftime_taken = models.BigIntegerField(default=0)
     

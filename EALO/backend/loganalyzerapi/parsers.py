@@ -7,6 +7,31 @@ from datetime import datetime
 
 SUPPORTED_FORMATS = frozenset({'apache', 'nginx', 'IIS-W3C', 'IIS-NCSA', 'app'})
 
+# Fast path for whitespace-separated plain fields and standalone quoted
+# fields. Match shlex's ASCII whitespace, not Python's broader Unicode \s.
+# Escapes in double quotes, unquoted escapes, and concatenated quoted/plain
+# fragments deliberately fall back to shlex to preserve their exact semantics.
+_SIMPLE_FIELD = r'''(?:[^ \t\r\n'"\\]+|"[^"\\]*"|'[^']*')'''
+_SIMPLE_LINE = re.compile(
+    _SIMPLE_FIELD + r'(?:[ \t\r\n]+' + _SIMPLE_FIELD + r')*'
+)
+_SIMPLE_FIELDS = re.compile(_SIMPLE_FIELD)
+
+
+def split_log_fields(line):
+    """Equivalent to shlex.split(line), with a fast path for ordinary logs."""
+    # Strip only shlex whitespace. Keeping optional leading/trailing whitespace
+    # in the regex would cause excessive backtracking on malformed padded rows.
+    fields = line.strip(' \t\r\n')
+    if not fields:
+        return []
+    if _SIMPLE_LINE.fullmatch(fields) is None:
+        return shlex.split(line)
+    return [
+        field[1:-1] if field[0] in ('"', "'") else field
+        for field in _SIMPLE_FIELDS.findall(fields)
+    ]
+
 
 class FormatParser:
     format_kind = None
@@ -71,7 +96,7 @@ def validate_log_line(line, format_kind, format_name, format_index, expected_cou
         return None
 
     try:
-        tokens = shlex.split(line)
+        tokens = split_log_fields(line)
     except ValueError as error:
         return ('invalid_quoting', str(error))
     if expected_count is not None and len(tokens) != expected_count:
@@ -94,9 +119,9 @@ def validate_log_line(line, format_kind, format_name, format_index, expected_cou
         'nginx': ('$status', '$body_bytes_sent', '$request_time'),
     }.get(format_kind, ('s', 'b', 'D' if 'D' in format_index else 'T'))
     try:
-        status_value = int(tokens[format_index[status_key]])
-        if status_value < 100 or status_value > 599:
-            raise ValueError('HTTP status is outside 100..599')
+        status_value = tokens[format_index[status_key]]
+        if re.fullmatch(r'[0-9]{3}', status_value) is None:
+            raise ValueError('HTTP status must be exactly three digits')
     except (KeyError, IndexError, ValueError) as error:
         return ('invalid_status', str(error))
     if byte_key in format_index:

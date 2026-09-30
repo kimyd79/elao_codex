@@ -47,7 +47,7 @@ export function deleteLogFile(logfileId: string | number) {
   return apiRequest<void>({ method: 'DELETE', url: `/logfile/${encodeURIComponent(String(logfileId))}/` })
 }
 export function deleteProject(projectId: string | number) {
-  return apiRequest<void>({ method: 'DELETE', url: `/logmaster/${encodeURIComponent(String(projectId))}/` })
+  return apiRequest<void>({ method: 'DELETE', url: `/logmaster/${encodeURIComponent(String(projectId))}/`, timeout: 120_000 })
 }
 export type FormatDetectionResult = {
   sample_count: number
@@ -118,7 +118,12 @@ export type ParseResult = {
   parsed_count: number
   stored_count: number
   rejected_count: number
-  files: Array<{ logfile_id: string; status: string; parsed_count: number; stored_count: number }>
+  files: Array<{
+    logfile_id: string; file_name?: string; status: string
+    source_count?: number; parsed_count: number; stored_count: number; rejected_count?: number
+    failure_reasons?: Array<{ error_code: string; error_message: string; count: number }>
+    failure_samples?: Array<{ line_number: number; error_code: string; error_message: string; raw_line_excerpt: string; truncated: boolean }>
+  }>
 }
 
 export type AnalysisJob = {
@@ -151,8 +156,12 @@ export async function parseProjectFiles(projectId: string, logfileIds: string[],
     data: { project_id: projectId, logfile_id: logfileIds, diff_hour: 0, ...(runId ? { run_id: runId } : {}) },
     // This legacy endpoint responds only after parsing and COPY have finished.
     timeout: 0,
+    validateStatus: (status) => status === 200 || status === 500,
   })
-  if (result.status !== 'COMPLETED' || result.rejected_count !== 0 ||
+  if (result.status === 'FAILED' && result.files?.length) return result
+  if (result.status !== 'COMPLETED' || result.rejected_count < 0 ||
+      result.rejected_count * 100 >= result.source_count ||
+      result.source_count !== result.stored_count + result.rejected_count ||
       !(result.stored_count > 0) || result.parsed_count !== result.stored_count ||
       !logfileIds.every((id) => result.files?.some((file) => file.logfile_id === id &&
         ['COMPLETED', 'ALREADY_COMPLETED'].includes(file.status) && file.parsed_count === file.stored_count))) {

@@ -1,0 +1,227 @@
+[ERROR][29/Sep/2026 09:41:10,756][9064|9276][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:10,795][9064|13940][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:10,811][9064|14928][loganalyzerapi.views|findings|1379] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:10,839][9064|6584][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:10,840][9064|13124][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:10,871][9064|7420][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:10,981][9064|14928][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11,  0][9064|9276][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11, 42][9064|6584][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11,127][9064|13124][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11,127][9064|13940][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11,169][9064|7420][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11,212][9064|9276][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:11,220][9064|14928][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,231][9064|7420][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,285][9064|6584][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,286][9064|13124][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,286][9064|13940][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,317][9064|9276][loganalyzerapi.views|findings|1379] Error Occured while processing findings : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,325][9064|14928][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,450][9064|7420][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,501][9064|13124][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,533][9064|6584][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,552][9064|13940][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,577][9064|14928][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,590][9064|7420][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,622][9064|9276][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,736][9064|14928][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,753][9064|13124][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,779][9064|13940][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,818][9064|6584][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,823][9064|7420][loganalyzerapi.views|statistics|1863] Error Occured while creating statistics : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,852][9064|14928][loganalyzerapi.views|chartdata|2220] Error Occured while creating chartdata : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,857][9064|9276][loganalyzerapi.views|chartdata|2220] Error Occured while creating chartdata : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:15,871][9064|13124][loganalyzerapi.views|chartdata|2220] Error Occured while creating chartdata : ModelSchema matching query does not exist.
+[ERROR][29/Sep/2026 09:41:18,727][9064|13124][loganalyzerapi.views|chartdata|2220] Error Occured while creating chartdata : ModelSchema matching query does not exist.
+[INFO][29/Sep/2026 12:59:16,510][5960|7848][loganalyzerapi.views|copy_csv_to_model|3995] COPY loaded 891638736 bytes into loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 in 29.285s (29733.57 KiB/s)
+[WARNING][29/Sep/2026 12:59:19,630][5960|7848][loganalyzerapi.views|create|2958] Accepted log row loss below 1%: source=873724, stored=872112, missing=1612
+[ERROR][29/Sep/2026 14:52:19,273][5960|4456][loganalyzerapi.views|start_end|1484] Error Occured while processing start_end : 'NoneType' object has no attribute 'fdate'
+[ERROR][29/Sep/2026 14:52:19,273][5960|7572][loganalyzerapi.views|start_end|1484] Error Occured while processing start_end : 'NoneType' object has no attribute 'fdate'
+[ERROR][29/Sep/2026 14:52:19,273][5960|11388][loganalyzerapi.views|start_end|1484] Error Occured while processing start_end : 'NoneType' object has no attribute 'fdate'
+[ERROR][29/Sep/2026 14:52:19,274][5960|10184][loganalyzerapi.views|start_end|1484] Error Occured while processing start_end : 'NoneType' object has no attribute 'fdate'
+[ERROR][29/Sep/2026 14:53:21,375][5960|8404][loganalyzerapi.views|create|3033] Error Occured while creating logdetail : Log row loss must be below 1%: source=873724, parsed=0, stored=0, missing=873724
+[INFO][29/Sep/2026 15:00:39,307][5960|5608][loganalyzerapi.views|copy_csv_to_model|3995] COPY loaded 891638736 bytes into loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 in 53.246s (16353.07 KiB/s)
+[WARNING][29/Sep/2026 15:00:43,117][5960|5608][loganalyzerapi.views|create|2958] Accepted log row loss below 1%: source=873724, stored=872112, missing=1612
+[ERROR][29/Sep/2026 15:23:25,754][5960|7364][loganalyzerapi.views|create|3033] Error Occured while creating logdetail : Log row loss must be below 1%: source=873724, parsed=0, stored=0, missing=873724
+[INFO][29/Sep/2026 15:33:12,653][11908|8008][loganalyzerapi.views|copy_csv_to_model|4030] COPY loaded 896366458 bytes into loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 in 67.294s (13007.92 KiB/s)
+[WARNING][29/Sep/2026 15:33:16,305][11908|8008][loganalyzerapi.views|create|2977] Accepted log row loss below 1%: source=873724, stored=872112, missing=1612
+[INFO][29/Sep/2026 16:25:11,154][16296|16080][loganalyzerapi.views|destroy|190] Deleted project 0b84ddbb-2adc-4d25-9527-3860fb0fa6e5 in 0.203s (database 0.203s, files 0.000s)
+[INFO][29/Sep/2026 16:37:41,105][3372|9588][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': 'aeadb9e7-5ae7-46ba-8db7-872db3ba7b21', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[ERROR][29/Sep/2026 16:37:41,107][3372|9588][loganalyzerapi.views|operational_findings|1148] Operational findings request failed after 0.002s: {'project_id': 'aeadb9e7-5ae7-46ba-8db7-872db3ba7b21', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\views.py", line 1146, in operational_findings
+    result = build_findings(request.user, project_id, filters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\operational_findings.py", line 201, in build_findings
+    authorize(user, project)
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\ai_dataset.py", line 60, in authorize
+    raise PermissionDenied('Project access denied')
+rest_framework.exceptions.PermissionDenied: Project access denied
+[INFO][29/Sep/2026 16:37:41,115][3372|9588][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': 'aeadb9e7-5ae7-46ba-8db7-872db3ba7b21', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[INFO][29/Sep/2026 16:37:41,205][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.083s
+[INFO][29/Sep/2026 16:37:41,229][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.109s
+[INFO][29/Sep/2026 16:37:41,230][3372|9588][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.115s: project_id=aeadb9e7-5ae7-46ba-8db7-872db3ba7b21 total=1 buckets=60
+[INFO][29/Sep/2026 16:37:41,238][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:37:41,253][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.019s
+[INFO][29/Sep/2026 16:37:41,257][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:37:41,273][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.018s
+[INFO][29/Sep/2026 16:37:41,281][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.001s
+[INFO][29/Sep/2026 16:37:41,298][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.021s
+[INFO][29/Sep/2026 16:37:41,338][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:37:41,358][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.024s
+[INFO][29/Sep/2026 16:37:41,363][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:37:41,382][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.022s
+[INFO][29/Sep/2026 16:37:41,384][3372|9588][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:37:41,393][3372|9588][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.010s
+[INFO][29/Sep/2026 16:40:10,235][10932|15728][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 16:40:13, 38][10932|15728][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=2.556s
+[INFO][29/Sep/2026 16:40:27,972][10932|15728][loganalyzerapi.operational_findings|analyze|193] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=17.617s
+[INFO][29/Sep/2026 16:40:27,973][10932|15728][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 17.739s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=872112 buckets=60
+[INFO][29/Sep/2026 16:41:28,313][16096|12688][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': 'b65b3e36-392a-424a-84ab-7e4f8e64cbde', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[ERROR][29/Sep/2026 16:41:28,315][16096|12688][loganalyzerapi.views|operational_findings|1148] Operational findings request failed after 0.002s: {'project_id': 'b65b3e36-392a-424a-84ab-7e4f8e64cbde', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\views.py", line 1146, in operational_findings
+    result = build_findings(request.user, project_id, filters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\operational_findings.py", line 245, in build_findings
+    authorize(user, project)
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\ai_dataset.py", line 60, in authorize
+    raise PermissionDenied('Project access denied')
+rest_framework.exceptions.PermissionDenied: Project access denied
+[INFO][29/Sep/2026 16:41:28,324][16096|12688][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': 'b65b3e36-392a-424a-84ab-7e4f8e64cbde', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[INFO][29/Sep/2026 16:41:28,335][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.003s
+[INFO][29/Sep/2026 16:41:28,358][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.029s
+[INFO][29/Sep/2026 16:41:28,358][16096|12688][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.035s: project_id=b65b3e36-392a-424a-84ab-7e4f8e64cbde total=1 buckets=60
+[INFO][29/Sep/2026 16:41:28,366][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:41:28,381][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.017s
+[INFO][29/Sep/2026 16:41:28,385][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:41:28,400][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.018s
+[INFO][29/Sep/2026 16:41:28,407][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.001s
+[INFO][29/Sep/2026 16:41:28,422][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.017s
+[INFO][29/Sep/2026 16:41:28,461][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:41:28,481][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.024s
+[INFO][29/Sep/2026 16:41:28,485][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:41:28,503][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.022s
+[INFO][29/Sep/2026 16:41:28,506][16096|12688][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:41:28,514][16096|12688][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.010s
+[INFO][29/Sep/2026 16:41:41,364][8548|12784][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': 'e13c9b46-84c6-4e21-91ea-5174df1637a8', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 16:41:44,512][8548|12784][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_e13c9b46_84c6_4e21_91ea_5174df1637a8 rows=274187 buckets=2895839 elapsed=2.797s
+[INFO][29/Sep/2026 16:41:51,157][8548|12784][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail_e13c9b46_84c6_4e21_91ea_5174df1637a8 rows=274187 buckets=2895839 elapsed=9.672s
+[INFO][29/Sep/2026 16:41:51,158][8548|12784][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 9.795s: project_id=e13c9b46-84c6-4e21-91ea-5174df1637a8 total=274187 buckets=60
+[INFO][29/Sep/2026 16:42:17,281][16140|15708][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '3affdac9-c8a7-47c0-95d2-78cda8a927b7', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[ERROR][29/Sep/2026 16:42:17,283][16140|15708][loganalyzerapi.views|operational_findings|1148] Operational findings request failed after 0.002s: {'project_id': '3affdac9-c8a7-47c0-95d2-78cda8a927b7', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\views.py", line 1146, in operational_findings
+    result = build_findings(request.user, project_id, filters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\operational_findings.py", line 245, in build_findings
+    authorize(user, project)
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\ai_dataset.py", line 60, in authorize
+    raise PermissionDenied('Project access denied')
+rest_framework.exceptions.PermissionDenied: Project access denied
+[INFO][29/Sep/2026 16:42:17,291][16140|15708][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '3affdac9-c8a7-47c0-95d2-78cda8a927b7', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[INFO][29/Sep/2026 16:42:17,302][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.003s
+[INFO][29/Sep/2026 16:42:17,325][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.028s
+[INFO][29/Sep/2026 16:42:17,325][16140|15708][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.034s: project_id=3affdac9-c8a7-47c0-95d2-78cda8a927b7 total=1 buckets=60
+[INFO][29/Sep/2026 16:42:17,332][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:17,347][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.017s
+[INFO][29/Sep/2026 16:42:17,351][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:17,367][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.018s
+[INFO][29/Sep/2026 16:42:17,373][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:17,389][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.018s
+[INFO][29/Sep/2026 16:42:17,428][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:42:17,448][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.024s
+[INFO][29/Sep/2026 16:42:17,452][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:42:17,471][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.022s
+[INFO][29/Sep/2026 16:42:17,473][16140|15708][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:17,481][16140|15708][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.009s
+[INFO][29/Sep/2026 16:42:17,487][16140|15708][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '00000000-0000-0000-0000-000000000001', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': True, 'has_time_filter': False}
+[INFO][29/Sep/2026 16:42:38,148][8104|16144][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '42f7d85d-28f3-4118-a3c3-996065f48747', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[ERROR][29/Sep/2026 16:42:38,150][8104|16144][loganalyzerapi.views|operational_findings|1148] Operational findings request failed after 0.002s: {'project_id': '42f7d85d-28f3-4118-a3c3-996065f48747', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\views.py", line 1146, in operational_findings
+    result = build_findings(request.user, project_id, filters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\operational_findings.py", line 245, in build_findings
+    authorize(user, project)
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\ai_dataset.py", line 60, in authorize
+    raise PermissionDenied('Project access denied')
+rest_framework.exceptions.PermissionDenied: Project access denied
+[INFO][29/Sep/2026 16:42:38,158][8104|16144][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '42f7d85d-28f3-4118-a3c3-996065f48747', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[INFO][29/Sep/2026 16:42:38,169][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.003s
+[INFO][29/Sep/2026 16:42:38,192][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.028s
+[INFO][29/Sep/2026 16:42:38,193][8104|16144][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.035s: project_id=42f7d85d-28f3-4118-a3c3-996065f48747 total=1 buckets=60
+[INFO][29/Sep/2026 16:42:38,200][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:38,215][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.018s
+[INFO][29/Sep/2026 16:42:38,219][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:38,234][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.017s
+[INFO][29/Sep/2026 16:42:38,241][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:38,256][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.018s
+[INFO][29/Sep/2026 16:42:38,295][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:42:38,315][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=181 buckets=6 elapsed=0.024s
+[INFO][29/Sep/2026 16:42:38,319][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 16:42:38,340][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.023s
+[INFO][29/Sep/2026 16:42:38,342][8104|16144][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 16:42:38,351][8104|16144][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.010s
+[INFO][29/Sep/2026 16:42:38,357][8104|16144][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '00000000-0000-0000-0000-000000000001', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': True, 'has_time_filter': False}
+[INFO][29/Sep/2026 16:50:41,957][16140|8444][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '100600', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 16:50:45,250][16140|8444][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=3.115s
+[INFO][29/Sep/2026 16:51:00,497][16140|8444][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=18.499s
+[INFO][29/Sep/2026 16:51:00,498][16140|8444][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 18.542s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=872112 buckets=60
+[INFO][29/Sep/2026 16:56:36,928][16140|1260][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '001000', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 16:56:37,  6][16140|1260][loganalyzerapi.operational_findings|analyze|111] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=3629 buckets=10 elapsed=0.023s
+[INFO][29/Sep/2026 16:56:37, 83][16140|1260][loganalyzerapi.operational_findings|analyze|237] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=3629 buckets=10 elapsed=0.103s
+[INFO][29/Sep/2026 16:56:37, 84][16140|1260][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.156s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=3629 buckets=60
+[INFO][29/Sep/2026 17:05:56,973][14656|16368][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '0959f84d-2eea-470f-9cac-34b6403b2f99', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[ERROR][29/Sep/2026 17:05:56,975][14656|16368][loganalyzerapi.views|operational_findings|1148] Operational findings request failed after 0.002s: {'project_id': '0959f84d-2eea-470f-9cac-34b6403b2f99', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\views.py", line 1146, in operational_findings
+    result = build_findings(request.user, project_id, filters)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\operational_findings.py", line 251, in build_findings
+    authorize(user, project)
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\ai_dataset.py", line 60, in authorize
+    raise PermissionDenied('Project access denied')
+rest_framework.exceptions.PermissionDenied: Project access denied
+[INFO][29/Sep/2026 17:05:56,984][14656|16368][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '0959f84d-2eea-470f-9cac-34b6403b2f99', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': True}
+[INFO][29/Sep/2026 17:05:56,995][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.003s
+[INFO][29/Sep/2026 17:05:57, 18][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=1 elapsed=0.028s
+[INFO][29/Sep/2026 17:05:57, 18][14656|16368][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.034s: project_id=0959f84d-2eea-470f-9cac-34b6403b2f99 total=1 buckets=60
+[INFO][29/Sep/2026 17:05:57, 25][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 17:05:57, 40][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.017s
+[INFO][29/Sep/2026 17:05:57, 44][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 17:05:57, 60][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=1 buckets=6 elapsed=0.018s
+[INFO][29/Sep/2026 17:05:57, 67][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.001s
+[INFO][29/Sep/2026 17:05:57, 83][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=121 elapsed=0.018s
+[INFO][29/Sep/2026 17:05:57,135][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=266 buckets=6 elapsed=0.003s
+[INFO][29/Sep/2026 17:05:57,157][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=266 buckets=6 elapsed=0.026s
+[INFO][29/Sep/2026 17:05:57,161][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.002s
+[INFO][29/Sep/2026 17:05:57,181][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=10 buckets=6 elapsed=0.024s
+[INFO][29/Sep/2026 17:05:57,184][14656|16368][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.001s
+[INFO][29/Sep/2026 17:05:57,192][14656|16368][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail rows=0 buckets=6 elapsed=0.010s
+[INFO][29/Sep/2026 17:05:57,199][14656|16368][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '00000000-0000-0000-0000-000000000001', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': True, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:10:09,310][7520|7912][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '001000', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:10:09,380][7520|7912][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=3629 buckets=10 elapsed=0.024s
+[INFO][29/Sep/2026 17:10:09,454][7520|7912][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=3629 buckets=10 elapsed=0.101s
+[INFO][29/Sep/2026 17:10:09,454][7520|7912][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.145s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=3629 buckets=60
+[INFO][29/Sep/2026 17:10:48, 60][7520|7912][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '100600', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:10:51,383][7520|7912][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=3.144s
+[INFO][29/Sep/2026 17:11:06,670][7520|7912][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=18.568s
+[INFO][29/Sep/2026 17:11:06,671][7520|7912][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 18.611s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=872112 buckets=60
+[INFO][29/Sep/2026 17:12:11,693][7520|7420][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '001200', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:12:11,764][7520|7420][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=3948 buckets=12 elapsed=0.025s
+[INFO][29/Sep/2026 17:12:11,842][7520|7420][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=3948 buckets=12 elapsed=0.106s
+[INFO][29/Sep/2026 17:12:11,843][7520|7420][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 0.149s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=3948 buckets=60
+[INFO][29/Sep/2026 17:14:23,923][7520|920][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '100600', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:14:36,137][7520|920][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=11.968s
+[INFO][29/Sep/2026 17:15:05,835][7520|920][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=41.866s
+[INFO][29/Sep/2026 17:15:05,837][7520|920][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 41.910s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=872112 buckets=60
+[INFO][29/Sep/2026 17:27:28,911][7520|11756][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': None, 'time_from': None, 'date_to': None, 'time_to': None, 'server_count': None, 'condition': None, 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:27:33,821][7520|11756][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=4.590s
+[INFO][29/Sep/2026 17:27:37,477][7520|3872][loganalyzerapi.views|operational_findings|1139] Operational findings request started: {'project_id': '85eee122-0aed-4fc0-b989-72af2daaf804', 'date_from': '20251209', 'time_from': '000002', 'date_to': '20251209', 'time_to': '100600', 'server_count': 1, 'condition': 'N', 'has_keyword': False, 'has_time_filter': False}
+[INFO][29/Sep/2026 17:27:46,739][7520|3872][loganalyzerapi.operational_findings|analyze|116] Operational findings timeline aggregated: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=9.004s
+[INFO][29/Sep/2026 17:28:12,449][7520|11756][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=43.459s
+[INFO][29/Sep/2026 17:28:12,449][7520|11756][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 43.535s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=872112 buckets=60
+[INFO][29/Sep/2026 17:28:14,925][7520|3872][loganalyzerapi.operational_findings|analyze|243] Operational findings analysis completed: model=loganalyzerapi_logdetail_85eee122_0aed_4fc0_b989_72af2daaf804 rows=872112 buckets=606 elapsed=37.402s
+[INFO][29/Sep/2026 17:28:14,927][7520|3872][loganalyzerapi.views|operational_findings|1151] Operational findings request completed in 37.444s: project_id=85eee122-0aed-4fc0-b989-72af2daaf804 total=872112 buckets=60

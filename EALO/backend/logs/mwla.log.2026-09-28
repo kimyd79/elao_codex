@@ -1,0 +1,205 @@
+[INFO][28/Sep/2026 15:10:59,678][14636|8464][loganalyzerapi.views|copy_csv_to_model|3872] COPY loaded 1027477239 bytes into loganalyzerapi_logdetail_00c983c6_d7fe_45ee_a34c_e248a169bfdd in 32.453s (30918.65 KiB/s)
+[ERROR][28/Sep/2026 15:11:02,830][14636|8464][loganalyzerapi.views|create|2934] Error Occured while creating logdetail : Stored row count does not match parsed row count: 664075 != 664076
+[WARNING][28/Sep/2026 15:11:48,155][14636|8464][loganalyzerapi.analysis_progress|report|40] Could not update analysis progress
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.QueryCanceled: 오류:  명령실행시간 초과로 작업을 취소합니다.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\analysis_progress.py", line 33, in report
+    cursor.execute(
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: 오류:  명령실행시간 초과로 작업을 취소합니다.
+
+[WARNING][28/Sep/2026 15:11:52,671][14636|8464][loganalyzerapi.analysis_progress|report|40] Could not update analysis progress
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.QueryCanceled: 오류:  명령실행시간 초과로 작업을 취소합니다.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\analysis_progress.py", line 33, in report
+    cursor.execute(
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: 오류:  명령실행시간 초과로 작업을 취소합니다.
+
+[INFO][28/Sep/2026 15:22:04,331][14636|8464][loganalyzerapi.views|copy_csv_to_model|3872] COPY loaded 1027477239 bytes into loganalyzerapi_logdetail_00c983c6_d7fe_45ee_a34c_e248a169bfdd in 28.249s (35519.94 KiB/s)
+[ERROR][28/Sep/2026 15:22:18,136][14636|8464][loganalyzerapi.views|create|2934] Error Occured while creating logdetail : Stored row count does not match parsed row count: 664075 != 664076
+[INFO][28/Sep/2026 15:34:41, 36][12472|4468][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 92497 bytes into loganalyzerapi_logdetail_890f3636_5820_4d1f_907f_e1309d1ab8d9 in 0.017s (5440.45 KiB/s)
+[WARNING][28/Sep/2026 15:34:41, 36][12472|4468][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 15:34:42,194][12472|4468][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 90967 bytes into loganalyzerapi_logdetail_56a2ed17_9190_4385_9f22_a8540ee5dcf0 in 0.031s (2887.26 KiB/s)
+[ERROR][28/Sep/2026 15:34:42,194][12472|4468][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : Log row loss must be below 1%: source=300, parsed=297, stored=297, missing=3
+[INFO][28/Sep/2026 15:34:43,383][12472|4468][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 803 bytes into loganalyzerapi_logdetail_07bbbb38_d93c_496c_a73a_e4ee2902f8c6 in 0.001s (784.18 KiB/s)
+[ERROR][28/Sep/2026 15:34:43,394][12472|4468][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : Log row loss must be below 1%: source=5, parsed=2, stored=2, missing=3
+[INFO][28/Sep/2026 15:34:44,424][12472|4468][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_7a18d02f_acf3_4b22_97a0_313829b79e96 in 0.011s (51.20 KiB/s)
+[INFO][28/Sep/2026 15:34:44,435][12472|4468][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_7a18d02f_acf3_4b22_97a0_313829b79e96 in 0.010s (58.13 KiB/s)
+[INFO][28/Sep/2026 15:34:44,445][12472|4468][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_7a18d02f_acf3_4b22_97a0_313829b79e96 in 0.010s (117.49 KiB/s)
+[INFO][28/Sep/2026 15:35:08,635][11912|5444][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 92497 bytes into loganalyzerapi_logdetail_18613369_29f8_4cf9_915e_1a6467d08e02 in 0.022s (4113.43 KiB/s)
+[WARNING][28/Sep/2026 15:35:08,637][11912|5444][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 15:49:43,758][14636|6032][loganalyzerapi.views|copy_csv_to_model|3872] COPY loaded 1027477239 bytes into loganalyzerapi_logdetail_00c983c6_d7fe_45ee_a34c_e248a169bfdd in 30.066s (33373.26 KiB/s)
+[ERROR][28/Sep/2026 15:49:56,973][14636|6032][loganalyzerapi.views|create|2934] Error Occured while creating logdetail : Stored row count does not match parsed row count: 664075 != 664076
+[INFO][28/Sep/2026 16:02:20,204][14636|13016][loganalyzerapi.views|copy_csv_to_model|3872] COPY loaded 1027477239 bytes into loganalyzerapi_logdetail_00c983c6_d7fe_45ee_a34c_e248a169bfdd in 28.555s (35138.49 KiB/s)
+[ERROR][28/Sep/2026 16:02:23, 99][14636|13016][loganalyzerapi.views|create|2934] Error Occured while creating logdetail : Stored row count does not match parsed row count: 664075 != 664076
+[INFO][28/Sep/2026 16:38:16,842][9696|11756][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1027476689 bytes into loganalyzerapi_logdetail_00c983c6_d7fe_45ee_a34c_e248a169bfdd in 28.102s (35704.87 KiB/s)
+[WARNING][28/Sep/2026 16:38:23,801][9696|11756][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=664076, stored=664075, missing=1
+[ERROR][28/Sep/2026 16:45:41,123][9696|5756][loganalyzerapi.views|get_before_after_detail|1079] Error Occured while processing get_before_after_detail : 'logs'
+[INFO][28/Sep/2026 17:13:23,914][924|7588][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1027476689 bytes into profile_log_99a0acc9eb7d43409e40bd7b134733bc in 31.558s (31795.35 KiB/s)
+[INFO][28/Sep/2026 17:14:59, 25][924|7588][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1027476689 bytes into profile_log_b253011823fd459eb9e7c93c9069ac54 in 31.587s (31766.44 KiB/s)
+[INFO][28/Sep/2026 17:23:38,787][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 803 bytes into loganalyzerapi_logdetail_32e877ad_680e_4ed2_8123_7e18f63c780b in 0.009s (86.88 KiB/s)
+[ERROR][28/Sep/2026 17:23:38,787][9288|14120][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : Log row loss must be below 1%: source=5, parsed=2, stored=2, missing=3
+[ERROR][28/Sep/2026 17:23:39,605][9288|14120][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][28/Sep/2026 17:23:40,515][9288|14120][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : synthetic COPY failure
+[INFO][28/Sep/2026 17:23:42,349][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_241d38dd_05a6_4ac0_aa21_43c0e8e79cd1 in 0.006s (93.19 KiB/s)
+[INFO][28/Sep/2026 17:23:42,357][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_241d38dd_05a6_4ac0_aa21_43c0e8e79cd1 in 0.008s (72.28 KiB/s)
+[INFO][28/Sep/2026 17:23:42,378][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_241d38dd_05a6_4ac0_aa21_43c0e8e79cd1 in 0.020s (58.77 KiB/s)
+[INFO][28/Sep/2026 17:23:43,527][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 90967 bytes into loganalyzerapi_logdetail_f6373fd9_9bd0_4f2a_bf1b_e89fc274628d in 0.051s (1727.06 KiB/s)
+[ERROR][28/Sep/2026 17:23:43,527][9288|14120][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : Log row loss must be below 1%: source=300, parsed=297, stored=297, missing=3
+[INFO][28/Sep/2026 17:23:44,551][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_b28fd9ba_3082_43cd_bb65_200b4bd47982 in 0.012s (45.46 KiB/s)
+[INFO][28/Sep/2026 17:23:44,578][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_b28fd9ba_3082_43cd_bb65_200b4bd47982 in 0.027s (21.60 KiB/s)
+[INFO][28/Sep/2026 17:23:44,589][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_b28fd9ba_3082_43cd_bb65_200b4bd47982 in 0.011s (106.85 KiB/s)
+[INFO][28/Sep/2026 17:23:44,609][9288|14120][loganalyzerapi.views|compare_dynamic_v2|3970] V2 comparison logfile=7be7ff27-e866-4446-a9d1-afa4068fedba result={'matches': True, 'differences': {}, 'dynamic_count': 5, 'v2_count': 5, 'elapsed_ms': 1.401}
+[INFO][28/Sep/2026 17:23:45,795][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 92497 bytes into loganalyzerapi_logdetail_efd9f9e6_1997_45c5_841c_6c58d8476642 in 0.051s (1775.04 KiB/s)
+[WARNING][28/Sep/2026 17:23:45,795][9288|14120][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 17:23:46,812][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_a5eb1b48_47e7_4043_998c_679cf4545ebf in 0.012s (46.96 KiB/s)
+[INFO][28/Sep/2026 17:23:46,832][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_a5eb1b48_47e7_4043_998c_679cf4545ebf in 0.020s (28.88 KiB/s)
+[INFO][28/Sep/2026 17:23:46,843][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_a5eb1b48_47e7_4043_998c_679cf4545ebf in 0.011s (107.04 KiB/s)
+[INFO][28/Sep/2026 17:23:47,941][9288|14120][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 92497 bytes into loganalyzerapi_logdetail_919bfbcd_63fa_4eb2_ae3a_d0823e6640d5 in 0.021s (4356.05 KiB/s)
+[WARNING][28/Sep/2026 17:23:47,941][9288|14120][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 17:27:36,368][12472|4276][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1027476689 bytes into profile_log_dc147a36ed154e408a53e8532d02fb12 in 32.287s (31077.24 KiB/s)
+[INFO][28/Sep/2026 17:28:08,  7][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 803 bytes into loganalyzerapi_logdetail_62f27ea3_f2fc_4bde_b2fb_4e75bfa65cf3 in 0.010s (78.35 KiB/s)
+[ERROR][28/Sep/2026 17:28:08,  9][10976|5140][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : Log row loss must be below 1%: source=5, parsed=2, stored=2, missing=3
+[ERROR][28/Sep/2026 17:28:08,490][10976|5140][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[ERROR][28/Sep/2026 17:28:09,404][10976|5140][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : synthetic COPY failure
+[INFO][28/Sep/2026 17:28:11,182][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_37b03f77_a7de_4e33_a0aa_5dc07ab09b02 in 0.021s (27.29 KiB/s)
+[INFO][28/Sep/2026 17:28:11,212][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_37b03f77_a7de_4e33_a0aa_5dc07ab09b02 in 0.030s (19.20 KiB/s)
+[INFO][28/Sep/2026 17:28:11,222][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_37b03f77_a7de_4e33_a0aa_5dc07ab09b02 in 0.010s (118.11 KiB/s)
+[INFO][28/Sep/2026 17:28:12,351][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 90967 bytes into loganalyzerapi_logdetail_e7a330b0_6cc0_409f_bc39_0c9a26366454 in 0.054s (1657.51 KiB/s)
+[ERROR][28/Sep/2026 17:28:12,353][10976|5140][loganalyzerapi.views|create|2955] Error Occured while creating logdetail : Log row loss must be below 1%: source=300, parsed=297, stored=297, missing=3
+[INFO][28/Sep/2026 17:28:13,371][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_28fcb84a_78ff_4f75_908c_36df39e7c5d2 in 0.031s (18.30 KiB/s)
+[INFO][28/Sep/2026 17:28:13,381][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_28fcb84a_78ff_4f75_908c_36df39e7c5d2 in 0.010s (57.46 KiB/s)
+[INFO][28/Sep/2026 17:28:13,391][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_28fcb84a_78ff_4f75_908c_36df39e7c5d2 in 0.010s (118.60 KiB/s)
+[INFO][28/Sep/2026 17:28:13,401][10976|5140][loganalyzerapi.views|compare_dynamic_v2|3970] V2 comparison logfile=e917bb16-d29c-47f4-b2f4-918d15d16198 result={'matches': True, 'differences': {}, 'dynamic_count': 5, 'v2_count': 5, 'elapsed_ms': 1.328}
+[INFO][28/Sep/2026 17:28:14,526][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 92497 bytes into loganalyzerapi_logdetail_7e0c949e_fbd1_48b6_ba1e_8636e7683cbf in 0.041s (2210.13 KiB/s)
+[WARNING][28/Sep/2026 17:28:14,526][10976|5140][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 17:28:15,527][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 577 bytes into loganalyzerapi_logdetail_98fde97a_ddea_43c2_a0ad_06a375a849f6 in 0.010s (55.55 KiB/s)
+[INFO][28/Sep/2026 17:28:15,537][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 595 bytes into loganalyzerapi_logdetail_98fde97a_ddea_43c2_a0ad_06a375a849f6 in 0.010s (57.71 KiB/s)
+[INFO][28/Sep/2026 17:28:15,588][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1219 bytes into loganalyzerapi_logdetail_98fde97a_ddea_43c2_a0ad_06a375a849f6 in 0.051s (23.35 KiB/s)
+[INFO][28/Sep/2026 17:28:16,721][10976|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 92497 bytes into loganalyzerapi_logdetail_7386c9e0_a91c_4136_adb6_f12aa010b623 in 0.063s (1444.27 KiB/s)
+[WARNING][28/Sep/2026 17:28:16,721][10976|5140][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 17:31:32,101][8524|8324][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1027476689 bytes into profile_log_9d32b1da83b7462d909101151ddd7c16 in 32.510s (30863.89 KiB/s)
+[INFO][28/Sep/2026 17:44:28,974][952|5140][loganalyzerapi.views|copy_csv_to_model|3893] COPY loaded 1027476689 bytes into loganalyzerapi_logdetail_9d5be72e_0143_47c1_beae_fa4dbef3008d in 28.771s (34875.47 KiB/s)
+[WARNING][28/Sep/2026 17:44:31,824][952|5140][loganalyzerapi.views|create|2881] Accepted log row loss below 1%: source=664076, stored=664075, missing=1
+[INFO][28/Sep/2026 18:09:18,646][13132|4456][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 92497 bytes into loganalyzerapi_logdetail_5bca0f0c_bbc3_4853_a508_e6a26575d663 in 0.020s (4515.44 KiB/s)
+[WARNING][28/Sep/2026 18:09:18,648][13132|4456][loganalyzerapi.views|create|2907] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 18:09:19,786][13132|4456][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 90967 bytes into loganalyzerapi_logdetail_f96ac8af_fdd8_42ac_a927_c9ce2bf3c445 in 0.021s (4231.41 KiB/s)
+[ERROR][28/Sep/2026 18:09:19,790][13132|4456][loganalyzerapi.views|create|2982] Error Occured while creating logdetail : Log row loss must be below 1%: source=300, parsed=297, stored=297, missing=3
+[INFO][28/Sep/2026 18:09:20,854][13132|4456][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 803 bytes into loganalyzerapi_logdetail_bef4fb55_3ddb_41b7_9ad4_07c12e68abba in 0.047s (16.68 KiB/s)
+[ERROR][28/Sep/2026 18:09:20,858][13132|4456][loganalyzerapi.views|create|2982] Error Occured while creating logdetail : Log row loss must be below 1%: source=5, parsed=2, stored=2, missing=3
+[INFO][28/Sep/2026 18:09:22,299][13132|4456][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 92497 bytes into loganalyzerapi_logdetail_6dda0c0e_53c7_4c88_9fc0_7767421f7d4f in 0.023s (3972.48 KiB/s)
+[WARNING][28/Sep/2026 18:09:22,300][13132|4456][loganalyzerapi.views|create|2907] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[ERROR][28/Sep/2026 18:11:55,739][10236|280][loganalyzerapi.views|create|2982] Error Occured while creating logdetail : LogMaster matching query does not exist.
+[INFO][28/Sep/2026 18:39:08,709][10236|13388][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 891451937 bytes into loganalyzerapi_logdetail_cbe4efaa_d96d_45e9_b566_8f5242955979 in 26.876s (32391.32 KiB/s)
+[WARNING][28/Sep/2026 18:39:11,447][10236|13388][loganalyzerapi.views|create|2907] Accepted log row loss below 1%: source=873724, stored=871924, missing=1800
+[INFO][28/Sep/2026 18:46:19,742][9520|13500][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 92497 bytes into loganalyzerapi_logdetail_9ab9a53a_009a_4e8d_9938_da80c3d8586f in 0.021s (4246.73 KiB/s)
+[WARNING][28/Sep/2026 18:46:19,742][9520|13500][loganalyzerapi.views|create|2907] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[INFO][28/Sep/2026 18:46:23,945][2688|9608][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 92497 bytes into loganalyzerapi_logdetail_9d774efe_56a4_441d_9300_6d023fff6a6a in 0.058s (1555.61 KiB/s)
+[WARNING][28/Sep/2026 18:46:23,945][2688|9608][loganalyzerapi.views|create|2907] Accepted log row loss below 1%: source=305, stored=302, missing=3
+[ERROR][28/Sep/2026 18:49:24,335][9392|10936][loganalyzerapi.views|destroy|166] Failed to delete project 9d5be72e-0143-47c1-beae-fa4dbef3008d: 오류:  deadlock 발생했음
+DETAIL:  12912 프로세스가 AccessExclusiveLock 상태로 지연되고 있음(해당 작업: 릴레이션 280747, 데이터베이스 16397); 7080 프로세스에 의해 블록킹되었음
+7080 프로세스가 ShareLock 상태로 지연되고 있음(해당 작업: 트랜잭션 36440); 12912 프로세스에 의해 블록킹되었음
+HINT:  쿼리 상세 정보는 서버 로그를 참조하십시오.
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 103, in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.DeadlockDetected: 오류:  deadlock 발생했음
+DETAIL:  12912 프로세스가 AccessExclusiveLock 상태로 지연되고 있음(해당 작업: 릴레이션 280747, 데이터베이스 16397); 7080 프로세스에 의해 블록킹되었음
+7080 프로세스가 ShareLock 상태로 지연되고 있음(해당 작업: 트랜잭션 36440); 12912 프로세스에 의해 블록킹되었음
+HINT:  쿼리 상세 정보는 서버 로그를 참조하십시오.
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Codex\ELAO\EALO\backend\loganalyzerapi\views.py", line 154, in destroy
+    schema.delete()
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\dynamic_models\models.py", line 34, in delete
+    self._schema_editor.drop_table(self.as_model())
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\dynamic_models\schema.py", line 28, in drop_table
+    editor.delete_model(model)
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\base\schema.py", line 547, in delete_model
+    self.execute(
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\postgresql\schema.py", line 48, in execute
+    return super().execute(sql, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\base\schema.py", line 204, in execute
+    cursor.execute(sql, params)
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Codex\ELAO\.venv312\Lib\site-packages\django\db\backends\utils.py", line 103, in _execute
+    return self.cursor.execute(sql)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: 오류:  deadlock 발생했음
+DETAIL:  12912 프로세스가 AccessExclusiveLock 상태로 지연되고 있음(해당 작업: 릴레이션 280747, 데이터베이스 16397); 7080 프로세스에 의해 블록킹되었음
+7080 프로세스가 ShareLock 상태로 지연되고 있음(해당 작업: 트랜잭션 36440); 12912 프로세스에 의해 블록킹되었음
+HINT:  쿼리 상세 정보는 서버 로그를 참조하십시오.
+
+[INFO][28/Sep/2026 18:53:30,834][9392|12972][loganalyzerapi.views|copy_csv_to_model|3944] COPY loaded 891638736 bytes into loganalyzerapi_logdetail_5fb867aa_1e78_45da_873a_fe18b4a2965a in 26.593s (32743.59 KiB/s)
+[WARNING][28/Sep/2026 18:53:33,785][9392|12972][loganalyzerapi.views|create|2907] Accepted log row loss below 1%: source=873724, stored=872112, missing=1612
+[INFO][28/Sep/2026 19:00:38,873][10840|5532][loganalyzerapi.views|copy_csv_to_model|3967] COPY loaded 577 bytes into loganalyzerapi_logdetail_450c4511_3720_45a8_bc58_88fd40a1f0cb in 0.008s (69.05 KiB/s)
+[INFO][28/Sep/2026 19:00:38,883][10840|5532][loganalyzerapi.views|copy_csv_to_model|3967] COPY loaded 595 bytes into loganalyzerapi_logdetail_450c4511_3720_45a8_bc58_88fd40a1f0cb in 0.010s (57.54 KiB/s)
+[INFO][28/Sep/2026 19:00:38,893][10840|5532][loganalyzerapi.views|copy_csv_to_model|3967] COPY loaded 1219 bytes into loganalyzerapi_logdetail_450c4511_3720_45a8_bc58_88fd40a1f0cb in 0.010s (118.66 KiB/s)
+[INFO][28/Sep/2026 19:02:05,529][9064|308][loganalyzerapi.views|destroy|189] Deleted project 5fb867aa-1e78-45da-873a-fe18b4a2965a in 0.375s (database 0.282s, files 0.093s)

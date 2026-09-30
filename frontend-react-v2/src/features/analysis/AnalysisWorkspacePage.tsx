@@ -9,10 +9,15 @@ import {
   type ProjectSummary,
 } from '@/features/init/service'
 import { fetchPeriod } from './service'
+import { Findings } from './Findings'
+import { clearPreparedAnalysis, takePreparedAnalysis, type PreparedAnalysis } from './prepareAnalysis'
 
 export function AnalysisWorkspacePage() {
   const [params] = useSearchParams()
   const projectId = params.get('project_id') ?? ''
+  const [prepared] = useState(() => takePreparedAnalysis(projectId))
+  const initial = prepared?.projectId === projectId ? prepared : undefined
+  useEffect(() => () => clearPreparedAnalysis(), [])
   return (
     <section className="dense-card analysis-workspace">
       <div className="analysis-heading">
@@ -30,25 +35,25 @@ export function AnalysisWorkspacePage() {
         </span>
       </div>
       <div className="analysis-sections">
-        <Information projectId={projectId} />
-        <Findings projectId={projectId} />
-        <Search projectId={projectId} />
+        <Information projectId={projectId} initial={initial} />
+        <Findings key={projectId} projectId={projectId} initial={initial} />
+        <Search projectId={projectId} initial={initial} />
         <section className="analysis-panel">
           <h2>Charts</h2>
-          <AnalysisChartPage />
+          <AnalysisChartPage initial={initial} />
         </section>
         <section className="analysis-panel">
           <h2>Statistic</h2>
-          <StatisticsPage />
+          <StatisticsPage initial={initial} />
         </section>
       </div>
     </section>
   )
 }
-function Information({ projectId }: { projectId: string }) {
-  const [project, setProject] = useState<ProjectSummary | undefined>()
-  const [files, setFiles] = useState<LogFileSummary[]>([])
-  const [total, setTotal] = useState<string>('-')
+function Information({ projectId, initial }: { projectId: string; initial?: PreparedAnalysis }) {
+  const [project, setProject] = useState<ProjectSummary | undefined>(initial?.project)
+  const [files, setFiles] = useState<LogFileSummary[]>(initial?.files ?? [])
+  const [total, setTotal] = useState<string>(initial ? String(initial.total) : '-')
   const [period, setPeriod] = useState('-')
   const formatDate = (value: unknown) => {
     const text = String(value ?? '').replace(/[^0-9]/g, '')
@@ -62,6 +67,11 @@ function Information({ projectId }: { projectId: string }) {
   }
   useEffect(() => {
     if (!projectId) return
+    if (initial) {
+      const r = initial.period
+      setPeriod(`${formatDate(r.start_date)} ${formatTime(r.start_time)}  ~  ${formatDate(r.end_date)} ${formatTime(r.end_time)}`)
+      return
+    }
     void listProjects().then((r) =>
       setProject((r.results ?? []).find((p) => String(p.project_id) === projectId)),
     )
@@ -78,7 +88,7 @@ function Information({ projectId }: { projectId: string }) {
         ),
       )
       .catch(() => undefined)
-  }, [projectId])
+  }, [projectId, initial])
   const formats =
     Array.from(new Set(files.map((f) => f.file_format).filter(Boolean))).join(', ') || '-'
   return (
@@ -104,56 +114,7 @@ function Information({ projectId }: { projectId: string }) {
     </div>
   )
 }
-function Findings({ projectId }: { projectId: string }) {
-  const [rows, setRows] = useState<Record<string, unknown>[]>([])
-  const [status, setStatus] = useState('Load findings for this project.')
-  const load = async () => {
-    setStatus('Loading...')
-    try {
-      const result = await apiRequest<{ findingsResult?: Record<string, unknown>[] }>({
-        method: 'POST',
-        url: '/logdetail_dynamic/findings/',
-        data: { project_id: projectId, filter: {} },
-      })
-      setRows(result.findingsResult ?? [])
-      setStatus('')
-    } catch {
-      setStatus('Findings API unavailable.')
-    }
-  }
-  return (
-    <div className="analysis-panel">
-      <h2>Findings</h2>
-      <button onClick={() => void load()} disabled={!projectId}>
-        Load findings
-      </button>
-      {status && <p role="status">{status}</p>}
-      {rows.length > 0 && (
-        <div style={{ overflow: 'auto' }}>
-          <table>
-            <thead>
-              <tr>
-                {Object.keys(rows[0]).map((key) => (
-                  <th key={key}>{key}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, i) => (
-                <tr key={i}>
-                  {Object.keys(rows[0]).map((key) => (
-                    <td key={key}>{String(row[key] ?? '')}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  )
-}
-export function Search({ projectId, targetPath = '/analysis', onSearch, isolated = false, eventName = 'elao:analysis-search', title = 'Search' }: { projectId: string; targetPath?: string; onSearch?: (query: Record<string, unknown>) => void; isolated?: boolean; eventName?: string; title?: string }) {
+export function Search({ projectId, targetPath = '/analysis', onSearch, isolated = false, eventName = 'elao:analysis-search', title = 'Search', initial }: { projectId: string; targetPath?: string; onSearch?: (query: Record<string, unknown>) => void; isolated?: boolean; eventName?: string; title?: string; initial?: PreparedAnalysis }) {
   const navigate = useNavigate()
   const urlParams = new URLSearchParams(window.location.search)
   const urlSearch = window.location.search
@@ -168,9 +129,21 @@ export function Search({ projectId, targetPath = '/analysis', onSearch, isolated
   const [keyword, setKeyword] = useState(urlParams.get('searchValue') ?? '')
   const [exclude, setExclude] = useState(urlParams.get('excludeSearch') === 'true')
   const [timeTaken, setTimeTaken] = useState([urlParams.get('ttFromValue') ?? '', urlParams.get('ttToValue') ?? ''])
+  const [searchError, setSearchError] = useState('')
   const initialSearchDone = useRef(false)
   useEffect(() => {
     if (!projectId) return
+    if (initial) {
+      initialSearchDone.current = true
+      setFiles(initial.files)
+      const next = { from: `${initial.period.start_date ?? ''} ${initial.period.start_time ?? ''}`, to: `${initial.period.end_date ?? ''} ${initial.period.end_time ?? ''}` }
+      setPeriod({
+        from: urlParams.get('dateFromValue') && urlParams.get('timeFromValue') ? `${urlParams.get('dateFromValue')} ${urlParams.get('timeFromValue')}` : next.from,
+        to: urlParams.get('dateToValue') && urlParams.get('timeToValue') ? `${urlParams.get('dateToValue')} ${urlParams.get('timeToValue')}` : next.to,
+      })
+      setInitialPeriod(next)
+      return
+    }
     initialSearchDone.current = false
     void listLogFiles(projectId).then((r) => setFiles(r.results ?? []))
     void fetchPeriod(projectId, 'admin')
@@ -188,7 +161,7 @@ export function Search({ projectId, targetPath = '/analysis', onSearch, isolated
   // urlParams is derived from urlSearch; keeping the primitive dependency
   // avoids rerunning this effect on every render.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, urlSearch])
+  }, [projectId, urlSearch, initial])
   useEffect(() => {
     // Step3 enters Analysis with the project's initial values. Dispatch the
     // same event as the Search button once those values are available so the
@@ -225,6 +198,7 @@ export function Search({ projectId, targetPath = '/analysis', onSearch, isolated
     ['S', 'Status'],
   ]
   const initialize = () => {
+    setSearchError('')
     setSelected(instances)
     setPeriod(initialPeriod)
     setCondition('N')
@@ -233,6 +207,16 @@ export function Search({ projectId, targetPath = '/analysis', onSearch, isolated
     setTimeTaken(['', ''])
   }
   const search = (initial?: { instances?: string[]; period?: { from: string; to: string } }) => {
+    const bounds = timeTaken.map((value) => value.trim() === '' ? null : Number(value))
+    if (bounds.some((value) => value !== null && (!Number.isFinite(value) || value < 0))) {
+      setSearchError('TimeTaken은 0 이상의 숫자(ms)를 입력해 주세요.')
+      return
+    }
+    if (bounds[0] !== null && bounds[1] !== null && bounds[0] > bounds[1]) {
+      setSearchError('TimeTaken의 왼쪽 값은 오른쪽 값보다 클 수 없습니다. 조회 범위를 확인해 주세요.')
+      return
+    }
+    setSearchError('')
     const searchInstances = initial?.instances ?? selected
     const searchPeriod = initial?.period ?? period
     const query = new URLSearchParams({
@@ -241,8 +225,8 @@ export function Search({ projectId, targetPath = '/analysis', onSearch, isolated
       searchValue: keyword,
       excludeSearch: String(exclude),
       projectServers: searchInstances.join(','),
-      ttFromValue: timeTaken[0],
-      ttToValue: timeTaken[1],
+      ttFromValue: timeTaken[0].trim(),
+      ttToValue: timeTaken[1].trim(),
       dateFromValue: searchPeriod.from.slice(0, 8),
       dateToValue: searchPeriod.to.slice(0, 8),
       timeFromValue: searchPeriod.from.slice(9),
@@ -360,6 +344,7 @@ export function Search({ projectId, targetPath = '/analysis', onSearch, isolated
           </div>
         </fieldset>
       </div>
+      {searchError && <p role="alert" className="statistic-detail-error">{searchError}</p>}
       <div className="search-actions">
         <button type="button" onClick={initialize}>
           Initialize

@@ -1,10 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { apiRequest } from '@/lib/api/client'
-import { parseProjectFiles, uploadLogFile } from './service'
+import { deleteProject, parseProjectFiles, uploadLogFile } from './service'
 
 vi.mock('@/lib/api/client', () => ({ apiRequest: vi.fn() }))
 beforeEach(() => vi.resetAllMocks())
 describe('legacy upload and parsing contract', () => {
+  it('allows project deletion to wait for active database work', async () => {
+    vi.mocked(apiRequest).mockResolvedValue(undefined)
+    await deleteProject('p1')
+    expect(apiRequest).toHaveBeenCalledWith({ method: 'DELETE', url: '/logmaster/p1/', timeout: 120_000 })
+  })
   it('keeps slash characters in uploaded log formats', async () => {
     vi.mocked(apiRequest).mockResolvedValue({ logfile_id: 'f1' })
     await uploadLogFile('p1', new File(['log'], 'access.log'), 'nginx/main/$request / $status', 'server', 'instance')
@@ -30,5 +35,19 @@ describe('legacy upload and parsing contract', () => {
       vi.mocked(apiRequest).mockResolvedValue(result)
       await expect(parseProjectFiles('p1', ['f1'])).rejects.toThrow('Parsing incomplete')
     }
+  })
+  it('accepts a completed result with less than one percent rejected rows', async () => {
+    const result = { status: 'COMPLETED', source_count: 664076, parsed_count: 664075, stored_count: 664075, rejected_count: 1,
+      files: [{ logfile_id: 'f1', status: 'COMPLETED', parsed_count: 664075, stored_count: 664075 }] }
+    vi.mocked(apiRequest).mockResolvedValue(result)
+    await expect(parseProjectFiles('p1', ['f1'])).resolves.toEqual(result)
+    vi.mocked(apiRequest).mockResolvedValue({ ...result, source_count: 100, parsed_count: 99, stored_count: 99 })
+    await expect(parseProjectFiles('p1', ['f1'])).rejects.toThrow('Parsing incomplete')
+  })
+  it('returns failure details for the blocking results dialog', async () => {
+    const result = { status: 'FAILED', source_count: 100, parsed_count: 99, stored_count: 0, rejected_count: 1,
+      files: [{ logfile_id: 'f1', status: 'FAILED', parsed_count: 99, stored_count: 0 }] }
+    vi.mocked(apiRequest).mockResolvedValue(result)
+    await expect(parseProjectFiles('p1', ['f1'])).resolves.toEqual(result)
   })
 })

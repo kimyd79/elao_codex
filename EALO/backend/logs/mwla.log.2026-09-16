@@ -1,0 +1,2 @@
+[INFO][16/Sep/2026 03:08:12,905][11856|11172][loganalyzerapi.views|copy_csv_to_model|3727] COPY loaded 363285 bytes into loganalyzerapi_logdetail_7663a354_0dd5_4621_a6eb_23f9504b64f4 in 0.100s (3550.67 KiB/s)
+[ERROR][16/Sep/2026 09:16:51,841][11856|15300][loganalyzerapi.views|get_before_after_detail|1025] Error Occured while processing get_before_after_detail : 'logs'

@@ -10,6 +10,7 @@ from loganalyzerapi.models import LogMaster, LogFile, LogDetail, LogDetailV2, Lo
 from loganalyzerapi.serializers import LogMasterSerializer, LogDetailSerializer, LogFileSerializer, LogFormatSerializer, LogFormatStringSerializer, UserSerializer, DynamicLogDetailSerializer, MetricsSerializer, LogMasterMetricSerializer, LogAnalysisJobSerializer, LogDetailV2Serializer
 import hashlib
 import time, uuid, re, csv, io
+from collections import Counter
 
 from datetime import datetime, timezone, timedelta
 from rest_framework.response import Response
@@ -17,8 +18,8 @@ from django.db import transaction, connection
 import pandas as pd
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Sum, Max, Min, Avg, F, Value, CharField, Q
-from django.db.models.functions import Concat, Coalesce, Substr, StrIndex, Length, Right, Left
+from django.db.models import Count, Sum, Max, Min, Avg, F, Value, CharField, Q, Case, When, FloatField
+from django.db.models.functions import Concat, Coalesce, Substr, StrIndex, Length, Right, Left, Mod
 from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -40,6 +41,8 @@ from threading import Thread
 from dynamic_models.models import ModelSchema, FieldSchema
 from loganalyzerapi.parsers import validate_log_line as validate_format_log_line
 from loganalyzerapi.chart_aggregation import status_timeline
+from loganalyzerapi.time_taken_filter import time_taken_filter
+from loganalyzerapi.statistics_indexes import ensure_statistics_indexes
 from loganalyzerapi.analysis_progress import AnalysisProgress, CopyProgressReader
 from django.apps import apps
 from django.db.models.signals import post_save
@@ -48,6 +51,41 @@ from django.conf import settings
 from django.utils import timezone as django_timezone
 import logging
 logger = logging.getLogger(__name__)
+
+
+def _xview_uri(request_value):
+    """Return the URI portion of a conventional HTTP request line."""
+    value = str(request_value or '').strip()
+    parts = value.split()
+    return parts[1] if len(parts) >= 2 else value or '-'
+
+
+def _xview_response_time_ms(value, unit):
+    try:
+        duration = float(value)
+    except (TypeError, ValueError):
+        return None
+    if duration < 0:
+        return None
+    # %T is stored in seconds. The other supported parsers normalize their
+    # duration field to microseconds before COPY insertion.
+    return round(duration * 1000 if unit == 'T' else duration / 1000, 3)
+
+
+def _xview_status_group(value):
+    try:
+        status_code = int(value)
+    except (TypeError, ValueError):
+        return 'other'
+    if 200 <= status_code < 300:
+        return '20x'
+    if 300 <= status_code < 400:
+        return '30x'
+    if 400 <= status_code < 500:
+        return '40x'
+    if 500 <= status_code < 600:
+        return '50x'
+    return 'other'
 
 
 def _separate_dynamic_field_schema_timestamps(sender, **kwargs):
@@ -82,25 +120,80 @@ class LogMasterViewSet(viewsets.ModelViewSet):
     filterset_fields = ['creator', 'project_name']
     search_fields = ['project_name']
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        creator = serializer.validated_data['creator']
+        project_name = serializer.validated_data['project_name']
+        with transaction.atomic():
+            # Serialize creation per account, including simultaneous requests.
+            if connection.vendor == 'postgresql':
+                lock_key = int.from_bytes(
+                    hashlib.sha256(('project-create:' + creator).encode()).digest()[:8],
+                    byteorder='big', signed=True,
+                )
+                with connection.cursor() as cursor:
+                    cursor.execute('SELECT pg_advisory_xact_lock(%s)', [lock_key])
+            if LogMaster.objects.filter(creator=creator, project_name=project_name).exists():
+                return Response(
+                    {'message': '같은 ID에 동일한 이름의 프로젝트가 이미 존재합니다.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=self.get_success_headers(serializer.data))
+
     def destroy(self, request, *args, **kwargs):
         """Delete a project and every project-scoped analysis artifact."""
+        delete_started = time.monotonic()
         instance = self.get_object()
         project_id = str(instance.project_id)
+        files = list(LogFile.objects.filter(project=instance).only(
+            'logfile_id', 'file_object',
+        ))
+        uploaded_files = [
+            (logfile.file_object.storage, logfile.file_object.name)
+            for logfile in files if logfile.file_object.name
+        ]
         try:
             with transaction.atomic():
+                # Analysis takes the same locks while parsing each file. Use
+                # the identical ordering so a table cannot be dropped while a
+                # COPY is still writing to it.
+                if connection.vendor == 'postgresql':
+                    for logfile_id in sorted(str(item.logfile_id) for item in files):
+                        with connection.cursor() as cursor:
+                            cursor.execute(
+                                'SELECT pg_advisory_xact_lock(hashtext(%s))',
+                                [logfile_id],
+                            )
                 try:
                     schema = ModelSchema.objects.get(name='logdetail_' + project_id)
-                    schema.as_model().objects.all().delete()
+                    # DROP TABLE releases all table storage directly. Deleting
+                    # every row first performs the same work twice and makes a
+                    # large project deletion scale with its log count.
                     schema.delete()
                 except ModelSchema.DoesNotExist:
                     pass
-                files = list(LogFile.objects.filter(project=instance))
-                for logfile in files:
-                    # File rows are deleted below by the project cascade, but
-                    # their uploaded blobs require explicit cleanup.
-                    logfile.file_object.delete(save=False)
-                LogDetailV2.objects.filter(logfile__project=instance).delete()
                 self.perform_destroy(instance)
+            database_finished = time.monotonic()
+            # Keep filesystem or remote-storage latency outside the database
+            # transaction so it cannot prolong table and row locks.
+            for storage, file_name in uploaded_files:
+                try:
+                    storage.delete(file_name)
+                except Exception as cleanup_error:
+                    logger.warning(
+                        'Project %s was deleted but uploaded file %s could not be removed: %s',
+                        project_id, file_name, cleanup_error,
+                    )
+            logger.info(
+                'Deleted project %s in %.3fs (database %.3fs, files %.3fs)',
+                project_id,
+                time.monotonic() - delete_started,
+                database_finished - delete_started,
+                time.monotonic() - database_finished,
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as error:
             logger.exception('Failed to delete project %s: %s', project_id, error)
@@ -143,7 +236,7 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             # id 필드로 대체 : logdetail_id
             # ForeignKey 제외 : logfile
             logfile_id = FieldSchema.objects.create(model_schema=logdetail_schema, name='logfile_id', data_type='character', max_length=64, null=True)
-            log_line = FieldSchema.objects.create(model_schema=logdetail_schema, name='log_line', data_type='character', max_length=1000, null=True)
+            log_line = FieldSchema.objects.create(model_schema=logdetail_schema, name='log_line', data_type='text', null=True)
             
             # # Filters
             fyear = FieldSchema.objects.create(model_schema=logdetail_schema, name='fyear', data_type='character', max_length=4, null=True)
@@ -158,10 +251,10 @@ class LogMasterViewSet(viewsets.ModelViewSet):
             ftime = FieldSchema.objects.create(model_schema=logdetail_schema, name='ftime', data_type='character', max_length=6, null=True)
             fdatetime = FieldSchema.objects.create(model_schema=logdetail_schema, name='fdatetime', data_type='character', max_length=14, null=True)
             
-            frequest = FieldSchema.objects.create(model_schema=logdetail_schema, name='frequest', data_type='character', max_length=500, null=True)
+            frequest = FieldSchema.objects.create(model_schema=logdetail_schema, name='frequest', data_type='text', null=True)
             fip = FieldSchema.objects.create(model_schema=logdetail_schema, name='fip', data_type='character', max_length=40, null=True)
-            freferer = FieldSchema.objects.create(model_schema=logdetail_schema, name='freferer', data_type='character', max_length=500, null=True)
-            fuser_agent = FieldSchema.objects.create(model_schema=logdetail_schema, name='fuser_agent', data_type='character', max_length=500, null=True)
+            freferer = FieldSchema.objects.create(model_schema=logdetail_schema, name='freferer', data_type='text', null=True)
+            fuser_agent = FieldSchema.objects.create(model_schema=logdetail_schema, name='fuser_agent', data_type='text', null=True)
             fstatus = FieldSchema.objects.create(model_schema=logdetail_schema, name='fstatus', data_type='character', max_length=10, null=True)
             
             # ftime_taken = models.IntegerField(default=0)
@@ -276,7 +369,7 @@ class LogFileViewSet(viewsets.ModelViewSet):
                 inferred[index] = '%t'
             elif column and all(request.match(value or '') for value in column):
                 inferred[index] = '%r'
-            elif column and all(value.isdigit() and 100 <= int(value) <= 599 for value in column):
+            elif column and all(re.fullmatch(r'[0-9]{3}', value or '') for value in column):
                 inferred[index] = '%>s'
         # Apache's first three identity columns have fixed positions when
         # represented as '-', but do not guess non-placeholder values.
@@ -289,7 +382,7 @@ class LogFileViewSet(viewsets.ModelViewSet):
         if '%r' not in inferred and width > 4 and inferred[4] == '%X':
             inferred[4] = '%r'
         if status_index is None and width > 5 and all(
-                value.isdigit() and 100 <= int(value) <= 599 for value in values[5]):
+                re.fullmatch(r'[0-9]{3}', value or '') for value in values[5]):
             inferred[5] = '%>s'
             status_index = 5
         if status_index is not None:
@@ -767,17 +860,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 logger.debug('Date and Time applied!')
         
         # Time-taken : Between
-        if (ttFromValue is not None) and (ttToValue is not None):
+        if (ttFromValue is not None) or (ttToValue is not None):
             # Time Unit 구분 : %T -> ms / 1000, %D (micros) -> ms * 1000            
-            if timeTakenUnit == 'D':        # microsecond
-                ttFromValue = int(ttFromValue) * 1000
-                ttToValue   = int(ttToValue) * 1000                 
-            elif timeTakenUnit == 'T':      # second
-                ttFromValue = int(ttFromValue) / 1000
-                ttToValue = int(ttToValue) / 1000
             # IIS, Nginx : ms 단위이므로 환산이 불필요하다.
                     
-            queryset = queryset.filter(ftime_taken__range=(ttFromValue, ttToValue))
+            queryset = queryset.filter(**time_taken_filter(ttFromValue, ttToValue, timeTakenUnit))
             
             if settings.DEBUG:
                 logger.debug('Time-taken applied!')
@@ -1027,6 +1114,44 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             response = {'message': 'get_before_after_detail creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+    @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated])
+    def operational_findings(self, request, pk=None):
+        from .operational_findings import build_findings
+        from rest_framework.exceptions import ValidationError
+        started = time.perf_counter()
+        project_id = request.data.get('project_id')
+        try:
+            project_id = str(uuid.UUID(str(project_id)))
+        except (ValueError, TypeError):
+            raise ValidationError('Valid project_id is required')
+        filters = request.data.get('filter', {})
+        if not isinstance(filters, dict):
+            raise ValidationError('filter must be an object')
+        log_context = dict(project_id=project_id,
+                           date_from=filters.get('dateFromValue'), time_from=filters.get('timeFromValue'),
+                           date_to=filters.get('dateToValue'), time_to=filters.get('timeToValue'),
+                           server_count=len(filters.get('projectServers', []))
+                           if isinstance(filters.get('projectServers'), list) else None,
+                           condition=filters.get('conditionValue'), has_keyword=bool(filters.get('searchValue')),
+                           has_time_filter=any(filters.get(key) not in (None, '')
+                                               for key in ('ttFromValue', 'ttToValue')))
+        logger.info('Operational findings request started: %s', log_context)
+        try:
+            with transaction.atomic():
+                if connection.vendor == 'postgresql':
+                    with connection.cursor() as cursor:
+                        cursor.execute("SET LOCAL statement_timeout = '15000ms'")
+                        cursor.execute('SET LOCAL jit = off')
+                result = build_findings(request.user, project_id, filters)
+        except Exception:
+            logger.exception('Operational findings request failed after %.3fs: %s',
+                             time.perf_counter()-started, log_context)
+            raise
+        logger.info('Operational findings request completed in %.3fs: project_id=%s total=%s buckets=%s',
+                    time.perf_counter()-started, project_id, result.get('total'),
+                    result.get('scope', {}).get('bucket_seconds'))
+        return Response(result)
 
     @action(methods=['post'], detail=False)
     def findings(self, request, pk=None):
@@ -1393,6 +1518,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
 
             type = request.data['type']
             N = request.data['N']
+            include_total = request.data.get('include_total', True) is not False
             intN = int(N)
             strN = str(N)
             
@@ -1411,16 +1537,33 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             
             start_time = time.time()
             
-            logfiles = LogFile.objects.filter(project_id=project_id).values('logfile_id')            
+            logfiles = LogFile.objects.filter(project_id=project_id).values(
+                'logfile_id', 'file_format'
+            )
             list_logfile_id = []         
             
             # logfile id 가져오기
             for logfile in logfiles:    # Loop 시작구간
                 list_logfile_id.append(str(logfile['logfile_id']))
-                timetakenUnit = self.getTimetakenUnit(str(logfile['logfile_id']))           
-            
-            queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by('fdatetime')
-            totalCnt = queryset.count()
+                file_format = logfile['file_format'] or ''
+                if ('D' in file_format or 'request_time' in file_format
+                        or 'time-taken' in file_format):
+                    timetakenUnit = 'D'
+                elif 'T' in file_format:
+                    timetakenUnit = 'T'
+                else:
+                    timetakenUnit = 'D'
+
+            # Aggregations do not need the model's default row ordering. Clear
+            # it to avoid unnecessary sorts on large project tables.
+            queryset = queryset.filter(logfile_id__in=list_logfile_id).order_by()
+            # These result types do not display percentages, and type 8 uses
+            # a byte sum as its denominator. Avoid a redundant full-table
+            # COUNT for them.
+            totalCnt = (
+                None if not include_total or type in (4, 8, 10, 11)
+                else queryset.count()
+            )
 
             #type=0. 전체 처리량(건수)
             if type == 0:
@@ -1778,6 +1921,120 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     
             response = {'message': 'statistics creation failed.'}            
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(methods=['post'], detail=False)
+    def xview(self, request, pk=None):
+        """Return every matching point, refusing selections above one million."""
+        try:
+            project_id = str(request.data['project_id'])
+            uri_limit = min(100, max(5, int(request.data.get('uri_limit', 20))))
+            queryset = self.get_queryset().filter(ftime_taken__gte=0)
+            uri_queryset = queryset
+            selected_uri = request.data.get('filter', {}).get('xview_uri')
+            if selected_uri:
+                queryset = queryset.filter(Q(frequest=selected_uri) | Q(
+                    frequest__regex=r'^\S+\s+' + re.escape(selected_uri) + r'(\s|$)'
+                ))
+            total_points = queryset.count()
+            if total_points > 1_000_000:
+                return Response({
+                    'message': '조회 데이터가 100만 건을 초과합니다. 검색조건을 설정하여 조회 데이터를 줄여 주세요.',
+                    'limit_exceeded': True, 'total_count': total_points,
+                    'displayed_count': 0, 'points': [], 'uris': [],
+                    'sampled': False, 'sample_stride': 1,
+                })
+
+            unit_by_logfile = {}
+            for logfile in LogFile.objects.filter(project_id=project_id).values(
+                'logfile_id', 'file_format'
+            ):
+                file_format = logfile['file_format'] or ''
+                unit_by_logfile[str(logfile['logfile_id'])] = (
+                    'T' if '%T' in file_format else 'D'
+                )
+
+            # Aggregate on the database first, then merge method/protocol
+            # variants that resolve to the same URI.
+            uri_counts = Counter()
+            grouped_requests = uri_queryset.values('frequest').annotate(
+                count=Count('id')
+            ).order_by('-count')[:max(2000, uri_limit * 20)]
+            for row in grouped_requests:
+                uri_counts[_xview_uri(row['frequest'])] += row['count']
+
+            raw_points = queryset.order_by('fdatetime', 'id').values(
+                'fdatetime', 'ftime_taken', 'fstatus', 'logfile_id'
+            ).iterator(chunk_size=10000)
+
+            points = []
+            for row in raw_points:
+                unit = unit_by_logfile.get(str(row['logfile_id']), 'D')
+                response_time = _xview_response_time_ms(row['ftime_taken'], unit)
+                if response_time is None:
+                    continue
+                points.append({
+                    'time': row['fdatetime'],
+                    'response_time_ms': response_time,
+                    'status_group': _xview_status_group(row['fstatus']),
+                })
+
+            response = {
+                'message': 'xview returned successfully',
+                'uris': [
+                    {'uri': uri, 'count': count}
+                    for uri, count in uri_counts.most_common(uri_limit)
+                ],
+                'points': points,
+                'total_count': total_points,
+                'displayed_count': len(points),
+                'sampled': False,
+                'sample_stride': 1,
+                'limit_exceeded': False,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as ex:
+            logger.exception('Error while creating X-View data: %s', ex)
+            return Response(
+                {'message': 'xview creation failed.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+    @action(methods=['post'], detail=False)
+    def xview_details(self, request, pk=None):
+        from rest_framework.exceptions import ValidationError
+        bounds = request.data.get('bounds', {})
+        ordering = request.data.get('ordering', 'fdatetime')
+        allowed_ordering = {'fdatetime', 'fdate', 'ftime', 'fip', 'frequest', 'fstatus', 'fbyte', 'xview_ms'}
+        if not isinstance(ordering, str) or ordering.removeprefix('-') not in allowed_ordering:
+            raise ValidationError('Invalid sort column.')
+        try:
+            start, end = bounds['start'], bounds['end']
+            datetime.strptime(start, '%Y%m%d%H%M%S')
+            datetime.strptime(end, '%Y%m%d%H%M%S')
+            lower, upper = float(bounds['lower']), float(bounds['upper'])
+            limit = min(100, max(1, int(request.data.get('limit', 20))))
+            offset = max(0, int(request.data.get('offset', 0)))
+            if start > end or not all(math.isfinite(v) for v in (lower, upper)) or lower < 0 or lower > upper:
+                raise ValueError()
+        except (KeyError, ValueError, TypeError):
+            raise ValidationError('Invalid X-View selection.')
+        queryset = self.get_queryset()
+        selected_uri = request.data.get('filter', {}).get('xview_uri')
+        if selected_uri:
+            queryset = queryset.filter(Q(frequest=selected_uri) | Q(
+                frequest__regex=r'^\S+\s+' + re.escape(selected_uri) + r'(\s|$)'
+            ))
+        seconds = [str(f.logfile_id) for f in LogFile.objects.filter(
+            project_id=request.data['project_id']) if '%T' in (f.file_format or '')]
+        queryset = queryset.annotate(xview_ms=Case(
+            When(logfile_id__in=seconds, then=F('ftime_taken') * Value(1000.0)),
+            default=F('ftime_taken') / Value(1000.0), output_field=FloatField(),
+        )).filter(fdatetime__range=(start, end), xview_ms__range=(lower, upper))
+        count = queryset.count()
+        rows = list(queryset.order_by(ordering, 'id').values(
+            'id', 'fdate', 'ftime', 'fip', 'frequest', 'fstatus', 'fbyte', 'xview_ms'
+        )[offset:offset + limit])
+        return Response({'count': count, 'results': rows})
 
     # For Statistics - chartdata    
     @action(methods=['post'], detail=False)
@@ -2467,6 +2724,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
         advisory_locks = []
         processed_logfile_ids = []
         LogDetail_dynamic = None
+        failure_report = None
         self.analysis_progress = None
         
         try:
@@ -2539,24 +2797,33 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         logfile_id=logfile_id
                     ).count()
                     analysis_job = analysis_jobs[str(logfile_id)]
+                    previous_job = LogAnalysisJob.objects.filter(
+                        logfile_id=logfile_id, status__in=['COMPLETED', 'PARTIAL'],
+                    ).exclude(job_id=analysis_job.job_id).order_by('-created').first()
+                    rejected_count = max(
+                        LogParseReject.objects.filter(logfile_id=logfile_id).count(),
+                        previous_job.rejected_count if previous_job else 0,
+                    )
+                    source_count = existing_count + rejected_count
                     LogAnalysisJob.objects.filter(
                         job_id=analysis_job.job_id
                     ).update(
                         status='COMPLETED',
-                        source_count=existing_count,
+                        source_count=source_count,
                         parsed_count=existing_count,
-                        rejected_count=0,
+                        rejected_count=rejected_count,
                         stored_count=existing_count,
                         finished=datetime.now(timezone.utc),
                     )
                     file_results.append({
                         'job_id': str(analysis_job.job_id),
                         'logfile_id': str(logfile_id),
-                        'source_count': existing_count,
+                        'source_count': source_count,
                         'parsed_count': existing_count,
-                        'rejected_count': 0,
+                        'rejected_count': rejected_count,
                         'stored_count': existing_count,
                         'status': 'ALREADY_COMPLETED',
+                        **self.parse_failure_details(locked_logfiles[str(logfile_id)], rejected_count),
                     })
                     
                 else:                  
@@ -2697,14 +2964,39 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         logfile_id=logfile_id
                     ).count()
                     self.analysis_progress.report('VERIFYING')
-                    if stored_count != validation['parsed_count']:
+                    missing_count = validation['source_count'] - stored_count
+                    if (stored_count > validation['parsed_count'] or
+                            missing_count < 0 or
+                            (missing_count and
+                             missing_count * 100 >= validation['source_count'])):
+                        failure_report = {
+                            'status': 'FAILED',
+                            'source_count': validation['source_count'],
+                            'parsed_count': stored_count,
+                            'stored_count': 0,
+                            'rejected_count': max(missing_count, 0),
+                            'files': [{
+                                'logfile_id': str(logfile_id),
+                                'status': 'FAILED',
+                                'source_count': validation['source_count'],
+                                'parsed_count': stored_count,
+                                'stored_count': 0,
+                                'rejected_count': max(missing_count, 0),
+                                **self.parse_failure_details(logfile_model, max(missing_count, 0)),
+                            }],
+                        }
                         raise ValueError(
-                            'Stored row count does not match parsed row count: '
-                            '%s != %s' % (
-                                stored_count,
-                                validation['parsed_count'],
+                            'Log row loss must be below 1%%: '
+                            'source=%s, parsed=%s, stored=%s, missing=%s' % (
+                                validation['source_count'], validation['parsed_count'],
+                                stored_count, missing_count,
                             )
                         )
+                    if missing_count:
+                        logger.warning('Accepted log row loss below 1%%: source=%s, stored=%s, missing=%s',
+                                       validation['source_count'], stored_count, missing_count)
+                    validation['parsed_count'] = stored_count
+                    validation['rejected_count'] = missing_count
                     v2_count = 0
                     v2_comparison = {'matches': True, 'differences': {}}
                     if settings.LOG_STORAGE_MODE in {'dual', 'v2'}:
@@ -2725,10 +3017,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                                 % v2_comparison['differences']
                             )
                     analysis_job = analysis_jobs[str(logfile_id)]
-                    job_status = (
-                        'PARTIAL'
-                        if validation['rejected_count'] else 'COMPLETED'
-                    )
+                    job_status = 'COMPLETED'
                     LogAnalysisJob.objects.filter(
                         job_id=analysis_job.job_id
                     ).update(
@@ -2748,14 +3037,26 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                         'stored_count': stored_count,
                         'v2_count': v2_count,
                         'v2_comparison': v2_comparison,
-                        'status': (
-                            'PARTIAL'
-                            if validation['rejected_count'] else 'COMPLETED'
-                        ),
+                        'status': job_status,
+                        **self.parse_failure_details(logfile_model, missing_count),
                     })
                     
                 # End Loop for each logfile_id
-                    
+
+                if processed_logfile_ids:
+                    try:
+                        # Build once after COPY rather than maintaining seven
+                        # indexes during bulk ingestion. Existing indexes are
+                        # retained and this also refreshes planner statistics.
+                        ensure_statistics_indexes(LogDetail_dynamic)
+                    except Exception:
+                        # Parsed log data remains valid even if an operator
+                        # must run optimize_statistics_indexes separately.
+                        logger.exception(
+                            'Statistics index creation failed for project %s',
+                            project_id,
+                        )
+
                 if settings.DEBUG:
                     logger.debug("To DB, Total Duration : %s sec" % (time.time() - start))
                 
@@ -2775,12 +3076,7 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     'stored_count': sum(
                         item['stored_count'] for item in file_results
                     ),
-                    'status': (
-                        'PARTIAL'
-                        if any(
-                            item['rejected_count'] for item in file_results
-                        ) else 'COMPLETED'
-                    ),
+                    'status': 'COMPLETED',
                 }
                 
             return Response(response, status = status.HTTP_200_OK)
@@ -2808,6 +3104,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 )
             
             response = {'message': 'logdetail creation failed.'}            
+            if failure_report is not None:
+                response.update(failure_report)
             return Response(response, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
         finally:
             if self.analysis_progress:
@@ -2837,6 +3135,28 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 )
         
     # app/was 로그 파싱(log4j)
+    def parse_failure_details(self, logfile, rejected_count):
+        rejects = LogParseReject.objects.filter(logfile=logfile)
+        reasons = list(rejects.values('error_code', 'error_message').annotate(count=Count('id')).order_by('-count', 'error_code'))
+        known_count = sum(item['count'] for item in reasons)
+        if rejected_count > known_count:
+            reasons.append({
+                'error_code': 'parser_row_loss',
+                'error_message': 'Rows were omitted during parsing or storage; original lines could not be identified.',
+                'count': rejected_count - known_count,
+            })
+        samples = []
+        for item in rejects.order_by('line_number').values('line_number', 'error_code', 'error_message', 'raw_line')[:5]:
+            raw = item.pop('raw_line')
+            excerpt = raw if len(raw) <= 500 else raw[:250] + ' … ' + raw[-250:]
+            item['raw_line_excerpt'] = ''.join(
+                char if char.isprintable() else '\\x%02x' % ord(char)
+                for char in excerpt
+            )
+            item['truncated'] = len(raw) > 500
+            samples.append(item)
+        return {'file_name': logfile.file_name, 'failure_reasons': reasons, 'failure_samples': samples}
+
     def prepare_validated_logfile(self, logfile_name, logfile_model, output_dir):
         """Write valid input rows to a temporary file and describe rejects."""
         progress = getattr(self, 'analysis_progress', None)
@@ -2883,11 +3203,11 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                 error = self.validate_log_line(
                     line, logfile_model.format_kind, logfile_model.format_name,
                     format_index, expected_count,
-                )
+                ) if '\0' not in line else ('invalid_nul', 'Log line contains NUL bytes')
                 if error is not None:
                     rejects.append({
                         'line_number': line_number,
-                        'raw_line': line,
+                        'raw_line': line.replace('\0', '\\0'),
                         'error_code': error[0],
                         'error_message': error[1],
                     })
@@ -2962,9 +3282,9 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
             format_kind, ('s', 'b', 'D' if 'D' in format_index else 'T')
         )
         try:
-            status_value = int(tokens[format_index[status_key]])
-            if status_value < 100 or status_value > 599:
-                raise ValueError('HTTP status is outside 100..599')
+            status_value = tokens[format_index[status_key]]
+            if re.fullmatch(r'[0-9]{3}', status_value) is None:
+                raise ValueError('HTTP status must be exactly three digits')
         except (KeyError, IndexError, ValueError) as error:
             return ('invalid_status', str(error))
 
@@ -3438,6 +3758,8 @@ class DynamicLogDetailViewSet(viewsets.ModelViewSet):
                     format_index['Referer'] = index
                 elif tmp.find('User-Agent') != -1:
                     format_index['User-Agent'] = index
+                elif tmp.find('Cookie') != -1:
+                    format_index['Cookie'] = index
                 elif tmp.find('X-Forwarded-For') != -1:
                     format_index['X-Forwarded-For'] = index                    
                 elif "%h" in tmp:

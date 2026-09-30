@@ -18,12 +18,13 @@ export function AppShell() {
           <NavLink to="/lookup" className="app-nav-link">
             Lookup
           </NavLink>
-          <NavLink to={pathname === '/detail' || pathname === '/analysis' ? `/analysis${search}` : '/analysis'} className="app-nav-link">
+          <NavLink to={['/detail', '/analysis', '/x-view'].includes(pathname) ? `/analysis${search}` : '/analysis'} className="app-nav-link">
             Analysis
           </NavLink>
-          <NavLink to={pathname === '/analysis' ? `/detail${search}` : '/detail'} className="app-nav-link">
+          <NavLink to={['/analysis', '/x-view'].includes(pathname) ? `/detail${search}` : '/detail'} className="app-nav-link">
             Detail
           </NavLink>
+          <NavLink to={`/x-view${search}`} className="app-nav-link">X-View</NavLink>
           <NavLink to={`/comparison_chart${search}`} className="app-nav-link">Comparison-Chart</NavLink>
           <NavLink to={`/comparison_statistic${search}`} className="app-nav-link">Comparison-Statistic</NavLink>
         </nav>
@@ -35,7 +36,7 @@ export function AppShell() {
           </button>
         </div>
       </header>
-      <main className={`dense-main${['/analysis', '/detail', '/comparison_chart', '/comparison_statistic'].includes(pathname) ? ' dense-main-fluid' : ''}`}>
+      <main className={`dense-main${['/analysis', '/detail', '/x-view', '/comparison_chart', '/comparison_statistic'].includes(pathname) ? ' dense-main-fluid' : ''}`}>
         <Outlet />
       </main>
     </div>

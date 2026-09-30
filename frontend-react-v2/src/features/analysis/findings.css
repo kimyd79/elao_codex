@@ -1,0 +1,15 @@
+.finding-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.finding-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; margin: 16px 0; }
+.finding-card { min-width: 0; padding: 18px; border: 1px solid #dce1ed; border-radius: 10px; background: #fff; }
+.finding-card h3 { margin: 0; font-size: 16px; }
+.finding-card h4 { margin-bottom: 8px; }
+.finding-card p, .finding-card li { font-size: 13px; line-height: 1.7; }
+.finding-status { padding: 4px 9px; border-radius: 5px; font-size: 12px; background: #edf1f8; white-space: nowrap; }
+.finding-status.detected { background: #fff0d6; color: #845300; }
+.finding-status.clear { background: #e6f4eb; color: #24653c; }
+.finding-status.insufficient { color: #555; }
+.finding-evidence details { margin: 10px 0; }
+.finding-metric { display: inline-block; margin: 4px 12px 4px 0; font-size: 13px; }
+.finding-table { overflow: auto; max-height: 340px; margin-top: 8px; }
+.finding-table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.finding-table th, .finding-table td { text-align: left; padding: 8px; border-bottom: 1px solid #e1e5ed; overflow-wrap: anywhere; min-width: 90px; max-width: 350px; }

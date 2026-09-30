@@ -1,0 +1,155 @@
+{
+  "file_id": "69ccabe3-9dd0-4e6d-bc90-96f51a34580d",
+  "filename": "HOM1-W-F11_500MB.log",
+  "source_bytes": 524951980,
+  "storage_mode": "dynamic",
+  "rounds": [
+    {
+      "run": 1,
+      "source_count": 664076,
+      "valid_count": 664075,
+      "reject_count": 1,
+      "csv_bytes": 1027476689,
+      "pandas_read_seconds": [
+        6.238352499902248,
+        8.270336400019005
+      ],
+      "stored_count": 664075,
+      "wall_seconds": 96.45636640000157,
+      "seconds": {
+        "REPLAY_PREPARATION": 5.7776574997697026,
+        "REJECT_PERSISTENCE": 0.0041108999866992235,
+        "AFTER_VALIDATION": 0.10565539984963834,
+        "CSV_WRITE": 28.84336160006933,
+        "PARSING": 51.98416580003686,
+        "TRANSFORM_OTHER": 8.63211530004628,
+        "DB_SETUP": 0.21687230002135038,
+        "COPY": 31.552303100004792,
+        "VERIFYING": 6.693347800057381,
+        "ROLLBACK": 0.12539179995656013
+      },
+      "pipeline_seconds": 90.22981670009904
+    },
+    {
+      "run": 2,
+      "source_count": 664076,
+      "valid_count": 664075,
+      "reject_count": 1,
+      "csv_bytes": 1027476689,
+      "pandas_read_seconds": [
+        5.893986899871379,
+        8.247326799901202
+      ],
+      "stored_count": 664075,
+      "wall_seconds": 89.18988439999521,
+      "seconds": {
+        "REPLAY_PREPARATION": 5.242549899965525,
+        "REJECT_PERSISTENCE": 0.00292569980956614,
+        "AFTER_VALIDATION": 0.09636419988237321,
+        "CSV_WRITE": 28.730199600104243,
+        "PARSING": 51.189304100116715,
+        "TRANSFORM_OTHER": 8.31779080023989,
+        "DB_SETUP": 0.007817700039595366,
+        "COPY": 31.58403189992532,
+        "VERIFYING": 0.9395113999489695,
+        "ROLLBACK": 0.12964339996688068
+      },
+      "pipeline_seconds": 83.712847399991
+    }
+  ],
+  "replay_rejects": true,
+  "method": "Actual full-file parser; isolated logged PostgreSQL table with copied indexes; COPY transaction rolled back. Progress UPDATE uses a nonexistent job UUID. No production rows changed.",
+  "validation_profile": {
+    "sample_lines": 2000,
+    "total_profiled_seconds": 2.734496899999999,
+    "functions": [
+      {
+        "file": "parsers.py",
+        "line": 49,
+        "function": "validate_log_line",
+        "calls": 2000,
+        "self_seconds": 0.017620800000000002,
+        "cumulative_seconds": 2.7344652000000003
+      },
+      {
+        "file": "shlex.py",
+        "line": 305,
+        "function": "split",
+        "calls": 2000,
+        "self_seconds": 0.0193527,
+        "cumulative_seconds": 2.6247311
+      },
+      {
+        "file": "shlex.py",
+        "line": 133,
+        "function": "read_token",
+        "calls": 38000,
+        "self_seconds": 1.9409143000000002,
+        "cumulative_seconds": 2.541424
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method strptime>",
+        "calls": 2000,
+        "self_seconds": 0.0069985,
+        "cumulative_seconds": 0.08936300000000001
+      },
+      {
+        "file": "_strptime.py",
+        "line": 650,
+        "function": "_strptime_datetime",
+        "calls": 2000,
+        "self_seconds": 0.006608200000000001,
+        "cumulative_seconds": 0.08236450000000001
+      },
+      {
+        "file": "_strptime.py",
+        "line": 392,
+        "function": "_strptime",
+        "calls": 2000,
+        "self_seconds": 0.035649,
+        "cumulative_seconds": 0.0757563
+      }
+    ]
+  },
+  "validation_component_timing": {
+    "sample_lines": 2000,
+    "runs": [
+      {
+        "total_seconds": 1.4809486998710781,
+        "shlex_split": 1.4183694019448012,
+        "datetime_strptime": 0.04902650509029627,
+        "other_seconds": 0.013552792835980654
+      },
+      {
+        "total_seconds": 1.4738364999648184,
+        "shlex_split": 1.4143989013973624,
+        "datetime_strptime": 0.04611330176703632,
+        "other_seconds": 0.013324296800419688
+      },
+      {
+        "total_seconds": 1.4766222999896854,
+        "shlex_split": 1.4162265055347234,
+        "datetime_strptime": 0.04692760086618364,
+        "other_seconds": 0.013468193588778377
+      }
+    ]
+  },
+  "full_validation_scan": {
+    "reading_seconds": 2.428,
+    "validating_seconds": 523.279,
+    "runs": 1,
+    "source": "Full-file perf_counter phase timing from first invocation; harness stopped after validation because it initially did not support rejected rows. Subsequent stages were measured separately with the persisted rejected line excluded and its raw content verified."
+  },
+  "limitations": [
+    "Stage total is the sum of separately measured stages, not a single uninterrupted request.",
+    "COPY uses an empty isolated logged table with copied indexes and rolls back; existing production table size, concurrent load, lock wait, commit and HTTP overhead are not reproduced.",
+    "Validation component percentages cover the sampled line validator, not the entire validation file loop."
+  ],
+  "post_measurement_audit": {
+    "remaining_measurement_tables": 0,
+    "original_stored_count": 664075,
+    "original_reject_count": 1
+  }
+}

@@ -11,6 +11,7 @@ export type LogQuery = {
   cursor?: string | null
   limit?: number
   offset?: number
+  condition?: string
   search?: string
   excludeSearch?: boolean
   dateFrom?: string
@@ -20,6 +21,8 @@ export type LogQuery = {
   ttFrom?: string
   ttTo?: string
   server?: string
+  detailCondition?: string
+  detailSearch?: string
 }
 export type LogPage = {
   results?: LogRow[]
@@ -37,6 +40,7 @@ export async function fetchLogs(query: LogQuery, signal?: AbortSignal) {
     offset: query.offset ?? undefined,
     // Empty icontains values are interpreted as no matches by the legacy
     // dynamic endpoint, so omit inactive filters entirely.
+    conditionValue: query.condition && query.condition !== 'N' ? query.condition : undefined,
     searchValue: query.search || undefined,
     excludeSearch: query.excludeSearch ? true : undefined,
     dateFromValue: query.dateFrom,
@@ -46,6 +50,8 @@ export async function fetchLogs(query: LogQuery, signal?: AbortSignal) {
     ttFromValue: query.ttFrom,
     ttToValue: query.ttTo,
     projectServers: query.server,
+    detailconditionValue: query.detailCondition,
+    detailsearchValue: query.detailSearch,
   }
   return apiRequest<LogPage>({ method: 'GET', url: '/logdetail_dynamic/', params, signal })
 }

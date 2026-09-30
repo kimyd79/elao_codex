@@ -1,0 +1,106 @@
+{
+  "file_id": "69ccabe3-9dd0-4e6d-bc90-96f51a34580d",
+  "filename": "HOM1-W-F11_500MB.log",
+  "source_bytes": 524951980,
+  "storage_mode": "dynamic",
+  "rounds": [
+    {
+      "run": 1,
+      "source_count": 664076,
+      "valid_count": 664075,
+      "reject_count": 1,
+      "baseline_validation_equivalent": true,
+      "validated_sha256": "a3947d9f25c826c2bc38b852c5d3c5b6d06bfdb1c016e40bf5039181c51d5f4f",
+      "csv_bytes": 1027476689,
+      "pandas_read_seconds": [
+        5.917862500064075,
+        8.19003689987585
+      ],
+      "stored_count": 664075,
+      "wall_seconds": 181.06208179984242,
+      "seconds": {
+        "READING": 2.4015295999124646,
+        "VALIDATING": 86.70391419995576,
+        "REJECT_PERSISTENCE": 0.003964300034567714,
+        "AFTER_VALIDATION": 7.148232199950144,
+        "CSV_WRITE": 28.91098319995217,
+        "PARSING": 51.21781360008754,
+        "TRANSFORM_OTHER": 8.198931000195444,
+        "DB_SETUP": 0.009133900050073862,
+        "COPY": 32.51649299985729,
+        "VERIFYING": 0.9467471002135426,
+        "ROLLBACK": 0.11742969998158514
+      },
+      "pipeline_seconds": 173.7864975000266
+    }
+  ],
+  "replay_rejects": false,
+  "method": "Actual full-file parser; isolated logged PostgreSQL table with copied indexes; COPY transaction rolled back. Progress UPDATE uses a nonexistent job UUID. No production rows changed.",
+  "validation_profile": {
+    "sample_lines": 2000,
+    "total_profiled_seconds": 0.3519498999999999,
+    "functions": [
+      {
+        "file": "parsers.py",
+        "line": 74,
+        "function": "validate_log_line",
+        "calls": 2000,
+        "self_seconds": 0.0120002,
+        "cumulative_seconds": 0.35190940000000004
+      },
+      {
+        "file": "parsers.py",
+        "line": 21,
+        "function": "split_log_fields",
+        "calls": 2000,
+        "self_seconds": 0.011725500000000002,
+        "cumulative_seconds": 0.2655149
+      },
+      {
+        "file": "shlex.py",
+        "line": 305,
+        "function": "split",
+        "calls": 176,
+        "self_seconds": 0.0019102000000000001,
+        "cumulative_seconds": 0.20142110000000002
+      },
+      {
+        "file": "shlex.py",
+        "line": 133,
+        "function": "read_token",
+        "calls": 3344,
+        "self_seconds": 0.1478771,
+        "cumulative_seconds": 0.1936362
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method strptime>",
+        "calls": 2000,
+        "self_seconds": 0.0051574,
+        "cumulative_seconds": 0.0721267
+      },
+      {
+        "file": "_strptime.py",
+        "line": 650,
+        "function": "_strptime_datetime",
+        "calls": 2000,
+        "self_seconds": 0.0051843,
+        "cumulative_seconds": 0.06696930000000001
+      },
+      {
+        "file": "_strptime.py",
+        "line": 392,
+        "function": "_strptime",
+        "calls": 2000,
+        "self_seconds": 0.0314446,
+        "cumulative_seconds": 0.06178500000000001
+      }
+    ]
+  },
+  "post_measurement_audit": {
+    "remaining_measurement_tables": 0,
+    "original_stored_count": 664075,
+    "original_reject_count": 1
+  }
+}

@@ -4,6 +4,8 @@ import { useAuth } from '@/app/auth'
 import { DenseTabs } from '@/components/tabs/DenseTabs'
 import { AddLogFormatDialog } from './AddLogFormatDialog'
 import { ParsingProgress } from './ParsingProgress'
+import { ParseResultDialog } from './ParseResultDialog'
+import { prepareAnalysis } from '@/features/analysis/prepareAnalysis'
 import { FormatDetectionDialog, type Candidate as FormatCandidate } from './FormatDetectionDialog'
 import {
   createDynamicLogDetail,
@@ -20,6 +22,7 @@ import {
   parseProjectFiles,
   type LogFormatSummary,
   type ProjectSummary,
+  type ParseResult,
 } from './service'
 import { initialInitState, initSteps, moveStep, stepIndex, type InitState } from './state'
 
@@ -46,6 +49,7 @@ export function InitPage() {
   const [pending, setPending] = useState(false)
   const [parsing, setParsing] = useState(false)
   const [analysisRunId, setAnalysisRunId] = useState('')
+  const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [formatDetection, setFormatDetection] = useState<FormatDetectionResult | null>(null)
   const [inferredFormat, setInferredFormat] = useState<FormatCandidate | null>(null)
   const uploadedFiles = useRef(new Map<File, string>())
@@ -110,8 +114,8 @@ export function InitPage() {
       update({ projectId: String(p.project_id) })
       setStatus('Project and dynamic schema created.')
       return true
-    } catch {
-      setStatus('Project creation failed.')
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Project creation failed.')
       return false
     } finally {
       setPending(false)
@@ -129,7 +133,7 @@ export function InitPage() {
         const registered = await listLogFiles(state.projectId)
         const result = await parseProjectFiles(state.projectId, (registered.results ?? []).map((file) => String(file.logfile_id)), runId)
         setStatus(`${result.stored_count.toLocaleString()} log lines stored.`)
-        navigate(`/analysis?project_id=${encodeURIComponent(state.projectId)}`)
+        setParseResult(result)
       } catch (error) {
         setStatus(error instanceof Error ? error.message : 'Parsing failed. Stay on Step3 and retry.')
       } finally {
@@ -580,6 +584,10 @@ export function InitPage() {
         {pending && !parsing && <button onClick={() => controller.current?.abort()}>Cancel</button>}
       </div>
     </section>
+    {parseResult && <ParseResultDialog result={parseResult} onClose={() => setParseResult(null)} onContinue={async (onProgress) => {
+      await prepareAnalysis(state.projectId, onProgress)
+      navigate(`/analysis?project_id=${encodeURIComponent(state.projectId)}`)
+    }} />}
     <FormatDetectionDialog
       open={formatDetection !== null}
       sampleCount={formatDetection?.sample_count ?? 0}
